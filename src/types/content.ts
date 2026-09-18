@@ -47,3 +47,19 @@ export type Program = {
   /** Whether this shows in the homepage impact module. */
   featured: boolean;
 };
+
+export type ImpactReport = {
+  /** URL slug, used to build /impact/[id] */
+  id: string;
+  title: string;
+  /** e.g. "January–December 2025" */
+  period: string;
+  /** e.g. "March 2026" */
+  publishedAt: string;
+  summary: string;
+  /** Full body copy for the report detail page, one entry per paragraph. */
+  description: string[];
+  stats: { label: string; value: string }[];
+  /** Program ids (see Program["id"]) covered by this report. */
+  relatedProgramIds: string[];
+};
