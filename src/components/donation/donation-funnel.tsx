@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AmountStep } from "@/components/donation/amount-step";
 import { DonorStep } from "@/components/donation/donor-step";
-import { ReviewStep } from "@/components/donation/review-step";
+import { PaymentStep } from "@/components/donation/payment-step";
 import {
   amountStepFields,
   donationSchema,
@@ -114,7 +114,7 @@ export function DonationFunnel() {
         >
           {step === 0 && <AmountStep form={form} />}
           {step === 1 && <DonorStep form={form} />}
-          {step === 2 && <ReviewStep values={form.getValues()} />}
+          {step === 2 && <PaymentStep values={form.getValues()} />}
 
           <div className="flex justify-between gap-3 border-t border-border pt-6">
             <Button
@@ -126,13 +126,9 @@ export function DonationFunnel() {
               Back
             </Button>
 
-            {step < steps.length - 1 ? (
+            {step < steps.length - 1 && (
               <Button type="button" onClick={goNext}>
                 Continue
-              </Button>
-            ) : (
-              <Button type="button" disabled>
-                Proceed to payment
               </Button>
             )}
           </div>
