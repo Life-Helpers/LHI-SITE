@@ -1,0 +1,103 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.625rem;
+
+  /* Neutrals */
+  --background: #ffffff;
+  --foreground: #241009;
+  --card: #ffffff;
+  --card-foreground: #241009;
+  --popover: #ffffff;
+  --popover-foreground: #241009;
+  --muted: #f4ede7;
+  --muted-foreground: #6b5c53;
+  --border: #e6dad0;
+  --input: #e6dad0;
+  --ring: #b3261e;
+
+  /* Brand: red is primary (CTAs, links), orange is accent (highlights, secondary emphasis). */
+  /* Every pairing below is WCAG 2.2 AA verified: see src/lib/color-contrast.ts */
+  --primary: #b3261e;
+  --primary-foreground: #ffffff;
+  --secondary: #f4ede7;
+  --secondary-foreground: #241009;
+  --accent: #c2410c;
+  --accent-foreground: #ffffff;
+  --destructive: #921e17;
+  --destructive-foreground: #ffffff;
+
+  /* Crisis/emergency alert surface: distinct from primary so urgent banners read
+     as a state, not just another red button. */
+  --alert: #921e17;
+  --alert-foreground: #ffffff;
+  --alert-border: #d32b2b;
+}
+
+.dark {
+  --background: #1a1209;
+  --foreground: #f5ede6;
+  --card: #241a0f;
+  --card-foreground: #f5ede6;
+  --popover: #241a0f;
+  --popover-foreground: #f5ede6;
+  --muted: #332619;
+  --muted-foreground: #cbb9ab;
+  --border: #3d2e1f;
+  --input: #3d2e1f;
+  --ring: #d32b2b;
+
+  --primary: #d32b2b;
+  --primary-foreground: #ffffff;
+  --secondary: #332619;
+  --secondary-foreground: #f5ede6;
+  --accent: #e8590c;
+  --accent-foreground: #1a1209;
+  --destructive: #d32b2b;
+  --destructive-foreground: #ffffff;
+
+  --alert: #d32b2b;
+  --alert-foreground: #ffffff;
+  --alert-border: #e8590c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-alert: var(--alert);
+  --color-alert-foreground: var(--alert-foreground);
+  --color-alert-border: var(--alert-border);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
