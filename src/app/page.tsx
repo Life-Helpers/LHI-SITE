@@ -1,18 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { featuredPrograms } from "@/data/programs";
+import { ProgramCard } from "@/components/program-card";
+import { programs } from "@/data/programs";
 
 export default function Home() {
+  const featuredPrograms = programs.filter((program) => program.featured);
+
   return (
     <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
       <section className="border-b border-border bg-muted/40">
@@ -58,34 +53,18 @@ export default function Home() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featuredPrograms.map((program) => (
-            <Card key={program.id} className="flex flex-col">
-              <CardHeader>
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" aria-hidden="true" />
-                  {program.region}
-                </div>
-                <CardTitle>{program.name}</CardTitle>
-                <CardDescription>{program.summary}</CardDescription>
-              </CardHeader>
-              <CardContent className="mt-auto">
-                <p className="text-2xl font-bold text-primary">
-                  {program.metricValue}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {program.metricLabel}
-                </p>
-              </CardContent>
-              <CardFooter>
-                <Link
-                  href={program.href}
-                  className="inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                >
-                  Learn more
-                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                </Link>
-              </CardFooter>
-            </Card>
+            <ProgramCard key={program.id} program={program} />
           ))}
+        </div>
+
+        <div className="mt-8">
+          <Link
+            href="/programs"
+            className="inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            View all programs
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </Link>
         </div>
       </section>
     </main>
