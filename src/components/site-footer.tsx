@@ -6,6 +6,8 @@ const footerLinks = [
   { label: "Impact Reports", href: "/impact" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
 ];
 
 export function SiteFooter() {

@@ -112,6 +112,19 @@ export function DonationFunnel() {
           noValidate
           className="flex flex-col gap-6"
         >
+          {/* Honeypot: hidden from sighted users and screen readers, but a
+              plain form bot will typically fill it. Read by PaymentStep at
+              submit time; non-empty means reject as spam server-side. */}
+          <input
+            type="text"
+            id="lhi-hp-website"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="absolute -left-[9999px] h-px w-px overflow-hidden"
+          />
+
           {step === 0 && <AmountStep form={form} />}
           {step === 1 && <DonorStep form={form} />}
           {step === 2 && <PaymentStep values={form.getValues()} />}

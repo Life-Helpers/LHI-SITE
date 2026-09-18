@@ -31,12 +31,17 @@ export function PaymentStep({ values }: { values: DonationFormValues }) {
   function createIntent(signal?: AbortSignal) {
     setIntent({ status: "loading" });
 
+    const honeypot =
+      (document.getElementById("lhi-hp-website") as HTMLInputElement | null)
+        ?.value ?? "";
+
     fetch("/api/donations/create-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...values,
         idempotencyKey: idempotencyKeyRef.current,
+        website: honeypot,
       }),
       signal,
     })

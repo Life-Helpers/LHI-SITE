@@ -7,6 +7,8 @@ import { donationSchema } from "@/lib/validations/donation";
 const requestSchema = donationSchema.extend({
   /** Client-generated per-attempt key so retries/double-submits don't create duplicate charges. */
   idempotencyKey: z.string().min(1).max(255).optional(),
+  /** Honeypot: hidden form field real users never fill. Non-empty means spam. */
+  website: z.string().max(500).optional(),
 });
 
 export async function POST(request: Request) {
@@ -19,6 +21,15 @@ export async function POST(request: Request) {
 
   const parsed = requestSchema.safeParse(body);
   if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid donation details." },
+      { status: 400 },
+    );
+  }
+
+  if (parsed.data.website) {
+    // Honeypot tripped — respond like a normal validation failure rather
+    // than tipping off the bot that it was specifically detected.
     return NextResponse.json(
       { error: "Invalid donation details." },
       { status: 400 },
