@@ -8,6 +8,26 @@ export type EmergencyAlert = {
   href: string;
 };
 
+export type EmergencyStatus = "active" | "resolved";
+
+export type Emergency = {
+  /** URL slug, used to build /emergencies/[id]. Alert banners reference this via href. */
+  id: string;
+  title: string;
+  region: string;
+  status: EmergencyStatus;
+  severity: AlertSeverity;
+  /** Short blurb for cards. */
+  summary: string;
+  /** Full body copy for the emergency detail page, one entry per paragraph. */
+  description: string[];
+  /** e.g. "January 2026" */
+  declaredAt: string;
+  stats: { label: string; value: string }[];
+  /** Program ids (see Program["id"]) responding to this emergency. */
+  relatedProgramIds: string[];
+};
+
 export type ProgramStatus = "active" | "completed";
 
 export type Program = {
