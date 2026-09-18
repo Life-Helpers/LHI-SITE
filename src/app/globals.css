@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --radius: 0.625rem;
 
@@ -37,31 +35,34 @@
   --alert-border: #d32b2b;
 }
 
-.dark {
-  --background: #1a1209;
-  --foreground: #f5ede6;
-  --card: #241a0f;
-  --card-foreground: #f5ede6;
-  --popover: #241a0f;
-  --popover-foreground: #f5ede6;
-  --muted: #332619;
-  --muted-foreground: #cbb9ab;
-  --border: #3d2e1f;
-  --input: #3d2e1f;
-  --ring: #d32b2b;
+/* No theme toggle yet — dark mode follows the OS/browser preference. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a1209;
+    --foreground: #f5ede6;
+    --card: #241a0f;
+    --card-foreground: #f5ede6;
+    --popover: #241a0f;
+    --popover-foreground: #f5ede6;
+    --muted: #332619;
+    --muted-foreground: #cbb9ab;
+    --border: #3d2e1f;
+    --input: #3d2e1f;
+    --ring: #d32b2b;
 
-  --primary: #d32b2b;
-  --primary-foreground: #ffffff;
-  --secondary: #332619;
-  --secondary-foreground: #f5ede6;
-  --accent: #e8590c;
-  --accent-foreground: #1a1209;
-  --destructive: #d32b2b;
-  --destructive-foreground: #ffffff;
+    --primary: #d32b2b;
+    --primary-foreground: #ffffff;
+    --secondary: #332619;
+    --secondary-foreground: #f5ede6;
+    --accent: #e8590c;
+    --accent-foreground: #1a1209;
+    --destructive: #d32b2b;
+    --destructive-foreground: #ffffff;
 
-  --alert: #d32b2b;
-  --alert-foreground: #ffffff;
-  --alert-border: #e8590c;
+    --alert: #d32b2b;
+    --alert-foreground: #ffffff;
+    --alert-border: #e8590c;
+  }
 }
 
 @theme inline {
