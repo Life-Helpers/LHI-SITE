@@ -44,7 +44,14 @@ function NavigationMenuTrigger({
   return (
     <NavigationMenuPrimitive.Trigger
       className={cn(
-        "group flex items-center gap-1 rounded text-sm font-medium text-foreground/80 outline-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring",
+        // Radix's NavigationMenu.Trigger does its own internal focus
+        // management (roving focus for arrow-key navigation), which
+        // defeats the browser's native :focus-visible heuristic even on
+        // genuine keyboard Tab — verified via Playwright: the CSS was
+        // correct but the pseudo-class never matched. Using :focus
+        // instead guarantees the ring shows whenever the trigger holds
+        // focus, which is what WCAG 2.4.7 actually requires here.
+        "group flex items-center gap-1 rounded text-sm font-medium text-foreground/80 hover:text-foreground focus:outline-3 focus:outline-offset-4 focus:outline-ring",
         className,
       )}
       {...props}

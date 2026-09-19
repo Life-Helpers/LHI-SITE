@@ -42,7 +42,7 @@ export default function ContactPage() {
 
           <a
             href={`tel:${siteConfig.contact.phone}`}
-            className="flex items-center gap-3 rounded-md border border-border p-4 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            className="flex items-center gap-3 rounded-md border border-border p-4 hover:bg-muted focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             <Phone className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
             <div>
@@ -61,7 +61,7 @@ export default function ContactPage() {
               <span className="font-medium">{channel.label}</span>
               <a
                 href={`mailto:${channel.email}`}
-                className="inline-flex items-center gap-1.5 rounded text-sm text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                className="inline-flex items-center gap-1.5 rounded text-sm text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 <Mail className="h-4 w-4" aria-hidden="true" />
                 {channel.email}

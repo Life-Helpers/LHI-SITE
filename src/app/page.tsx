@@ -1,7 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Eyebrow } from "@/components/eyebrow";
+import { GradientText } from "@/components/gradient-text";
+import { CountUp } from "@/components/effects/count-up";
+import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { WhoWeAreBand } from "@/components/home/who-we-are-band";
 import { WhatWeDoTiles } from "@/components/home/what-we-do-tiles";
 import { LatestFromLHI } from "@/components/home/latest-from-lhi";
@@ -10,57 +16,56 @@ import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { PartnersStrip } from "@/components/home/partners-strip";
 import { PhilosophyQuote } from "@/components/home/philosophy-quote";
 import { NewsletterSubscribe } from "@/components/home/newsletter-subscribe";
-
-const stats = [
-  { label: "States active", value: "11" },
-  { label: "Individuals reached", value: "1.5M+" },
-  { label: "Households reached", value: "400,000+" },
-  { label: "Years of service", value: "20+" },
-];
+import { useLocale } from "@/i18n/locale-context";
 
 export default function Home() {
+  const { t } = useLocale();
+
+  const stats = [
+    { label: t.home.stats.statesActive, value: "11" },
+    { label: t.home.stats.individualsReached, value: "1.5M+" },
+    { label: t.home.stats.householdsReached, value: "400,000+" },
+    { label: t.home.stats.yearsOfService, value: "20+" },
+  ];
+
   return (
     <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
-      <section className="border-b border-border bg-muted/40">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 sm:px-6">
-          <p className="text-sm font-semibold tracking-wide text-accent uppercase">
-            Life Helpers Initiative &middot; Sokoto, Nigeria
-          </p>
-          <h1 className="max-w-2xl text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-            Health, education, and livelihood programs across Northern
-            Nigeria.
+      <section className="px-4 pt-14 pb-8 sm:px-6">
+        <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 animate-fade-blur-in">
+          <Eyebrow className="text-accent">{t.home.heroEyebrow}</Eyebrow>
+          <h1 className="max-w-3xl text-[40px] leading-[1.1] font-extrabold tracking-tight text-balance text-foreground sm:text-[52px] lg:text-[64px]">
+            {t.home.heroPrefix}
+            <GradientText>{t.home.heroHighlight}</GradientText>
+            {t.home.heroSuffix}
           </h1>
           <p className="max-w-xl text-lg text-muted-foreground">
-            Since 2004, LHI has combined development programming, emergency
-            humanitarian relief, and disaster risk reduction across 11
-            states — touching lives, transforming households, impacting
-            communities.
+            {t.home.heroBody}
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild size="lg">
               <Link href="/donate">
-                Donate now
+                {t.home.donateNow}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/programs">See our programs</Link>
+              <Link href="/programs">{t.home.seePrograms}</Link>
             </Button>
           </div>
         </div>
 
-        <div className="border-t border-border">
-          <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-8 sm:px-6 md:grid-cols-4">
+        <ScrollReveal className="mx-auto mt-10 max-w-6xl">
+          <dl className="glass-surface glow-border grid grid-cols-2 gap-6 px-6 py-8 md:grid-cols-4">
             {stats.map((stat) => (
               <div key={stat.label}>
                 <dt className="text-sm text-muted-foreground">{stat.label}</dt>
-                <dd className="text-2xl font-bold text-primary sm:text-3xl">
-                  {stat.value}
+                <dd className="bg-gradient-to-r from-primary to-accent bg-clip-text text-2xl font-bold text-transparent sm:text-3xl">
+                  <CountUp value={stat.value} />
                 </dd>
               </div>
             ))}
           </dl>
-        </div>
+        </ScrollReveal>
       </section>
 
       <WhoWeAreBand />

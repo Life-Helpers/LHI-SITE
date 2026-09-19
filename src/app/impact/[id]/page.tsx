@@ -47,7 +47,7 @@ export default async function ImpactReportDetailPage({
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <Link
           href="/impact"
-          className="mb-6 inline-flex items-center gap-1 rounded text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="mb-6 inline-flex items-center gap-1 rounded text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
           All reports

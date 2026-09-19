@@ -26,7 +26,7 @@ export function ComingSoon({
           {seeAlso && (
             <Link
               href={seeAlso.href}
-              className="rounded text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="rounded text-sm font-medium text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {seeAlso.label} →
             </Link>

@@ -14,18 +14,34 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import {
-  impactLinks,
-  whatWeDoCards,
-  whatWeDoExtra,
-  whoWeAreLinks,
-  type NavLink,
-} from "@/components/nav-data";
+import { useLocalizedNav, type NavLink } from "@/components/nav-data";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { AccessibilityToolbar } from "@/components/accessibility/accessibility-toolbar";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useLocale } from "@/i18n/locale-context";
 
-const simpleLinks: NavLink[] = [
-  { label: "Get Involved", href: "/get-involved" },
-  { label: "Contact", href: "/contact" },
-];
+function NavUnderlineLink({
+  href,
+  className = "",
+  children,
+}: {
+  href: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`group relative rounded text-sm font-medium text-foreground/80 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-ring ${className}`}
+    >
+      {children}
+      <span
+        aria-hidden="true"
+        className="absolute -bottom-1 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent transition-transform duration-300 group-hover:scale-x-100"
+      />
+    </Link>
+  );
+}
 
 function DropdownPanel({ links }: { links: NavLink[] }) {
   return (
@@ -35,7 +51,7 @@ function DropdownPanel({ links }: { links: NavLink[] }) {
           <NavigationMenuLink asChild>
             <Link
               href={link.href}
-              className="block rounded px-3 py-2 text-sm text-foreground/80 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="block rounded-lg px-3 py-2 text-sm text-foreground/80 hover:bg-foreground/5 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {link.label}
             </Link>
@@ -46,17 +62,23 @@ function DropdownPanel({ links }: { links: NavLink[] }) {
   );
 }
 
-function WhatWeDoPanel() {
+function WhatWeDoPanel({
+  cards,
+  extra,
+}: {
+  cards: ReturnType<typeof useLocalizedNav>["whatWeDoCards"];
+  extra: NavLink;
+}) {
   return (
     <div className="w-[min(90vw,720px)]">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {whatWeDoCards.map((card) => (
+        {cards.map((card) => (
           <NavigationMenuLink asChild key={card.href}>
             <Link
               href={card.href}
-              className="group flex flex-col overflow-hidden rounded-md border border-border hover:border-primary/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="glow-border group flex flex-col overflow-hidden rounded-2xl border border-border hover:border-primary/40 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              <div className="flex h-20 items-center justify-center bg-gradient-to-br from-primary to-accent">
+              <div className="flex h-20 items-center justify-center bg-gradient-to-br from-primary to-accent shadow-[0_0_24px_var(--glow-shadow-hover)]">
                 <card.icon
                   className="h-8 w-8 text-primary-foreground"
                   aria-hidden="true"
@@ -78,10 +100,10 @@ function WhatWeDoPanel() {
       <div className="mt-3 border-t border-border pt-3">
         <NavigationMenuLink asChild>
           <Link
-            href={whatWeDoExtra.href}
-            className="inline-block rounded px-1 text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            href={extra.href}
+            className="inline-block rounded px-1 text-sm font-medium text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
-            {whatWeDoExtra.label} →
+            {extra.label} →
           </Link>
         </NavigationMenuLink>
       </div>
@@ -100,7 +122,7 @@ function MobileDisclosure({
 }) {
   return (
     <details className="group">
-      <summary className="flex cursor-pointer list-none items-center justify-between rounded px-2 py-2 text-sm font-medium text-foreground/80 hover:bg-muted hover:text-foreground [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between rounded px-2 py-2 text-sm font-medium text-foreground/80 hover:bg-foreground/5 hover:text-foreground [&::-webkit-details-marker]:hidden">
         {label}
         <span aria-hidden="true" className="transition-transform group-open:rotate-180">
           ⌄
@@ -112,7 +134,7 @@ function MobileDisclosure({
             <Link
               href={link.href}
               onClick={onNavigate}
-              className="block rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="block rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-foreground/5 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {link.label}
             </Link>
@@ -125,16 +147,24 @@ function MobileDisclosure({
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useLocale();
+  const { whoWeAreLinks, whatWeDoCards, whatWeDoExtra, impactLinks } =
+    useLocalizedNav();
+
+  const simpleLinks: NavLink[] = [
+    { label: t.nav.getInvolved, href: "/get-involved" },
+    { label: t.nav.contact, href: "/contact" },
+  ];
 
   return (
-    <header className="relative border-b border-border">
+    <header className="glass-surface sticky top-0 z-40 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-6xl rounded-3xl border-border/80 sm:w-[calc(100%-3rem)]">
       <nav
         aria-label="Primary"
-        className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6"
+        className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6"
       >
         <Link
           href="/"
-          className="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+          className="rounded focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-ring"
         >
           <Image
             src="/logo.png"
@@ -149,32 +179,25 @@ export function SiteHeader() {
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link
-                  href="/"
-                  className="rounded text-sm font-medium text-foreground/80 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-                >
-                  Home
-                </Link>
-              </NavigationMenuLink>
+              <NavUnderlineLink href="/">{t.nav.home}</NavUnderlineLink>
             </NavigationMenuItem>
 
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Who We Are</NavigationMenuTrigger>
+              <NavigationMenuTrigger>{t.nav.whoWeAre}</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <DropdownPanel links={whoWeAreLinks} />
               </NavigationMenuContent>
             </NavigationMenuItem>
 
             <NavigationMenuItem>
-              <NavigationMenuTrigger>What We Do</NavigationMenuTrigger>
+              <NavigationMenuTrigger>{t.nav.whatWeDo}</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <WhatWeDoPanel />
+                <WhatWeDoPanel cards={whatWeDoCards} extra={whatWeDoExtra} />
               </NavigationMenuContent>
             </NavigationMenuItem>
 
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Impact</NavigationMenuTrigger>
+              <NavigationMenuTrigger>{t.nav.impact}</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <DropdownPanel links={impactLinks} />
               </NavigationMenuContent>
@@ -182,27 +205,32 @@ export function SiteHeader() {
 
             {simpleLinks.map((link) => (
               <NavigationMenuItem key={link.href}>
-                <NavigationMenuLink asChild>
-                  <Link
-                    href={link.href}
-                    className="rounded text-sm font-medium text-foreground/80 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-                  >
-                    {link.label}
-                  </Link>
-                </NavigationMenuLink>
+                <NavUnderlineLink href={link.href}>
+                  {link.label}
+                </NavUnderlineLink>
               </NavigationMenuItem>
             ))}
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="flex items-center gap-2">
-          <Button asChild size="sm">
-            <Link href="/donate">Donate</Link>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="hidden items-center gap-1.5 sm:flex">
+            <LanguageSwitcher />
+            <AccessibilityToolbar />
+            <ThemeToggle />
+          </div>
+
+          <Button
+            asChild
+            size="sm"
+            className="transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_var(--glow-shadow-hover)]"
+          >
+            <Link href="/donate">{t.nav.donate}</Link>
           </Button>
 
           <button
             type="button"
-            className="rounded p-2 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:hidden"
+            className="rounded p-2 hover:bg-foreground/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring md:hidden"
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
             onClick={() => setMenuOpen((open) => !open)}
@@ -227,23 +255,23 @@ export function SiteHeader() {
           <Link
             href="/"
             onClick={() => setMenuOpen(false)}
-            className="block rounded px-2 py-2 text-sm font-medium text-foreground/80 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            className="block rounded px-2 py-2 text-sm font-medium text-foreground/80 hover:bg-foreground/5 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
-            Home
+            {t.nav.home}
           </Link>
 
           <MobileDisclosure
-            label="Who We Are"
+            label={t.nav.whoWeAre}
             links={whoWeAreLinks}
             onNavigate={() => setMenuOpen(false)}
           />
           <MobileDisclosure
-            label="What We Do"
+            label={t.nav.whatWeDo}
             links={[...whatWeDoCards, whatWeDoExtra]}
             onNavigate={() => setMenuOpen(false)}
           />
           <MobileDisclosure
-            label="Impact"
+            label={t.nav.impact}
             links={impactLinks}
             onNavigate={() => setMenuOpen(false)}
           />
@@ -253,11 +281,17 @@ export function SiteHeader() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="block rounded px-2 py-2 text-sm font-medium text-foreground/80 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="block rounded px-2 py-2 text-sm font-medium text-foreground/80 hover:bg-foreground/5 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {link.label}
             </Link>
           ))}
+
+          <div className="mt-2 flex items-center gap-2 border-t border-border pt-3">
+            <LanguageSwitcher />
+            <AccessibilityToolbar />
+            <ThemeToggle />
+          </div>
         </div>
       )}
     </header>

@@ -1,63 +1,64 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-const coreValues = [
-  "Grassroots first",
-  "Multi-sectoral by design",
-  "Zero tolerance for exploitation",
-];
+import { Eyebrow } from "@/components/eyebrow";
+import { ScrollReveal } from "@/components/effects/scroll-reveal";
+import { useLocale } from "@/i18n/locale-context";
 
 export function WhoWeAreBand() {
+  const { t } = useLocale();
+  const values = t.home.whoWeAre.values;
+
   return (
     <section
       aria-labelledby="who-we-are-heading"
       className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6"
     >
-      <div className="mb-8 flex flex-col gap-2">
-        <p className="text-sm font-semibold tracking-wide text-accent uppercase">
-          Who We Are
-        </p>
-        <h2 id="who-we-are-heading" className="text-2xl font-bold tracking-tight">
-          Since 2004, working across Northern Nigeria
+      <ScrollReveal className="mb-8 flex flex-col gap-2">
+        <Eyebrow>{t.home.whoWeAre.eyebrow}</Eyebrow>
+        <h2 id="who-we-are-heading" className="text-2xl font-bold tracking-tight sm:text-3xl">
+          {t.home.whoWeAre.heading}
         </h2>
-        <p className="max-w-2xl text-muted-foreground">
-          Founded as Beulah Projects in Sokoto, LHI has grown into a national
-          NGO combining development programming, humanitarian relief, and
-          disaster risk reduction.
-        </p>
-      </div>
+        <p className="max-w-2xl text-muted-foreground">{t.home.whoWeAre.body}</p>
+      </ScrollReveal>
 
       <div className="grid gap-6 sm:grid-cols-3">
-        <div className="rounded-md border border-border p-5">
-          <h3 className="font-semibold">Our Vision</h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            &ldquo;Touching Lives, Transforming Households, Impacting
-            Communities.&rdquo;
-          </p>
-        </div>
-        <div className="rounded-md border border-border p-5">
-          <h3 className="font-semibold">Our Mission</h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Combining development programming, emergency humanitarian
-            relief, resilience building, and disaster risk reduction for
-            vulnerable households across 11 Nigerian states.
-          </p>
-        </div>
-        <div className="rounded-md border border-border p-5">
-          <h3 className="font-semibold">Our Core Values</h3>
-          <ul className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground">
-            {coreValues.map((value) => (
-              <li key={value}>{value}</li>
-            ))}
-          </ul>
-        </div>
+        {[
+          { title: t.home.whoWeAre.visionTitle, body: t.home.whoWeAre.visionBody },
+          { title: t.home.whoWeAre.missionTitle, body: t.home.whoWeAre.missionBody },
+        ].map((item, i) => (
+          <ScrollReveal key={item.title} delay={i * 100}>
+            <article
+              aria-label={item.title}
+              className="glass-surface glow-border h-full p-5 transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-accent hover:shadow-[0_0_30px_var(--glow-shadow-hover)]"
+            >
+              <h3 className="font-semibold">{item.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{item.body}</p>
+            </article>
+          </ScrollReveal>
+        ))}
+        <ScrollReveal delay={200}>
+          <article
+            aria-label={t.home.whoWeAre.valuesTitle}
+            className="glass-surface glow-border h-full p-5 transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-accent hover:shadow-[0_0_30px_var(--glow-shadow-hover)]"
+          >
+            <h3 className="font-semibold">{t.home.whoWeAre.valuesTitle}</h3>
+            <ul className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground">
+              {values.map((value) => (
+                <li key={value}>{value}</li>
+              ))}
+            </ul>
+          </article>
+        </ScrollReveal>
       </div>
 
       <Link
         href="/about"
-        className="mt-6 inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        className="mt-6 inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
-        More about LHI
+        {t.home.whoWeAre.moreAboutLhi}
         <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
       </Link>
     </section>

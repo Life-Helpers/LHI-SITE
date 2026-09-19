@@ -52,7 +52,7 @@ export default function ImpactPage() {
                 <CardFooter>
                   <Link
                     href={`/impact/${report.id}`}
-                    className="inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    className="inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
                   >
                     Read report
                     <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />

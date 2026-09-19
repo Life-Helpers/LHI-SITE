@@ -5,9 +5,12 @@ import { Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { siteConfig } from "@/config/site";
+import { useLocale } from "@/i18n/locale-context";
 
 export function NewsletterSubscribe() {
+  const { t } = useLocale();
   const [email, setEmail] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -22,38 +25,45 @@ export function NewsletterSubscribe() {
   return (
     <section
       aria-labelledby="newsletter-heading"
-      className="border-t border-border"
+      className="border-t border-border/60"
     >
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-4 px-4 py-16 sm:px-6">
-        <Mail className="h-6 w-6 text-primary" aria-hidden="true" />
-        <h2 id="newsletter-heading" className="text-2xl font-bold tracking-tight">
-          Subscribe to our Newsletter
-        </h2>
-        <p className="max-w-xl text-muted-foreground">
-          There&apos;s no automated mailing list connected yet — submitting
-          this form opens your email client so we can add you manually.
-        </p>
+      <ScrollReveal>
+        <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
+          <div className="glass-surface glow-border flex flex-col items-start gap-4 p-8">
+            <Mail className="h-6 w-6 text-primary" aria-hidden="true" />
+            <h2
+              id="newsletter-heading"
+              className="text-2xl font-bold tracking-tight sm:text-3xl"
+            >
+              {t.home.newsletter.heading}
+            </h2>
+            <p className="max-w-xl text-muted-foreground">
+              {t.home.newsletter.body}
+            </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-full max-w-md flex-col gap-3 sm:flex-row"
-        >
-          <label htmlFor="newsletter-email" className="sr-only">
-            Email address
-          </label>
-          <Input
-            id="newsletter-email"
-            type="email"
-            required
-            placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-          <Button type="submit" className="shrink-0">
-            Subscribe
-          </Button>
-        </form>
-      </div>
+            <form
+              onSubmit={handleSubmit}
+              className="flex w-full max-w-md flex-col gap-3 sm:flex-row"
+            >
+              <label htmlFor="newsletter-email" className="sr-only">
+                {t.home.newsletter.placeholder}
+              </label>
+              <Input
+                id="newsletter-email"
+                type="email"
+                required
+                placeholder={t.home.newsletter.placeholder}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="bg-background/60"
+              />
+              <Button type="submit" className="shrink-0">
+                {t.home.newsletter.subscribeCta}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </ScrollReveal>
     </section>
   );
 }

@@ -1,0 +1,157 @@
+import type { Dictionary } from "@/i18n/types";
+
+export const yo: Dictionary = {
+  htmlLang: "yo",
+  skipToContent: "Fo lọ si àkóónú",
+  nav: {
+    home: "Ilé",
+    whoWeAre: "Ẹni Tí A Jẹ́",
+    whatWeDo: "Iṣẹ́ Wa",
+    impact: "Ipa",
+    getInvolved: "Kópa",
+    contact: "Kàn Sí Wa",
+    donate: "Ṣe Ìtọrẹ",
+  },
+  whoWeAreMenu: {
+    aboutUs: "Nípa Wa",
+    ourHistory: "Ìtàn Wa",
+    ourCommitment: "Ìfarajìn Wa",
+    ourStrategies: "Ète Wa",
+    nidake: "NIDAKE",
+    boardOfTrustees: "Ìgbìmọ̀ Alábòójútó",
+    managementTeam: "Ẹgbẹ́ Alábòójútó",
+  },
+  whatWeDoMenu: {
+    health: "Ìlera",
+    healthDesc: "Ìjẹunjẹ, ìlera ìyá àti ọmọ, omi àti ìmọ́tótó",
+    education: "Ẹ̀kọ́",
+    educationDesc: "Ẹ̀kọ́ ọmọbìnrin, ìdàgbàsókè ọmọdé, ìmọ̀ dígítà",
+    livelihood: "Ọ̀nà Ìṣẹ́gbáyé",
+    livelihoodDesc: "Ìdálẹ́kọ̀ọ́ iṣẹ́, àwùjọ ìfowópamọ́, ìrànlọ́wọ́ owó",
+    foodSecurity: "Ààbò Oúnjẹ",
+    foodSecurityDesc: "Iṣẹ́ àgbẹ̀ tó bá ojú ọjọ́ mu & wíwọlé ọjà",
+    socialInclusion: "Ìdàpọ̀ Láwùjọ",
+    socialInclusionDesc: "Ìkópa àwùjọ & ìdàpọ̀ àwọn aláàbọ̀-ara",
+    protection: "Ààbò",
+    protectionDesc: "Ìdáhùn sí ìwà ipá ìbálòpọ̀ & ìdáàbòbò",
+    radioAdvocacy: "Ìpolongo Rédíò",
+  },
+  impactMenu: {
+    blog: "Bùlọ́ọ̀gì",
+    successStories: "Àwọn Ìtàn Àṣeyọrí",
+    annualReport: "Ìròyìn Ọdọọdún",
+    projectsInterventions: "Àwọn Iṣẹ́ àti Ìdásí",
+    eventsUpdates: "Àwọn Ìṣẹ̀lẹ̀ àti Ìwífún",
+    newsletter: "Ìwé Ìròyìn",
+    radioStory: "Ìtàn Rédíò",
+  },
+  accessibility: {
+    settingsLabel: "Ètò Ìrọ̀rùn Wíwọlé",
+    textSize: "Ìwọ̀n Ọ̀rọ̀",
+    decrease: "Dín ìwọ̀n ọ̀rọ̀ kù",
+    increase: "Fẹ ìwọ̀n ọ̀rọ̀ sí i",
+    dyslexiaFont: "Ọ̀nà Ìkọ̀wé fún Dyslexia",
+    reduceMotion: "Dín Iṣíṣí kù",
+  },
+  theme: {
+    switchToLight: "Yí padà sí ìlànà ìmọ́lẹ́",
+    switchToDark: "Yí padà sí ìlànà òkùnkùn",
+  },
+  language: {
+    label: "Èdè",
+    disclaimer:
+      "Àwọn ìtumọ̀ wọ̀nyí jẹ́ ti ẹ̀rọ olóye (AI) a sì ń dúró de àyẹ̀wò láti ọ̀dọ̀ agbọ́rọ̀sọ àdánidá.",
+  },
+  footer: {
+    tagline:
+      "Life Helpers Initiative (LHI) jẹ́ àjọ àìlérè ti Nàìjíríà tí ń ṣiṣẹ́ lórí ìlera, ẹ̀kọ́, ọ̀nà ìṣẹ́gbáyé, iṣẹ́ àgbẹ̀, àti ààbò fún àwọn àwùjọ tí kò lágbára ní ìpínlẹ̀ mọ́kànlá.",
+    emergencies: "Ìpàjáwìrì",
+    programs: "Àwọn Ètò",
+    impactReports: "Àwọn Ìròyìn Ipa",
+    about: "Nípa Wa",
+    contact: "Kàn Sí Wa",
+    privacy: "Ìlànà Àṣírí",
+    terms: "Àwọn Òfin Lílò",
+    rights: "Gbogbo ẹ̀tọ́ ni a dáàbò bò.",
+  },
+  home: {
+    heroEyebrow: "Life Helpers Initiative · Sokoto, Nàìjíríà",
+    heroPrefix: "Àwọn ètò ìlera, ẹ̀kọ́, àti ọ̀nà ìṣẹ́gbáyé jákèjádò ",
+    heroHighlight: "Àríwá Nàìjíríà",
+    heroSuffix: ".",
+    heroBody:
+      "Láti ọdún 2004, LHI ti so ètò ìdàgbàsókè, ìrànlọ́wọ́ pàjáwìrì, àti ìdín ewu ìjàmbá kù pọ̀ ní ìpínlẹ̀ mọ́kànlá — ó ń fọwọ́kan ìwàláàyè, ó ń yí ilé ká, ó sì ń nípa lórí àwùjọ.",
+    donateNow: "Ṣe Ìtọrẹ Nísisìyí",
+    seePrograms: "Wo Àwọn Ètò Wa",
+    stats: {
+      statesActive: "Àwọn Ìpínlẹ̀ tí À ń Ṣiṣẹ́",
+      individualsReached: "Àwọn Ẹnìkọ̀ọ̀kan tí A Ti Ràn Lọ́wọ́",
+      householdsReached: "Àwọn Ilé tí A Ti Ràn Lọ́wọ́",
+      yearsOfService: "Àwọn Ọdún Iṣẹ́ Ìsìn",
+    },
+    whoWeAre: {
+      eyebrow: "Ẹni Tí A Jẹ́",
+      heading: "Láti 2004, à ń ṣiṣẹ́ jákèjádò Àríwá Nàìjíríà",
+      body: "A dá a sílẹ̀ gẹ́gẹ́ bí Beulah Projects ní Sokoto, LHI ti dàgbà di àjọ àìlérè orílẹ̀-èdè tí ń so ètò ìdàgbàsókè, ìrànlọ́wọ́ ọ̀gá ọ̀run, àti ìdín ewu ìjàmbá kù pọ̀.",
+      visionTitle: "Ìríran Wa",
+      visionBody: "“Fífọwọ́kan Ìwàláàyè, Yíyí Ilé Ká, Níṣẹ́ Lórí Àwùjọ.”",
+      missionTitle: "Ète Wa",
+      missionBody:
+        "Ìsopọ̀ ètò ìdàgbàsókè, ìrànlọ́wọ́ pàjáwìrì, ìmúrasílẹ̀ le, àti ìdín ewu ìjàmbá kù fún àwọn ilé tí kò lágbára ní ìpínlẹ̀ mọ́kànlá ní Nàìjíríà.",
+      valuesTitle: "Àwọn Ìlànà Pàtàkì Wa",
+      values: [
+        "Àwùjọ ni àkọ́kọ́",
+        "A ṣe é fún ọ̀pọ̀lọpọ̀ ẹ̀ka",
+        "Kò sí ìfaradà fún ìlòkulò",
+      ],
+      moreAboutLhi: "Kọ́ Sí I Nípa LHI",
+    },
+    whatWeDo: {
+      heading: "Iṣẹ́ Wa",
+      subtitle: "Àwọn ẹ̀ka mẹ́fà tí ó jọra, tí à ń ṣe ní ìpínlẹ̀ mọ́kànlá.",
+      viewAllPrograms: "Wo Gbogbo Àwọn Ètò",
+    },
+    latest: {
+      heading: "Àwọn Ìwífún Tuntun láti ọ̀dọ̀ LHI",
+      subtitle: "Àwọn ìṣẹ̀lẹ̀, ìkéde, àti àwọn ìtàn láti pápá iṣẹ́.",
+      eventsTitle: "Àwọn Ìṣẹ̀lẹ̀ àti Ìwífún",
+      eventsNote:
+        "A kò dá ọjọ́ ìṣẹ̀lẹ̀ mọ̀ - apá yìí yóò ṣe àkójọ àwọn ìṣẹ̀lẹ̀ àti ìkéde LHI tòótọ́ ní kété tí a bá ṣètò wọn.",
+      eventsCta: "Wo Àwọn Ìṣẹ̀lẹ̀ àti Ìwífún",
+      blogTitle: "Bùlọ́ọ̀gì",
+      blogNote:
+        "Kò sí àpilẹ̀kọ kan tí a ti tẹ̀ jáde síbẹ̀ - àwọn ìtàn àti ìwífún láti pápá iṣẹ́ yóò farahàn níbí ní kété tí wọ́n bá wà.",
+      blogCta: "Wo Bùlọ́ọ̀gì",
+    },
+    radio: {
+      eyebrow: "Ìpolongo Rédíò",
+      heading: "Yàrá Ìṣọ́ra Àwọn Obìnrin",
+      body: "Ètò rédíò ọ̀sọ̀ọ̀sẹ̀ lórí ẹ̀tọ́ ọmọlúàbí àwọn obìnrin, ìlera ìbímọ, àti ìdàgbàsókè olórí - ó ń dé àwọn àwùjọ tí rédíò nìkan lè dé.",
+      cta: "Kọ́ Sí I",
+    },
+    testimonials: {
+      heading: "Ohun Tí Àwọn Ènìyàn Ń Sọ Nípa Wa",
+      subtitle: "Ohùn àwọn àwùjọ, alábàáṣepọ̀, àti òṣìṣẹ́ tí LHI ń bá ṣiṣẹ́.",
+      comingSoonTitle: "Apá yìí ń bọ̀ láìpẹ́",
+      comingSoonBody:
+        "À ń kójọ àwọn ìtàn tòótọ́ tààrà láti ọ̀dọ̀ àwọn ènìyàn àti àwùjọ tí à ń bá ṣiṣẹ́ - a kò tẹ̀ àwọn ọ̀rọ̀ àṣàrò jáde, nítorí náà padà wá láìpẹ́.",
+    },
+    partners: {
+      heading: "Àwọn Alábàáṣepọ̀ Ìmúṣẹ",
+      subtitle:
+        "A ń ṣe àwọn ètò pẹ̀lú àwọn alábàáṣepọ̀ àgbáyé àti ti orílẹ̀-èdè mìíràn, títí kan:",
+    },
+    philosophy: {
+      heading: "Ìmọ̀ Ọgbọ́n Wa",
+      quote:
+        "“Fífi ẹ̀rín músẹ́ sí ojú - fífọwọ́kan ìwàláàyè, yíyí ilé ká, níṣẹ́ lórí àwùjọ.”",
+      attribution: "Ọ̀rọ̀ ìpìlẹ̀ṣẹ̀ LHI, láti ọdún 2004",
+    },
+    newsletter: {
+      heading: "Forúkọsílẹ̀ fún Ìwé Ìròyìn Wa",
+      body: "Kò sí àkójọ ìfìwérànṣẹ́ àdáṣe kan tí a ti so pọ̀ síbẹ̀ - fífi fọ́ọ̀mù yìí ránṣẹ́ yóò ṣí ẹ̀rọ ìránṣẹ́ rẹ láti jẹ́ kí a fi ọ́ kún un fúnra wa.",
+      placeholder: "iwo@apeere.com",
+      subscribeCta: "Forúkọsílẹ̀",
+    },
+  },
+};

@@ -1,3 +1,5 @@
+"use client";
+
 import type { LucideIcon } from "lucide-react";
 import {
   GraduationCap,
@@ -7,6 +9,8 @@ import {
   Users,
   Wheat,
 } from "lucide-react";
+
+import { useLocale } from "@/i18n/locale-context";
 
 export type NavCard = {
   label: string;
@@ -83,3 +87,52 @@ export const impactLinks: NavLink[] = [
   { label: "Newsletter", href: "/news-updates" },
   { label: "Radio Story", href: "/radio-story" },
 ];
+
+/** Localized overlay: keeps hrefs/icons fixed, swaps labels via the active dictionary. */
+export function useLocalizedNav() {
+  const { t } = useLocale();
+
+  const whoWeAre: NavLink[] = [
+    { label: t.whoWeAreMenu.aboutUs, href: "/about" },
+    { label: t.whoWeAreMenu.ourHistory, href: "/our-history" },
+    { label: t.whoWeAreMenu.ourCommitment, href: "/our-commitment" },
+    { label: t.whoWeAreMenu.ourStrategies, href: "/our-strategies" },
+    { label: t.whoWeAreMenu.nidake, href: "/nidake" },
+    { label: t.whoWeAreMenu.boardOfTrustees, href: "/board-of-trustees" },
+    { label: t.whoWeAreMenu.managementTeam, href: "/management-team" },
+  ];
+
+  const whatWeDo: NavCard[] = [
+    { label: t.whatWeDoMenu.health, description: t.whatWeDoMenu.healthDesc, href: "/health", icon: HeartPulse },
+    { label: t.whatWeDoMenu.education, description: t.whatWeDoMenu.educationDesc, href: "/education", icon: GraduationCap },
+    { label: t.whatWeDoMenu.livelihood, description: t.whatWeDoMenu.livelihoodDesc, href: "/livelihood", icon: Handshake },
+    { label: t.whatWeDoMenu.foodSecurity, description: t.whatWeDoMenu.foodSecurityDesc, href: "/food-security", icon: Wheat },
+    { label: t.whatWeDoMenu.socialInclusion, description: t.whatWeDoMenu.socialInclusionDesc, href: "/social-inclusion", icon: Users },
+    { label: t.whatWeDoMenu.protection, description: t.whatWeDoMenu.protectionDesc, href: "/protection", icon: ShieldCheck },
+  ];
+
+  const whatWeDoExtraLocalized: NavLink = {
+    label: t.whatWeDoMenu.radioAdvocacy,
+    href: "/radio",
+  };
+
+  const impact: NavLink[] = [
+    { label: t.impactMenu.blog, href: "/blog" },
+    { label: t.impactMenu.successStories, href: "/success-stories" },
+    { label: t.impactMenu.annualReport, href: "/impact" },
+    {
+      label: t.impactMenu.projectsInterventions,
+      href: "/interventions/projectandintervention",
+    },
+    { label: t.impactMenu.eventsUpdates, href: "/events" },
+    { label: t.impactMenu.newsletter, href: "/news-updates" },
+    { label: t.impactMenu.radioStory, href: "/radio-story" },
+  ];
+
+  return {
+    whoWeAreLinks: whoWeAre,
+    whatWeDoCards: whatWeDo,
+    whatWeDoExtra: whatWeDoExtraLocalized,
+    impactLinks: impact,
+  };
+}

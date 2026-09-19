@@ -1,20 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Sora } from "next/font/google";
 import "./globals.css";
 
 import { EmergencyAlertBanner } from "@/components/emergency-alert-banner";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { ThemeProvider } from "@/components/theme-provider";
+import { AccessibilityProvider } from "@/components/accessibility/accessibility-context";
+import { BokehBackground } from "@/components/effects/bokeh-background";
+import { LocaleProvider } from "@/i18n/locale-context";
 import { activeAlerts } from "@/config/alerts";
 import { siteConfig } from "@/config/site";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -49,7 +53,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${sora.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <script
@@ -58,16 +63,23 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: JSON.stringify(organizationJsonLd),
           }}
         />
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-        >
-          Skip to content
-        </a>
-        <EmergencyAlertBanner alerts={activeAlerts} />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        <ThemeProvider>
+          <AccessibilityProvider>
+            <LocaleProvider>
+              <BokehBackground />
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                Skip to content
+              </a>
+              <EmergencyAlertBanner alerts={activeAlerts} />
+              <SiteHeader />
+              {children}
+              <SiteFooter />
+            </LocaleProvider>
+          </AccessibilityProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

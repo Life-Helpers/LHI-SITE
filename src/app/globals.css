@@ -1,21 +1,25 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Tailwind v4's `dark:` variant defaults to `prefers-color-scheme`. This
+   project needs a user-toggleable theme (next-themes, class-based) with
+   dark as the default, so `dark:` targets `.dark` on the html element. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --radius: 0.625rem;
 
-  /* Neutrals */
+  /* Neutrals — brand black/white per the glassmorphism brief. */
   --background: #ffffff;
-  --foreground: #241009;
-  --card: #ffffff;
-  --card-foreground: #241009;
+  --foreground: #0a0a0a;
+  --card: rgba(255, 255, 255, 0.7);
+  --card-foreground: #0a0a0a;
   --popover: #ffffff;
-  --popover-foreground: #241009;
+  --popover-foreground: #0a0a0a;
   --muted: #f4ede7;
-  --muted-foreground: #6b5c53;
-  --border: #e6dad0;
+  --muted-foreground: #55504c;
+  --border: rgba(10, 10, 10, 0.08);
   --input: #e6dad0;
-  --ring: #eb161c;
 
   /*
    * Brand colors are derived from the real LHI logo (public/logo.png),
@@ -25,52 +29,80 @@
    * tokens below are the minimally-darkened same-hue variants that do
    * (verified 4.5+ against white). The true hex values stay reserved for the
    * logo asset itself and for dark-text-on-color treatments, where they
-   * pass easily (dark ink on true orange: 7.23:1).
+   * pass easily (dark ink on true orange: 7.23:1). A bolder glassmorphism
+   * redesign keeps these exact tokens rather than swapping in an unrelated
+   * red/orange pair, so the site stays visually tied to the real logo.
    */
   --primary: #eb161c;
   --primary-foreground: #ffffff;
   --secondary: #f4ede7;
-  --secondary-foreground: #241009;
+  --secondary-foreground: #0a0a0a;
   --accent: #c05709;
   --accent-foreground: #ffffff;
   --destructive: #bb1015;
   --destructive-foreground: #ffffff;
+  --ring: var(--accent);
 
   /* Crisis/emergency alert surface: distinct (deeper) red from primary so
      urgent banners read as a state, not just another red button. */
   --alert: #bb1015;
   --alert-foreground: #ffffff;
   --alert-border: #ed3237;
+
+  /* Glassmorphism surface + effect tokens (light mode: white frosted glass). */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(10, 10, 10, 0.08);
+  --glass-blur: 20px;
+  --glow-shadow: 0 0 30px rgba(235, 22, 28, 0.25);
+  --glow-shadow-hover: 0 0 30px rgba(235, 22, 28, 0.4);
+  --orb-primary: rgba(235, 22, 28, 0.35);
+  --orb-accent: rgba(192, 87, 9, 0.3);
+  --scrim-color: 255, 255, 255;
+  --scrim-opacity: 0.85;
+
+  /* Accessibility: user-controlled font scale (A- / A+), 1 = 100%. */
+  --font-scale: 1;
+
+  --font-body-family: var(--font-inter);
+  --font-heading-family: var(--font-sora);
 }
 
-/* No theme toggle yet — dark mode follows the OS/browser preference. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1a1209;
-    --foreground: #f5ede6;
-    --card: #241a0f;
-    --card-foreground: #f5ede6;
-    --popover: #241a0f;
-    --popover-foreground: #f5ede6;
-    --muted: #332619;
-    --muted-foreground: #cbb9ab;
-    --border: #3d2e1f;
-    --input: #3d2e1f;
-    --ring: #eb161c;
+.dark {
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
+  --card: rgba(255, 255, 255, 0.06);
+  --card-foreground: #f5f5f5;
+  --popover: #141414;
+  --popover-foreground: #f5f5f5;
+  --muted: #1a1a1a;
+  --muted-foreground: #b8b3ae;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: #2a2a2a;
 
-    --primary: #eb161c;
-    --primary-foreground: #ffffff;
-    --secondary: #332619;
-    --secondary-foreground: #f5ede6;
-    --accent: #c05709;
-    --accent-foreground: #ffffff;
-    --destructive: #bb1015;
-    --destructive-foreground: #ffffff;
+  --primary: #eb161c;
+  --primary-foreground: #ffffff;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #f5f5f5;
+  --accent: #f58634;
+  --accent-foreground: #0a0a0a;
+  --destructive: #ff4d4d;
+  --destructive-foreground: #ffffff;
+  --ring: var(--accent);
 
-    --alert: #bb1015;
-    --alert-foreground: #ffffff;
-    --alert-border: #ed3237;
-  }
+  --alert: #ff2d2d;
+  --alert-foreground: #ffffff;
+  --alert-border: #ff6b00;
+
+  /* Glassmorphism surface tokens (dark mode: frosted black over the
+     RED→Orange gradient + bokeh background). */
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glow-shadow: 0 0 30px rgba(245, 134, 52, 0.25);
+  --glow-shadow-hover: 0 0 30px rgba(245, 134, 52, 0.45);
+  --orb-primary: rgba(235, 22, 28, 0.45);
+  --orb-accent: rgba(245, 134, 52, 0.4);
+  --scrim-color: 10, 10, 10;
+  --scrim-opacity: 0.7;
 }
 
 @theme inline {
@@ -102,11 +134,135 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-body-family);
+  --font-heading: var(--font-heading-family);
+
+  --animate-drift-1: drift-1 32s ease-in-out infinite;
+  --animate-drift-2: drift-2 38s ease-in-out infinite;
+  --animate-drift-3: drift-3 44s ease-in-out infinite;
+  --animate-spin-slow: spin-slow 6s linear infinite;
+  --animate-fade-blur-in: fade-blur-in 0.8s ease-out both;
+}
+
+@keyframes drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(4vw, 6vh) scale(1.08); }
+  66% { transform: translate(-3vw, 3vh) scale(0.96); }
+}
+@keyframes drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-5vw, -4vh) scale(1.1); }
+}
+@keyframes drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40% { transform: translate(3vw, -5vh) scale(0.94); }
+  70% { transform: translate(-4vw, 2vh) scale(1.05); }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes fade-blur-in {
+  from { opacity: 0; filter: blur(12px); transform: translateY(16px); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+/* Scroll-reveal: JS adds/removes [data-revealed] via IntersectionObserver. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+[data-reveal="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html {
+  font-size: calc(16px * var(--font-scale));
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-body-family);
+  line-height: 1.8;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading-family);
+}
+
+/* Dyslexia-friendly mode: wider, more open letterforms and generous
+   spacing. We don't ship the OpenDyslexic webfont itself (no verified,
+   network-reachable source in this environment) — the fallback stack
+   below (Comic Sans MS / Verdana) are the commonly-recommended
+   dyslexia-friendlier system fonts, so this degrades honestly rather
+   than silently doing nothing if OpenDyslexic isn't installed locally. */
+[data-dyslexia-font="true"] {
+  --font-body-family: "OpenDyslexic", "Comic Sans MS", Verdana, sans-serif;
+  --font-heading-family: "OpenDyslexic", "Comic Sans MS", Verdana, sans-serif;
+  letter-spacing: 0.03em;
+  word-spacing: 0.08em;
+}
+
+/* Reduced motion: respect the OS setting AND an explicit in-page toggle. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+[data-reduced-motion="true"] *,
+[data-reduced-motion="true"] *::before,
+[data-reduced-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+[data-reduced-motion="true"] [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Glassmorphism card primitive. */
+.glass-surface {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: 1.5rem;
+}
+
+/* Rotating conic-gradient border, RED to Orange, revealed on hover/focus. */
+.glow-border {
+  position: relative;
+  isolation: isolate;
+}
+.glow-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from 0deg, var(--primary), var(--accent), var(--primary));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: var(--animate-spin-slow);
+  animation-play-state: paused;
+  z-index: -1;
+}
+.glow-border:hover::before,
+.glow-border:focus-within::before {
+  opacity: 1;
+  animation-play-state: running;
 }

@@ -59,14 +59,14 @@ export function EmergencyAlertBanner({
       <p className="flex-1 font-medium">{alert.message}</p>
       <Link
         href={alert.href}
-        className="shrink-0 rounded underline decoration-2 underline-offset-2 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+        className="shrink-0 rounded underline decoration-2 underline-offset-2 hover:no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-current"
       >
         {alert.ctaLabel}
       </Link>
       <button
         type="button"
         onClick={handleDismiss}
-        className="shrink-0 rounded p-1 hover:bg-black/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+        className="shrink-0 rounded p-1 hover:bg-black/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-current"
       >
         <X className="h-4 w-4" aria-hidden="true" />
         <span className="sr-only">Dismiss alert</span>
