@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { siteConfig } from "@/config/site";
+
 const footerLinks = [
   { label: "Emergencies", href: "/emergencies" },
   { label: "Programs", href: "/programs" },
@@ -15,12 +17,9 @@ export function SiteFooter() {
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-start md:justify-between">
         <div>
-          <p className="text-lg font-bold tracking-tight">
-            Life Helpers Initiative
-          </p>
+          <p className="text-lg font-bold tracking-tight">{siteConfig.name}</p>
           <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-            Rapid crisis response, community programs, and audited impact
-            reporting.
+            {siteConfig.description}
           </p>
         </div>
 
@@ -41,8 +40,7 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-border px-4 py-4 text-xs text-muted-foreground sm:px-6">
-        © {new Date().getFullYear()} Life Helpers Initiative. All rights
-        reserved.
+        © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
       </div>
     </footer>
   );

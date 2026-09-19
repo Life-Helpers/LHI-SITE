@@ -34,6 +34,15 @@ const organizationJsonLd = {
   alternateName: siteConfig.shortName,
   description: siteConfig.description,
   url: siteConfig.url,
+  logo: `${siteConfig.url}/logo.png`,
+  foundingDate: siteConfig.foundingDate,
+  areaServed: "NG",
+  email: siteConfig.contact.email,
+  telephone: siteConfig.contact.phone,
+  address: {
+    "@type": "PostalAddress",
+    ...siteConfig.address,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -15,24 +15,32 @@
   --muted-foreground: #6b5c53;
   --border: #e6dad0;
   --input: #e6dad0;
-  --ring: #b3261e;
+  --ring: #eb161c;
 
-  /* Brand: red is primary (CTAs, links), orange is accent (highlights, secondary emphasis). */
-  /* Every pairing below is WCAG 2.2 AA verified: see src/lib/color-contrast.ts */
-  --primary: #b3261e;
+  /*
+   * Brand colors are derived from the real LHI logo (public/logo.png),
+   * pixel-sampled directly: true brand red is #ed3237, true brand orange is
+   * #f58634. Neither passes WCAG AA with white text at body-text size on its
+   * own (red: 4.11:1, orange: 2.52:1 — both under the 4.5:1 minimum), so the
+   * tokens below are the minimally-darkened same-hue variants that do
+   * (verified 4.5+ against white). The true hex values stay reserved for the
+   * logo asset itself and for dark-text-on-color treatments, where they
+   * pass easily (dark ink on true orange: 7.23:1).
+   */
+  --primary: #eb161c;
   --primary-foreground: #ffffff;
   --secondary: #f4ede7;
   --secondary-foreground: #241009;
-  --accent: #c2410c;
+  --accent: #c05709;
   --accent-foreground: #ffffff;
-  --destructive: #921e17;
+  --destructive: #bb1015;
   --destructive-foreground: #ffffff;
 
-  /* Crisis/emergency alert surface: distinct from primary so urgent banners read
-     as a state, not just another red button. */
-  --alert: #921e17;
+  /* Crisis/emergency alert surface: distinct (deeper) red from primary so
+     urgent banners read as a state, not just another red button. */
+  --alert: #bb1015;
   --alert-foreground: #ffffff;
-  --alert-border: #d32b2b;
+  --alert-border: #ed3237;
 }
 
 /* No theme toggle yet — dark mode follows the OS/browser preference. */
@@ -48,20 +56,20 @@
     --muted-foreground: #cbb9ab;
     --border: #3d2e1f;
     --input: #3d2e1f;
-    --ring: #d32b2b;
+    --ring: #eb161c;
 
-    --primary: #d32b2b;
+    --primary: #eb161c;
     --primary-foreground: #ffffff;
     --secondary: #332619;
     --secondary-foreground: #f5ede6;
-    --accent: #e8590c;
-    --accent-foreground: #1a1209;
-    --destructive: #d32b2b;
+    --accent: #c05709;
+    --accent-foreground: #ffffff;
+    --destructive: #bb1015;
     --destructive-foreground: #ffffff;
 
-    --alert: #d32b2b;
+    --alert: #bb1015;
     --alert-foreground: #ffffff;
-    --alert-border: #e8590c;
+    --alert-border: #ed3237;
   }
 }
 

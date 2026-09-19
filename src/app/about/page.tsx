@@ -2,22 +2,37 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "About Life Helpers Initiative's mission and approach.",
+  description:
+    "Life Helpers Initiative (LHI) is a Nigerian non-profit founded in 2004, operating across 11 states.",
 };
 
 const values = [
   {
-    title: "Rapid response",
-    body: "Placeholder: Field teams are pre-positioned and resourced to begin deploying within 72 hours of a crisis declaration.",
+    title: "Grassroots first",
+    body: "LHI began as Beulah Projects in 2004, caring for orphans and vulnerable children in Sokoto, and has grown into a national NGO without losing that local, community-led starting point.",
   },
   {
-    title: "Open reporting",
-    body: "Placeholder: Every program publishes its reach and spending in an annual impact report, available to anyone.",
+    title: "Multi-sectoral by design",
+    body: "Health, education, livelihoods, agriculture, and protection are treated as connected — a household's needs rarely fit inside a single program category.",
   },
   {
-    title: "Local partnership",
-    body: "Placeholder: Programs are built and handed off with local health authorities, schools, and water agencies rather than run in isolation.",
+    title: "Zero tolerance for exploitation",
+    body: "A strict PSEA and safeguarding policy applies across every program, protecting beneficiaries from sexual exploitation, abuse, and harassment.",
   },
+];
+
+const partners = [
+  "UNICEF",
+  "USAID",
+  "World Food Programme (WFP)",
+  "UK FCDO",
+  "European Union (EU)",
+  "UNDP",
+  "Save the Children",
+  "Plan International",
+  "International Rescue Committee (IRC)",
+  "COOPI",
+  "GISCOR",
 ];
 
 export default function AboutPage() {
@@ -28,23 +43,26 @@ export default function AboutPage() {
           About Life Helpers Initiative
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-          Placeholder: Life Helpers Initiative delivers rapid crisis response,
-          durable community programs, and openly audited impact reporting for
-          communities facing humanitarian emergencies.
+          &ldquo;Putting a smile on a face&rdquo; — touching lives,
+          transforming households, impacting communities.
         </p>
 
         <div className="mt-12 flex flex-col gap-4 text-muted-foreground">
           <p>
-            Placeholder copy: This organization mobilizes field teams,
-            medical care, clean water infrastructure, and emergency supplies
-            wherever a crisis is declared, then stays engaged through
-            longer-term programs once the emergency phase ends.
+            Life Helpers Initiative (LHI) was established on October 1, 2004,
+            initially founded as Beulah Projects, dedicated to caring for
+            orphans and vulnerable children in Sokoto. Over more than two
+            decades of grassroots and humanitarian service, LHI has matured
+            into a national non-governmental, not-for-profit organization
+            combining development programming, emergency humanitarian relief,
+            resilience building, and disaster risk reduction (DRR).
           </p>
           <p>
-            Placeholder copy: Every program and emergency response tracked on
-            this site links to the audited impact report that covers it, so
-            donors and partners can follow a gift from commitment through to
-            outcome.
+            Today LHI operates across 11 Nigerian states — Adamawa, Bauchi,
+            Benue, Borno, Ebonyi, FCT Abuja (Liaison Office), Katsina, Kebbi,
+            Plateau, Yobe, and Zamfara — with more than 350 full-time staff
+            and over 700 trained community volunteers deployed across remote
+            local government areas.
           </p>
         </div>
 
@@ -58,6 +76,21 @@ export default function AboutPage() {
             </div>
           ))}
         </div>
+
+        <section aria-labelledby="partners-heading" className="mt-16">
+          <h2 id="partners-heading" className="text-xl font-semibold">
+            Institutional partners
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Programs are delivered alongside multilateral and international
+            partners, including:
+          </p>
+          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted-foreground sm:grid-cols-3">
+            {partners.map((partner) => (
+              <li key={partner}>{partner}</li>
+            ))}
+          </ul>
+        </section>
       </div>
     </main>
   );

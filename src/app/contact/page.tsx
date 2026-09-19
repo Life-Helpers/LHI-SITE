@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { Mail } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
+
+import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -7,18 +9,9 @@ export const metadata: Metadata = {
 };
 
 const channels = [
-  {
-    label: "General inquiries",
-    email: "info@example.org",
-  },
-  {
-    label: "Media inquiries",
-    email: "press@example.org",
-  },
-  {
-    label: "Partnership inquiries",
-    email: "partners@example.org",
-  },
+  { label: "General inquiries", email: siteConfig.contact.email },
+  { label: "Feedback", email: siteConfig.contact.feedbackEmail },
+  { label: "Recruitment", email: siteConfig.contact.recruitmentEmail },
 ];
 
 export default function ContactPage() {
@@ -28,12 +21,38 @@ export default function ContactPage() {
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           Contact
         </h1>
-        <p className="mt-4 text-muted-foreground">
-          Placeholder: these addresses are demo placeholders — replace with
-          the organization&apos;s real inboxes before launch.
-        </p>
 
-        <ul className="mt-8 flex flex-col gap-4">
+        <div className="mt-6 flex flex-col gap-3">
+          <div className="flex items-start gap-3 rounded-md border border-border p-4">
+            <MapPin
+              className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <div>
+              <p className="font-medium">Headquarters</p>
+              <p className="text-sm text-muted-foreground">
+                {siteConfig.address.streetAddress}, {siteConfig.address.addressLocality},{" "}
+                {siteConfig.address.addressRegion}, Nigeria ({siteConfig.address.postalCode})
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Plus an Abuja Liaison Office (FCT).
+              </p>
+            </div>
+          </div>
+
+          <a
+            href={`tel:${siteConfig.contact.phone}`}
+            className="flex items-center gap-3 rounded-md border border-border p-4 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            <Phone className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <div>
+              <p className="font-medium">Helpline / Feedback</p>
+              <p className="text-sm text-primary">{siteConfig.contact.phoneDisplay}</p>
+            </div>
+          </a>
+        </div>
+
+        <ul className="mt-3 flex flex-col gap-3">
           {channels.map((channel) => (
             <li
               key={channel.label}

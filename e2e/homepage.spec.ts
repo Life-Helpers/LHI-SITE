@@ -6,27 +6,27 @@ test.describe("homepage", () => {
 
     await expect(
       page.getByRole("heading", {
-        name: /Rapid crisis response, delivered where it's needed most\./,
+        name: /Health, education, and livelihood programs across Northern Nigeria\./,
       }),
     ).toBeVisible();
 
     await expect(page.getByRole("link", { name: "Donate now" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Program impact" }),
+      page.getByRole("heading", { name: "Our Focus Areas" }),
     ).toBeVisible();
   });
 
-  test("crisis alert banner is visible and dismissible", async ({ page }) => {
+  test("no crisis banner renders when there are no active alerts", async ({
+    page,
+  }) => {
     await page.goto("/");
 
     // Next.js itself renders a hidden, always-present role="alert" route
-    // announcer for a11y — scope to visible text so this only matches our
-    // actual banner.
-    const banner = page.getByRole("alert").filter({ hasText: "Placeholder" });
-    await expect(banner).toBeVisible();
-
-    await page.getByRole("button", { name: "Dismiss alert" }).click();
+    // announcer for a11y — this is not our banner, so it staying present is
+    // expected. There is currently no real declared emergency, so our own
+    // banner (which would have visible text) must not render.
+    const banner = page.getByRole("alert").filter({ hasText: /\S/ });
     await expect(banner).toHaveCount(0);
   });
 

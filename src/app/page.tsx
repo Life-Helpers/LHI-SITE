@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button";
 import { ProgramCard } from "@/components/program-card";
 import { programs } from "@/data/programs";
 
+const stats = [
+  { label: "States active", value: "11" },
+  { label: "Individuals reached", value: "1.5M+" },
+  { label: "Households reached", value: "400,000+" },
+  { label: "Years of service", value: "20+" },
+];
+
 export default function Home() {
   const featuredPrograms = programs.filter((program) => program.featured);
 
@@ -13,15 +20,17 @@ export default function Home() {
       <section className="border-b border-border bg-muted/40">
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-20 sm:px-6">
           <p className="text-sm font-semibold tracking-wide text-accent uppercase">
-            Life Helpers Initiative
+            Life Helpers Initiative &middot; Sokoto, Nigeria
           </p>
           <h1 className="max-w-2xl text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-            Rapid crisis response, delivered where it&apos;s needed most.
+            Health, education, and livelihood programs across Northern
+            Nigeria.
           </h1>
           <p className="max-w-xl text-lg text-muted-foreground">
-            We mobilize field teams, medical care, and emergency supplies for
-            communities facing humanitarian crises — and report our impact
-            openly.
+            Since 2004, LHI has combined development programming, emergency
+            humanitarian relief, and disaster risk reduction across 11
+            states — touching lives, transforming households, impacting
+            communities.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild size="lg">
@@ -35,19 +44,36 @@ export default function Home() {
             </Button>
           </div>
         </div>
+
+        <div className="border-t border-border">
+          <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-8 sm:px-6 md:grid-cols-4">
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <dt className="text-sm text-muted-foreground">{stat.label}</dt>
+                <dd className="text-2xl font-bold text-primary sm:text-3xl">
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </section>
 
       <section
-        aria-labelledby="impact-heading"
+        aria-labelledby="focus-areas-heading"
         className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6"
       >
         <div className="mb-8 flex flex-col gap-2">
-          <h2 id="impact-heading" className="text-2xl font-bold tracking-tight">
-            Program impact
+          <h2
+            id="focus-areas-heading"
+            className="text-2xl font-bold tracking-tight"
+          >
+            Our Focus Areas
           </h2>
           <p className="max-w-xl text-muted-foreground">
-            A snapshot of field programs currently reaching communities in
-            need. Full figures are published in our audited impact reports.
+            LHI&apos;s programs are delivered across health, education,
+            livelihoods, agriculture, and protection — connected, not
+            siloed.
           </p>
         </div>
 

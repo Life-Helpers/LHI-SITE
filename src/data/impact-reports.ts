@@ -1,48 +1,38 @@
 import type { ImpactReport } from "@/types/content";
 
-/** Placeholder impact report catalog backing /impact and /impact/[id]. */
+/**
+ * Real, cumulative organization-wide figures from LHI's own content brief.
+ * No per-year audited financial breakdown was available, so this is framed
+ * as a single cumulative snapshot rather than fabricated annual reports with
+ * invented dollar figures — replace with real audited annual reports once
+ * those exist.
+ */
 export const impactReports: ImpactReport[] = [
   {
-    id: "fy2025",
-    title: "FY2025 Impact Report",
-    period: "January–December 2025",
-    publishedAt: "March 2026",
+    id: "cumulative-impact",
+    title: "Cumulative Impact Since 2004",
+    period: "October 2004 – present",
+    publishedAt: "based on LHI's most recent organizational figures",
     summary:
-      "Placeholder: Full-year results across all active field programs and emergency responses.",
+      "Two decades of grassroots and humanitarian service across 11 Nigerian states.",
     description: [
-      "Placeholder copy: This report summarizes program reach, spending, and outcomes across all field operations for the 2025 fiscal year.",
-      "Placeholder copy: Figures shown here are illustrative scaffold data, not real audited results — replace with the actual audited financials before publishing.",
+      "Life Helpers Initiative (LHI) was established on October 1, 2004, initially founded as 'Beulah Projects' dedicated to caring for orphans and vulnerable children in Sokoto. Over more than two decades of grassroots and humanitarian service, LHI has grown into a national non-governmental, not-for-profit organization operating across 11 states in Nigeria.",
+      "These figures are cumulative organization-wide totals rather than a per-project or per-year breakdown — a real audited annual report with a full financial and per-program split would replace this page once available.",
     ],
     stats: [
-      { label: "People reached", value: "205,000" },
-      { label: "Program spending ratio", value: "84%" },
-      { label: "Countries active", value: "6" },
-      { label: "Total raised", value: "$12.4M" },
+      { label: "Individuals reached", value: "1.5M+" },
+      { label: "Households reached", value: "400,000+" },
+      { label: "Projects completed", value: "45+" },
+      { label: "States active", value: "11" },
+      { label: "Full-time staff", value: "350+" },
+      { label: "Trained volunteers", value: "700+" },
     ],
     relatedProgramIds: [
-      "demo-clean-water-access",
-      "demo-mobile-health-clinics",
-      "demo-emergency-shelter",
-      "demo-school-feeding",
+      "health-nutrition",
+      "education",
+      "livelihood-social-protection",
+      "agriculture-food-security",
+      "gender-protection",
     ],
-  },
-  {
-    id: "fy2024",
-    title: "FY2024 Impact Report",
-    period: "January–December 2024",
-    publishedAt: "March 2025",
-    summary:
-      "Placeholder: Full-year results across all active field programs and emergency responses.",
-    description: [
-      "Placeholder copy: This report summarizes program reach, spending, and outcomes across all field operations for the 2024 fiscal year.",
-      "Placeholder copy: Figures shown here are illustrative scaffold data, not real audited results — replace with the actual audited financials before publishing.",
-    ],
-    stats: [
-      { label: "People reached", value: "168,500" },
-      { label: "Program spending ratio", value: "82%" },
-      { label: "Countries active", value: "5" },
-      { label: "Total raised", value: "$9.8M" },
-    ],
-    relatedProgramIds: ["demo-winter-relief", "demo-emergency-shelter"],
   },
 ];

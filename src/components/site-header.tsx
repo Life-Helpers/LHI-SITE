@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
@@ -24,9 +25,16 @@ export function SiteHeader() {
       >
         <Link
           href="/"
-          className="rounded text-lg font-bold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+          className="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
         >
-          Life Helpers Initiative
+          <Image
+            src="/logo.png"
+            alt="Life Helpers Initiative"
+            width={1533}
+            height={440}
+            priority
+            className="h-9 w-auto sm:h-10"
+          />
         </Link>
 
         <ul className="hidden items-center gap-6 md:flex">

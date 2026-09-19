@@ -12,7 +12,7 @@ test.describe("content hierarchy", () => {
     await expect(page.getByRole("link", { name: "Support this work" })).toBeVisible();
   });
 
-  test("emergencies listing links to a detail page with responding programs", async ({
+  test("emergencies listing shows the empty state when none are declared", async ({
     page,
   }) => {
     await page.goto("/emergencies");
@@ -20,16 +20,10 @@ test.describe("content hierarchy", () => {
       page.getByRole("heading", { name: "Emergencies", level: 1 }),
     ).toBeVisible();
 
-    // The sitewide alert banner also has a "View response" CTA, rendered
-    // before this page's content — scope to <main> so this clicks the
-    // listing's card, not the banner.
-    await page
-      .locator("main")
-      .getByRole("link", { name: "View response" })
-      .first()
-      .click();
+    // There is no real declared emergency right now — the honest empty
+    // state should render instead of any fabricated entry.
     await expect(
-      page.getByRole("heading", { name: "Responding programs" }),
+      page.getByText("There are no declared emergencies at this time."),
     ).toBeVisible();
   });
 
