@@ -13,7 +13,7 @@ test.describe("homepage", () => {
     await expect(page.getByRole("link", { name: "Donate now" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Our Focus Areas" }),
+      page.getByRole("heading", { name: "What We Do", level: 2 }),
     ).toBeVisible();
   });
 

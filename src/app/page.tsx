@@ -2,8 +2,14 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { ProgramCard } from "@/components/program-card";
-import { programs } from "@/data/programs";
+import { WhoWeAreBand } from "@/components/home/who-we-are-band";
+import { WhatWeDoTiles } from "@/components/home/what-we-do-tiles";
+import { LatestFromLHI } from "@/components/home/latest-from-lhi";
+import { RadioBanner } from "@/components/home/radio-banner";
+import { TestimonialsSection } from "@/components/home/testimonials-section";
+import { PartnersStrip } from "@/components/home/partners-strip";
+import { PhilosophyQuote } from "@/components/home/philosophy-quote";
+import { NewsletterSubscribe } from "@/components/home/newsletter-subscribe";
 
 const stats = [
   { label: "States active", value: "11" },
@@ -13,8 +19,6 @@ const stats = [
 ];
 
 export default function Home() {
-  const featuredPrograms = programs.filter((program) => program.featured);
-
   return (
     <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
       <section className="border-b border-border bg-muted/40">
@@ -59,40 +63,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        aria-labelledby="focus-areas-heading"
-        className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6"
-      >
-        <div className="mb-8 flex flex-col gap-2">
-          <h2
-            id="focus-areas-heading"
-            className="text-2xl font-bold tracking-tight"
-          >
-            Our Focus Areas
-          </h2>
-          <p className="max-w-xl text-muted-foreground">
-            LHI&apos;s programs are delivered across health, education,
-            livelihoods, agriculture, and protection — connected, not
-            siloed.
-          </p>
-        </div>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredPrograms.map((program) => (
-            <ProgramCard key={program.id} program={program} />
-          ))}
-        </div>
-
-        <div className="mt-8">
-          <Link
-            href="/programs"
-            className="inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            View all programs
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
+      <WhoWeAreBand />
+      <WhatWeDoTiles />
+      <LatestFromLHI />
+      <RadioBanner />
+      <TestimonialsSection />
+      <PartnersStrip />
+      <PhilosophyQuote />
+      <NewsletterSubscribe />
     </main>
   );
 }
