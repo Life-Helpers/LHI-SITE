@@ -1,42 +1,10 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ArrowLeft, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { programs } from "@/data/programs";
+import type { Program } from "@/types/content";
 
-function getProgram(id: string) {
-  return programs.find((program) => program.id === id);
-}
-
-export function generateStaticParams() {
-  return programs.map((program) => ({ id: program.id }));
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
-  const { id } = await params;
-  const program = getProgram(id);
-  if (!program) return {};
-  return {
-    title: program.name,
-    description: program.summary,
-  };
-}
-
-export default async function ProgramDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const program = getProgram(id);
-  if (!program) notFound();
-
+export function ProgramDetail({ program }: { program: Program }) {
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">

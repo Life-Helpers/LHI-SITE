@@ -14,15 +14,29 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/about",
     "/contact",
     "/donate",
+    "/get-involved",
     "/privacy",
     "/terms",
+    "/our-history",
+    "/our-commitment",
+    "/our-strategies",
+    "/nidake",
+    "/board-of-trustees",
+    "/management-team",
+    "/blog",
+    "/success-stories",
+    "/events",
+    "/news-updates",
+    "/radio",
+    "/radio-story",
+    "/interventions/projectandintervention",
   ].map((path) => ({
     url: `${siteConfig.url}${path}`,
     changeFrequency: "weekly" as const,
   }));
 
   const programRoutes = programs.map((program) => ({
-    url: `${siteConfig.url}/programs/${program.id}`,
+    url: `${siteConfig.url}/${program.id}`,
     changeFrequency: "monthly" as const,
   }));
 

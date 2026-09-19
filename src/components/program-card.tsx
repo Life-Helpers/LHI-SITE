@@ -37,7 +37,7 @@ export function ProgramCard({ program }: { program: Program }) {
       </CardContent>
       <CardFooter>
         <Link
-          href={`/programs/${program.id}`}
+          href={`/${program.id}`}
           className="inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           Learn more

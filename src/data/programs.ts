@@ -3,19 +3,24 @@ import type { Program } from "@/types/content";
 /**
  * LHI's real thematic operational pillars, sourced from the organization's
  * own content brief (not the live site, which currently has no dedicated
- * program pages to draw from). Card/stat numbers are counts of named focus
- * areas and organization-wide facts (states active, founding year) rather
- * than fabricated per-pillar impact figures — LHI's real reporting only
- * gives cumulative, org-wide numbers (see /impact), not a per-pillar split.
+ * program pages to draw from). Split into 6 flat top-level pages to match
+ * the requested site IA (/health, /education, /livelihood, /food-security,
+ * /social-inclusion, /protection) — Food Security, Social Inclusion, and
+ * Protection are each distinct real sub-areas drawn from the same source
+ * pillars as Agriculture and Gender/Inclusion, not invented content.
+ * Card/stat numbers are honest counts (focus areas, states, founding year)
+ * rather than fabricated per-pillar impact figures — LHI's own reporting
+ * only gives cumulative, org-wide numbers (see /impact), not a per-pillar
+ * split.
  */
 export const programs: Program[] = [
   {
-    id: "health-nutrition",
-    name: "Health & Nutrition",
+    id: "health",
+    name: "Health",
     region: "Northwest & Northeast Nigeria",
     status: "active",
     summary:
-      "High-impact health interventions across conflict-affected and rural communities, delivered alongside multilateral partners.",
+      "High-impact health and nutrition interventions across conflict-affected and rural communities, delivered alongside multilateral partners.",
     description: [
       "In the northwest and northeast zones of Nigeria, health indices remain relatively low in many communities — a core, high-engagement focus area for LHI's field teams.",
       "Maternal, Infant, and Young Child Nutrition (MIYCN): prevention and clinical treatment of acute malnutrition, including MUAC screening, Community-Based Management of Acute Malnutrition (CMAM), and locally formulated complementary food (Tom Brown).",
@@ -33,7 +38,7 @@ export const programs: Program[] = [
   },
   {
     id: "education",
-    name: "Education & Emergency Learning",
+    name: "Education",
     region: "Northern Nigeria",
     status: "active",
     summary:
@@ -54,8 +59,8 @@ export const programs: Program[] = [
     featured: true,
   },
   {
-    id: "livelihood-social-protection",
-    name: "Livelihood, Social Protection & Cash Assistance",
+    id: "livelihood",
+    name: "Livelihood",
     region: "Adamawa, Bauchi, Benue, Borno, Ebonyi, Katsina, Kebbi, Plateau, Yobe, Zamfara",
     status: "active",
     summary:
@@ -75,14 +80,14 @@ export const programs: Program[] = [
     featured: true,
   },
   {
-    id: "agriculture-food-security",
-    name: "Agriculture, Food Security & Climate Adaptation",
+    id: "food-security",
+    name: "Food Security",
     region: "Rural Northern Nigeria",
     status: "active",
     summary:
       "Climate-smart farming, livestock support, and market access for smallholder and peasant farmers.",
     description: [
-      "For beneficiaries who are largely peasant and smallholder farmers, LHI's agriculture component focuses on production, diversification, value addition, and market linkages to enhance livelihoods.",
+      "For beneficiaries who are largely peasant and smallholder farmers, LHI's agriculture and food security component focuses on production, diversification, value addition, and market linkages to enhance livelihoods.",
       "Smallholder Farmer Extension: climate-smart agronomic practices, drought-resistant certified seed distribution, and modern planting techniques.",
       "Livestock & Small Ruminant Husbandry: distribution and veterinary support for goats and sheep to diversify household income.",
       "Market Access & Producer Groups: aggregate marketing, post-harvest loss reduction, and sustainable commercial value chain linkages.",
@@ -96,21 +101,39 @@ export const programs: Program[] = [
     featured: false,
   },
   {
-    id: "gender-protection",
-    name: "Gender, Social Inclusion & Protection",
+    id: "social-inclusion",
+    name: "Social Inclusion",
     region: "Northern Nigeria",
     status: "active",
     summary:
-      "Protection, inclusion, and civic participation for women, girls, and people with disabilities.",
+      "Civic participation and economic inclusion for women, youth, and people with disabilities.",
     description: [
       "Basic participation for marginalized groups: identifying, selecting, training, and supporting women, youth, and people with special needs to be involved in local and political governance.",
-      "Gender-Based Violence (GBV) Response: psychosocial support, case management, and sustained community awareness, including the 16 Days of Activism campaign.",
       "The Women Situation Room: weekly radio outreach discussing women's civic rights, reproductive healthcare, and leadership development.",
       "Disability Inclusion: tailored economic and social intervention funds for Persons Living With Disabilities (PLWD).",
+    ],
+    metricLabel: "Focus areas",
+    metricValue: "2",
+    stats: [
+      { label: "States active", value: "11" },
+      { label: "Established", value: "2004" },
+    ],
+    featured: false,
+  },
+  {
+    id: "protection",
+    name: "Protection",
+    region: "Northern Nigeria",
+    status: "active",
+    summary:
+      "Gender-based violence response and safeguarding for vulnerable beneficiaries.",
+    description: [
+      "Protection work sits alongside every other program area, since safety underpins whether health, education, and livelihood gains can hold.",
+      "Gender-Based Violence (GBV) Response: psychosocial support, case management, and sustained community awareness, including the 16 Days of Activism campaign.",
       "PSEA & Safeguarding Policy: zero-tolerance compliance framework safeguarding beneficiaries against sexual exploitation, abuse, and harassment across all programs.",
     ],
     metricLabel: "Focus areas",
-    metricValue: "4",
+    metricValue: "2",
     stats: [
       { label: "States active", value: "11" },
       { label: "Established", value: "2004" },

@@ -42,7 +42,12 @@ test.describe("homepage", () => {
 
     await page.getByRole("button", { name: "Open menu" }).click();
     await expect(mobileNav).toBeVisible();
-    await expect(mobileNav.getByRole("link", { name: "Emergencies" })).toBeVisible();
+    await expect(mobileNav.getByRole("link", { name: "Get Involved" })).toBeVisible();
+
+    // "What We Do" is a disclosure (<details>/<summary>) in the mega menu,
+    // not a flat link — confirm it expands to reveal a program link.
+    await mobileNav.getByText("What We Do").click();
+    await expect(mobileNav.getByRole("link", { name: "Health" })).toBeVisible();
 
     await page.getByRole("button", { name: "Close menu" }).click();
     await expect(mobileNav).toHaveCount(0);

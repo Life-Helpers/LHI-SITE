@@ -28,11 +28,12 @@ export const impactReports: ImpactReport[] = [
       { label: "Trained volunteers", value: "700+" },
     ],
     relatedProgramIds: [
-      "health-nutrition",
+      "health",
       "education",
-      "livelihood-social-protection",
-      "agriculture-food-security",
-      "gender-protection",
+      "livelihood",
+      "food-security",
+      "social-inclusion",
+      "protection",
     ],
   },
 ];
