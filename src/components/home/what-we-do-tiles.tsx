@@ -35,9 +35,9 @@ export function WhatWeDoTiles() {
               <Link
                 href={card.href}
                 aria-label={`${card.label}: ${card.description}`}
-                className="glow-border group flex h-full items-center gap-4 rounded-3xl border border-border bg-card/60 p-4 backdrop-blur-sm transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-accent hover:shadow-[0_0_30px_var(--glow-shadow-hover)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                className="group flex h-full items-center gap-4 rounded-3xl border border-border bg-card/60 p-4 backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary shadow-[0_0_20px_var(--glow-shadow)] group-hover:shadow-[0_0_28px_var(--glow-shadow-hover)]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary shadow-sm group-hover:scale-105 transition-transform duration-200">
                   <card.icon
                     className="h-6 w-6 text-primary-foreground"
                     aria-hidden="true"

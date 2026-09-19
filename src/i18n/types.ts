@@ -71,6 +71,11 @@ export type Dictionary = {
     privacy: string;
     terms: string;
     rights: string;
+    adminLogin: string;
+    whoWeAreHeading: string;
+    programsHeading: string;
+    impactHeading: string;
+    getInvolvedHeading: string;
   };
   home: {
     heroEyebrow: string;

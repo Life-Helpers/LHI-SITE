@@ -73,6 +73,11 @@ export const ha: Dictionary = {
     privacy: "Manufar Sirri",
     terms: "Sharuɗɗan Amfani",
     rights: "An kiyaye duk haƙƙoƙi.",
+    adminLogin: "Shiga Admin",
+    whoWeAreHeading: "Wane ne Mu",
+    programsHeading: "Shirye-shiryenmu",
+    impactHeading: "Tasiri & Sabuntawa",
+    getInvolvedHeading: "Shiga Ciki",
   },
   home: {
     heroEyebrow: "Life Helpers Initiative · Sokoto, Najeriya",

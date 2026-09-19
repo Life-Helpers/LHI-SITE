@@ -140,7 +140,6 @@
   --animate-drift-1: drift-1 32s ease-in-out infinite;
   --animate-drift-2: drift-2 38s ease-in-out infinite;
   --animate-drift-3: drift-3 44s ease-in-out infinite;
-  --animate-spin-slow: spin-slow 6s linear infinite;
   --animate-fade-blur-in: fade-blur-in 0.8s ease-out both;
 }
 
@@ -157,9 +156,6 @@
   0%, 100% { transform: translate(0, 0) scale(1); }
   40% { transform: translate(3vw, -5vh) scale(0.94); }
   70% { transform: translate(-4vw, 2vh) scale(1.05); }
-}
-@keyframes spin-slow {
-  to { transform: rotate(360deg); }
 }
 @keyframes fade-blur-in {
   from { opacity: 0; filter: blur(12px); transform: translateY(16px); }
@@ -240,29 +236,20 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 1.5rem;
 }
 
-/* Rotating conic-gradient border, RED to Orange, revealed on hover/focus. */
+/* Card border primitive without rotating animations */
 .glow-border {
   position: relative;
-  isolation: isolate;
 }
-.glow-border::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: conic-gradient(from 0deg, var(--primary), var(--accent), var(--primary));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  animation: var(--animate-spin-slow);
-  animation-play-state: paused;
-  z-index: -1;
+
+.font-serif-display {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
 }
-.glow-border:hover::before,
-.glow-border:focus-within::before {
-  opacity: 1;
-  animation-play-state: running;
+
+/* Mega menu fixed dropdown: suppress all slide, move, and carousel animations */
+[data-radix-navigation-menu-viewport],
+[data-radix-navigation-menu-content],
+[data-motion] {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
 }

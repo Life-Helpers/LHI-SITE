@@ -75,6 +75,11 @@ export const fr: Dictionary = {
     privacy: "Politique de confidentialité",
     terms: "Conditions d'utilisation",
     rights: "Tous droits réservés.",
+    adminLogin: "Connexion Admin",
+    whoWeAreHeading: "Qui nous sommes",
+    programsHeading: "Nos programmes",
+    impactHeading: "Impact & Mises à jour",
+    getInvolvedHeading: "S'impliquer",
   },
   home: {
     heroEyebrow: "Life Helpers Initiative · Sokoto, Nigeria",

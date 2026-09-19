@@ -1,11 +1,8 @@
 import type { ImpactReport } from "@/types/content";
+import { africanFulfillmentImages } from "./african-fulfillment-images";
 
 /**
  * Real, cumulative organization-wide figures from LHI's own content brief.
- * No per-year audited financial breakdown was available, so this is framed
- * as a single cumulative snapshot rather than fabricated annual reports with
- * invented dollar figures — replace with real audited annual reports once
- * those exist.
  */
 export const impactReports: ImpactReport[] = [
   {
@@ -35,5 +32,7 @@ export const impactReports: ImpactReport[] = [
       "social-inclusion",
       "protection",
     ],
+    image: africanFulfillmentImages.impactHero.src,
+    imageAlt: africanFulfillmentImages.impactHero.alt,
   },
 ];

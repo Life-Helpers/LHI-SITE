@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { ArrowRight, Menu, Radio, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,14 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { useLocalizedNav, type NavLink } from "@/components/nav-data";
+import {
+  useLocalizedNav,
+  type NavCard,
+  type NavLink,
+  whoWeAreFeatured,
+  whatWeDoFeatured,
+  impactFeatured,
+} from "@/components/nav-data";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AccessibilityToolbar } from "@/components/accessibility/accessibility-toolbar";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -43,104 +50,569 @@ function NavUnderlineLink({
   );
 }
 
-function DropdownPanel({ links }: { links: NavLink[] }) {
-  return (
-    <ul className="grid w-56 gap-1">
-      {links.map((link) => (
-        <li key={link.href}>
-          <NavigationMenuLink asChild>
-            <Link
-              href={link.href}
-              className="block rounded-lg px-3 py-2 text-sm text-foreground/80 hover:bg-foreground/5 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              {link.label}
-            </Link>
-          </NavigationMenuLink>
-        </li>
-      ))}
-    </ul>
-  );
-}
+/** 1. WHO WE ARE MEGA MENU */
+function WhoWeAreMegaMenu({ links }: { links: NavLink[] }) {
+  const orgLinks = links.slice(0, 4);
+  const govLinks = links.slice(4);
 
-function WhatWeDoPanel({
-  cards,
-  extra,
-}: {
-  cards: ReturnType<typeof useLocalizedNav>["whatWeDoCards"];
-  extra: NavLink;
-}) {
   return (
-    <div className="w-[min(90vw,720px)]">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {cards.map((card) => (
-          <NavigationMenuLink asChild key={card.href}>
-            <Link
-              href={card.href}
-              className="glow-border group flex flex-col overflow-hidden rounded-2xl border border-border hover:border-primary/40 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              <div className="flex h-20 items-center justify-center bg-gradient-to-br from-primary to-accent shadow-[0_0_24px_var(--glow-shadow-hover)]">
-                <card.icon
-                  className="h-8 w-8 text-primary-foreground"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="p-3">
-                <p className="text-sm font-semibold group-hover:text-primary">
-                  {card.label}
-                </p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {card.description}
-                </p>
-              </div>
-            </Link>
-          </NavigationMenuLink>
-        ))}
+    <div className="w-full p-6">
+      {/* Mega Menu Header */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-4">
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+            CAC/IT/NO 25301
+          </span>
+          <p className="text-xs text-muted-foreground">
+            Non-profit humanitarian relief and sustainable development since Oct 1, 2004.
+          </p>
+        </div>
+        <Link
+          href="/about"
+          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+        >
+          Explore About Us <ArrowRight className="h-3 w-3" />
+        </Link>
       </div>
 
-      <div className="mt-3 border-t border-border pt-3">
-        <NavigationMenuLink asChild>
-          <Link
-            href={extra.href}
-            className="inline-block rounded px-1 text-sm font-medium text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            {extra.label} →
-          </Link>
-        </NavigationMenuLink>
+      {/* Grid: 2 link columns + 1 visual featured column */}
+      <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-12">
+        {/* Column 1: Organization */}
+        <div className="md:col-span-4">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Our Organization
+          </p>
+          <ul className="mt-3 space-y-1.5">
+            {orgLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <li key={link.href}>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href={link.href}
+                      className="group flex items-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/70 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      {Icon && (
+                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-xs font-semibold text-foreground group-hover:text-primary">
+                            {link.label}
+                          </p>
+                          {link.tag && (
+                            <span className="rounded bg-muted px-1.5 py-0.2 text-[9px] text-muted-foreground">
+                              {link.tag}
+                            </span>
+                          )}
+                        </div>
+                        {link.description && (
+                          <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+                            {link.description}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  </NavigationMenuLink>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        {/* Column 2: Governance & Enterprise */}
+        <div className="md:col-span-4">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Governance & Enterprise
+          </p>
+          <ul className="mt-3 space-y-1.5">
+            {govLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <li key={link.href}>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href={link.href}
+                      className="group flex items-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/70 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      {Icon && (
+                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-xs font-semibold text-foreground group-hover:text-primary">
+                            {link.label}
+                          </p>
+                          {link.tag && (
+                            <span className="rounded bg-muted px-1.5 py-0.2 text-[9px] text-muted-foreground">
+                              {link.tag}
+                            </span>
+                          )}
+                        </div>
+                        {link.description && (
+                          <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+                            {link.description}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  </NavigationMenuLink>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Quick whistleblowing notice */}
+          <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-2.5 text-[11px]">
+            <p className="font-semibold text-foreground">Safeguarding & Whistleblowing</p>
+            <p className="mt-0.5 text-muted-foreground">
+              Confidential reporting at{" "}
+              <span className="font-mono text-primary">feedback@lhinigeria.org</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Column 3: Featured Visual Story Card */}
+        <div className="md:col-span-4 flex flex-col gap-3">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Featured Story
+          </p>
+          <NavigationMenuLink asChild>
+            <Link
+              href={whoWeAreFeatured.heritage.href}
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card p-2.5 transition-colors hover:border-primary/50 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <div className="relative h-28 w-full overflow-hidden rounded-xl bg-muted">
+                <Image
+                  src={whoWeAreFeatured.heritage.image}
+                  alt="Life Helpers Initiative humanitarian outreach"
+                  fill
+                  sizes="260px"
+                  referrerPolicy="no-referrer"
+                  className="object-cover"
+                />
+                <span className="absolute top-2 left-2 rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground backdrop-blur-sm">
+                  {whoWeAreFeatured.heritage.tag}
+                </span>
+              </div>
+              <div className="mt-2.5">
+                <h4 className="text-xs font-bold text-foreground group-hover:text-primary">
+                  {whoWeAreFeatured.heritage.title}
+                </h4>
+                <p className="mt-1 text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                  {whoWeAreFeatured.heritage.subtitle}
+                </p>
+                <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-primary group-hover:underline">
+                  Our 20-Year Journey <ArrowRight className="h-3 w-3" />
+                </span>
+              </div>
+            </Link>
+          </NavigationMenuLink>
+
+          {/* Secondary mini badge for NIDAKE */}
+          <NavigationMenuLink asChild>
+            <Link
+              href={whoWeAreFeatured.nidake.href}
+              className="group flex items-center gap-2.5 rounded-xl border border-border/70 bg-card/60 p-2 transition-all hover:border-primary/40 hover:bg-card"
+            >
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                <Image
+                  src={whoWeAreFeatured.nidake.image}
+                  alt="NIDAKE reusable sanitary pad initiative"
+                  fill
+                  sizes="48px"
+                  referrerPolicy="no-referrer"
+                  className="object-cover"
+                />
+              </div>
+              <div>
+                <span className="text-[10px] font-semibold text-primary uppercase tracking-wide">
+                  {whoWeAreFeatured.nidake.tag}
+                </span>
+                <p className="text-xs font-bold text-foreground group-hover:text-primary">
+                  {whoWeAreFeatured.nidake.title}
+                </p>
+              </div>
+            </Link>
+          </NavigationMenuLink>
+        </div>
       </div>
     </div>
   );
 }
 
+/** 2. WHAT WE DO MEGA MENU */
+function WhatWeDoMegaMenu({
+  cards,
+  extra,
+}: {
+  cards: NavCard[];
+  extra: NavLink;
+}) {
+  return (
+    <div className="w-full p-6">
+      {/* Mega Menu Header */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-4">
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+            6 Thematic Sectors
+          </span>
+          <p className="text-xs text-muted-foreground">
+            Targeted humanitarian relief, community resilience, and system strengthening across 11 states.
+          </p>
+        </div>
+        <Link
+          href="/interventions/projectandintervention"
+          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+        >
+          View All 9 Projects <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
+      {/* 6 Thematic Sector Cards with Images & Icons */}
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {cards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <NavigationMenuLink asChild key={card.href}>
+              <Link
+                href={card.href}
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card/60 p-2.5 transition-colors hover:border-primary/50 hover:bg-card hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                {/* Visual Image Banner with Tag & Icon */}
+                <div className="relative h-24 w-full overflow-hidden rounded-xl bg-muted">
+                  {card.image && (
+                    <Image
+                      src={card.image}
+                      alt={card.label}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 280px"
+                      referrerPolicy="no-referrer"
+                      className="object-cover"
+                    />
+                  )}
+                  {/* Subtle Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+                  {card.tag && (
+                    <span className="absolute top-2 right-2 rounded-full bg-background/90 px-2 py-0.5 text-[9px] font-semibold text-foreground backdrop-blur-sm">
+                      {card.tag}
+                    </span>
+                  )}
+
+                  {/* Icon floating on bottom left */}
+                  <div className="absolute bottom-2 left-2 flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-md">
+                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                  </div>
+                </div>
+
+                {/* Card Text Content */}
+                <div className="mt-2.5">
+                  <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
+                    {card.label}
+                  </h4>
+                  <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                    {card.description}
+                  </p>
+                </div>
+              </Link>
+            </NavigationMenuLink>
+          );
+        })}
+      </div>
+
+      {/* Bottom Featured Bar: Radio Advocacy */}
+      <div className="mt-4 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-card to-accent/10 p-3.5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
+              <Image
+                src={whatWeDoFeatured.image}
+                alt="Radio advocacy broadcast studio"
+                fill
+                sizes="80px"
+                referrerPolicy="no-referrer"
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <Radio className="h-3.5 w-3.5 text-primary" />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                  {whatWeDoFeatured.tag}
+                </span>
+              </div>
+              <h4 className="text-xs font-bold text-foreground">
+                {whatWeDoFeatured.title}
+              </h4>
+              <p className="text-[11px] text-muted-foreground line-clamp-1">
+                {whatWeDoFeatured.subtitle}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 sm:shrink-0">
+            <NavigationMenuLink asChild>
+              <Link
+                href={extra.href}
+                className="rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors inline-flex items-center gap-1"
+              >
+                Listen / On-Air <ArrowRight className="h-3 w-3" />
+              </Link>
+            </NavigationMenuLink>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** 3. IMPACT MEGA MENU */
+function ImpactMegaMenu({ links }: { links: NavLink[] }) {
+  const reportLinks = links.slice(0, 3);
+  const mediaLinks = links.slice(3);
+
+  return (
+    <div className="w-full p-6">
+      {/* Mega Menu Header */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-4">
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+            Evidence & Governance
+          </span>
+          <p className="text-xs text-muted-foreground">
+            Audited financial stewardship, donor compliance, and verified community impact.
+          </p>
+        </div>
+        <Link
+          href="/impact"
+          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+        >
+          View Annual Reports <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
+      {/* Grid: 2 navigation columns + 2 visual impact stories */}
+      <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-12">
+        {/* Column 1: Reports & Accountability */}
+        <div className="md:col-span-3">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Accountability
+          </p>
+          <ul className="mt-3 space-y-1.5">
+            {reportLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <li key={link.href}>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href={link.href}
+                      className="group flex items-start gap-2.5 rounded-xl p-2 transition-colors hover:bg-muted/70 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      {Icon && (
+                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-xs font-semibold text-foreground group-hover:text-primary">
+                          {link.label}
+                        </p>
+                        {link.description && (
+                          <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
+                            {link.description}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  </NavigationMenuLink>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        {/* Column 2: Media & Field Dispatches */}
+        <div className="md:col-span-4">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Media & Field Dispatches
+          </p>
+          <ul className="mt-3 space-y-1.5">
+            {mediaLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <li key={link.href}>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href={link.href}
+                      className="group flex items-start gap-2.5 rounded-xl p-2 transition-colors hover:bg-muted/70 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      {Icon && (
+                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-xs font-semibold text-foreground group-hover:text-primary">
+                          {link.label}
+                        </p>
+                        {link.description && (
+                          <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
+                            {link.description}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  </NavigationMenuLink>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        {/* Column 3: Two Visual Impact Stories with Images */}
+        <div className="md:col-span-5 flex flex-col gap-3">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Verified Field Impact
+          </p>
+
+          {/* Story 1: Tom Brown Malnutrition */}
+          <NavigationMenuLink asChild>
+            <Link
+              href={impactFeatured.nutrition.href}
+              className="group flex gap-3 rounded-2xl border border-border/80 bg-card p-2.5 transition-colors hover:border-primary/50 hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
+                <Image
+                  src={impactFeatured.nutrition.image}
+                  alt="Malnutrition recovery initiative"
+                  fill
+                  sizes="96px"
+                  referrerPolicy="no-referrer"
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-center">
+                <span className="text-[10px] font-semibold text-primary uppercase">
+                  {impactFeatured.nutrition.tag}
+                </span>
+                <h4 className="text-xs font-bold text-foreground group-hover:text-primary">
+                  {impactFeatured.nutrition.title}
+                </h4>
+                <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground line-clamp-2">
+                  {impactFeatured.nutrition.subtitle}
+                </p>
+              </div>
+            </Link>
+          </NavigationMenuLink>
+
+          {/* Story 2: Gujba Clean Water */}
+          <NavigationMenuLink asChild>
+            <Link
+              href={impactFeatured.water.href}
+              className="group flex gap-3 rounded-2xl border border-border/80 bg-card p-2.5 transition-colors hover:border-primary/50 hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
+                <Image
+                  src={impactFeatured.water.image}
+                  alt="Solar clean water borehole"
+                  fill
+                  sizes="96px"
+                  referrerPolicy="no-referrer"
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-center">
+                <span className="text-[10px] font-semibold text-primary uppercase">
+                  {impactFeatured.water.tag}
+                </span>
+                <h4 className="text-xs font-bold text-foreground group-hover:text-primary">
+                  {impactFeatured.water.title}
+                </h4>
+                <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground line-clamp-2">
+                  {impactFeatured.water.subtitle}
+                </p>
+              </div>
+            </Link>
+          </NavigationMenuLink>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** MOBILE DISCLOSURE WITH RICH THUMBNAIL/ICON CARDS */
 function MobileDisclosure({
   label,
   links,
   onNavigate,
 }: {
   label: string;
-  links: NavLink[];
+  links: (NavLink | NavCard)[];
   onNavigate: () => void;
 }) {
   return (
-    <details className="group">
-      <summary className="flex cursor-pointer list-none items-center justify-between rounded px-2 py-2 text-sm font-medium text-foreground/80 hover:bg-foreground/5 hover:text-foreground [&::-webkit-details-marker]:hidden">
-        {label}
-        <span aria-hidden="true" className="transition-transform group-open:rotate-180">
-          ⌄
+    <details className="group border-b border-border/40 py-1">
+      <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-2.5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted/70 [&::-webkit-details-marker]:hidden">
+        <span>{label}</span>
+        <span
+          aria-hidden="true"
+          className="text-xs text-muted-foreground transition-transform duration-200 group-open:rotate-180"
+        >
+          ▼
         </span>
       </summary>
-      <ul className="mt-1 mb-2 flex flex-col gap-0.5 pl-4">
-        {links.map((link) => (
-          <li key={link.href}>
+      <div className="mt-1 mb-3 grid grid-cols-1 gap-1.5 pl-2">
+        {links.map((link) => {
+          const Icon = link.icon;
+          const image = "image" in link ? link.image : undefined;
+          return (
             <Link
+              key={link.href}
               href={link.href}
               onClick={onNavigate}
-              className="block rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-foreground/5 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="flex items-center gap-3 rounded-xl border border-transparent p-2 text-xs hover:border-border hover:bg-card focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              {link.label}
+              {image ? (
+                <div className="relative h-10 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                  <Image
+                    src={image}
+                    alt={link.label}
+                    fill
+                    sizes="48px"
+                    referrerPolicy="no-referrer"
+                    className="object-cover"
+                  />
+                </div>
+              ) : Icon ? (
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Icon className="h-4 w-4" />
+                </div>
+              ) : null}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold text-foreground truncate">
+                    {link.label}
+                  </p>
+                  {link.tag && (
+                    <span className="rounded bg-muted px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                      {link.tag}
+                    </span>
+                  )}
+                </div>
+                {link.description && (
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    {link.description}
+                  </p>
+                )}
+              </div>
             </Link>
-          </li>
-        ))}
-      </ul>
+          );
+        })}
+      </div>
     </details>
   );
 }
@@ -148,16 +620,21 @@ function MobileDisclosure({
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useLocale();
-  const { whoWeAreLinks, whatWeDoCards, whatWeDoExtra, impactLinks } =
-    useLocalizedNav();
+  const {
+    whoWeAreLinks,
+    whatWeDoCards,
+    whatWeDoExtra,
+    impactLinks,
+  } = useLocalizedNav();
 
   const simpleLinks: NavLink[] = [
     { label: t.nav.getInvolved, href: "/get-involved" },
+    { label: "Careers", href: "/career" },
     { label: t.nav.contact, href: "/contact" },
   ];
 
   return (
-    <header className="glass-surface sticky top-0 z-40 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-6xl rounded-3xl border-border/80 sm:w-[calc(100%-3rem)]">
+    <header className="glass-surface relative sticky top-0 z-40 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-6xl rounded-3xl border-border/80 sm:w-[calc(100%-3rem)]">
       <nav
         aria-label="Primary"
         className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6"
@@ -182,24 +659,27 @@ export function SiteHeader() {
               <NavUnderlineLink href="/">{t.nav.home}</NavUnderlineLink>
             </NavigationMenuItem>
 
+            {/* WHO WE ARE MEGA MENU */}
             <NavigationMenuItem>
               <NavigationMenuTrigger>{t.nav.whoWeAre}</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <DropdownPanel links={whoWeAreLinks} />
+                <WhoWeAreMegaMenu links={whoWeAreLinks} />
               </NavigationMenuContent>
             </NavigationMenuItem>
 
+            {/* WHAT WE DO MEGA MENU */}
             <NavigationMenuItem>
               <NavigationMenuTrigger>{t.nav.whatWeDo}</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <WhatWeDoPanel cards={whatWeDoCards} extra={whatWeDoExtra} />
+                <WhatWeDoMegaMenu cards={whatWeDoCards} extra={whatWeDoExtra} />
               </NavigationMenuContent>
             </NavigationMenuItem>
 
+            {/* IMPACT MEGA MENU */}
             <NavigationMenuItem>
               <NavigationMenuTrigger>{t.nav.impact}</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <DropdownPanel links={impactLinks} />
+                <ImpactMegaMenu links={impactLinks} />
               </NavigationMenuContent>
             </NavigationMenuItem>
 
@@ -247,15 +727,16 @@ export function SiteHeader() {
         </div>
       </nav>
 
+      {/* MOBILE DRAWER */}
       {menuOpen && (
         <div
           id="mobile-nav"
-          className="flex flex-col gap-1 border-t border-border px-4 py-3 md:hidden"
+          className="flex flex-col gap-1 border-t border-border px-4 py-3 md:hidden max-h-[80vh] overflow-y-auto"
         >
           <Link
             href="/"
             onClick={() => setMenuOpen(false)}
-            className="block rounded px-2 py-2 text-sm font-medium text-foreground/80 hover:bg-foreground/5 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            className="block rounded px-2.5 py-2 text-sm font-semibold text-foreground/90 hover:bg-muted focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             {t.nav.home}
           </Link>
@@ -281,16 +762,36 @@ export function SiteHeader() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="block rounded px-2 py-2 text-sm font-medium text-foreground/80 hover:bg-foreground/5 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="block rounded px-2.5 py-2 text-sm font-medium text-foreground/80 hover:bg-muted focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {link.label}
             </Link>
           ))}
 
-          <div className="mt-2 flex items-center gap-2 border-t border-border pt-3">
+          {/* Quick Support Badge */}
+          <div className="mt-2 rounded-2xl border border-primary/20 bg-primary/5 p-3">
+            <div className="flex items-center gap-2 text-xs font-semibold text-primary">
+              <Sparkles className="h-4 w-4" />
+              <span>NIDAKE Pad Social Enterprise</span>
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Empowering girls and women with dignity and school retention.
+            </p>
+            <Link
+              href="/nidake"
+              onClick={() => setMenuOpen(false)}
+              className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+            >
+              Learn More About NIDAKE →
+            </Link>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
             <LanguageSwitcher />
-            <AccessibilityToolbar />
-            <ThemeToggle />
+            <div className="flex items-center gap-1.5">
+              <AccessibilityToolbar />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       )}

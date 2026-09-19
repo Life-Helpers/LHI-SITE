@@ -1,19 +1,26 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 
-import { DonationFunnel } from "@/components/donation/donation-funnel";
+import { DonateView } from "@/components/donate/donate-view";
 
 export const metadata: Metadata = {
-  title: "Donate",
+  title: "Donate | Support Life Helpers Initiative",
   description:
-    "Support Life Helpers Initiative's crisis response and field programs.",
+    "Your donation directly supports emergency food assistance, clinical care, malnutrition stabilization, and child protection hubs across 11 frontline states.",
 };
 
 export default function DonatePage() {
   return (
-    <main id="main-content" tabIndex={-1} className="flex-1">
-      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <DonationFunnel />
-      </div>
+    <main id="main-content" tabIndex={-1} className="min-h-screen">
+      <Suspense
+        fallback={
+          <div className="flex min-h-[60vh] items-center justify-center py-20 text-muted-foreground">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
+        }
+      >
+        <DonateView />
+      </Suspense>
     </main>
   );
 }

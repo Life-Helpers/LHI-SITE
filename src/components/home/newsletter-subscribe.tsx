@@ -29,7 +29,7 @@ export function NewsletterSubscribe() {
     >
       <ScrollReveal>
         <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-          <div className="glass-surface glow-border flex flex-col items-start gap-4 p-8">
+          <div className="glass-surface flex flex-col items-start gap-4 p-8">
             <Mail className="h-6 w-6 text-primary" aria-hidden="true" />
             <h2
               id="newsletter-heading"

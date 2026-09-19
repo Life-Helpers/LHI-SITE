@@ -1,17 +1,9 @@
 import type { Program } from "@/types/content";
+import { africanFulfillmentImages } from "./african-fulfillment-images";
 
 /**
  * LHI's real thematic operational pillars, sourced from the organization's
- * own content brief (not the live site, which currently has no dedicated
- * program pages to draw from). Split into 6 flat top-level pages to match
- * the requested site IA (/health, /education, /livelihood, /food-security,
- * /social-inclusion, /protection) — Food Security, Social Inclusion, and
- * Protection are each distinct real sub-areas drawn from the same source
- * pillars as Agriculture and Gender/Inclusion, not invented content.
- * Card/stat numbers are honest counts (focus areas, states, founding year)
- * rather than fabricated per-pillar impact figures — LHI's own reporting
- * only gives cumulative, org-wide numbers (see /impact), not a per-pillar
- * split.
+ * own content brief.
  */
 export const programs: Program[] = [
   {
@@ -35,6 +27,8 @@ export const programs: Program[] = [
       { label: "Established", value: "2004" },
     ],
     featured: true,
+    image: africanFulfillmentImages.healthHero.src,
+    imageAlt: africanFulfillmentImages.healthHero.alt,
   },
   {
     id: "education",
@@ -57,6 +51,8 @@ export const programs: Program[] = [
       { label: "Established", value: "2004" },
     ],
     featured: true,
+    image: africanFulfillmentImages.educationHero.src,
+    imageAlt: africanFulfillmentImages.educationHero.alt,
   },
   {
     id: "livelihood",
@@ -78,6 +74,8 @@ export const programs: Program[] = [
       { label: "Established", value: "2004" },
     ],
     featured: true,
+    image: africanFulfillmentImages.livelihoodHero.src,
+    imageAlt: africanFulfillmentImages.livelihoodHero.alt,
   },
   {
     id: "food-security",
@@ -99,6 +97,8 @@ export const programs: Program[] = [
       { label: "Established", value: "2004" },
     ],
     featured: false,
+    image: africanFulfillmentImages.foodSecurityHero.src,
+    imageAlt: africanFulfillmentImages.foodSecurityHero.alt,
   },
   {
     id: "social-inclusion",
@@ -119,6 +119,8 @@ export const programs: Program[] = [
       { label: "Established", value: "2004" },
     ],
     featured: false,
+    image: africanFulfillmentImages.socialInclusionHero.src,
+    imageAlt: africanFulfillmentImages.socialInclusionHero.alt,
   },
   {
     id: "protection",
@@ -139,5 +141,7 @@ export const programs: Program[] = [
       { label: "Established", value: "2004" },
     ],
     featured: false,
+    image: africanFulfillmentImages.protectionHero.src,
+    imageAlt: africanFulfillmentImages.protectionHero.alt,
   },
 ];

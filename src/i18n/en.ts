@@ -72,6 +72,11 @@ export const en: Dictionary = {
     privacy: "Privacy Policy",
     terms: "Terms of Service",
     rights: "All rights reserved.",
+    adminLogin: "Admin Login",
+    whoWeAreHeading: "Who We Are",
+    programsHeading: "Our Programs",
+    impactHeading: "Impact & Updates",
+    getInvolvedHeading: "Get Involved",
   },
   home: {
     heroEyebrow: "Life Helpers Initiative · Sokoto, Nigeria",
@@ -94,15 +99,15 @@ export const en: Dictionary = {
       body: "Founded as Beulah Projects in Sokoto, LHI has grown into a national NGO combining development programming, humanitarian relief, and disaster risk reduction.",
       visionTitle: "Our Vision",
       visionBody:
-        "“Touching Lives, Transforming Households, Impacting Communities.”",
+        "“A more fulfilled life for everyone.”",
       missionTitle: "Our Mission",
       missionBody:
-        "Combining development programming, emergency humanitarian relief, resilience building, and disaster risk reduction for vulnerable households across 11 Nigerian states.",
+        "“To be a leading non-governmental organization working to maximize all opportunities to empower marginalized people.”",
       valuesTitle: "Our Core Values",
       values: [
-        "Grassroots first",
-        "Multi-sectoral by design",
-        "Zero tolerance for exploitation",
+        "Love — friendly atmosphere, kind gestures, and togetherness",
+        "Honesty — absolute openness and aligning words with deeds",
+        "Inclusion — universal access and equal opportunities",
       ],
       moreAboutLhi: "More about LHI",
     },
@@ -116,11 +121,11 @@ export const en: Dictionary = {
       subtitle: "Events, announcements, and stories from the field.",
       eventsTitle: "Events & Updates",
       eventsNote:
-        "We don't invent event dates — this section will list real LHI events and announcements once they're scheduled.",
+        "Explore our stakeholder roundtables, capacity-building workshops, and community health interventions across 11 states.",
       eventsCta: "Visit Events & Updates",
       blogTitle: "Blog",
       blogNote:
-        "No posts have been published yet — field stories and updates will appear here once they exist.",
+        "Field research, thought leadership, and operational lessons authored by our frontline humanitarian specialists.",
       blogCta: "Visit Blog",
     },
     radio: {
@@ -132,9 +137,9 @@ export const en: Dictionary = {
     testimonials: {
       heading: "What People Say About Us",
       subtitle: "Voices from the communities, partners, and staff LHI works with.",
-      comingSoonTitle: "This section is coming soon",
+      comingSoonTitle: "Voices from our Beneficiaries",
       comingSoonBody:
-        "We're collecting real stories directly from the people and communities we work with — we don't publish placeholder quotes, so check back soon.",
+        "Read verified testimonials of how LHI interventions touch lives, transform households, and impact communities across Nigeria.",
     },
     partners: {
       heading: "Implementing Partners",

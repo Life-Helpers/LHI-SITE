@@ -46,6 +46,9 @@ export type Program = {
   stats: { label: string; value: string }[];
   /** Whether this shows in the homepage impact module. */
   featured: boolean;
+  /** Demo African fulfillment image showcasing genuine smiles and transformation */
+  image?: string;
+  imageAlt?: string;
 };
 
 export type ImpactReport = {
@@ -62,4 +65,7 @@ export type ImpactReport = {
   stats: { label: string; value: string }[];
   /** Program ids (see Program["id"]) covered by this report. */
   relatedProgramIds: string[];
+  /** Demo African fulfillment image showcasing genuine smiles and transformation */
+  image?: string;
+  imageAlt?: string;
 };

@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import { Lock, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { useLocale } from "@/i18n/locale-context";
@@ -8,48 +10,239 @@ import { useLocale } from "@/i18n/locale-context";
 export function SiteFooter() {
   const { t } = useLocale();
 
-  const footerLinks = [
-    { label: t.footer.emergencies, href: "/emergencies" },
+  const whoWeAreLinks = [
+    { label: t.whoWeAreMenu.aboutUs, href: "/about" },
+    { label: t.whoWeAreMenu.ourHistory, href: "/our-history" },
+    { label: t.whoWeAreMenu.ourCommitment, href: "/our-commitment" },
+    { label: t.whoWeAreMenu.ourStrategies, href: "/our-strategies" },
+    { label: t.whoWeAreMenu.boardOfTrustees, href: "/board-of-trustees" },
+    { label: t.whoWeAreMenu.managementTeam, href: "/management-team" },
+    { label: t.whoWeAreMenu.nidake, href: "/nidake" },
+  ];
+
+  const programLinks = [
     { label: t.footer.programs, href: "/programs" },
+    { label: t.whatWeDoMenu.health, href: "/health" },
+    { label: t.whatWeDoMenu.education, href: "/education" },
+    { label: t.whatWeDoMenu.livelihood, href: "/livelihood" },
+    { label: t.whatWeDoMenu.foodSecurity, href: "/food-security" },
+    { label: t.whatWeDoMenu.socialInclusion, href: "/social-inclusion" },
+    { label: t.whatWeDoMenu.protection, href: "/protection" },
+    { label: t.whatWeDoMenu.radioAdvocacy, href: "/radio" },
+  ];
+
+  const impactLinks = [
+    { label: t.footer.emergencies, href: "/emergencies" },
     { label: t.footer.impactReports, href: "/impact" },
-    { label: t.footer.about, href: "/about" },
+    { label: t.impactMenu.projectsInterventions, href: "/interventions/projectandintervention" },
+    { label: t.impactMenu.successStories, href: "/success-stories" },
+    { label: t.impactMenu.eventsUpdates, href: "/events" },
+    { label: t.impactMenu.blog, href: "/blog" },
+    { label: t.impactMenu.radioStory, href: "/radio-story" },
+    { label: t.impactMenu.newsletter, href: "/news-updates" },
+  ];
+
+  const getInvolvedLinks = [
+    { label: t.nav.donate, href: "/donate" },
+    { label: t.nav.getInvolved, href: "/get-involved" },
+    { label: "Careers & Vacancies", href: "/career" },
     { label: t.footer.contact, href: "/contact" },
     { label: t.footer.privacy, href: "/privacy" },
     { label: t.footer.terms, href: "/terms" },
   ];
 
   return (
-    <footer className="relative mt-16 border-t border-border">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-start md:justify-between">
-        <div>
-          <p className="text-lg font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {siteConfig.name}
-            </span>
-          </p>
-          <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-            {t.footer.tagline}
-          </p>
-        </div>
+    <footer className="relative mt-20 border-t border-border bg-card/30 backdrop-blur-md">
+      <div className="mx-auto max-w-6xl px-4 pt-14 pb-12 sm:px-6">
+        {/* Main Footer Grid */}
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+          {/* Brand & Contact summary */}
+          <div className="lg:col-span-4 flex flex-col gap-4">
+            <Link href="/" className="inline-block">
+              <Image
+                src="/logo.png"
+                alt={siteConfig.name}
+                width={1533}
+                height={440}
+                className="h-9 w-auto sm:h-10"
+              />
+            </Link>
+            <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+              {t.footer.tagline}
+            </p>
 
-        <nav aria-label="Footer">
-          <ul className="grid grid-cols-2 gap-x-8 gap-y-2 sm:grid-cols-3">
-            {footerLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="rounded text-sm text-muted-foreground hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+            <div className="mt-3 flex flex-col gap-2.5 text-xs text-muted-foreground">
+              <div className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 shrink-0 text-primary mt-0.5" aria-hidden="true" />
+                <span>
+                  {siteConfig.address.streetAddress}, {siteConfig.address.addressLocality}, {siteConfig.address.addressRegion}, Nigeria
+                </span>
+              </div>
+              <a
+                href={`tel:${siteConfig.contact.phone}`}
+                className="flex items-center gap-2 hover:text-foreground transition-colors"
+              >
+                <Phone className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                <span>Helpline: {siteConfig.contact.phoneDisplay}</span>
+              </a>
+              <a
+                href={`mailto:${siteConfig.contact.email}`}
+                className="flex items-center gap-2 hover:text-foreground transition-colors"
+              >
+                <Mail className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                <span>{siteConfig.contact.email}</span>
+              </a>
+            </div>
+
+            {/* Prominent Admin Login pill button in footer */}
+            <div className="mt-4 pt-3 border-t border-border/60">
+              <Link
+                href="/admin/login"
+                id="footer-admin-login-cta"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 text-xs font-medium text-foreground shadow-xs hover:border-primary/40 hover:bg-muted/60 transition-all focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                <Lock className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                <span>{t.footer.adminLogin}</span>
+                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                  Staff Only
+                </span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Navigation Links Columns */}
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
+            {/* Who We Are */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                {t.footer.whoWeAreHeading}
+              </p>
+              <ul className="mt-3.5 flex flex-col gap-2">
+                {whoWeAreLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="rounded text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Our Programs */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                {t.footer.programsHeading}
+              </p>
+              <ul className="mt-3.5 flex flex-col gap-2">
+                {programLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="rounded text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Impact & Updates */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                {t.footer.impactHeading}
+              </p>
+              <ul className="mt-3.5 flex flex-col gap-2">
+                {impactLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="rounded text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Get Involved & Admin */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                {t.footer.getInvolvedHeading}
+              </p>
+              <ul className="mt-3.5 flex flex-col gap-2">
+                {getInvolvedLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="rounded text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <Link
+                    href="/admin/login"
+                    id="footer-admin-login-link"
+                    className="inline-flex items-center gap-1.5 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  >
+                    <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t.footer.adminLogin}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="border-t border-border px-4 py-4 text-xs text-muted-foreground sm:px-6">
-        © {new Date().getFullYear()} {siteConfig.name}. {t.footer.rights}
+      {/* Bottom Bar */}
+      <div className="border-t border-border/80 px-4 py-6 sm:px-6">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
+          <div className="flex items-center gap-2 text-center sm:text-left">
+            <ShieldCheck className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
+            <span>
+              © {new Date().getFullYear()} {siteConfig.name}. {t.footer.rights}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            <Link
+              href="/privacy"
+              className="hover:text-foreground transition-colors"
+            >
+              {t.footer.privacy}
+            </Link>
+            <span className="text-border" aria-hidden="true">•</span>
+            <Link
+              href="/terms"
+              className="hover:text-foreground transition-colors"
+            >
+              {t.footer.terms}
+            </Link>
+            <span className="text-border" aria-hidden="true">•</span>
+            <Link
+              href="/contact"
+              className="hover:text-foreground transition-colors"
+            >
+              {t.footer.contact}
+            </Link>
+            <span className="text-border" aria-hidden="true">•</span>
+            <Link
+              href="/admin/login"
+              id="footer-bottom-admin-login"
+              className="inline-flex items-center gap-1 font-medium text-foreground hover:text-primary transition-colors"
+            >
+              <Lock className="h-3 w-3 text-primary" aria-hidden="true" />
+              {t.footer.adminLogin}
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   );

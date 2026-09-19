@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { siteConfig } from "@/config/site";
+import { PageHeroBanner } from "@/components/ui/page-hero-banner";
+import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -10,6 +12,18 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
+      <PageHeroBanner
+        eyebrow="— Data Protection &amp; Beneficiary Dignity"
+        title={
+          <>
+            Privacy <em className="font-light italic text-primary">Policy.</em>
+          </>
+        }
+        subtitle="Safeguarding beneficiary trust, personal information, and community rights."
+        description={`How ${siteConfig.name} collects, uses, and protects your information in strict accordance with international humanitarian safeguarding guidelines.`}
+        image={africanFulfillmentImages.commitmentHero}
+      />
+
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
         <div
           role="note"

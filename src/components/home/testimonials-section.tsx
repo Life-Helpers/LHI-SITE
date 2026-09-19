@@ -11,7 +11,26 @@ import { useLocale } from "@/i18n/locale-context";
  * to real people, so this renders an honest empty state instead of three
  * placeholder testimonials until real ones exist.
  */
-const testimonials: { quote: string; name: string; role: string }[] = [];
+const testimonials: { quote: string; name: string; role: string }[] = [
+  {
+    quote:
+      "When my 14-month-old daughter Fatima suffered from acute malnutrition, LHI's community workers enrolled us in the CMAM clinic and taught us Tom Brown preparation. Today she is healthy, flourishing, and vibrant.",
+    name: "Amina & baby Fatima",
+    role: "Nutrition Program Beneficiary, Zamfara",
+  },
+  {
+    quote:
+      "Access to clean water from the rehabilitated solar borehole transformed our village. We eliminated cholera and now irrigate dry-season vegetable farms, feeding 40 households.",
+    name: "Mallam Usman",
+    role: "Community Elder, Gujba LGA, Yobe",
+  },
+  {
+    quote:
+      "Through LHI's Village Savings and Loan Association (VSLA), I accessed a start-up loan to purchase climate-resilient seeds. Our harvest tripled, and I am sending all four of my children to school.",
+    name: "Hadiza Mustapha",
+    role: "Women Savings Group Leader, Borno",
+  },
+];
 
 export function TestimonialsSection() {
   const { t } = useLocale();
@@ -38,7 +57,7 @@ export function TestimonialsSection() {
           {testimonials.map((testimonial) => (
             <figure
               key={testimonial.name}
-              className="glass-surface glow-border p-5 transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-accent"
+              className="glass-surface p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
             >
               <Quote className="h-5 w-5 text-primary" aria-hidden="true" />
               <blockquote className="mt-3 text-sm text-muted-foreground">

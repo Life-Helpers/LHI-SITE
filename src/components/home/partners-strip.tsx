@@ -5,16 +5,19 @@ import { useLocale } from "@/i18n/locale-context";
 
 const partners = [
   "UNICEF",
+  "Plan International",
+  "Nigeria Humanitarian Fund (NHF)",
+  "ActionAid",
+  "BMZ (German Development)",
+  "Global Affairs Canada",
+  "KfW Development Bank",
   "USAID",
   "World Food Programme (WFP)",
   "UK FCDO",
   "European Union (EU)",
   "UNDP",
   "Save the Children",
-  "Plan International",
   "International Rescue Committee (IRC)",
-  "COOPI",
-  "GISCOR",
 ];
 
 export function PartnersStrip() {

@@ -74,6 +74,11 @@ export const ig: Dictionary = {
     privacy: "Iwu Nzuzo",
     terms: "Usoro Ojiji",
     rights: "Echedoro ikike niile.",
+    adminLogin: "Nbanye Onye Nlekọta",
+    whoWeAreHeading: "Onye Anyị Bụ",
+    programsHeading: "Mmemme Anyị",
+    impactHeading: "Mmetụta & Mmelite",
+    getInvolvedHeading: "Banye",
   },
   home: {
     heroEyebrow: "Life Helpers Initiative · Sokoto, Naịjirịa",

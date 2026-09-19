@@ -73,6 +73,11 @@ export const yo: Dictionary = {
     privacy: "Ìlànà Àṣírí",
     terms: "Àwọn Òfin Lílò",
     rights: "Gbogbo ẹ̀tọ́ ni a dáàbò bò.",
+    adminLogin: "Wọlé Alábòójútó",
+    whoWeAreHeading: "Ta ni Wa",
+    programsHeading: "Àwọn Ètò Wa",
+    impactHeading: "Ipa & Àwọn Ìròyìn",
+    getInvolvedHeading: "Kópa",
   },
   home: {
     heroEyebrow: "Life Helpers Initiative · Sokoto, Nàìjíríà",

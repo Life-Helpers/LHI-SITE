@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, MapPin } from "lucide-react";
 
 import {
@@ -13,7 +14,26 @@ import type { Program } from "@/types/content";
 
 export function ProgramCard({ program }: { program: Program }) {
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col overflow-hidden transition-all hover:border-primary/40 hover:shadow-lg">
+      {program.image && (
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+          <Image
+            src={program.image}
+            alt={program.imageAlt || program.name}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            referrerPolicy="no-referrer"
+            className="object-cover transition-transform duration-500 hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-xs">
+            <span className="font-medium drop-shadow-sm">Life Helpers Initiative</span>
+            <span className="rounded-full bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground backdrop-blur-sm">
+              Fulfillment
+            </span>
+          </div>
+        </div>
+      )}
       <CardHeader>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">

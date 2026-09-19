@@ -1,0 +1,6 @@
+{
+  "name": "Life Helpers Initiative",
+  "description": "Life Helpers Initiative (LHI) is a Nigerian non-governmental organization combining humanitarian relief, development programming, and resilience building across 11 states.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

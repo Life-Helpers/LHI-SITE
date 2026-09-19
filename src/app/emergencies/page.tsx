@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 
 import { EmergencyCard } from "@/components/emergency-card";
 import { emergencies } from "@/data/emergencies";
+import { PageHeroBanner } from "@/components/ui/page-hero-banner";
+import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
-  title: "Emergencies",
+  title: "Emergencies | Life Helpers Initiative",
   description:
-    "Active and past crisis responses coordinated by Life Helpers Initiative.",
+    "Active and past crisis responses coordinated by Life Helpers Initiative bringing relief, dignity, and smiles in challenging times.",
 };
 
 export default function EmergenciesPage() {
@@ -15,12 +17,27 @@ export default function EmergenciesPage() {
 
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
+      {/* Hero with African Fulfillment Demo Image */}
+      <PageHeroBanner
+        eyebrow="— Rapid Humanitarian Response"
+        title={
+          <>
+            Emergency Relief &amp; <em className="font-light italic text-primary">Restoration.</em>
+          </>
+        }
+        subtitle="Restoring dignity and bringing smiles back to displaced and crisis-affected families."
+        description="Life Helpers Initiative deploys rapid multi-sectoral emergency assistance within 48 hours of crisis declarations. From cholera outbreaks to flood displacements and armed conflict response, our rapid teams provide lifesaving water, medical supplies, child-friendly spaces, and unconditional cash transfers."
+        image={africanFulfillmentImages.emergenciesHero}
+      />
+
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="mb-8 flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight">Emergencies</h1>
-          <p className="max-w-2xl text-muted-foreground">
+        <div className="mb-10 flex flex-col gap-2">
+          <h2 className="font-serif-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            Crisis Declarations &amp; Deployments
+          </h2>
+          <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
             Crisis declarations that trigger a coordinated field response,
-            from initial deployment through resolution.
+            from initial rapid assessment through community stabilization and resolution.
           </p>
         </div>
 

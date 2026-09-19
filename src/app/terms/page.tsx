@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { siteConfig } from "@/config/site";
+import { PageHeroBanner } from "@/components/ui/page-hero-banner";
+import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -10,6 +12,18 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
+      <PageHeroBanner
+        eyebrow="— Ethical Standards &amp; Terms"
+        title={
+          <>
+            Terms of <em className="font-light italic text-primary">Service.</em>
+          </>
+        }
+        subtitle="Transparent governance and terms for our partners, donors, and visitors."
+        description={`Terms governing use of the ${siteConfig.name} digital platforms, partner resources, and public materials.`}
+        image={africanFulfillmentImages.commitmentHero}
+      />
+
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
         <div
           role="note"

@@ -13,7 +13,7 @@ function NavigationMenu({
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Root>) {
   return (
     <NavigationMenuPrimitive.Root
-      className={cn("flex items-center", className)}
+      className={cn("static flex items-center", className)}
       {...props}
     >
       {children}
@@ -71,16 +71,28 @@ function NavigationMenuContent({
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Content>) {
   return (
     <NavigationMenuPrimitive.Content
-      className={cn("w-full p-6 sm:w-auto", className)}
+      className={cn(
+        "top-0 left-0 w-full transition-none duration-0 animate-none data-[motion]:transition-none data-[motion]:transform-none data-[motion]:animate-none",
+        className,
+      )}
       {...props}
     />
   );
 }
 
-function NavigationMenuViewport() {
+function NavigationMenuViewport({
+  className,
+  ...props
+}: React.ComponentProps<typeof NavigationMenuPrimitive.Viewport>) {
   return (
-    <div className="absolute top-full left-0 flex w-full justify-center">
-      <NavigationMenuPrimitive.Viewport className="relative mt-2 h-(--radix-navigation-menu-viewport-height) w-full origin-top overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg sm:w-(--radix-navigation-menu-viewport-width)" />
+    <div className="pointer-events-none absolute top-[calc(100%+0.5rem)] left-0 right-0 z-50 flex w-full justify-center">
+      <NavigationMenuPrimitive.Viewport
+        className={cn(
+          "pointer-events-auto relative w-[min(calc(100vw-2.5rem),880px)] origin-top overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl transition-none duration-0 animate-none data-[state=open]:animate-none data-[state=closed]:animate-none",
+          className,
+        )}
+        {...props}
+      />
     </div>
   );
 }

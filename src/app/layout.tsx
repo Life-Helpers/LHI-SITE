@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Sora } from "next/font/google";
+import { Cormorant_Garamond, Inter, Sora } from "next/font/google";
 import "./globals.css";
 
 import { EmergencyAlertBanner } from "@/components/emergency-alert-banner";
@@ -8,9 +8,17 @@ import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AccessibilityProvider } from "@/components/accessibility/accessibility-context";
 import { BokehBackground } from "@/components/effects/bokeh-background";
+import { FloatingWhatsApp } from "@/components/floating-whatsapp";
 import { LocaleProvider } from "@/i18n/locale-context";
 import { activeAlerts } from "@/config/alerts";
 import { siteConfig } from "@/config/site";
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
 
 const sora = Sora({
   variable: "--font-sora",
@@ -54,9 +62,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${sora.variable} ${inter.variable} h-full antialiased`}
+      className={`${sora.variable} ${inter.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -77,6 +85,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <SiteHeader />
               {children}
               <SiteFooter />
+              <FloatingWhatsApp />
             </LocaleProvider>
           </AccessibilityProvider>
         </ThemeProvider>

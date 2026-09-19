@@ -32,7 +32,7 @@ export function WhoWeAreBand() {
           <ScrollReveal key={item.title} delay={i * 100}>
             <article
               aria-label={item.title}
-              className="glass-surface glow-border h-full p-5 transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-accent hover:shadow-[0_0_30px_var(--glow-shadow-hover)]"
+              className="glass-surface h-full p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
             >
               <h3 className="font-semibold">{item.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{item.body}</p>
@@ -42,7 +42,7 @@ export function WhoWeAreBand() {
         <ScrollReveal delay={200}>
           <article
             aria-label={t.home.whoWeAre.valuesTitle}
-            className="glass-surface glow-border h-full p-5 transition-all duration-400 hover:-translate-y-2 hover:scale-[1.02] hover:border-accent hover:shadow-[0_0_30px_var(--glow-shadow-hover)]"
+            className="glass-surface h-full p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
           >
             <h3 className="font-semibold">{t.home.whoWeAre.valuesTitle}</h3>
             <ul className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground">
