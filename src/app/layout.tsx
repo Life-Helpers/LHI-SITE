@@ -66,6 +66,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <script
+          dangerouslySetInnerHTML={{
+            __html: `window.addEventListener('error',function(e){if(e&&(e.error?.name==='ChunkLoadError'||(e.message&&e.message.indexOf('Loading chunk')!==-1))){var l=sessionStorage.getItem('chunk_reload');var n=Date.now();if(!l||n-Number(l)>10000){sessionStorage.setItem('chunk_reload',String(n));window.location.reload();}}});`,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationJsonLd),
