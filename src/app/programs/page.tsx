@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { ProgramCard } from "@/components/program-card";
 import { programs } from "@/data/programs";
@@ -57,12 +58,12 @@ export default function ProgramsPage() {
               Explore 18+ active and past interventions implemented with institutional donors like MSH, Save the Children, UNICEF, Plan International, and BMZ Germany.
             </p>
           </div>
-          <a
+          <Link
             href="/interventions/projectandintervention"
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs"
           >
             <span>View All Interventions &rarr;</span>
-          </a>
+          </Link>
         </div>
       </div>
     </main>

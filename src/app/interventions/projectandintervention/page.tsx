@@ -16,6 +16,7 @@ import {
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { InterventionsList } from "@/components/interventions-list";
+import { OperationalMap } from "@/components/operational-map";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
@@ -134,11 +135,21 @@ export default function ProjectsAndInterventionsPage() {
                 <Users size={20} />
               </div>
               <div>
-                <div className="text-xl font-bold text-foreground">350,000+</div>
+                <div className="text-xl font-bold text-foreground">1.5M+</div>
                 <div className="text-[11px] text-muted-foreground">Direct Beneficiaries</div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Interactive 11-State Operational Map */}
+      <section aria-labelledby="map-heading" className="border-b border-border py-14 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h2 id="map-heading" className="mb-8 font-serif-display text-3xl font-light text-foreground">
+            Interventions by <em className="italic text-primary">state.</em>
+          </h2>
+          <OperationalMap />
         </div>
       </section>
 

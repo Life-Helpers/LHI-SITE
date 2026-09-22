@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
 import { emergencies } from "@/data/emergencies";
 import { impactReports } from "@/data/impact-reports";
+import { INTERVENTIONS_DATA } from "@/data/interventions-data";
 import { programs } from "@/data/programs";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -30,6 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/radio",
     "/radio-story",
     "/interventions/projectandintervention",
+    "/partner-portal",
   ].map((path) => ({
     url: `${siteConfig.url}${path}`,
     changeFrequency: "weekly" as const,
@@ -50,5 +52,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "yearly" as const,
   }));
 
-  return [...staticRoutes, ...programRoutes, ...emergencyRoutes, ...impactRoutes];
+  const interventionRoutes = INTERVENTIONS_DATA.map((project) => ({
+    url: `${siteConfig.url}/interventions/${project.id}`,
+    changeFrequency: "monthly" as const,
+  }));
+
+  return [...staticRoutes, ...programRoutes, ...emergencyRoutes, ...impactRoutes, ...interventionRoutes];
 }

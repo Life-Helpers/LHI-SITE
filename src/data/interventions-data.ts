@@ -1,3 +1,5 @@
+import type { OperationalStateId } from "@/data/operational-states";
+
 export type ThematicPillarId =
   | "health"
   | "education"
@@ -22,6 +24,8 @@ export interface InterventionProject {
   status: "Active" | "Completed" | "Multi-Year";
   duration: string;
   locations: string;
+  /** Frontline states where this intervention is delivered (drives the operational map). */
+  states: OperationalStateId[];
   thematicAreas: ThematicPillarRef[];
   primaryThematic: ThematicPillarId;
   image: {
@@ -29,6 +33,10 @@ export interface InterventionProject {
     alt: string;
     caption: string;
   };
+  /** Extra field photos for the dossier carousel. Add real LHI photos here as they become available. */
+  gallery?: { src: string; alt: string; caption: string }[];
+  /** Optional YouTube video id for the dossier's field video. */
+  youtubeId?: string;
   summary: string;
   keyInterventions: string[];
   impactMetric: string;
@@ -98,6 +106,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Multi-Year Grant",
     locations: "Zamfara State (Selected LGAs & Primary Health Facilities)",
+    states: ["zamfara"],
     primaryThematic: "health",
     thematicAreas: [getPillarRef("health")],
     image: {
@@ -127,6 +136,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "4-Year Comprehensive Initiative",
     locations: "Yobe State (Conflict-Affected Communities in Bade, Jakusko & Damaturu)",
+    states: ["yobe"],
     primaryThematic: "education",
     thematicAreas: [
       getPillarRef("education"),
@@ -161,6 +171,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Multi-Year Global Program",
     locations: "Sokoto State (Focus LGAs & Rural Wards)",
+    states: ["sokoto"],
     primaryThematic: "protection",
     thematicAreas: [
       getPillarRef("protection"),
@@ -193,6 +204,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Completed",
     duration: "5-Year Flagship Project",
     locations: "Sokoto & Bauchi States",
+    states: ["sokoto", "bauchi"],
     primaryThematic: "health",
     thematicAreas: [
       getPillarRef("health"),
@@ -225,6 +237,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Multi-Year Field Program",
     locations: "Zamfara State (Gusau, Maru, Kaura Namoda, Anka) & Sokoto State",
+    states: ["zamfara", "sokoto"],
     primaryThematic: "health",
     thematicAreas: [
       getPillarRef("health"),
@@ -257,6 +270,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Multi-Year Initiative",
     locations: "Northwest Nigeria (Sokoto, Kebbi, Zamfara)",
+    states: ["sokoto", "kebbi", "zamfara"],
     primaryThematic: "education",
     thematicAreas: [
       getPillarRef("education"),
@@ -290,6 +304,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Multi-Year Grant",
     locations: "Zamfara State (Host & Displaced Communities)",
+    states: ["zamfara"],
     primaryThematic: "livelihood",
     thematicAreas: [
       getPillarRef("livelihood"),
@@ -321,6 +336,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Multi-Year Partnership",
     locations: "Borno State (Jere LGA & Biu LGA)",
+    states: ["borno"],
     primaryThematic: "food-security",
     thematicAreas: [
       getPillarRef("food-security"),
@@ -352,6 +368,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Multi-Year",
     duration: "Humanitarian-Development Nexus Program",
     locations: "Yobe State (Conflict-Affected LGAs)",
+    states: ["yobe"],
     primaryThematic: "livelihood",
     thematicAreas: [
       getPillarRef("livelihood"),
@@ -383,6 +400,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Completed",
     duration: "Strategic Nutrition Project",
     locations: "Sokoto State (Statewide Primary Care Network)",
+    states: ["sokoto"],
     primaryThematic: "health",
     thematicAreas: [getPillarRef("health")],
     image: {
@@ -411,6 +429,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Multi-Year Epidemic Control Program",
     locations: "Sokoto State (Target LGAs & Treatment Facilities)",
+    states: ["sokoto"],
     primaryThematic: "health",
     thematicAreas: [getPillarRef("health")],
     image: {
@@ -439,6 +458,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Completed",
     duration: "Multi-Year Health Systems Grant",
     locations: "Sokoto & Kebbi States",
+    states: ["sokoto", "kebbi"],
     primaryThematic: "health",
     thematicAreas: [getPillarRef("health")],
     image: {
@@ -467,6 +487,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Humanitarian Response Allocation",
     locations: "Borno State (Jere LGA & Maiduguri Metropolitan Council)",
+    states: ["borno"],
     primaryThematic: "protection",
     thematicAreas: [
       getPillarRef("protection"),
@@ -498,6 +519,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Strategic Multi-Agency Consortium",
     locations: "Northeast & North-Central Nigeria (Borno, Adamawa, Yobe, Sokoto)",
+    states: ["borno", "adamawa", "yobe", "sokoto"],
     primaryThematic: "food-security",
     thematicAreas: [
       getPillarRef("food-security"),
@@ -529,6 +551,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Completed",
     duration: "Institutional Capacity Initiative",
     locations: "Sokoto State",
+    states: ["sokoto"],
     primaryThematic: "social-inclusion",
     thematicAreas: [
       getPillarRef("social-inclusion"),
@@ -560,6 +583,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Strategic Civic Program",
     locations: "Sokoto & Kebbi States",
+    states: ["sokoto", "kebbi"],
     primaryThematic: "social-inclusion",
     thematicAreas: [getPillarRef("social-inclusion")],
     image: {
@@ -588,6 +612,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Education Grant Cycle",
     locations: "Zamfara & Sokoto States (40 Rural Wards)",
+    states: ["zamfara", "sokoto"],
     primaryThematic: "education",
     thematicAreas: [
       getPillarRef("education"),
@@ -619,6 +644,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     status: "Active",
     duration: "Continuous Weekly Flagship Broadcast",
     locations: "11 States Regional Broadcast Network",
+    states: ["sokoto", "zamfara", "kebbi", "borno", "yobe", "adamawa", "bauchi", "kano", "kaduna", "niger", "fct"],
     primaryThematic: "social-inclusion",
     thematicAreas: [
       getPillarRef("social-inclusion"),

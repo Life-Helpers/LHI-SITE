@@ -10,7 +10,9 @@ export async function POST(req: NextRequest) {
       package_id,
       custom_amount,
       frequency = "one_time",
+      designation,
     } = body;
+    const isNidake = designation === "nidake";
 
     // Determine donation amount in USD
     let amount = 100;
@@ -67,7 +69,9 @@ export async function POST(req: NextRequest) {
               product_data: {
                 name: isMonthly
                   ? `Monthly Giving (${package_id || "Custom Tier"})`
-                  : `Life Helpers Initiative Support`,
+                  : isNidake
+                    ? "NIDAKE Dignity Kit Sponsorship"
+                    : `Life Helpers Initiative Support`,
                 description: isMonthly
                   ? "Recurring monthly gift empowering frontline medical, nutrition, and relief programs across 11 Nigerian states."
                   : "Tax-deductible gift directly empowering vulnerable communities across 11 frontline Nigerian states.",
@@ -83,6 +87,7 @@ export async function POST(req: NextRequest) {
           donor_email: donor_email?.trim() || "",
           frequency,
           package_id: package_id || "custom",
+          designation: isNidake ? "nidake" : "general",
         },
         success_url: `${origin}/donate/success?session_id={CHECKOUT_SESSION_ID}&amount=${amount}&kind=${frequency}`,
         cancel_url: `${origin}/donate?cancelled=true`,

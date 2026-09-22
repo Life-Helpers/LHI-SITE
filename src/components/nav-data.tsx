@@ -214,9 +214,16 @@ export const impactLinks: NavLink[] = [
   {
     label: "Projects & Interventions",
     href: "/interventions/projectandintervention",
-    description: "9 multi-state programs backed by UNICEF, KfW, NHF & Plan",
+    description: "18 flagship interventions with dossiers & PDF factsheets",
     icon: FolderGit2,
     tag: "Active Grants",
+  },
+  {
+    label: "Partner & Bidder Portal",
+    href: "/partner-portal",
+    description: "Compliance documents & consortium / RFP expression of interest",
+    icon: Handshake,
+    tag: "For Donors",
   },
   {
     label: "Success Stories",
@@ -424,9 +431,16 @@ export function useLocalizedNav() {
     {
       label: t.impactMenu.projectsInterventions,
       href: "/interventions/projectandintervention",
-      description: "9 multi-state programs backed by UNICEF, KfW, NHF & Plan",
+      description: "18 flagship interventions with dossiers & PDF factsheets",
       icon: FolderGit2,
       tag: "Active Grants",
+    },
+    {
+      label: "Partner & Bidder Portal",
+      href: "/partner-portal",
+      description: "Compliance documents & consortium / RFP expression of interest",
+      icon: Handshake,
+      tag: "For Donors",
     },
     {
       label: t.impactMenu.successStories,

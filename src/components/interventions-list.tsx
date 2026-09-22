@@ -414,7 +414,9 @@ export function InterventionsList({ initialFilter = "all" }: InterventionsListPr
 
                   {/* Title & Location */}
                   <h3 className="mt-3 font-serif-display text-lg font-bold text-foreground sm:text-xl group-hover:text-primary transition-colors">
-                    {project.title}
+                    <Link href={`/interventions/${project.id}`} className="hover:underline">
+                      {project.title}
+                    </Link>
                   </h3>
 
                   <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -467,11 +469,11 @@ export function InterventionsList({ initialFilter = "all" }: InterventionsListPr
                     </div>
 
                     <Link
-                      href="/contact"
-                      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-xs font-semibold text-foreground hover:bg-muted transition-colors shadow-2xs"
+                      href={`/interventions/${project.id}`}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-2xs"
                     >
-                      <span>Inquire / Partner</span>
-                      <ArrowRight size={12} className="text-primary" />
+                      <span>View Project Dossier</span>
+                      <ArrowRight size={12} />
                     </Link>
                   </div>
                 </div>

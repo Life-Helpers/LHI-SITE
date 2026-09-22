@@ -3,6 +3,8 @@ import Link from "next/link";
 import { CheckCircle2, Heart, Leaf, ShieldCheck, Sparkles, Users } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
+import { NidakeImpactCalculator } from "@/components/nidake/impact-calculator";
+import { donateHrefForKits } from "@/data/nidake";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
@@ -76,12 +78,14 @@ export default function NidakePage() {
               </div>
               <h3 className="mt-4 text-lg font-bold text-foreground">Reusable</h3>
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                Engineered with multi-layer absorbent cores and leak-proof backing, washable and durable for up to 12 months.
+                Engineered with multi-layer absorbent cores and leak-proof backing, washable, with each kit lasting up to three years.
               </p>
             </div>
           </div>
         </div>
       </section>
+
+      <NidakeImpactCalculator />
 
       {/* Dual Impact: Health & Livelihoods */}
       <section className="py-16 md:py-24 bg-background">
@@ -137,11 +141,11 @@ export default function NidakePage() {
               Sponsor a NIDAKE Dignity Kit
             </h3>
             <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
-              A single NIDAKE kit provides a girl with washable pads, sanitary soap, and an underwear pack lasting an entire year of uninterrupted schooling.
+              A single NIDAKE kit provides a girl with washable pads, sanitary soap, and an underwear pack: three years of menstrual dignity and around 180 school days she no longer misses.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Link
-                href="/donate"
+                href={donateHrefForKits(1)}
                 className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
               >
                 Donate a Dignity Kit →

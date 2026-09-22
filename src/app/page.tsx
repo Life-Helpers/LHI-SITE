@@ -4,6 +4,7 @@ import { HeroSlider } from "@/components/home/hero-slider";
 import { StatsSection } from "@/components/home/stats-section";
 import { WhoWeAreBand } from "@/components/home/who-we-are-band";
 import { WhatWeDoTiles } from "@/components/home/what-we-do-tiles";
+import { OperationalMapSection } from "@/components/home/operational-map-section";
 import { LatestFromLHI } from "@/components/home/latest-from-lhi";
 import { RadioBanner } from "@/components/home/radio-banner";
 import { TestimonialsSection } from "@/components/home/testimonials-section";
@@ -19,6 +20,7 @@ export default function Home() {
       <StatsSection />
       <WhoWeAreBand />
       <WhatWeDoTiles />
+      <OperationalMapSection />
       <LatestFromLHI />
       <RadioBanner />
       <TestimonialsSection />

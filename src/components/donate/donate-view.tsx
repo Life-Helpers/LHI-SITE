@@ -83,6 +83,7 @@ export function DonateView() {
   const [noticeMessage, setNoticeMessage] = useState<string>("");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showBankDetails, setShowBankDetails] = useState<boolean>(false);
+  const [designation, setDesignation] = useState<string | null>(null);
 
   useEffect(() => {
     if (searchParams.get("cancelled") === "true") {
@@ -91,6 +92,20 @@ export function DonateView() {
     const err = searchParams.get("error");
     if (err) {
       setErrorMessage(decodeURIComponent(err));
+    }
+    const presetAmount = Number(searchParams.get("amount"));
+    if (Number.isFinite(presetAmount) && presetAmount >= 5) {
+      setFrequency("one_time");
+      setCustomAmount(String(presetAmount));
+    }
+    if (searchParams.get("designation") === "nidake") {
+      const kits = Number(searchParams.get("kits"));
+      setDesignation("nidake");
+      setNoticeMessage(
+        Number.isFinite(kits) && kits > 0
+          ? `Your gift will sponsor ${kits} NIDAKE dignity ${kits === 1 ? "kit" : "kits"} for displaced and rural schoolgirls.`
+          : "Your gift will sponsor NIDAKE dignity kits for displaced and rural schoolgirls.",
+      );
     }
   }, [searchParams]);
 
@@ -138,6 +153,7 @@ export function DonateView() {
         frequency,
         package_id: customAmount ? null : currentSelectedTier,
         custom_amount: customAmount ? effectiveAmount : null,
+        designation,
       };
 
       const res = await fetch("/api/donations/checkout", {

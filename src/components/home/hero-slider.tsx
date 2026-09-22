@@ -146,15 +146,15 @@ export function HeroSlider({ slides = heroChildSlides }: HeroSliderProps) {
         {/* TOP INTERNAL BAR: Brand badge & Slide Progress Indicator */}
         {/* ========================================================================= */}
         <div className="relative z-10 flex items-center justify-between gap-4">
-          <div className="inline-flex items-center gap-2 rounded-full bg-black/40 backdrop-blur-md border border-white/15 px-3.5 py-1.5 text-xs text-white/90">
-            <Sparkles className="h-3.5 w-3.5 text-accent" />
-            <span className="font-semibold text-white">Life Helpers Initiative</span>
-            <span className="text-white/60">·</span>
-            <span className="text-white/80">{currentSlide.tag}</span>
+          <div className="inline-flex min-w-0 items-center gap-2 rounded-full bg-black/40 backdrop-blur-md border border-white/15 px-3.5 py-1.5 text-xs text-white/90">
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-accent" />
+            <span className="truncate font-semibold text-white">Life Helpers Initiative</span>
+            <span className="hidden text-white/60 sm:inline">·</span>
+            <span className="hidden text-white/80 sm:inline">{currentSlide.tag}</span>
           </div>
 
           {/* Slide Navigation Dots & Play/Pause */}
-          <div className="flex items-center gap-2 rounded-full bg-black/40 backdrop-blur-md border border-white/15 px-3 py-1.5">
+          <div className="flex shrink-0 items-center gap-2 rounded-full bg-black/40 backdrop-blur-md border border-white/15 px-3 py-1.5">
             <div className="flex items-center gap-1.5" role="tablist" aria-label="Hero slides">
               {slides.map((slide, idx) => {
                 const isActive = idx === currentIndex;
