@@ -43,6 +43,27 @@ export default function ProgramsPage() {
             <ProgramCard key={program.id} program={program} />
           ))}
         </div>
+
+        {/* Link to Projects & Interventions */}
+        <div className="mt-14 rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+              Impact Portfolio
+            </span>
+            <h3 className="text-lg font-bold text-foreground sm:text-xl">
+              Specific Grants &amp; Field Interventions
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground max-w-xl">
+              Explore 18+ active and past interventions implemented with institutional donors like MSH, Save the Children, UNICEF, Plan International, and BMZ Germany.
+            </p>
+          </div>
+          <a
+            href="/interventions/projectandintervention"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs"
+          >
+            <span>View All Interventions &rarr;</span>
+          </a>
+        </div>
       </div>
     </main>
   );

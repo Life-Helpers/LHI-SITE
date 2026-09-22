@@ -10,6 +10,7 @@ import {
   FolderGit2,
   GraduationCap,
   Handshake,
+  Headphones,
   HeartHandshake,
   HeartPulse,
   Newspaper,
@@ -17,6 +18,7 @@ import {
   Scale,
   ShieldAlert,
   ShieldCheck,
+  Sliders,
   Sparkles,
   Target,
   Users,
@@ -251,6 +253,20 @@ export const impactLinks: NavLink[] = [
     icon: Radio,
     tag: "Audio Stories",
   },
+  {
+    label: "Before & After Visuals",
+    href: "/transformations",
+    description: "Interactive comparison sliders of community water, farming & clinic upgrades",
+    icon: Sliders,
+    tag: "Visual Proof",
+  },
+  {
+    label: "Multimedia & Radio Hub",
+    href: "/multimedia",
+    description: "Women Situation Room podcasts in Hausa, Kanuri & English",
+    icon: Headphones,
+    tag: "Audio Hub",
+  },
 ];
 
 export const impactFeatured: {
@@ -446,6 +462,20 @@ export function useLocalizedNav() {
       description: "Recorded beneficiary audio testimonials from rural airwaves",
       icon: Radio,
       tag: "Audio Stories",
+    },
+    {
+      label: "Before & After Visuals",
+      href: "/transformations",
+      description: "Interactive comparison sliders of community water, farming & clinic upgrades",
+      icon: Sliders,
+      tag: "Visual Proof",
+    },
+    {
+      label: "Multimedia & Radio Hub",
+      href: "/multimedia",
+      description: "Women Situation Room podcasts in Hausa, Kanuri & English",
+      icon: Headphones,
+      tag: "Audio Hub",
     },
   ];
 

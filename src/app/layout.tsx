@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter, Sora } from "next/font/google";
 import "./globals.css";
@@ -9,7 +10,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AccessibilityProvider } from "@/components/accessibility/accessibility-context";
 import { BokehBackground } from "@/components/effects/bokeh-background";
 import { FloatingWhatsApp } from "@/components/floating-whatsapp";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { LocaleProvider } from "@/i18n/locale-context";
+import { GoogleTranslateBridge } from "@/components/google-translate-bridge";
 import { activeAlerts } from "@/config/alerts";
 import { siteConfig } from "@/config/site";
 
@@ -33,10 +36,51 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: siteConfig.name,
+    default: "Life Helpers Initiative | Humanitarian Relief & Sustainable Development",
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  keywords: [
+    "Life Helpers Initiative",
+    "LHI Nigeria",
+    "Humanitarian Relief Nigeria",
+    "NGO Sokoto",
+    "Tom Brown Nutrition",
+    "NIDAKE Reusable Pads",
+    "VSLA Microfinance Nigeria",
+    "Child Safeguarding Nigeria",
+    "Clean Water Boreholes Sokoto",
+    "Displacement Response Northern Nigeria",
+  ],
+  authors: [{ name: "Life Helpers Initiative", url: siteConfig.url }],
+  creator: "Life Helpers Initiative",
+  publisher: "Life Helpers Initiative",
+  openGraph: {
+    type: "website",
+    locale: "en_NG",
+    url: siteConfig.url,
+    title: "Life Helpers Initiative | Humanitarian Relief & Sustainable Development",
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    images: [
+      {
+        url: "/logo.png",
+        width: 1533,
+        height: 440,
+        alt: "Life Helpers Initiative (LHI) Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Life Helpers Initiative | Humanitarian Relief & Sustainable Development",
+    description: siteConfig.description,
+    images: ["/logo.png"],
+    creator: "@lhinigeria",
+  },
+  alternates: {
+    canonical: siteConfig.url,
+  },
 };
 
 const organizationJsonLd = {
@@ -57,7 +101,11 @@ const organizationJsonLd = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
@@ -79,6 +127,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider>
           <AccessibilityProvider>
             <LocaleProvider>
+              <GoogleTranslateBridge />
               <BokehBackground />
               <a
                 href="#main-content"
@@ -88,6 +137,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </a>
               <EmergencyAlertBanner alerts={activeAlerts} />
               <SiteHeader />
+              <Suspense fallback={null}>
+                <GoogleAnalytics />
+              </Suspense>
               {children}
               <SiteFooter />
               <FloatingWhatsApp />

@@ -1,69 +1,425 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import {
+  ArrowRight,
+  Sparkles,
+  HeartPulse,
+  GraduationCap,
+  Handshake,
+  Wheat,
+  Users,
+  ShieldCheck,
+} from "lucide-react";
 
-import { useLocalizedNav } from "@/components/nav-data";
-import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { useLocale } from "@/i18n/locale-context";
+
+interface StrategicPillar {
+  id: string;
+  pillarNumber: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  href: string;
+  icon: typeof HeartPulse;
+  tag: string;
+  stat: string;
+  statLabel: string;
+  accentColor: string;
+  image: string;
+}
+
+const strategicPillars: StrategicPillar[] = [
+  // 3 UP (Top Row)
+  {
+    id: "health-wash",
+    pillarNumber: "01",
+    title: "Health & WASH",
+    subtitle: "Maternal Health & Clean Water",
+    description:
+      "Tom Brown infant nutrition, mobile clinics, maternal health, and solar clean water boreholes preventing disease.",
+    href: "/health",
+    icon: HeartPulse,
+    tag: "Maternal & Child",
+    stat: "1,200+",
+    statLabel: "Infants Restored",
+    accentColor: "from-emerald-500/20 to-teal-500/10",
+    image:
+      "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: "education",
+    pillarNumber: "02",
+    title: "Education",
+    subtitle: "Accelerated Learning & Girl-Child",
+    description:
+      "Non-formal learning centers, STEM kits, menstrual hygiene education, and girl-child school retention initiatives.",
+    href: "/education",
+    icon: GraduationCap,
+    tag: "Basic Education",
+    stat: "25,000+",
+    statLabel: "Students Reached",
+    accentColor: "from-blue-500/20 to-indigo-500/10",
+    image:
+      "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: "livelihood",
+    pillarNumber: "03",
+    title: "Livelihood",
+    subtitle: "Community Savings & Enterprise",
+    description:
+      "Village Savings and Loans Associations (VSLA), vocational starter kits, small grants, and female economic resilience.",
+    href: "/livelihood",
+    icon: Handshake,
+    tag: "Resilience & Skills",
+    stat: "85+",
+    statLabel: "VSLA Savings Hubs",
+    accentColor: "from-amber-500/20 to-orange-500/10",
+    image:
+      "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&w=600&q=80",
+  },
+  // 3 DOWN (Bottom Row)
+  {
+    id: "food-security",
+    pillarNumber: "04",
+    title: "Food Security",
+    subtitle: "Climate-Smart Agriculture",
+    description:
+      "Drought-resistant crops, dry-season solar irrigation, smallholder farmers' cooperatives, and nutritious harvest storage.",
+    href: "/food-security",
+    icon: Wheat,
+    tag: "Food Systems",
+    stat: "300+",
+    statLabel: "Hectares Farmed",
+    accentColor: "from-lime-500/20 to-emerald-500/10",
+    image:
+      "https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: "social-inclusion",
+    pillarNumber: "05",
+    title: "Social Inclusion",
+    subtitle: "Disability Rights & Civic Advocacy",
+    description:
+      "Accessible infrastructure, assistive mobility devices, sign language integration, and marginalized civic voice empowerment.",
+    href: "/social-inclusion",
+    icon: Users,
+    tag: "Equal Rights & PWDs",
+    stat: "1,800+",
+    statLabel: "PWDs Supported",
+    accentColor: "from-purple-500/20 to-pink-500/10",
+    image:
+      "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    id: "protection",
+    pillarNumber: "06",
+    title: "Protection & GBV",
+    subtitle: "Safe Spaces & PSEA Safeguarding",
+    description:
+      "Confidential survivor support, trauma-informed psychological first aid, legal aid referrals, and child safeguarding.",
+    href: "/protection",
+    icon: ShieldCheck,
+    tag: "Humanitarian Safe Spaces",
+    stat: "24/7",
+    statLabel: "Protection Helpline",
+    accentColor: "from-rose-500/20 to-red-500/10",
+    image:
+      "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80",
+  },
+];
 
 export function WhatWeDoTiles() {
   const { t } = useLocale();
-  const { whatWeDoCards } = useLocalizedNav();
+  const shouldReduceMotion = useReducedMotion();
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+
+  // Split into 3 UP and 3 DOWN (Two Roll layout)
+  const topThree = strategicPillars.slice(0, 3);
+  const bottomThree = strategicPillars.slice(3, 6);
 
   return (
     <section
+      id="what-we-do"
       aria-labelledby="what-we-do-heading"
-      className="border-t border-border/60"
+      className="relative overflow-hidden border-t border-border/70 bg-muted/20 py-20 sm:py-28"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-        <ScrollReveal className="mb-8 flex flex-col gap-2">
-          <h2
-            id="what-we-do-heading"
-            className="text-2xl font-bold tracking-tight sm:text-3xl"
-          >
-            {t.home.whatWeDo.heading}
-          </h2>
-          <p className="max-w-xl text-muted-foreground">
-            {t.home.whatWeDo.subtitle}
-          </p>
-        </ScrollReveal>
+      {/* Background ambient decorative glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-96 w-full max-w-7xl rounded-full bg-primary/5 blur-3xl"
+      />
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {whatWeDoCards.map((card, i) => (
-            <ScrollReveal key={card.href} delay={i * 60}>
-              <Link
-                href={card.href}
-                aria-label={`${card.label}: ${card.description}`}
-                className="group flex h-full items-center gap-4 rounded-3xl border border-border bg-card/60 p-4 backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary shadow-sm group-hover:scale-105 transition-transform duration-200">
-                  <card.icon
-                    className="h-6 w-6 text-primary-foreground"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div>
-                  <p className="font-semibold group-hover:text-primary">
-                    {card.label}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {card.description}
-                  </p>
-                </div>
-              </Link>
-            </ScrollReveal>
-          ))}
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 border-b border-border/60">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>{t.home.whatWeDo.heading || "Our Strategic Pillars"}</span>
+            </div>
+            <h2
+              id="what-we-do-heading"
+              className="mt-3 font-serif-display text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-foreground"
+            >
+              What We Do — <span className="italic text-primary font-serif">Community Impact</span>
+            </h2>
+            <p className="mt-3 text-base text-muted-foreground leading-relaxed">
+              {t.home.whatWeDo.subtitle ||
+                "Integrated humanitarian assistance and sustainable development frameworks across 11 states in Nigeria. Interactive pillars crafted for resilience."}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <Link
+              href="/programs"
+              className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-primary hover:text-primary-foreground transition-all shadow-xs"
+            >
+              <span>{t.home.whatWeDo.viewAllPrograms || "All 9 Interventions"}</span>
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
 
-        <Link
-          href="/programs"
-          className="mt-6 inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-        >
-          {t.home.whatWeDo.viewAllPrograms}
-          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-        </Link>
+        {/* 3 UP, 3 DOWN (TWO ROLL) INTERACTIVE JELLY CARD GRID */}
+        <div className="mt-12 space-y-6 sm:space-y-8">
+          {/* Row 1: 3 UP */}
+          <div>
+            <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              <span>Pillars 01 – 03 • Humanitarian Relief & Development</span>
+              <span className="hidden sm:inline">Row 1 (3 Up)</span>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {topThree.map((pillar, index) => (
+                <JellyCard
+                  key={pillar.id}
+                  pillar={pillar}
+                  index={index}
+                  isHovered={hoveredCardId === pillar.id}
+                  onHover={() => setHoveredCardId(pillar.id)}
+                  onLeave={() => setHoveredCardId(null)}
+                  reducedMotion={!!shouldReduceMotion}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Row 2: 3 DOWN */}
+          <div>
+            <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              <span>Pillars 04 – 06 • Sustainability & Empowerment</span>
+              <span className="hidden sm:inline">Row 2 (3 Down)</span>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {bottomThree.map((pillar, index) => (
+                <JellyCard
+                  key={pillar.id}
+                  pillar={pillar}
+                  index={index + 3}
+                  isHovered={hoveredCardId === pillar.id}
+                  onHover={() => setHoveredCardId(pillar.id)}
+                  onLeave={() => setHoveredCardId(null)}
+                  reducedMotion={!!shouldReduceMotion}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Banner with Radio & Emergency Links */}
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-foreground">
+                Cross-Cutting Innovation: The Women Situation Room
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                Broadcasting in Hausa, Kanuri, Fulfulde, and English across Northern Nigeria.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/radio"
+            className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-primary hover:underline shrink-0"
+          >
+            <span>Explore Radio Advocacy</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </div>
     </section>
+  );
+}
+
+function JellyCard({
+  pillar,
+  index,
+  isHovered,
+  onHover,
+  onLeave,
+  reducedMotion,
+}: {
+  pillar: StrategicPillar;
+  index: number;
+  isHovered: boolean;
+  onHover: () => void;
+  onLeave: () => void;
+  reducedMotion: boolean;
+}) {
+  const Icon = pillar.icon;
+
+  // Spring physics jelly animation configuration
+  const springTransition = {
+    type: "spring" as const,
+    stiffness: 380,
+    damping: 12,
+    mass: 0.8,
+  };
+
+  const jellyVariants = {
+    rest: {
+      scale: 1,
+      y: 0,
+      rotate: 0,
+      borderRadius: "24px",
+      transition: springTransition,
+    },
+    hover: reducedMotion
+      ? { y: -4 }
+      : {
+          scale: 1.035,
+          y: -8,
+          rotate: index % 2 === 0 ? [-0.8, 1.2, -0.6, 0] : [0.8, -1.2, 0.6, 0],
+          borderRadius: [
+            "24px",
+            "30px 18px 28px 20px",
+            "20px 28px 18px 30px",
+            "24px",
+          ],
+          transition: {
+            ...springTransition,
+            rotate: { duration: 0.5, ease: "easeInOut" },
+            borderRadius: { duration: 0.7, ease: "easeInOut" },
+          },
+        },
+    tap: {
+      scale: 0.95,
+      y: 2,
+      rotate: 0,
+      transition: { type: "spring" as const, stiffness: 500, damping: 18 },
+    },
+  };
+
+  return (
+    <motion.div
+      variants={jellyVariants}
+      initial="rest"
+      animate={isHovered ? "hover" : "rest"}
+      whileTap="tap"
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+      className="group relative flex flex-col justify-between overflow-hidden border border-border/80 bg-card p-6 shadow-xs cursor-pointer transition-colors duration-300 hover:border-primary/60 hover:shadow-xl dark:bg-[#070e1c]"
+    >
+      {/* Dynamic Specular Jelly Sheen Overlay */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${pillar.accentColor} opacity-20 transition-opacity duration-300 group-hover:opacity-60`}
+      />
+
+      {/* Gloss reflection sweep */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-white/10 dark:bg-white/5 blur-2xl transition-transform duration-500 group-hover:scale-150"
+      />
+
+      <div>
+        {/* Card Header: Pillar Number & Tag */}
+        <div className="relative z-10 flex items-center justify-between">
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-primary uppercase">
+            Pillar {pillar.pillarNumber}
+          </span>
+          <span className="text-[11px] font-medium text-muted-foreground">
+            {pillar.tag}
+          </span>
+        </div>
+
+        {/* Icon & Title */}
+        <div className="relative z-10 mt-6 flex items-start gap-4">
+          <motion.div
+            animate={
+              isHovered && !reducedMotion
+                ? {
+                    scale: [1, 1.15, 0.95, 1.08, 1],
+                    rotate: [0, -6, 6, -2, 0],
+                  }
+                : { scale: 1, rotate: 0 }
+            }
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm shadow-primary/30"
+          >
+            <Icon className="h-6 w-6" aria-hidden="true" />
+          </motion.div>
+
+          <div className="min-w-0">
+            <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+              {pillar.title}
+            </h3>
+            <p className="text-xs font-semibold text-primary/80 dark:text-accent/90">
+              {pillar.subtitle}
+            </p>
+          </div>
+        </div>
+
+        {/* Thumbnail peek */}
+        <div className="relative mt-4 h-24 w-full overflow-hidden rounded-xl bg-muted">
+          <Image
+            src={pillar.image}
+            alt={pillar.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            referrerPolicy="no-referrer"
+            className="object-cover transition-transform duration-500 group-hover:scale-108 brightness-95 dark:brightness-85"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+          <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-xs">
+            <span className="font-bold text-foreground drop-shadow-sm">
+              {pillar.stat}
+            </span>
+            <span className="text-[10px] text-muted-foreground drop-shadow-sm">
+              {pillar.statLabel}
+            </span>
+          </div>
+        </div>
+
+        {/* Description */}
+        <p className="relative z-10 mt-4 text-xs leading-relaxed text-muted-foreground line-clamp-3">
+          {pillar.description}
+        </p>
+      </div>
+
+      {/* Card Action Link */}
+      <div className="relative z-10 mt-6 flex items-center justify-between border-t border-border/70 pt-4">
+        <Link
+          href={pillar.href}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary group-hover:underline"
+        >
+          <span>Explore Pillar</span>
+          <motion.span
+            animate={isHovered ? { x: 4 } : { x: 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          >
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </motion.span>
+        </Link>
+        <span className="text-[10px] text-muted-foreground">Learn more</span>
+      </div>
+    </motion.div>
   );
 }

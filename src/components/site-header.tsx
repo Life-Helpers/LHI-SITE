@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, Radio, Sparkles, X } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -30,21 +29,27 @@ import { useLocale } from "@/i18n/locale-context";
 function NavUnderlineLink({
   href,
   className = "",
+  insideHero = false,
   children,
 }: {
   href: string;
   className?: string;
+  insideHero?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <Link
       href={href}
-      className={`group relative rounded text-sm font-medium text-foreground/80 hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-ring ${className}`}
+      className={`group relative px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+        insideHero ? "text-white/90 hover:text-white" : "text-foreground/80 hover:text-primary"
+      } transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring ${className}`}
     >
       {children}
       <span
         aria-hidden="true"
-        className="absolute -bottom-1 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent transition-transform duration-300 group-hover:scale-x-100"
+        className={`absolute left-3 right-3 bottom-0 h-0.5 origin-left scale-x-0 ${
+          insideHero ? "bg-white" : "bg-primary"
+        } transition-transform duration-300 group-hover:scale-x-100`}
       />
     </Link>
   );
@@ -617,8 +622,14 @@ function MobileDisclosure({
   );
 }
 
-export function SiteHeader() {
+interface SiteHeaderProps {
+  insideHero?: boolean;
+}
+
+export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { t } = useLocale();
   const {
     whoWeAreLinks,
@@ -627,21 +638,48 @@ export function SiteHeader() {
     impactLinks,
   } = useLocalizedNav();
 
+  useEffect(() => {
+    if (!insideHero) return;
+
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 30;
+      setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev));
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [insideHero]);
+
+  if (pathname === "/" && !insideHero) {
+    return null;
+  }
+
+  const isHeroGlass = insideHero && !isScrolled;
+
   const simpleLinks: NavLink[] = [
     { label: t.nav.getInvolved, href: "/get-involved" },
-    { label: "Careers", href: "/career" },
     { label: t.nav.contact, href: "/contact" },
   ];
 
   return (
-    <header className="glass-surface relative sticky top-0 z-40 mx-auto mt-3 w-[calc(100%-1.5rem)] max-w-6xl rounded-3xl border-border/80 sm:w-[calc(100%-3rem)]">
-      <nav
-        aria-label="Primary"
-        className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6"
+    <header
+      className={
+        insideHero
+          ? isScrolled
+            ? "fixed top-0 left-0 right-0 w-full z-50 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 shadow-md transition-all duration-300"
+            : "w-full bg-black/40 backdrop-blur-md border border-white/20 rounded-2xl px-4 sm:px-6 py-3 shadow-2xl transition-all duration-300"
+          : "sticky top-0 z-50 w-full transition-colors duration-300 bg-background/85 dark:bg-[#050b18]/85 backdrop-blur-xl border-b border-primary/10 dark:border-white/10 shadow-xs"
+      }
+    >
+      <div
+        className={`max-w-[1440px] mx-auto ${
+          isHeroGlass ? "px-1 sm:px-3" : "px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16"
+        } h-16 sm:h-20 flex items-center justify-between gap-4 transition-all duration-300`}
       >
         <Link
           href="/"
-          className="rounded focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-ring"
+          className="rounded focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-ring shrink-0"
         >
           <Image
             src="/logo.png"
@@ -649,19 +687,24 @@ export function SiteHeader() {
             width={1533}
             height={440}
             priority
-            className="h-9 w-auto sm:h-10"
+            referrerPolicy="no-referrer"
+            className="h-9 sm:h-10 w-auto transition-all duration-300 hover:scale-[1.02]"
           />
         </Link>
 
-        <NavigationMenu className="hidden md:flex">
-          <NavigationMenuList>
+        <NavigationMenu className="hidden md:flex" aria-label="Primary">
+          <NavigationMenuList className="gap-2 lg:gap-4">
             <NavigationMenuItem>
-              <NavUnderlineLink href="/">{t.nav.home}</NavUnderlineLink>
+              <NavUnderlineLink href="/" insideHero={isHeroGlass}>{t.nav.home}</NavUnderlineLink>
             </NavigationMenuItem>
 
             {/* WHO WE ARE MEGA MENU */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>{t.nav.whoWeAre}</NavigationMenuTrigger>
+              <NavigationMenuTrigger className={`px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+                isHeroGlass ? "text-white/90 hover:text-white data-[state=open]:text-white" : "text-foreground/80 hover:text-primary data-[state=open]:text-primary"
+              } transition-colors`}>
+                {t.nav.whoWeAre}
+              </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <WhoWeAreMegaMenu links={whoWeAreLinks} />
               </NavigationMenuContent>
@@ -669,7 +712,11 @@ export function SiteHeader() {
 
             {/* WHAT WE DO MEGA MENU */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>{t.nav.whatWeDo}</NavigationMenuTrigger>
+              <NavigationMenuTrigger className={`px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+                isHeroGlass ? "text-white/90 hover:text-white data-[state=open]:text-white" : "text-foreground/80 hover:text-primary data-[state=open]:text-primary"
+              } transition-colors`}>
+                {t.nav.whatWeDo}
+              </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <WhatWeDoMegaMenu cards={whatWeDoCards} extra={whatWeDoExtra} />
               </NavigationMenuContent>
@@ -677,7 +724,11 @@ export function SiteHeader() {
 
             {/* IMPACT MEGA MENU */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>{t.nav.impact}</NavigationMenuTrigger>
+              <NavigationMenuTrigger className={`px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+                isHeroGlass ? "text-white/90 hover:text-white data-[state=open]:text-white" : "text-foreground/80 hover:text-primary data-[state=open]:text-primary"
+              } transition-colors`}>
+                {t.nav.impact}
+              </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ImpactMegaMenu links={impactLinks} />
               </NavigationMenuContent>
@@ -685,7 +736,7 @@ export function SiteHeader() {
 
             {simpleLinks.map((link) => (
               <NavigationMenuItem key={link.href}>
-                <NavUnderlineLink href={link.href}>
+                <NavUnderlineLink href={link.href} insideHero={isHeroGlass}>
                   {link.label}
                 </NavUnderlineLink>
               </NavigationMenuItem>
@@ -693,24 +744,28 @@ export function SiteHeader() {
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <div className="hidden items-center gap-1.5 sm:flex">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className={`hidden items-center gap-1.5 sm:flex ${isHeroGlass ? "[&_button]:border-white/30 [&_button]:text-white [&_button:hover]:border-white/60" : ""}`}>
             <LanguageSwitcher />
             <AccessibilityToolbar />
             <ThemeToggle />
           </div>
 
-          <Button
-            asChild
-            size="sm"
-            className="transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_var(--glow-shadow-hover)]"
+          <Link
+            href="/donate"
+            className="btn-swipe group hidden sm:inline-flex items-center gap-2 rounded-full border border-primary dark:border-accent bg-primary text-primary-foreground hover:text-white px-5 py-2.5 text-[12px] uppercase tracking-[0.18em] font-semibold shadow-sm transition-all duration-300 active:scale-95"
           >
-            <Link href="/donate">{t.nav.donate}</Link>
-          </Button>
+            <span>{t.nav.donate}</span>
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+          </Link>
 
           <button
             type="button"
-            className="rounded p-2 hover:bg-foreground/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring md:hidden"
+            className={`inline-flex items-center justify-center w-10 h-10 rounded-full border ${
+              isHeroGlass
+                ? "border-white/30 text-white hover:bg-white/10"
+                : "border-primary/30 dark:border-white/20 text-primary dark:text-accent hover:bg-primary/5"
+            } md:hidden transition-colors`}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
             onClick={() => setMenuOpen((open) => !open)}
@@ -725,13 +780,17 @@ export function SiteHeader() {
             </span>
           </button>
         </div>
-      </nav>
+      </div>
 
       {/* MOBILE DRAWER */}
       {menuOpen && (
         <div
           id="mobile-nav"
-          className="flex flex-col gap-1 border-t border-border px-4 py-3 md:hidden max-h-[80vh] overflow-y-auto"
+          className={`flex flex-col gap-1 border-t ${
+            isHeroGlass
+              ? "border-white/20 bg-slate-950/95 text-white rounded-b-2xl"
+              : "border-border/80 bg-background/95 dark:bg-[#050b18]/95 text-foreground"
+          } backdrop-blur-2xl px-6 py-4 md:hidden max-h-[80vh] overflow-y-auto shadow-2xl`}
         >
           <Link
             href="/"

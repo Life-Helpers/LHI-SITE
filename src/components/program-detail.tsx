@@ -1,11 +1,27 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Heart, MapPin, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  FolderGit2,
+  Heart,
+  MapPin,
+  Sparkles,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { Program } from "@/types/content";
+import { INTERVENTIONS_DATA, type ThematicPillarId } from "@/data/interventions-data";
 
 export function ProgramDetail({ program }: { program: Program }) {
+  // Find all projects linked to this thematic pillar
+  const pillarId = program.id as ThematicPillarId;
+  const linkedProjects = INTERVENTIONS_DATA.filter((proj) =>
+    proj.thematicAreas.some((t) => t.id === pillarId)
+  );
+
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
@@ -93,16 +109,109 @@ export function ProgramDetail({ program }: { program: Program }) {
           ))}
         </dl>
 
+        {/* Linked Projects & Interventions Section */}
+        {linkedProjects.length > 0 && (
+          <div className="mt-14 rounded-3xl border border-border bg-muted/20 p-6 sm:p-8">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+                  <FolderGit2 size={14} />
+                  <span>Impact &middot; Projects &amp; Interventions</span>
+                </div>
+                <h2 className="mt-1 font-serif-display text-xl font-bold text-foreground sm:text-2xl">
+                  Active Projects in {program.name}
+                </h2>
+              </div>
+              <Link
+                href="/interventions/projectandintervention"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+              >
+                <span>View All Interventions ({INTERVENTIONS_DATA.length})</span>
+                <ArrowRight size={12} />
+              </Link>
+            </div>
+
+            <p className="mt-3 text-xs text-muted-foreground">
+              These field-level interventions are currently or previously implemented under our {program.name} thematic portfolio across northern Nigeria:
+            </p>
+
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {linkedProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-4 shadow-2xs hover:border-primary/50 hover:shadow-xs transition-all"
+                >
+                  <div>
+                    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-muted mb-3">
+                      <Image
+                        src={project.image.src}
+                        alt={project.image.alt}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 400px"
+                        referrerPolicy="no-referrer"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <span className="absolute top-2 left-2 rounded-full bg-background/90 px-2.5 py-0.5 text-[10px] font-semibold text-foreground backdrop-blur-md">
+                        {project.status}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-[11px] font-medium text-primary">
+                      <Building2 size={12} />
+                      <span className="line-clamp-1">{project.donor}</span>
+                    </div>
+
+                    <h3 className="mt-1 text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                      {project.title}
+                    </h3>
+
+                    <div className="mt-1.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <MapPin size={11} className="text-primary shrink-0" />
+                      <span className="line-clamp-1">{project.locations}</span>
+                    </div>
+
+                    <p className="mt-2 text-xs text-muted-foreground line-clamp-3">
+                      {project.summary}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-[11px]">
+                    <span className="font-medium text-foreground flex items-center gap-1">
+                      <CheckCircle2 size={12} className="text-primary" />
+                      <span>{project.duration}</span>
+                    </span>
+                    <Link
+                      href="/interventions/projectandintervention"
+                      className="font-semibold text-primary hover:underline inline-flex items-center gap-0.5"
+                    >
+                      <span>Full Details</span>
+                      <ArrowRight size={10} />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mt-10 border-t border-border pt-8 flex flex-wrap items-center justify-between gap-4">
           <Button asChild size="lg">
             <Link href="/donate">Support this work</Link>
           </Button>
-          <Link
-            href="/success-stories"
-            className="text-sm font-semibold text-primary hover:underline"
-          >
-            Read beneficiary success stories →
-          </Link>
+          <div className="flex items-center gap-4 text-sm font-semibold">
+            <Link
+              href="/interventions/projectandintervention"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              All Projects &amp; Interventions &rarr;
+            </Link>
+            <Link
+              href="/success-stories"
+              className="text-primary hover:underline"
+            >
+              Read beneficiary stories &rarr;
+            </Link>
+          </div>
         </div>
       </div>
     </main>

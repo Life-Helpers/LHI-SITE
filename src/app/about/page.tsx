@@ -6,6 +6,7 @@ import { CheckCircle2, Heart, Lock, Users } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { FaqAccordion } from "@/components/faq-accordion";
 
 export const metadata: Metadata = {
   title: "About Us | Life Helpers Initiative",
@@ -235,6 +236,11 @@ export default function AboutPage() {
             </Link>
           </div>
         </div>
+      </section>
+
+      {/* Frequently Asked Questions */}
+      <section className="border-t border-border bg-background py-16 sm:py-24">
+        <FaqAccordion />
       </section>
     </main>
   );

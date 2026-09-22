@@ -6,6 +6,7 @@ import { Lock, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { useLocale } from "@/i18n/locale-context";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export function SiteFooter() {
   const { t } = useLocale();
@@ -45,6 +46,7 @@ export function SiteFooter() {
   const getInvolvedLinks = [
     { label: t.nav.donate, href: "/donate" },
     { label: t.nav.getInvolved, href: "/get-involved" },
+    { label: "Frequently Asked Questions", href: "/faq" },
     { label: "Careers & Vacancies", href: "/career" },
     { label: t.footer.contact, href: "/contact" },
     { label: t.footer.privacy, href: "/privacy" },
@@ -64,6 +66,7 @@ export function SiteFooter() {
                 alt={siteConfig.name}
                 width={1533}
                 height={440}
+                referrerPolicy="no-referrer"
                 className="h-9 w-auto sm:h-10"
               />
             </Link>
@@ -212,6 +215,15 @@ export function SiteFooter() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            <LanguageSwitcher />
+            <span className="text-border" aria-hidden="true">•</span>
+            <Link
+              href="/faq"
+              className="hover:text-foreground transition-colors"
+            >
+              FAQ
+            </Link>
+            <span className="text-border" aria-hidden="true">•</span>
             <Link
               href="/privacy"
               className="hover:text-foreground transition-colors"

@@ -9,6 +9,7 @@ import {
   Briefcase,
   Building2,
   CheckCircle2,
+  Clock,
   GraduationCap,
   HandHeart,
   Heart,
@@ -17,10 +18,12 @@ import {
   Megaphone,
   ShieldCheck,
   Sparkles,
+  Users,
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { recentJobPostings } from "@/data/careers-data";
 
 interface FormData {
   name: string;
@@ -89,6 +92,18 @@ const cards = [
       to: "/contact",
       label: "Advocate with us",
       isAnchor: false,
+    },
+  },
+  {
+    id: "careers",
+    index: "05",
+    icon: Briefcase,
+    title: "Careers & Jobs",
+    body: "Join our frontline humanitarian team across 11 states in Nigeria. Professional roles in Health, Nutrition, Protection & PSEA, MEAL, and Operations.",
+    cta: {
+      anchor: "#careers",
+      label: "View Open Vacancies",
+      isAnchor: true,
     },
   },
 ];
@@ -527,45 +542,119 @@ export function GetInvolvedView() {
         </div>
       </section>
 
-      {/* 4. ADDITIONAL OPPORTUNITIES: CAREERS & INSTITUTIONAL PARTNERSHIPS */}
+      {/* 4. CAREERS & HUMANITARIAN VACANCIES SECTION */}
+      <section id="careers" className="border-t border-border bg-card/40 py-16 sm:py-24" aria-label="Careers and job opportunities">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-border/80 pb-6">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                <Briefcase className="h-3.5 w-3.5" />
+                <span>Careers & Open Vacancies</span>
+              </div>
+              <h2 className="mt-3 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
+                Work With Us on the Frontlines
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground leading-relaxed">
+                Join our multi-disciplinary team delivering life-saving relief, nutrition, maternal health, child protection, and resilience programming across 11 states in Nigeria.
+              </p>
+            </div>
+            <Link
+              href="/career"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-all shrink-0 self-start sm:self-auto"
+            >
+              <span>Explore All Vacancies</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          {/* Job Postings Grid Preview */}
+          <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2">
+            {recentJobPostings.slice(0, 4).map((job) => (
+              <div
+                key={job.id}
+                className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-xs transition-all hover:border-primary/50 hover:shadow-md"
+              >
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+                      {job.department}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+                      <Clock className="h-3 w-3" />
+                      {job.type}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-3 text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    {job.title}
+                  </h3>
+
+                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1">
+                      <MapPin className="h-3.5 w-3.5 text-primary" />
+                      {job.location}, {job.state}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Users className="h-3.5 w-3.5 text-primary" />
+                      {job.slots} {job.slots === 1 ? "Slot" : "Slots"}
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-xs text-muted-foreground leading-relaxed line-clamp-3">
+                    {job.summary}
+                  </p>
+                </div>
+
+                <div className="mt-6 flex items-center justify-between border-t border-border/70 pt-4">
+                  <span className="text-[11px] text-muted-foreground">
+                    Experience: {job.experienceLevel}
+                  </span>
+                  <Link
+                    href="/career"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                  >
+                    <span>View & Apply</span>
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Equal Opportunity & Safeguarding Footnote */}
+          <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-border/80 bg-muted/40 p-5 text-xs text-muted-foreground">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-foreground">Equal Opportunity & PSEA Zero Tolerance:</strong> LHI does not charge application fees at any recruitment stage. Female candidates and persons with disabilities are strongly encouraged to apply.
+              </div>
+            </div>
+            <a
+              href={`mailto:${siteConfig.contact.recruitmentEmail}?subject=Career%20Inquiry`}
+              className="inline-flex items-center gap-1.5 whitespace-nowrap font-medium text-primary hover:underline shrink-0"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              {siteConfig.contact.recruitmentEmail}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. ADDITIONAL OPPORTUNITIES: TRAINING & CERTIFICATIONS */}
       <section className="border-t border-border py-16 sm:py-20" aria-label="Additional opportunities">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between border-b border-border/80 pb-6">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-muted-foreground">
-                — Professional & Academic Pathways
+                — Academic & Certified Pathways
               </p>
               <h2 className="mt-2 font-serif-display text-2xl font-light text-foreground sm:text-3xl">
-                Looking for careers or certified training?
+                Looking for humanitarian training & certifications?
               </h2>
             </div>
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {/* Career Opportunities */}
-            <div className="flex flex-col justify-between rounded-xl border border-border bg-card/60 p-6 backdrop-blur-sm">
-              <div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <Briefcase className="h-5 w-5" aria-hidden="true" />
-                </div>
-                <h3 className="mt-4 font-semibold text-foreground">
-                  Career Vacancies
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Open roles across monitoring and evaluation, medical nutrition, child safeguarding, finance, and field logistics are posted periodically.
-                </p>
-              </div>
-              <div className="mt-6">
-                <a
-                  href={`mailto:${siteConfig.contact.recruitmentEmail}?subject=Career%20Inquiry%20-%20LHI`}
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-primary hover:underline"
-                >
-                  <Mail className="h-3.5 w-3.5" aria-hidden="true" />
-                  Email recruitment ({siteConfig.contact.recruitmentEmail})
-                </a>
-              </div>
-            </div>
-
             {/* Courses & Certification */}
             <div className="flex flex-col justify-between rounded-xl border border-border bg-card/60 p-6 backdrop-blur-sm">
               <div>
@@ -587,6 +676,30 @@ export function GetInvolvedView() {
                   <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                   Inquire about training ({siteConfig.contact.email})
                 </a>
+              </div>
+            </div>
+
+            {/* Institutional Partnerships */}
+            <div className="flex flex-col justify-between rounded-xl border border-border bg-card/60 p-6 backdrop-blur-sm">
+              <div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Building2 className="h-5 w-5" aria-hidden="true" />
+                </div>
+                <h3 className="mt-4 font-semibold text-foreground">
+                  Institutional Partnerships & Research
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  We partner with UN agencies, international non-profits, universities, and research institutes on joint baseline assessments and community impact research.
+                </p>
+              </div>
+              <div className="mt-6">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-primary hover:underline"
+                >
+                  <Mail className="h-3.5 w-3.5" aria-hidden="true" />
+                  Connect with Partnership Directorate →
+                </Link>
               </div>
             </div>
           </div>

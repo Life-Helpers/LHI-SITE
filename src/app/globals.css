@@ -141,6 +141,20 @@
   --animate-drift-2: drift-2 38s ease-in-out infinite;
   --animate-drift-3: drift-3 44s ease-in-out infinite;
   --animate-fade-blur-in: fade-blur-in 0.8s ease-out both;
+  --animate-marquee: marquee 85s linear infinite;
+  --animate-marquee-fast: marquee 45s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 85s linear infinite;
+  --animate-marquee-reverse-fast: marquee-reverse 45s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
 }
 
 @keyframes drift-1 {
@@ -243,6 +257,63 @@ h1, h2, h3, h4, h5, h6 {
 
 .font-serif-display {
   font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-feature-settings: "liga", "dlig";
+  letter-spacing: -0.02em;
+}
+
+/* Compassionate Health Foundation signature styling primitives */
+.hairline {
+  height: 1px;
+  background: currentColor;
+  opacity: 0.25;
+}
+
+.chf-frame {
+  padding: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 36px rgba(235, 22, 28, 0.08);
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.dark .chf-frame {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+}
+
+.btn-swipe {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-swipe::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: translateY(101%);
+  transition: transform 0.42s cubic-bezier(0.76, 0, 0.24, 1);
+  z-index: -1;
+}
+.btn-swipe:hover::before {
+  transform: translateY(0);
+}
+
+.ken-burns-pan {
+  animation: kenBurnsSlow 24s ease-in-out infinite alternate;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+@keyframes kenBurnsSlow {
+  0% { transform: scale(1.03) translate(0, 0); }
+  50% { transform: scale(1.08) translate(-1%, -1%); }
+  100% { transform: scale(1.04) translate(1%, 1%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ken-burns-pan {
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 /* Mega menu fixed dropdown: suppress all slide, move, and carousel animations */
@@ -253,3 +324,36 @@ h1, h2, h3, h4, h5, h6 {
   transition: none !important;
   transform: none !important;
 }
+
+/* Google Translate seamless full-site translation */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+body {
+  top: 0 !important;
+  position: static !important;
+}
+
+.goog-tooltip,
+.goog-tooltip:hover {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+#google_translate_element {
+  display: none !important;
+}
+
+.skiptranslate > iframe {
+  display: none !important;
+}
+

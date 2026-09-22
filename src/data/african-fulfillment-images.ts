@@ -13,6 +13,136 @@ export interface FulfillmentImage {
   tag?: string;
 }
 
+export interface HeroSlideItem {
+  id: string;
+  src: string;
+  alt: string;
+  eyebrow: string;
+  prefix: string;
+  highlight: string;
+  suffix: string;
+  body: string;
+  caption: string;
+  tag: string;
+  mottoBadge: string;
+  primaryCta: {
+    label: string;
+    href: string;
+  };
+  secondaryCta: {
+    label: string;
+    href: string;
+  };
+}
+
+export const heroChildSlides: HeroSlideItem[] = [
+  {
+    id: "slide-smile",
+    src: "https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?auto=format&fit=crop&w=1600&q=85",
+    alt: "Joyful African child with a wide beaming radiant smile embodying pure hope and happiness",
+    eyebrow: "Life Helpers Initiative · Sokoto, Nigeria",
+    prefix: "Putting a radiant smile on every child's face across ",
+    highlight: "Northern Nigeria",
+    suffix: ".",
+    body: "Since 2004, LHI has combined humanitarian relief, child protection, and community development across 11 states — touching lives, transforming households, and nurturing resilient young generations.",
+    caption: "Putting a smile on a face — bringing dignity, joy, and hope to every vulnerable child.",
+    tag: "Child Welfare & Hope",
+    mottoBadge: "Motto: “Putting a smile on a face” since 2004",
+    primaryCta: {
+      label: "Donate Now",
+      href: "/donate",
+    },
+    secondaryCta: {
+      label: "See Our Programs",
+      href: "/programs",
+    },
+  },
+  {
+    id: "slide-education",
+    src: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1600&q=85",
+    alt: "African school children smiling brightly in classroom during interactive learning",
+    eyebrow: "Education & Girl-Child Literacy",
+    prefix: "Nurturing young minds through ",
+    highlight: "inclusive quality learning",
+    suffix: ".",
+    body: "Providing school kits, safe learning spaces, teacher training, and scholarships to eliminate barriers for out-of-school children and vulnerable girl scholars.",
+    caption: "Empowering over 80,000 children to learn, read, and lead with confidence and joy.",
+    tag: "Quality Education",
+    mottoBadge: "Equal Access to Joyful Learning",
+    primaryCta: {
+      label: "Support Education",
+      href: "/education",
+    },
+    secondaryCta: {
+      label: "View Success Stories",
+      href: "/success-stories",
+    },
+  },
+  {
+    id: "slide-health",
+    src: "https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=1600&q=85",
+    alt: "Radiant African girl smiling with bright eyes and hope in community health program",
+    eyebrow: "Maternal, Infant & Child Health",
+    prefix: "Restoring health, nutrition & vitality for ",
+    highlight: "vulnerable children",
+    suffix: ".",
+    body: "Delivering life-saving primary healthcare, routine immunization, therapeutic nutrition for malnourished children, and clean WASH facilities in remote rural settlements.",
+    caption: "Clinical nutrition and immunization restoring vibrant health and childhood smiles.",
+    tag: "Vitality & Nutrition",
+    mottoBadge: "Every Child Healthy & Thriving",
+    primaryCta: {
+      label: "Health Interventions",
+      href: "/health",
+    },
+    secondaryCta: {
+      label: "Our Impact",
+      href: "/impact",
+    },
+  },
+  {
+    id: "slide-protection",
+    src: "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?auto=format&fit=crop&w=1600&q=85",
+    alt: "Young African boy with a beaming confident smile in a child-friendly safe space",
+    eyebrow: "Child Protection & Psychosocial Care",
+    prefix: "Creating safe havens and safeguarding ",
+    highlight: "children's dignity",
+    suffix: ".",
+    body: "Establishing community child-friendly spaces, psychosocial trauma counseling, and zero-tolerance safeguarding policies that protect children from harm and exploitation.",
+    caption: "Safe community spaces where children play, heal, and develop their full potential.",
+    tag: "Safe & Protected",
+    mottoBadge: "Safe Havens for Every Child",
+    primaryCta: {
+      label: "Protect Children",
+      href: "/protection",
+    },
+    secondaryCta: {
+      label: "Our Safeguarding",
+      href: "/our-commitment",
+    },
+  },
+  {
+    id: "slide-community",
+    src: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1600&q=85",
+    alt: "Group of African children smiling and laughing together outdoors with genuine happiness",
+    eyebrow: "20+ Years of Impact · 1.5M+ Lives Reached",
+    prefix: "Transforming communities with love, honesty and ",
+    highlight: "unwavering hope",
+    suffix: ".",
+    body: "From Beulah Projects funfairs in Sokoto in 2004 to a national NGO operating across 11 states — bringing smiles, resilience, and economic dignity to households.",
+    caption: "Two decades of continuous dedication to putting smiles on faces across Nigeria.",
+    tag: "20 Years of Impact",
+    mottoBadge: "1.5M+ Smiles & Counting",
+    primaryCta: {
+      label: "Get Involved",
+      href: "/get-involved",
+    },
+    secondaryCta: {
+      label: "About Life Helpers",
+      href: "/about",
+    },
+  },
+];
+
 export const africanFulfillmentImages = {
   // 1. Home Hero & Banner
   homeHero: {

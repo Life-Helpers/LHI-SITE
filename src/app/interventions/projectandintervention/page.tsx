@@ -1,141 +1,88 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  Baby,
-  CheckCircle2,
-  GraduationCap,
-  HeartPulse,
+  ArrowRight,
+  Award,
+  Building,
+  FileText,
+  Handshake,
+  HeartHandshake,
+  Layers,
   MapPin,
-  Radio,
   ShieldCheck,
+  Sparkles,
   Users,
-  Wheat,
 } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
+import { InterventionsList } from "@/components/interventions-list";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
   title: "Projects & Interventions | Life Helpers Initiative",
   description:
-    "Explore active and past humanitarian, health, education, and livelihood interventions implemented by Life Helpers Initiative across 11 Nigerian states.",
+    "Explore active and past humanitarian, health, education, and livelihood interventions implemented by Life Helpers Initiative across 11 Nigerian states alongside MSH, Save the Children, UNICEF, Plan International, SIF, ZOA, and BMZ.",
+  keywords: [
+    "LHI projects",
+    "interventions Nigeria",
+    "Life Helpers Initiative programs",
+    "MSH Zamfara malaria",
+    "Save the Children Yobe early recovery",
+    "Spotlight Initiative Sokoto",
+    "UNICEF MIRP nutrition",
+    "Plan International BMZ",
+    "Secours Islamique France",
+    "ZOA Borno agriculture",
+  ],
+  openGraph: {
+    title: "Projects & Interventions | Life Helpers Initiative",
+    description:
+      "Comprehensive directory of LHI's evidence-based humanitarian and development projects mapped to our 6 thematic areas across 11 states in Nigeria.",
+    type: "website",
+  },
 };
 
-const interventions = [
-  {
-    id: "plan-aspired",
-    title: "ASPIRED: Adolescent Sexual and Reproductive Health and Rights",
-    donor: "Funded by Global Affairs Canada & Canadian Donors, via Plan International",
-    category: "Health & Gender",
-    locations: "Bauchi & Sokoto States",
-    duration: "5-Year Multi-Phase Project",
-    icon: HeartPulse,
-    summary:
-      "A flagship initiative improving adolescent sexual and reproductive health outcomes. LHI establishes youth-friendly health corners, trains frontline health workers on respectful adolescent care, and mobilizes peer educators to dismantle taboos and counter early child marriage.",
-    stats: "Over 85,000 adolescents reached with youth-friendly healthcare and rights education.",
-  },
-  {
-    id: "plan-bmz",
-    title: "PLAN BMZ Community Resilience & Livelihoods Project",
-    donor: "German Federal Ministry for Economic Cooperation and Development (BMZ) via Plan International",
-    category: "Livelihoods & Food Security",
-    locations: "Yobe State (Conflict-Affected LGAs)",
-    duration: "Multi-Year Humanitarian-Development Nexus",
-    icon: Wheat,
-    summary:
-      "Strengthening economic resilience in communities recovering from insurgency. Delivers Village Savings and Loan Associations (VSLA), climate-resilient dry-season farming inputs, small ruminant livestock transfers to female-headed households, and local peace committees.",
-    stats: "120+ Village Savings groups established, supporting over 3,200 households.",
-  },
-  {
-    id: "unicef-mirp",
-    title: "UNICEF Multi-Sectoral Integrated Resilience Programme (MIRP)",
-    donor: "UNICEF Nigeria",
-    category: "Resilience, Health & WASH",
-    locations: "Zamfara State (Gusau, Maru, Kaura Namoda, Anka)",
-    duration: "Active Field Program",
-    icon: Baby,
-    summary:
-      "Combines nutrition stabilization, infant and young child feeding (IYCF), routine immunization catch-up, and community-led total sanitation (CLTS) to reverse acute malnutrition and infectious disease burdens in hard-to-reach rural wards.",
-    stats: "45,000+ children screened for malnutrition; 98% cure rate in outpatient stabilization.",
-  },
-  {
-    id: "unicef-reach",
-    title: "REACH: Reaching and Empowering Adolescent Girls",
-    donor: "UNICEF Nigeria",
-    category: "Education & Protection",
-    locations: "Northwest Nigeria (Sokoto, Kebbi, Zamfara)",
-    duration: "Multi-Year Initiative",
-    icon: GraduationCap,
-    summary:
-      "Re-enrolling out-of-school adolescent girls and survivors of violence into non-formal accelerated literacy, numeracy, and vocational skills programs. Integrates psycho-social counseling, menstrual hygiene management, and enterprise start-up kits.",
-    stats: "Over 14,000 adolescent girls transitioned to formal schools or viable micro-enterprises.",
-  },
-  {
-    id: "nhf-cpie",
-    title: "NHF Emergency Child Protection & Dignity Kit Distribution",
-    donor: "Nigeria Humanitarian Fund (NHF) / UN OCHA, Child Protection AoR",
-    category: "Protection & Emergencies",
-    locations: "Borno State (Jere LGA & Maiduguri Metropole)",
-    duration: "Humanitarian Response",
-    icon: ShieldCheck,
-    summary:
-      "Providing emergency child protection case management, identification and tracing of unaccompanied and separated children (UASC), safe spaces for children displaced by conflict, and distribution of comprehensive dignity kits to women and adolescent girls.",
-    stats: "18,000+ dignity kits delivered; 2,400 vulnerable children provided psychosocial first aid.",
-  },
-  {
-    id: "unicef-sarah",
-    title: "SARAH: Strengthening Access to Reproductive & Adolescent Health",
-    donor: "UNICEF Nigeria",
-    category: "Health & Youth",
-    locations: "Sokoto State",
-    duration: "Strategic Program",
-    icon: Users,
-    summary:
-      "Empowers adolescent girls through school health clubs, community health dialogues, and youth-tailored clinic days at primary healthcare facilities, reducing teenage pregnancy and maternal mortality.",
-    stats: "110 health facility staff mentored in youth-responsive healthcare delivery.",
-  },
-  {
-    id: "bmz-mothers",
-    title: "BMZ / KfW Mothers' Associations for Girls' Education",
-    donor: "German Government (BMZ) via KfW Development Bank & UNICEF",
-    category: "Education in Emergencies",
-    locations: "Zamfara & Sokoto States",
-    duration: "Education Program",
-    icon: GraduationCap,
-    summary:
-      "Mobilizes mothers into organized advocacy associations that monitor girl-child school attendance, conduct house-to-house enrollment drives, and manage community revolving micro-funds for school uniforms and books.",
-    stats: "Over 220 functional Mothers' Associations established across 40 rural wards.",
-  },
-  {
-    id: "nhf-wash",
-    title: "NHF Integrated WASH & Cholera Outbreak Prevention",
-    donor: "Nigeria Humanitarian Fund (NHF)",
-    category: "WASH & Public Health",
-    locations: "Adamawa & Borno States",
-    duration: "Emergency Health Response",
-    icon: HeartPulse,
-    summary:
-      "Rehabilitating dysfunctional community boreholes with solar pumps, constructing disability-accessible sanitation blocks in IDP camps, and deploying door-to-door community health volunteers for rapid cholera case detection and water chlorination.",
-    stats: "Over 65,000 community members provided sustained access to safe potable water.",
-  },
-  {
-    id: "women-situation-room",
-    title: "Women Situation Room & Peace Radio Dialogues",
-    donor: "Life Helpers Initiative Media Advocacy Directorate",
-    category: "Advocacy & Media",
-    locations: "11 States Broadcast Network",
-    duration: "Weekly Flagship Broadcast",
-    icon: Radio,
-    summary:
-      "Broadcasting weekly radio discussions in Hausa, Kanuri, and English addressing gender-based violence, civic rights, peacebuilding, routine immunization, and reproductive healthcare, reaching rural communities without internet access.",
-    stats: "Over 2.5 million weekly listeners across northern and central Nigeria.",
-  },
+const institutionalDonors = [
+  { name: "Management Sciences for Health (MSH)", role: "PMI-S Malaria Consortium" },
+  { name: "Save the Children International (SCI)", role: "EU Early Recovery & Resilience" },
+  { name: "United Nations Spotlight Initiative", role: "Eliminating Violence Against Women & Girls" },
+  { name: "Plan International", role: "ASPIRED & BMZ Resilience Projects" },
+  { name: "UNICEF Nigeria", role: "MIRP, REACH & Mothers' Associations" },
+  { name: "Secours Islamique France (SIF)", role: "Stabilization & Livelihood Restoration" },
+  { name: "ZOA International", role: "Food Security & Agricultural Resilience" },
+  { name: "BMZ Germany & KfW", role: "Girls' Education & Community Resilience" },
+  { name: "Global Affairs Canada", role: "SHOW Adolescent Health Project" },
+  { name: "USAID / Palladium Group", role: "Integrated Health Program (IHP)" },
+  { name: "Nigeria Humanitarian Fund (NHF)", role: "Child Protection in Emergencies (CPiE)" },
+  { name: "ECHO & IRC Consortium", role: "ECODiN Disaster Response Coordination" },
+  { name: "FHI 360 / Gates Foundation", role: "Alive & Thrive MIYCN Nutrition" },
+  { name: "European Union / British Council", role: "EU-ACT Governance Transformation" },
+  { name: "IRI & National Democratic Institute", role: "Civic Inclusion & Democratic Rights" },
 ];
 
 export default function ProjectsAndInterventionsPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Life Helpers Initiative Projects & Interventions",
+    description:
+      "Directory of evidence-based health, education, livelihoods, food security, social inclusion, and protection interventions implemented across Nigeria.",
+    publisher: {
+      "@type": "NGO",
+      name: "Life Helpers Initiative",
+      url: "https://lhinigeria.org",
+    },
+  };
+
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
-      {/* Hero with African Fulfillment Demo Image */}
+      {/* Schema.org JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      {/* Hero Banner */}
       <PageHeroBanner
         eyebrow="— Evidence-Based Action"
         title={
@@ -144,87 +91,151 @@ export default function ProjectsAndInterventionsPage() {
           </>
         }
         subtitle="Empowering communities with sustainable solutions that bring lasting smiles."
-        description="Since 2004, Life Helpers Initiative has executed high-impact multi-sectoral projects with leading international donors including UNICEF, Plan International, the Nigeria Humanitarian Fund (NHF), BMZ Germany, and Global Affairs Canada."
+        description="Since 2004, Life Helpers Initiative has executed high-impact multi-sectoral projects alongside premier multilateral donors including USAID, MSH, Save the Children, UNICEF, Plan International, the Nigeria Humanitarian Fund (NHF), BMZ Germany, and Secours Islamique France."
         image={africanFulfillmentImages.interventionsHero}
       />
 
-      {/* Projects Grid */}
-      <section className="py-16 md:py-24">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="space-y-8">
-            {interventions.map((proj) => (
+      {/* Key Numbers / Portfolio Highlights Bar */}
+      <section className="border-b border-border bg-card/40 py-8">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-2xs">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Sparkles size={20} />
+              </div>
+              <div>
+                <div className="text-xl font-bold text-foreground">18+</div>
+                <div className="text-[11px] text-muted-foreground">Strategic Interventions</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-2xs">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <MapPin size={20} />
+              </div>
+              <div>
+                <div className="text-xl font-bold text-foreground">11 States</div>
+                <div className="text-[11px] text-muted-foreground">Operational Footprint</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-2xs">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Layers size={20} />
+              </div>
+              <div>
+                <div className="text-xl font-bold text-foreground">6 Pillars</div>
+                <div className="text-[11px] text-muted-foreground">Integrated Thematic Focus</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-2xs">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Users size={20} />
+              </div>
+              <div>
+                <div className="text-xl font-bold text-foreground">350,000+</div>
+                <div className="text-[11px] text-muted-foreground">Direct Beneficiaries</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Interactive Projects Directory */}
+      <section className="py-14 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <InterventionsList initialFilter="all" />
+        </div>
+      </section>
+
+      {/* Institutional Partners & Donors Strip */}
+      <section className="border-t border-border bg-muted/20 py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Global Standards &middot; Local Reach
+            </span>
+            <h2 className="mt-2 font-serif-display text-2xl font-light text-foreground sm:text-3xl">
+              Trusted Institutional Partners &amp; Donors
+            </h2>
+            <p className="mx-auto mt-2 max-w-2xl text-xs text-muted-foreground">
+              Our interventions undergo rigorous third-party monitoring, annual certified audits, and continuous community accountability feedback loops.
+            </p>
+          </div>
+
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+            {institutionalDonors.map((donor, idx) => (
               <div
-                key={proj.id}
-                className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/40 hover:shadow-md sm:p-8"
+                key={idx}
+                className="flex flex-col justify-between rounded-xl border border-border bg-card p-4 text-center shadow-2xs hover:border-primary/40 transition-colors"
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                      <proj.icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-accent">
-                        {proj.category}
-                      </span>
-                      <h2 className="text-lg font-bold text-foreground sm:text-xl">
-                        {proj.title}
-                      </h2>
-                    </div>
-                  </div>
-                  <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                    {proj.duration}
-                  </span>
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-y-2 gap-x-6 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1.5 font-medium text-foreground">
-                    <MapPin size={13} className="text-primary" />
-                    {proj.locations}
-                  </span>
-                  <span>Donor: {proj.donor}</span>
-                </div>
-
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {proj.summary}
-                </p>
-
-                <div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-primary/10 bg-primary/5 p-4 text-xs">
-                  <div className="flex items-center gap-2 font-medium text-primary">
-                    <CheckCircle2 size={15} />
-                    <span>Impact Metric: {proj.stats}</span>
-                  </div>
-                  <Link
-                    href="/contact"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-                  >
-                    Inquire About This Project →
-                  </Link>
+                <div className="font-semibold text-foreground text-xs">{donor.name}</div>
+                <div className="mt-2 text-[10px] text-muted-foreground leading-snug">
+                  {donor.role}
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-16 rounded-2xl border border-border bg-muted/40 p-8 text-center sm:p-12">
-            <h3 className="font-serif-display text-2xl font-light text-foreground sm:text-3xl">
-              Partner With Us on Future Interventions
-            </h3>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
-              LHI provides rapid field mobilization, extensive local trust, transparent financial auditing, and robust MEAL frameworks across 11 states in Nigeria.
-            </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-4">
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
-              >
-                Contact Partnerships Directorate
-              </Link>
-              <Link
-                href="/donate"
-                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-card"
-              >
-                Support Field Operations
-              </Link>
-            </div>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-xs">
+            <Link
+              href="/impact"
+              className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
+            >
+              <FileText size={14} />
+              <span>Read Audited Annual Reports</span>
+              <ArrowRight size={12} />
+            </Link>
+            <span className="text-muted-foreground">&middot;</span>
+            <Link
+              href="/our-commitment"
+              className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
+            >
+              <ShieldCheck size={14} />
+              <span>PSEA Safeguarding Protocols</span>
+              <ArrowRight size={12} />
+            </Link>
+            <span className="text-muted-foreground">&middot;</span>
+            <Link
+              href="/success-stories"
+              className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
+            >
+              <Award size={14} />
+              <span>Verified Beneficiary Stories</span>
+              <ArrowRight size={12} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Consortium Bidding & Partnership CTA */}
+      <section className="border-t border-border bg-card py-16">
+        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <HeartHandshake className="h-6 w-6" />
+          </div>
+          <h2 className="mt-4 font-serif-display text-2xl font-light text-foreground sm:text-3xl">
+            Partner With Life Helpers Initiative
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm leading-relaxed text-muted-foreground">
+            Looking for a battle-tested grassroots implementing partner across Northern Nigeria? LHI brings 20+ years of community trust, robust financial management (CAC/IT/NO: 20121), security risk mitigation, and proven delivery across all 6 thematic areas.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+            >
+              <Building size={14} />
+              <span>Request Consortium Partnership</span>
+            </Link>
+            <Link
+              href="/donate"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-muted transition-colors shadow-2xs"
+            >
+              <Handshake size={14} />
+              <span>Support Active Field Operations</span>
+            </Link>
           </div>
         </div>
       </section>

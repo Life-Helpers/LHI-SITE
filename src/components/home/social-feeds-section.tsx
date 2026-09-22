@@ -197,6 +197,7 @@ export function SocialFeedsSection() {
                         src="/logo.png"
                         alt="Life Helpers Initiative"
                         fill
+                        referrerPolicy="no-referrer"
                         className="object-cover"
                       />
                     </div>
@@ -276,6 +277,7 @@ export function SocialFeedsSection() {
                           src="/logo.png"
                           alt="Life Helpers Initiative"
                           fill
+                          referrerPolicy="no-referrer"
                           className="object-cover"
                         />
                       </div>

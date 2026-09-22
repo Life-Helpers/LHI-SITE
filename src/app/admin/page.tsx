@@ -1,95 +1,449 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  AlertTriangle,
+  Archive,
   ArrowLeft,
-  CheckCircle2,
-  DollarSign,
-  FileText,
-  HeartHandshake,
+  Bell,
+  BookOpen,
+  Database,
+  LayoutDashboard,
   LogOut,
-  MapPin,
+  Radio,
   Shield,
-  Users,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { siteConfig } from "@/config/site";
-import { emergencies } from "@/data/emergencies";
-import { programs } from "@/data/programs";
+import type {
+  AdminAuditLog,
+  AdminBackupData,
+  AdminBlogPost,
+  AdminNotification,
+  ContactLifecycleStatus,
+  CrmContact,
+  NotificationCategory,
+} from "@/types/admin";
+import {
+  initialAuditLogs,
+  initialBlogPosts,
+  initialCrmContacts,
+  initialNotifications,
+  playNotificationChime,
+} from "@/lib/admin-data";
+import { AdminOverview } from "@/components/admin/admin-overview";
+import { AdminNotificationsCenter } from "@/components/admin/admin-notifications";
+import { AdminCrmContacts } from "@/components/admin/admin-crm-contacts";
+import { AdminCmsPosts } from "@/components/admin/admin-cms-posts";
+import { AdminBackupAudit } from "@/components/admin/admin-backup-audit";
+import { AdminNotificationToast } from "@/components/admin/admin-notification-toast";
+
+type AdminTab = "overview" | "notifications" | "crm" | "cms" | "backups";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
+  const [, startTransition] = useTransition();
   const [currentUser, setCurrentUser] = useState<string>("admin@lhinigeria.org");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [activeTab, setActiveTab] = useState<AdminTab>("overview");
 
+  // Core Data States
+  const [contacts, setContacts] = useState<CrmContact[]>(initialCrmContacts);
+  const [posts, setPosts] = useState<AdminBlogPost[]>(initialBlogPosts);
+  const [notifications, setNotifications] = useState<AdminNotification[]>(initialNotifications);
+  const [auditLogs, setAuditLogs] = useState<AdminAuditLog[]>(initialAuditLogs);
+
+  // Real-Time Notification & Audio Stream State
+  const [isStreamActive, setIsStreamActive] = useState<boolean>(true);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [activeToast, setActiveToast] = useState<AdminNotification | null>(null);
+
+  // Load from localStorage on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const user = sessionStorage.getItem("lhi_admin_user");
-      if (user) {
-        setCurrentUser(user);
+      const storedUser = sessionStorage.getItem("lhi_admin_user");
+      if (storedUser) {
+        setCurrentUser(storedUser);
       }
+
+      try {
+        const localContacts = localStorage.getItem("lhi_admin_contacts");
+        if (localContacts) setContacts(JSON.parse(localContacts));
+
+        const localPosts = localStorage.getItem("lhi_admin_posts");
+        if (localPosts) setPosts(JSON.parse(localPosts));
+
+        const localNotifs = localStorage.getItem("lhi_admin_notifications");
+        if (localNotifs) setNotifications(JSON.parse(localNotifs));
+
+        const localLogs = localStorage.getItem("lhi_admin_audit_logs");
+        if (localLogs) setAuditLogs(JSON.parse(localLogs));
+      } catch (err) {
+        console.error("Failed loading admin cache", err);
+      }
+
       setIsLoaded(true);
     }
-  }, [router]);
+  }, []);
+
+  // Save changes to localStorage
+  const persistContacts = (updated: CrmContact[]) => {
+    setContacts(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("lhi_admin_contacts", JSON.stringify(updated));
+    }
+  };
+
+  const persistPosts = (updated: AdminBlogPost[]) => {
+    setPosts(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("lhi_admin_posts", JSON.stringify(updated));
+    }
+  };
+
+  const persistNotifications = (updated: AdminNotification[]) => {
+    setNotifications(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("lhi_admin_notifications", JSON.stringify(updated));
+    }
+  };
+
+  const persistAuditLogs = useCallback((updated: AdminAuditLog[]) => {
+    setAuditLogs(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("lhi_admin_audit_logs", JSON.stringify(updated));
+    }
+  }, []);
+
+  const logAuditEvent = useCallback((
+    action: string,
+    target: string,
+    category: AdminAuditLog["category"],
+    details?: string
+  ) => {
+    const newLog: AdminAuditLog = {
+      id: `log-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      userEmail: currentUser,
+      action,
+      target,
+      category,
+      details,
+    };
+    setAuditLogs((prev) => {
+      const updated = [newLog, ...prev];
+      persistAuditLogs(updated);
+      return updated;
+    });
+  }, [currentUser, persistAuditLogs]);
+
+  // Handle Incoming New Alert Event
+  const pushNewAlert = useCallback((newNotif: AdminNotification) => {
+    setNotifications((prev) => {
+      const updated = [newNotif, ...prev];
+      if (typeof window !== "undefined") {
+        localStorage.setItem("lhi_admin_notifications", JSON.stringify(updated));
+      }
+      return updated;
+    });
+
+    setActiveToast(newNotif);
+
+    if (soundEnabled) {
+      playNotificationChime();
+    }
+  }, [soundEnabled]);
+
+  // Simulate Incoming Real-Time Events
+  const triggerSimulation = useCallback((forcedCategory?: NotificationCategory) => {
+    const sampleEvents: AdminNotification[] = [
+      {
+        id: `notif-${Date.now()}`,
+        title: "New Online Contribution Logged",
+        message: "₦85,000 received via Stripe from Dr. Ibrahim Waziri for NIDAKE sanitary hygiene kits in Kebbi.",
+        category: "donation",
+        priority: "normal",
+        timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+        read: false,
+        actionRequired: true,
+        actionType: "review_donation",
+        metadata: {
+          donorName: "Dr. Ibrahim Waziri",
+          amount: "85,000",
+          currency: "NGN",
+          receiptNumber: `LHI-DN-${Math.floor(1000 + Math.random() * 9000)}`,
+          state: "Kebbi",
+        },
+      },
+      {
+        id: `notif-${Date.now()}`,
+        title: "Public Aid Referral Received",
+        message: "Bama Community Clinic submitted request for emergency nutritional therapeutic supplies (40 sachets).",
+        category: "inquiry",
+        priority: "urgent",
+        timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+        read: false,
+        actionRequired: true,
+        actionType: "reply_inquiry",
+        metadata: {
+          senderName: "Bama Clinic Desk",
+          senderEmail: "referrals@bama-clinic.org.ng",
+          state: "Borno",
+        },
+      },
+      {
+        id: `notif-${Date.now()}`,
+        title: "Disbursement Voucher Awaiting Sign-Off",
+        message: "Field Coordinator submitted voucher #DISB-2026-62: ₦950,000 for emergency grain storage repairs.",
+        category: "approval",
+        priority: "urgent",
+        timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+        read: false,
+        actionRequired: true,
+        actionType: "approve_disbursement",
+        metadata: {
+          amount: "950,000",
+          currency: "NGN",
+          state: "Sokoto",
+          taskTitle: "Grain Storage Voucher #DISB-2026-62",
+        },
+      },
+      {
+        id: `notif-${Date.now()}`,
+        title: "Institutional Grant Inflow (USD)",
+        message: "$1,200.00 USD received from Global Health Impact Fund earmarked for Maternal Nutrition.",
+        category: "donation",
+        priority: "normal",
+        timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+        read: false,
+        actionRequired: false,
+        metadata: {
+          donorName: "Global Health Impact Fund",
+          amount: "1,200.00",
+          currency: "USD",
+          receiptNumber: `LHI-INT-${Math.floor(1000 + Math.random() * 9000)}`,
+        },
+      },
+    ];
+
+    let chosen = sampleEvents[Math.floor(Math.random() * sampleEvents.length)];
+    if (forcedCategory) {
+      const match = sampleEvents.find((e) => e.category === forcedCategory);
+      if (match) chosen = match;
+    }
+
+    pushNewAlert(chosen);
+  }, [pushNewAlert]);
+
+  // Periodic simulated live stream if active
+  useEffect(() => {
+    if (!isStreamActive) return;
+
+    // Trigger an incoming event every 45 seconds for a lively realistic simulation
+    const interval = setInterval(() => {
+      triggerSimulation();
+    }, 45000);
+
+    return () => clearInterval(interval);
+  }, [isStreamActive, triggerSimulation]);
+
+  // Notification Actions
+  function handleMarkAsRead(id: string) {
+    const updated = notifications.map((n) => (n.id === id ? { ...n, read: true } : n));
+    persistNotifications(updated);
+  }
+
+  function handleMarkAllAsRead() {
+    const updated = notifications.map((n) => ({ ...n, read: true }));
+    persistNotifications(updated);
+    logAuditEvent("Marked All Notifications as Read", `${notifications.length} alerts`, "Security");
+  }
+
+  function handleDeleteNotification(id: string) {
+    const updated = notifications.filter((n) => n.id !== id);
+    persistNotifications(updated);
+  }
+
+  function handleClearRead() {
+    const updated = notifications.filter((n) => !n.read);
+    persistNotifications(updated);
+  }
+
+  function handleApproveTask(id: string, taskTitle: string) {
+    const updated = notifications.map((n) =>
+      n.id === id ? { ...n, read: true, actionRequired: false, title: `Approved: ${n.title}` } : n
+    );
+    persistNotifications(updated);
+    logAuditEvent("Approved Operational Task", taskTitle, "Approval", `Authorized by ${currentUser}`);
+  }
+
+  // CRM Actions
+  function handleAddContact(newContact: CrmContact) {
+    const updated = [newContact, ...contacts];
+    persistContacts(updated);
+  }
+
+  function handleUpdateContactStatus(id: string, status: ContactLifecycleStatus) {
+    const updated = contacts.map((c) => (c.id === id ? { ...c, status } : c));
+    persistContacts(updated);
+  }
+
+  function handleDeleteContact(id: string) {
+    const target = contacts.find((c) => c.id === id)?.fullName || id;
+    const updated = contacts.filter((c) => c.id !== id);
+    persistContacts(updated);
+    logAuditEvent("Deleted CRM Contact", target, "CRM");
+  }
+
+  // CMS Actions
+  function handleAddPost(newPost: AdminBlogPost) {
+    const updated = [newPost, ...posts];
+    persistPosts(updated);
+  }
+
+  function handleUpdatePost(updatedPost: AdminBlogPost) {
+    const updated = posts.map((p) => (p.id === updatedPost.id ? updatedPost : p));
+    persistPosts(updated);
+  }
+
+  function handleDeletePost(id: string) {
+    const target = posts.find((p) => p.id === id)?.title || id;
+    const updated = posts.filter((p) => p.id !== id);
+    persistPosts(updated);
+    logAuditEvent("Deleted Blog Article", target, "CMS");
+  }
+
+  // Backup & Restore
+  function handleRestoreBackup(backup: AdminBackupData) {
+    if (backup.data.contacts) persistContacts(backup.data.contacts);
+    if (backup.data.posts) persistPosts(backup.data.posts);
+    if (backup.data.notifications) persistNotifications(backup.data.notifications);
+    if (backup.data.auditLogs) persistAuditLogs(backup.data.auditLogs);
+  }
+
+  function handleResetDemoData() {
+    persistContacts(initialCrmContacts);
+    persistPosts(initialBlogPosts);
+    persistNotifications(initialNotifications);
+    persistAuditLogs(initialAuditLogs);
+    logAuditEvent("Reset All Data to System Defaults", "All collections", "Security");
+  }
 
   function handleSignOut() {
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("lhi_admin_authenticated");
       sessionStorage.removeItem("lhi_admin_user");
     }
-    router.push("/admin/login");
+    startTransition(() => {
+      router.push("/admin/login");
+    });
   }
+
+  const handleDismissToast = useCallback(() => {
+    setActiveToast(null);
+  }, []);
+
+  const handleViewToast = useCallback(() => {
+    setActiveToast(null);
+    setActiveTab("notifications");
+  }, []);
 
   if (!isLoaded) {
     return (
       <main className="flex flex-1 items-center justify-center py-20 text-muted-foreground">
-        Loading admin console…
+        Loading Life Helpers Initiative administrative workspace…
       </main>
     );
   }
 
-  const activeEmergencies = emergencies.filter((e) => e.status === "active");
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <main id="main-content" tabIndex={-1} className="flex-1">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        {/* Top bar */}
-        <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-center sm:justify-between">
+    <main id="main-content" tabIndex={-1} className="flex-1 bg-muted/10 min-h-screen">
+      {/* Toast popup for live notifications */}
+      <AdminNotificationToast
+        notification={activeToast}
+        onDismiss={handleDismissToast}
+        onView={handleViewToast}
+      />
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+        {/* Header Bar */}
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-xs sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                 <Shield className="h-3.5 w-3.5" aria-hidden="true" />
-                Staff Administration
+                Executive Directorate Console
               </span>
+
+              {isStreamActive && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                  <Radio className="h-3 w-3 animate-pulse" />
+                  Live Inflow Connected
+                </span>
+              )}
+
               <span className="text-xs text-muted-foreground">
-                Signed in as <strong className="text-foreground">{currentUser}</strong>
+                Logged in: <strong className="text-foreground">{currentUser}</strong>
               </span>
             </div>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-              {siteConfig.name} Portal Dashboard
+
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              {siteConfig.name} Coordination Portal
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Coordination center for humanitarian field interventions across 11 states.
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Integrated CRM constituent directory, field research CMS, real-time donor telemetry, and local backup auditing.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Button asChild variant="outline" size="sm">
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Quick Notification Bell in Header */}
+            <Button
+              variant={activeTab === "notifications" ? "primary" : "outline"}
+              size="sm"
+              onClick={() => setActiveTab("notifications")}
+              className="relative h-9 gap-1.5 text-xs"
+              title="View live notifications"
+            >
+              <Bell className="h-4 w-4" />
+              <span className="hidden sm:inline">Alerts</span>
+              {unreadCount > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                  {unreadCount}
+                </span>
+              )}
+            </Button>
+
+            {/* Audio Toggle */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSoundEnabled((prev) => !prev)}
+              className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground"
+              title={soundEnabled ? "Audio chimes enabled" : "Audio chimes muted"}
+            >
+              {soundEnabled ? <Volume2 className="h-4 w-4 text-primary" /> : <VolumeX className="h-4 w-4" />}
+            </Button>
+
+            {/* Public Site Link */}
+            <Button asChild variant="outline" size="sm" className="h-9 text-xs">
               <Link href="/">
                 <ArrowLeft className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
                 Public Site
               </Link>
             </Button>
+
+            {/* Sign Out */}
             <Button
               onClick={handleSignOut}
               variant="outline"
               size="sm"
-              className="text-destructive hover:bg-destructive/10 border-destructive/30"
+              className="h-9 text-xs text-destructive hover:bg-destructive/10 border-destructive/30"
             >
               <LogOut className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
               Sign Out
@@ -97,186 +451,142 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Quick Stats Grid */}
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card className="border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Active Emergencies
-              </CardTitle>
-              <AlertTriangle className="h-4 w-4 text-alert" aria-hidden="true" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">
-                {activeEmergencies.length}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Borno & North-West field responses active
-              </p>
-            </CardContent>
-          </Card>
+        {/* Navigation Tabs Bar */}
+        <div className="flex overflow-x-auto rounded-xl border border-border bg-card p-1.5 shadow-xs gap-1 text-xs">
+          <button
+            onClick={() => setActiveTab("overview")}
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-colors whitespace-nowrap ${
+              activeTab === "overview"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            }`}
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            Executive Overview
+          </button>
 
-          <Card className="border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Field Programs
-              </CardTitle>
-              <HeartHandshake className="h-4 w-4 text-primary" aria-hidden="true" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">
-                {programs.length} Sectors
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Health, Education, Food Security, Protection
-              </p>
-            </CardContent>
-          </Card>
+          <button
+            onClick={() => setActiveTab("notifications")}
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-colors whitespace-nowrap ${
+              activeTab === "notifications"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            }`}
+          >
+            <Bell className="h-4 w-4" />
+            Live Notifications
+            {unreadCount > 0 && (
+              <span
+                className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                  activeTab === "notifications"
+                    ? "bg-white text-primary"
+                    : "bg-destructive text-destructive-foreground"
+                }`}
+              >
+                {unreadCount}
+              </span>
+            )}
+          </button>
 
-          <Card className="border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Beneficiaries Reached
-              </CardTitle>
-              <Users className="h-4 w-4 text-primary" aria-hidden="true" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">1.5M+</div>
-              <p className="text-xs text-muted-foreground">
-                Across 11 operational state offices
-              </p>
-            </CardContent>
-          </Card>
+          <button
+            onClick={() => setActiveTab("crm")}
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-colors whitespace-nowrap ${
+              activeTab === "crm"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            }`}
+          >
+            <Database className="h-4 w-4" />
+            CRM Constituents ({contacts.length})
+          </button>
 
-          <Card className="border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Online Giving Gateway
-              </CardTitle>
-              <DollarSign className="h-4 w-4 text-primary" aria-hidden="true" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">Active</div>
-              <p className="text-xs text-muted-foreground">
-                Stripe payment intents processing smoothly
-              </p>
-            </CardContent>
-          </Card>
+          <button
+            onClick={() => setActiveTab("cms")}
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-colors whitespace-nowrap ${
+              activeTab === "cms"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            }`}
+          >
+            <BookOpen className="h-4 w-4" />
+            Field Blog CMS ({posts.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab("backups")}
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 font-semibold transition-colors whitespace-nowrap ${
+              activeTab === "backups"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            }`}
+          >
+            <Archive className="h-4 w-4" />
+            Data Backups & Auditing
+          </button>
         </div>
 
-        {/* Action sections */}
-        <div className="mt-8 grid gap-8 lg:grid-cols-2">
-          {/* Active Field Emergency Status */}
-          <Card className="border-border">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Active Crisis Responses</CardTitle>
-                <Link
-                  href="/emergencies"
-                  className="text-xs text-primary hover:underline"
-                >
-                  View public register →
-                </Link>
-              </div>
-              <CardDescription>
-                Emergency declarations actively mobilizing relief supplies
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {activeEmergencies.map((em) => (
-                <div
-                  key={em.id}
-                  className="flex flex-col gap-1 rounded-lg border border-border bg-muted/30 p-4"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground">{em.title}</span>
-                    <span className="rounded-full bg-alert/20 px-2 py-0.5 text-xs font-semibold text-alert">
-                      Active
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3" aria-hidden="true" />
-                    {em.region} • Declared {em.declaredAt}
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                    {em.summary}
-                  </p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+        {/* Tab Content Display */}
+        {activeTab === "overview" && (
+          <AdminOverview
+            contacts={contacts}
+            posts={posts}
+            notifications={notifications}
+            auditLogs={auditLogs}
+            currentUser={currentUser}
+            onNavigateTab={(tab) => setActiveTab(tab as AdminTab)}
+            onApproveTask={handleApproveTask}
+            onLogAudit={logAuditEvent}
+          />
+        )}
 
-          {/* Quick Management Shortcuts */}
-          <Card className="border-border">
-            <CardHeader>
-              <CardTitle className="text-lg">Administrative Tools</CardTitle>
-              <CardDescription>
-                Shortcuts for site governance, accountability & reports
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted/40 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <FileText className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Impact & Audit Reports</p>
-                    <p className="text-xs text-muted-foreground">Review published audited reports</p>
-                  </div>
-                </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/impact">View Reports</Link>
-                </Button>
-              </div>
+        {activeTab === "notifications" && (
+          <AdminNotificationsCenter
+            notifications={notifications}
+            onMarkAsRead={handleMarkAsRead}
+            onMarkAllAsRead={handleMarkAllAsRead}
+            onDeleteNotification={handleDeleteNotification}
+            onClearRead={handleClearRead}
+            onApproveTask={handleApproveTask}
+            onTriggerSimulation={triggerSimulation}
+            isStreamActive={isStreamActive}
+            onToggleStream={() => setIsStreamActive((prev) => !prev)}
+            soundEnabled={soundEnabled}
+            onToggleSound={() => setSoundEnabled((prev) => !prev)}
+          />
+        )}
 
-              <div className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted/40 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <CheckCircle2 className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Field Interventions Log</p>
-                    <p className="text-xs text-muted-foreground">Track project delivery milestones</p>
-                  </div>
-                </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/interventions/projectandintervention">Interventions</Link>
-                </Button>
-              </div>
+        {activeTab === "crm" && (
+          <AdminCrmContacts
+            contacts={contacts}
+            onAddContact={handleAddContact}
+            onUpdateContactStatus={handleUpdateContactStatus}
+            onDeleteContact={handleDeleteContact}
+            onLogAudit={logAuditEvent}
+          />
+        )}
 
-              <div className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted/40 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Users className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Volunteer & Partner Submissions</p>
-                    <p className="text-xs text-muted-foreground">Manage volunteer applications</p>
-                  </div>
-                </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/get-involved">Get Involved</Link>
-                </Button>
-              </div>
+        {activeTab === "cms" && (
+          <AdminCmsPosts
+            posts={posts}
+            onAddPost={handleAddPost}
+            onUpdatePost={handleUpdatePost}
+            onDeletePost={handleDeletePost}
+            onLogAudit={logAuditEvent}
+          />
+        )}
 
-              <div className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted/40 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Shield className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">PSEA & Safeguarding Desk</p>
-                    <p className="text-xs text-muted-foreground">Zero tolerance policy enforcement</p>
-                  </div>
-                </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/our-commitment">Standards</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {activeTab === "backups" && (
+          <AdminBackupAudit
+            contacts={contacts}
+            posts={posts}
+            notifications={notifications}
+            auditLogs={auditLogs}
+            currentUser={currentUser}
+            onRestoreBackup={handleRestoreBackup}
+            onLogAudit={logAuditEvent}
+            onResetDemoData={handleResetDemoData}
+          />
+        )}
       </div>
     </main>
   );
