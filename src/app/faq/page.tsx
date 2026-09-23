@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { FaqAccordion } from "@/components/faq-accordion";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions (FAQ) | Life Helpers Initiative",
@@ -76,8 +77,8 @@ export default function FaqPage() {
         subtitle="Transparent clarity on our organization, humanitarian interventions, and donation stewardship."
         description="Whether you are an institutional partner, prospective donor, community leader, or volunteer, find immediate answers to the most common inquiries regarding our work across Nigeria."
         image={{
-          src: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop",
-          alt: "LHI Community Dialogue and Support Center",
+          src: LHI_PHOTOS.communityDialogue.src,
+          alt: LHI_PHOTOS.communityDialogue.alt,
           caption: "LHI field outreach and stakeholder engagement in Northern Nigeria",
           tag: "Transparency & Governance",
         }}

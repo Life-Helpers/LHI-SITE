@@ -56,8 +56,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Safe Schools & Accelerated Basic Learning for Out-of-School Children",
     ],
     targetStates: ["Sokoto", "Borno", "Yobe", "Adamawa", "Zamfara"],
-    statsHeadline: "Children Reached with UNICEF",
-    statsValue: "240,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.unicef.org/nigeria",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -129,8 +129,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Youth Civic Leadership & Peacebuilding Circles",
     ],
     targetStates: ["Borno", "Adamawa", "Sokoto"],
-    statsHeadline: "Girls & Young Women Empowered",
-    statsValue: "85,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://plan-international.org/nigeria",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -188,8 +188,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "First-Line Medical & Cholera Prevention Encampments",
     ],
     targetStates: ["Borno", "Yobe", "Adamawa"],
-    statsHeadline: "Frontline IDPs Supported",
-    statsValue: "180,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.unocha.org/nigeria/about-nhf",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -245,8 +245,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Resilient Livelihoods & Agro-Ecological Training Clusters",
     ],
     targetStates: ["Sokoto", "Zamfara", "Kebbi", "FCT"],
-    statsHeadline: "Women Farmers & Leaders Supported",
-    statsValue: "42,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://nigeria.actionaid.org",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -297,8 +297,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Soil Rehabilitation & Drought-Resilient Crop Trials",
     ],
     targetStates: ["Sokoto", "Zamfara", "Katsina"],
-    statsHeadline: "Households Supported with Clean Water & Power",
-    statsValue: "64,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.bmz.de/en",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -354,8 +354,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Community Oversight Committees for Civil Infrastructure",
     ],
     targetStates: ["Sokoto", "Borno", "Adamawa"],
-    statsHeadline: "Public Infrastructure Facilities Upgraded",
-    statsValue: "78 Facilities",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.kfw-entwicklungsbank.de",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -406,8 +406,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Girl-Child Education Scholarships & Retention Mentorship",
     ],
     targetStates: ["Sokoto", "Zamfara", "FCT"],
-    statsHeadline: "Mothers & Infants Reached with Care",
-    statsValue: "52,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.international.gc.ca",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -461,8 +461,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Clean Water Sanitation Encampments for Influx Zones",
     ],
     targetStates: ["Sokoto", "Kebbi", "Borno"],
-    statsHeadline: "Beneficiaries of Preventative Care",
-    statsValue: "115,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.usaid.gov/nigeria",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -514,8 +514,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Emergency Cold-Chain Logistics & Nutritious Paste Distribution",
     ],
     targetStates: ["Borno", "Yobe", "Adamawa"],
-    statsHeadline: "Rations & Nutrition Doses Distributed",
-    statsValue: "310,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.wfp.org/countries/nigeria",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -567,8 +567,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Disability-Inclusive WASH Facilities in Public Schools",
     ],
     targetStates: ["Sokoto", "Katsina", "Zamfara"],
-    statsHeadline: "Girls Supported with Secondary Scholarships",
-    statsValue: "28,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.gov.uk/government/organisations/foreign-commonwealth-development-office",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -622,8 +622,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Critical Medical Supply Chains for Remote Rural Clinics",
     ],
     targetStates: ["Borno", "Yobe", "Adamawa", "Sokoto"],
-    statsHeadline: "Displaced Civilians Treated",
-    statsValue: "140,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://civil-protection-humanitarian-aid.ec.europa.eu",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -686,8 +686,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Ecological Tree Nurseries & Desertification Countermeasures",
     ],
     targetStates: ["Borno", "Yobe", "Adamawa"],
-    statsHeadline: "Youth Micro-Enterprises Funded",
-    statsValue: "4,200 Businesses",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.undp.org/nigeria",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -739,8 +739,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Temporary Learning Spaces (TLS) for Crisis-Affected Children",
     ],
     targetStates: ["Sokoto", "Katsina", "Zamfara", "Borno"],
-    statsHeadline: "Under-5 Children Treated & Protected",
-    statsValue: "165,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://nigeria.savethechildren.net",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -793,8 +793,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Cash Relief for Displaced Households Facing Extreme Duress",
     ],
     targetStates: ["Borno", "Adamawa", "Yobe"],
-    statsHeadline: "Emergency Displaced Persons Served",
-    statsValue: "95,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.rescue.org/country/nigeria",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -847,8 +847,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Epidemic Early Warning & Response System (EWARS) Surveillance",
     ],
     targetStates: ["Sokoto", "Zamfara", "Kebbi", "Katsina", "Borno", "Adamawa", "Yobe", "Kano", "Kaduna", "Bauchi", "FCT"],
-    statsHeadline: "Community Immunizations Administered",
-    statsValue: "620,000+",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://health.gov.ng",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -901,8 +901,8 @@ export const PARTNERS_DATA: PartnerItem[] = [
       "Specialized Case Workers Standards & PSEA Auditing Framework",
     ],
     targetStates: ["Borno", "Yobe", "Adamawa", "Sokoto", "Zamfara"],
-    statsHeadline: "Unaccompanied Children Reunited with Families",
-    statsValue: "3,850 Children",
+    statsHeadline: "",
+    statsValue: "",
     websiteUrl: "https://www.cpaor.net",
     logo: (
       <svg viewBox="0 0 200 60" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">

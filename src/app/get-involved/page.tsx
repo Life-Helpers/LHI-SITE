@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { GetInvolvedView } from "@/components/get-involved/get-involved-view";
 import { siteConfig } from "@/config/site";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
   title: "Volunteer & Get Involved",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     title: "Volunteer & Get Involved | Life Helpers Initiative",
     description:
       "This mission takes all of us. Choose your path to support life-saving humanitarian work and grassroots community development.",
-    images: ["https://images.pexels.com/photos/6647020/pexels-photo-6647020.jpeg"],
+    images: [LHI_PHOTOS.staffGroup.src],
   },
 };
 

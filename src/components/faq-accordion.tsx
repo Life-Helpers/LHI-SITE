@@ -35,7 +35,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "organization",
     question: "What is Life Helpers Initiative (LHI) and what is its mission?",
     answer:
-      "Life Helpers Initiative (LHI) is an indigenous, non-governmental, non-profit organization established in Nigeria and incorporated with the Corporate Affairs Commission (CAC/IT/NO: 20121). LHI is dedicated to creating an inclusive, equitable society where children, adolescents, women, and marginalized populations have access to quality health, education, protection, resilient livelihoods, and rapid humanitarian relief.",
+      "Life Helpers Initiative (LHI) is a Nigerian non-governmental, not-for-profit organisation founded on 1 October 2004 as the Beulah Project, supporting children at the orphanage in Sokoto, and registered with the Corporate Affairs Commission as CAC/IT/25232 in September 2007. Our vision is a more fulfilled life for everyone; our mission is to be a leading non-governmental organisation working to maximise all opportunities to empower marginalised people.",
     tags: ["mission", "about", "registration", "mandate"],
     featured: true,
   },
@@ -44,7 +44,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "organization",
     question: "Where is LHI headquartered and in which Nigerian states does it operate?",
     answer:
-      "LHI is headquartered in Sokoto State, Nigeria (Plot 18, Block B, Commercial Layout, Off Gusau Road, Sokoto). We maintain active operational presences, field coordinators, and technical teams across Northern and North-Central Nigeria, including Sokoto, Kebbi, Zamfara, Katsina, Kano, Borno, and the Federal Capital Territory (Abuja).",
+      "Our headquarters is at the Goshen Development Center, Tamaje Gagi, Old Airport Area, Eastern Bypass Road, Sokoto. LHI works across 11 states: Sokoto, Adamawa, Bauchi, Borno, Ebonyi, the FCT, Katsina, Kebbi, Plateau, Yobe and Zamfara. See the contact page for every office address.",
     tags: ["headquarters", "sokoto", "locations", "coverage"],
     featured: true,
   },
@@ -53,7 +53,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "organization",
     question: "Is Life Helpers Initiative legally registered and compliant with Nigerian regulators?",
     answer:
-      "Yes. LHI is fully compliant with all statutory regulations in Nigeria. We are registered with the Corporate Affairs Commission (CAC), the Special Control Unit Against Money Laundering (SCUML / EFCC), the Federal Inland Revenue Service (FIRS), and collaborate directly with Federal and State Ministries of Budget, Planning, and Humanitarian Affairs.",
+      "Yes. LHI is registered with the Corporate Affairs Commission (CAC/IT/25232, September 2007). Registration, tax and accountability documents are available to partners through the Partner & Bidder Portal.",
     tags: ["cac", "legal", "scuml", "compliance"],
   },
   {
@@ -61,7 +61,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "organization",
     question: "How is LHI governed and are your financial audits publicly accessible?",
     answer:
-      "LHI is guided by an independent Board of Trustees composed of accomplished leaders in public health, law, developmental economics, and civil society. Our governance structure enforces strict internal controls, conflict of interest safeguards, and anti-fraud protocols. Our accounts are audited annually by accredited external certified auditing firms and shared with our institutional partners.",
+      "LHI is governed by a Board of Trustees and led by a management team headed by the National Executive Director. Our annual report is published on the Impact page, and compliance documents for due diligence are available through the Partner & Bidder Portal.",
     tags: ["governance", "board", "audit", "accountability"],
   },
   {
@@ -69,7 +69,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "organization",
     question: "What safeguarding and ethical standards does LHI enforce?",
     answer:
-      "LHI operates under a strict Zero Tolerance Policy toward Sexual Exploitation, Abuse, and Harassment (PSEAH), child abuse, and financial impropriety. All staff members, volunteers, community mobilizers, and contractors undergo mandatory background checks, safeguarding inductions, and sign our strict Code of Conduct.",
+      "LHI has zero tolerance for sexual exploitation, abuse and harassment. Our safeguarding and PSEA policies apply to all staff, volunteers, interns, consultants, vendors and partners, who are trained and sign our code of conduct. Anyone can take our free safeguarding courses in the Humanitarian Training centre, and concerns can be raised confidentially at psea@lhinigeria.org.",
     tags: ["safeguarding", "psea", "ethics", "child-protection"],
   },
 
@@ -79,7 +79,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "programs",
     question: "What are LHI's key core thematic programmatic areas?",
     answer:
-      "LHI focuses on five integrated thematic areas:\n1. Health & Nutrition: Maternal and child health, immunization drives, adolescent reproductive health, and community malnutrition management.\n2. Education & Youth Development: Safe school initiatives, girl-child enrollment and retention, literacy hubs, and remedial learning.\n3. Protection & Human Rights: Prevention and response to Gender-Based Violence (GBV), survivor psychosocial counseling, and legal support.\n4. Food Security & Resilient Livelihoods: Climate-smart agriculture, women economic collectives, vocational training, and village savings schemes.\n5. Humanitarian & Disaster Response: Rapid relief delivery to displaced persons, emergency water sanitation, and crisis relief.",
+      "LHI works in six thematic areas:\n1. Health: MNCH, nutrition, WASH, immunisation, malaria, SRH, HIV/AIDS and TB.\n2. Education: early child development, formal and non-formal education, education governance and complementary services.\n3. Livelihoods: technical and vocational training, savings and loan associations, entrepreneurship, financial literacy and multi-purpose cash assistance.\n4. Food Security: agriculture, small ruminants and aquaculture, food supplies and climate adaptation.\n5. Protection: violence against women and girls, and child protection.\n6. Social Inclusion: governance, peacebuilding and high-level advocacy.",
     tags: ["pillars", "thematic", "health", "education", "protection", "livelihoods"],
     featured: true,
   },
@@ -88,7 +88,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "programs",
     question: "What is the NIDAKE Pad Social Enterprise?",
     answer:
-      "NIDAKE is an award-winning social enterprise initiative spearheaded by Life Helpers Initiative. It produces high-quality, eco-friendly, and affordable sanitary pads locally. NIDAKE breaks the barriers of menstrual poverty that cause adolescent girls to miss school, equips schools with dignity kits, and creates dignified manufacturing and distribution jobs for local women.",
+      "NIDAKE is LHI's locally made reusable sanitary pad, produced at the Goshen Development Centre, Tamaje Bye Pass, Sokoto (\"For you, for me, for every woman\"). It gives girls and women a washable, affordable option. For orders, call 0706 650 3228 or email nidakesanipad@gmail.com.",
     tags: ["nidake", "menstrual-health", "sanitary-pads", "girls", "enterprise"],
     featured: true,
   },
@@ -97,7 +97,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "programs",
     question: "How does LHI ensure community ownership and cultural sensitivity?",
     answer:
-      "Every LHI program follows a participatory, community-led model. We establish close working partnerships with traditional emirs, village heads, religious scholars, women leaders, and youth groups. Before any project launch, extensive community town halls and barrier-analysis dialogues ensure solutions are culturally respectful, community-owned, and enduring.",
+      "We work through community structures: traditional and religious leaders, Community-Based Management Committees, facility management committees, savings groups and women's and youth groups. For example, the Gidan Arziki hub in Batagarawa is run with a 20-member Facility Management Committee, and ABEP trained 164 CBMC members to support learners.",
     tags: ["community", "traditional-leaders", "sustainability", "co-design"],
   },
   {
@@ -105,7 +105,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "programs",
     question: "How does LHI respond to rapid humanitarian emergencies and IDP crises?",
     answer:
-      "LHI maintains dedicated contingency response teams and rapid deployment protocols. During climate disasters such as seasonal flooding or security displacements, our field coordinators deliver life-saving emergency food baskets, dignity kits, temporary shelter materials, and clean water within 48 to 72 hours, working hand-in-hand with NEMA, SEMA, and UN clusters.",
+      "LHI has delivered emergency responses with partners such as UNOCHA, IRC, ECHO and UNICEF, including multi-sector assistance, nutrition and dignity kits for displaced people. We coordinate with the State Emergency Management Agency and humanitarian clusters, and our education programme includes a crisis modifier for emergency radio learning.",
     tags: ["humanitarian", "emergency", "idp", "flooding", "relief"],
   },
   {
@@ -113,7 +113,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "programs",
     question: "How can other organizations, agencies, or corporations partner with LHI?",
     answer:
-      "LHI actively collaborates with United Nations agencies (UNICEF, UNFPA, WHO), bilateral donors, international NGOs, federal/state ministries, and corporate CSR foundations. We welcome technical consortiums, joint proposal co-creation, and localized implementation partnerships. Please visit our 'Get Involved' page or reach out to partnerships@lifehelpers.org.",
+      "LHI works with UN agencies, bilateral donors, international NGOs, government and the private sector. Visit the Partner & Bidder Portal for our compliance documents and to submit a consortium expression of interest, or email official@lhinigeria.org.",
     tags: ["partnerships", "un-agencies", "csr", "collaboration"],
   },
 
@@ -123,7 +123,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "donations",
     question: "How are donations utilized and what percentage goes directly to beneficiaries?",
     answer:
-      "Financial integrity and efficiency are core to our mission. Over 88% of every donated sum directly funds frontline programmatic deliverables—including medical supplies, school retention kits, nutrition packets, and community micro-grants. Less than 12% is used for administrative governance, third-party audits, and compliance monitoring.",
+      "Donations fund LHI's programmes and the systems that keep them accountable. You can choose where your gift goes on the donation page, and our annual report describes our work each year. For questions about a specific gift, email official@lhinigeria.org.",
     tags: ["transparency", "allocation", "percentages", "stewardship"],
     featured: true,
   },
@@ -165,7 +165,7 @@ const FAQ_DATA: FaqItem[] = [
     category: "donations",
     question: "How do I set up recurring monthly donations or corporate gift matching?",
     answer:
-      "On our donation page, simply toggle the 'Monthly Giving' option. This establishes a predictable recurring contribution that sustains our continuous field centers. For corporate philanthropy, workplace giving, or matching gifts, please contact us at donations@lifehelpers.org.",
+      "On the donation page, choose the monthly option to give every month. For corporate giving or partnerships, contact us at official@lhinigeria.org.",
     tags: ["monthly", "recurring", "corporate-giving", "sponsorship"],
   },
 ];
@@ -473,11 +473,11 @@ export function FaqAccordion({
             </p>
             <div className="mt-4 flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-semibold text-foreground">
               <a
-                href="mailto:info@lifehelpers.org"
+                href="mailto:official@lhinigeria.org"
                 className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
               >
                 <Mail className="h-4 w-4 text-primary" />
-                <span>info@lifehelpers.org</span>
+                <span>official@lhinigeria.org</span>
               </a>
               <span className="text-muted-foreground/40">•</span>
               <a

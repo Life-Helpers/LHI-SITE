@@ -248,7 +248,8 @@ function PartnerDetailModal({ partner, onClose }: PartnerDetailModalProps) {
           </div>
         </div>
 
-        {/* Impact Highlight Banner */}
+        {/* Impact Highlight Banner (only when a verified figure is set in the CMS) */}
+        {partner.statsValue && (
         <div className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-4 flex items-center justify-between gap-4">
           <div>
             <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
@@ -260,6 +261,7 @@ function PartnerDetailModal({ partner, onClose }: PartnerDetailModalProps) {
           </div>
           <ShieldCheck className="w-8 h-8 text-primary/70 shrink-0" />
         </div>
+        )}
 
         {/* Description & Humanitarian Mandate */}
         <div className="mt-5">
