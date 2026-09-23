@@ -1,0 +1,49 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+
+import { gradeExam, issueCertificate } from "@/lib/training/grading";
+
+const schema = z.object({
+  courseId: z.string().min(1).max(80),
+  name: z.string().trim().min(2, "Enter your full name as it should appear on the certificate.").max(80),
+  email: z.string().trim().email("Enter a valid email address."),
+  organization: z.string().trim().max(120).optional(),
+  answers: z.record(z.string(), z.number().int().min(0).max(10)),
+});
+
+// Light abuse protection: 20 attempts per IP per hour.
+const attempts = new Map<string, { count: number; until: number }>();
+
+export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  const entry = attempts.get(ip);
+  const fresh = !entry || entry.until < Date.now();
+  const count = fresh ? 1 : entry.count + 1;
+  attempts.set(ip, { count, until: fresh ? Date.now() + 3600_000 : entry.until });
+  if (count > 20) {
+    return NextResponse.json({ error: "Too many attempts. Please try again in an hour." }, { status: 429 });
+  }
+
+  const parsed = schema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid submission." }, { status: 400 });
+  }
+  const { courseId, name, email, organization, answers } = parsed.data;
+  const graded = gradeExam(courseId, answers);
+  if (!graded) return NextResponse.json({ error: "Unknown course." }, { status: 404 });
+
+  const incorrect = graded.results.filter((r) => !r.correct).map((r) => r.id);
+  if (!graded.passed) {
+    return NextResponse.json({ passed: false, score: graded.score, passMark: graded.course.passMark, incorrect });
+  }
+
+  const certificate = await issueCertificate({
+    courseId,
+    courseTitle: graded.course.title,
+    name,
+    email,
+    organization: organization || undefined,
+    score: graded.score,
+  });
+  return NextResponse.json({ passed: true, score: graded.score, incorrect, certificateId: certificate.id });
+}

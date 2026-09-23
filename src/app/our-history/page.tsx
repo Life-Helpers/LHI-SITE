@@ -8,30 +8,30 @@ import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 export const metadata: Metadata = {
   title: "Our History | Life Helpers Initiative",
   description:
-    "The journey of Life Helpers Initiative: from Beulah Projects in 2004 to a national humanitarian and development organization operating across 11 states in Nigeria.",
+    "The journey of Life Helpers Initiative: from the Beulah Project in 2004 to a national humanitarian and development organization operating across 11 states in Nigeria.",
 };
 
 const milestones = [
   {
     year: "2004",
-    title: "Inception as Beulah Projects",
+    title: "Inception as the Beulah Project",
     location: "Sokoto State",
     summary:
-      "Founded on October 1, 2004 in Sokoto under the initial name 'Beulah Projects' by Mr. Tayo Fatinikun and colleagues. Began as a grassroots volunteer initiative dedicated to orphans and vulnerable children (OVC), providing joyful funfairs, educational kits, nutritional feeding, and emotional safe spaces.",
+      "Established on October 1, 2004 as the Beulah Project, supporting children at the orphanage. In the words of Executive Director Tayo Fatinikun, “It was simply just a passion – a passion to touch lives, a passion to make children feel wanted, an attempt to restore their dignity.”",
   },
   {
     year: "2006",
-    title: "Structural Formalization",
+    title: "Renamed Life Helpers Initiative",
     location: "Sokoto State",
     summary:
-      "As community health crises and vulnerability deepened across Northwest Nigeria, the volunteer group recognized the need for a structured institutional framework. The organization restructured to address maternal mortality, childhood illnesses, and community livelihoods.",
+      "As it expanded its scope beyond immediate community needs, the Beulah Project was renamed Life Helpers Initiative and began its transition from a localised project into a structured organisation with broader development ambitions.",
   },
   {
     year: "2007",
     title: "Incorporation as Life Helpers Initiative",
     location: "National CAC Registration",
     summary:
-      "Officially registered with the Corporate Affairs Commission (CAC) under Part C as Life Helpers Initiative (CAC/IT/NO 25301). Established formal institutional governance, an independent Board of Trustees, and secured strategic collaboration with state health ministries.",
+      "Registered with the Corporate Affairs Commission, Abuja, in September 2007 (CAC/IT/25232), with a Board of Trustees providing governance and oversight.",
   },
   {
     year: "2013",
@@ -66,21 +66,42 @@ const milestones = [
     title: "Abuja Liaison Office & Ebonyi State Expansion",
     location: "FCT Abuja & Ebonyi State",
     summary:
-      "Established the Abuja Implementation & Liaison Office in Gwarimpa to facilitate national policy dialogue, federal ministry engagement, and donor coordination. Extended operations into Ebonyi State in Southeast Nigeria, advancing inclusive socio-economic livelihoods.",
+      "Established the Liaison Office in Gwarimpa, Abuja, for partner and federal coordination. Extended operations into Ebonyi State, where LHI supported health workers and community-based workers across 65 PHCs to reduce malnutrition in children under 5.",
   },
   {
     year: "2022",
     title: "Expansion to Plateau State",
     location: "Plateau State",
     summary:
-      "Initiated community peacebuilding, conflict-sensitive agriculture, and social inclusion initiatives in Plateau State, bridging communal divides through youth-led dialogues and women-led savings groups.",
+      "Under the President's Malaria Initiative for States with Management Sciences for Health, LHI began mentoring frontline providers on malaria case management, data management and malaria in pregnancy across 327 primary healthcare centres.",
   },
   {
-    year: "2023–Present",
-    title: "Katsina Expansion & Nationwide Impact",
-    location: "11 Frontline States",
+    year: "2023",
+    title: "Katsina Office",
+    location: "Katsina State",
     summary:
-      "Expanded into Katsina State to tackle maternal health and educational barriers. Today, LHI operates across 11 states with over 350 full-time staff, 700+ community volunteers, and millions of lives touched across health, education, livelihoods, agriculture, and protection.",
+      "Opened the Katsina office, later home to the FCDO/WFP Resilience Building and Smallholder Farmers Support Project and the Gidan Arziki Farmer Service Centre in Batagarawa.",
+  },
+  {
+    year: "2021–2025",
+    title: "Over ₦8 Billion in Grants",
+    location: "11 Office States",
+    summary:
+      "Secured grant portfolios of over ₦8 billion, migrated to an ERP financial system, adopted Kobo Collect for digital data, strengthened MERL, invested in owned offices in Sokoto, Kebbi and Yobe, and created a dedicated Communications Unit.",
+  },
+  {
+    year: "2025",
+    title: "Noma Tushen Arziki Farmer Hub",
+    location: "Wamakko LGA, Sokoto",
+    summary:
+      "Commissioned the Noma Tushen Arziki (“Farming Wealth”) Hub on 27 November 2025 with WFP and FCDO: milling, cold storage, a fish farm, hire services and a training space run by a community Facility Management Committee.",
+  },
+  {
+    year: "2026",
+    title: "Strategic Plan 2026–2030",
+    location: "Goshen Development Centre, Sokoto",
+    summary:
+      "Adopted LHI's third strategic plan, “A plan towards Consolidation of Programme Impact and Organisational Sustainability”. Today LHI has delivered over 45 projects, directly reaching over 1.5 million people in more than 400,000 households, with 350+ staff and 700+ community volunteers.",
   },
 ];
 
@@ -96,7 +117,7 @@ export default function OurHistoryPage() {
           </>
         }
         subtitle="Putting smiles on faces across Nigeria for over 20 years."
-        description="What began in 2004 as Beulah Projects — a small community effort bringing smiles to orphans and vulnerable children in Sokoto — has matured into a premier national NGO delivering lifesaving relief, sustainable healthcare, education, and economic empowerment across 11 Nigerian states."
+        description="What began on October 1, 2004 as the Beulah Project, supporting children at an orphanage in Sokoto, has matured into a premier national NGO delivering lifesaving relief, sustainable healthcare, education, and economic empowerment across 11 Nigerian states."
         image={africanFulfillmentImages.historyHero}
       />
 

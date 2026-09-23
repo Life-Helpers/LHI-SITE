@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 const trustees = [
   {
-    name: "Engr. Godfrey Mayoku",
+    name: "Engr. Godfrey Mayuku",
     role: "Board Chairman",
     qualification: "FNSE, COREN Registered",
     bio: "Brings extensive strategic leadership, engineering management, and governance experience. Provides high-level strategic direction, ensuring institutional resilience, infrastructure integrity, and corporate accountability across all LHI operations.",
@@ -23,7 +23,7 @@ const trustees = [
     name: "Mr. Tayo Fatinikun",
     role: "National Executive Director & Trustee",
     qualification: "FICA, FIMC, CMC",
-    bio: "Founding visionary of Life Helpers Initiative (originally Beulah Projects in 2004). With over two decades of humanitarian programming, civil society leadership, and public policy advocacy, he steers LHI's mission, field expansions, and donor partnerships across 11 states.",
+    bio: "Founding visionary of Life Helpers Initiative (originally the Beulah Project in 2004). With over two decades of humanitarian programming, civil society leadership, and public policy advocacy, he steers LHI's mission, field expansions, and donor partnerships across 11 states.",
   },
   {
     name: "Pharm. Iyabo Adebisi",

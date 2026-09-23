@@ -78,7 +78,7 @@ export const whoWeAreLinks: NavLink[] = [
   {
     label: "Our Strategies",
     href: "/our-strategies",
-    description: "6 strategic pillars: advocacy, SBCC, evidence & partnerships",
+    description: "Our 4 strategies and the Strategic Plan 2026–2030",
     icon: Target,
     tag: "Approach",
   },
@@ -214,7 +214,7 @@ export const impactLinks: NavLink[] = [
   {
     label: "Projects & Interventions",
     href: "/interventions/projectandintervention",
-    description: "18 flagship interventions with dossiers & PDF factsheets",
+    description: "38 profiled projects with dossiers & PDF factsheets",
     icon: FolderGit2,
     tag: "Active Grants",
   },
@@ -329,7 +329,7 @@ export function useLocalizedNav() {
     {
       label: t.whoWeAreMenu.ourStrategies,
       href: "/our-strategies",
-      description: "6 strategic pillars: advocacy, SBCC, evidence & partnerships",
+      description: "Our 4 strategies and the Strategic Plan 2026–2030",
       icon: Target,
       tag: "Approach",
     },
@@ -431,7 +431,7 @@ export function useLocalizedNav() {
     {
       label: t.impactMenu.projectsInterventions,
       href: "/interventions/projectandintervention",
-      description: "18 flagship interventions with dossiers & PDF factsheets",
+      description: "38 profiled projects with dossiers & PDF factsheets",
       icon: FolderGit2,
       tag: "Active Grants",
     },

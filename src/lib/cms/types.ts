@@ -22,7 +22,7 @@ export type CmsPartner = Omit<PartnerItem, "logo" | "categoryBadgeColor"> & {
 export interface CmsDocument {
   id: string;
   title: string;
-  category: "Registration & tax" | "Financial accountability" | "Safeguarding & integrity";
+  category: "Organisational documents" | "Registration & tax" | "Financial accountability" | "Safeguarding & integrity";
   description: string;
   file: string;
   href: string;

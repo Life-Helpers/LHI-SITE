@@ -1,6 +1,10 @@
 import { siteConfig } from "@/config/site";
 
-export type ComplianceCategory = "Registration & tax" | "Financial accountability" | "Safeguarding & integrity";
+export type ComplianceCategory =
+  | "Organisational documents"
+  | "Registration & tax"
+  | "Financial accountability"
+  | "Safeguarding & integrity";
 
 export interface ComplianceDocument {
   id: string;
@@ -17,6 +21,27 @@ export interface ComplianceDocument {
 }
 
 export const COMPLIANCE_DOCUMENTS: ComplianceDocument[] = [
+  {
+    id: "organisational-profile",
+    title: "Organisational Profile",
+    category: "Organisational documents",
+    description: "Who we are, leadership, strategies, thematic focus, offices and project experience.",
+    file: "/documents/lhi-organisational-profile.pdf",
+  },
+  {
+    id: "strategic-plan-2026-2030",
+    title: "Strategic Plan 2026–2030",
+    category: "Organisational documents",
+    description: "Goal, expected results, key strategies, theory of change and institutional capacity plan.",
+    file: "/documents/lhi-strategic-plan-2026-2030.pdf",
+  },
+  {
+    id: "project-magazine-vol-1",
+    title: "Project Magazine: Cultivating Resilience, Vol. 1",
+    category: "Organisational documents",
+    description: "The FCDO/WFP Resilience Building and Smallholder Farmers Support Project, Sept 2025 – Feb 2026.",
+    file: "/documents/cultivating-resilience-magazine-vol-1.pdf",
+  },
   {
     id: "cac-certificate",
     title: "CAC Certificate of Incorporation",
@@ -52,7 +77,9 @@ export const COMPLIANCE_DOCUMENTS: ComplianceDocument[] = [
     id: "child-safeguarding",
     title: "Child Safeguarding Policy",
     category: "Safeguarding & integrity",
-    description: "Standards of conduct, safe-recruitment practice and referral pathways protecting children in every programme.",
+    description:
+      "Principles, code of conduct, reporting flow, case management, disciplinary committee and prevention measures protecting children and vulnerable adults.",
+    file: "/documents/lhi-child-safeguarding-policy.pdf",
   },
   {
     id: "anti-fraud",

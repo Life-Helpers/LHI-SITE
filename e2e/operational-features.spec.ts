@@ -4,13 +4,13 @@ test("operational map shows state details when a state is selected", async ({ pa
   await page.goto("/interventions/projectandintervention");
   await page.locator('path[aria-label^="Borno"]').click();
   await expect(page.getByRole("heading", { name: "Borno State" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /NHF Child Protection/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /ALIMA Emergency Medico-Nutrition/ })).toBeVisible();
 });
 
 test("project dossier links to a downloadable factsheet PDF", async ({ page, request }) => {
-  await page.goto("/interventions/pmi-s-msh");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("President's Malaria Initiative");
-  const res = await request.get("/interventions/pmi-s-msh/factsheet");
+  await page.goto("/interventions/eu-unicef-rmnch-sokoto");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("RMNCH+NM Quality of Care");
+  const res = await request.get("/interventions/eu-unicef-rmnch-sokoto/factsheet");
   expect(res.status()).toBe(200);
   expect(res.headers()["content-type"]).toContain("application/pdf");
 });

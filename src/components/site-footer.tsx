@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Lock, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
+import { SocialLinks } from "@/components/social-links";
 import { useLocale } from "@/i18n/locale-context";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
@@ -96,6 +97,8 @@ export function SiteFooter() {
                 <span>{siteConfig.contact.email}</span>
               </a>
             </div>
+
+            <SocialLinks className="mt-4" />
 
             {/* Prominent Admin Login pill button in footer */}
             <div className="mt-4 pt-3 border-t border-border/60">

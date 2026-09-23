@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
+import { siteConfig } from "@/config/site";
+
 export interface OfficeLocation {
   id: string;
   type: string;
@@ -43,7 +45,7 @@ export interface OfficeLocation {
   operationalRole: string;
 }
 
-export const nationwideOffices: OfficeLocation[] = [
+const officeDetails: OfficeLocation[] = [
   {
     id: "sokoto-hq",
     type: "National Headquarters (HQ)",
@@ -102,8 +104,8 @@ export const nationwideOffices: OfficeLocation[] = [
   },
   {
     id: "bauchi-office",
-    type: "North-East Field Office (Bauchi & Gombe)",
-    name: "Bauchi/Gombe Office",
+    type: "North-East Field Office",
+    name: "Bauchi Office",
     stateName: "Bauchi State",
     stateCode: "BAU",
     address:
@@ -371,6 +373,14 @@ export const nationwideOffices: OfficeLocation[] = [
     ],
   },
 ];
+
+/** Addresses and names come from siteConfig (the Organisational Profile) so they stay in one place. */
+export const nationwideOffices: OfficeLocation[] = officeDetails.map((office) => {
+  const official = siteConfig.offices.find((o) => o.id === office.id);
+  return official
+    ? { ...office, name: official.name, address: `${official.address}, ${official.city}`, mapQuery: official.mapQuery, phone: official.phone }
+    : office;
+});
 
 // Structured Nigerian State Geometry Definitions
 interface StateGeometry {

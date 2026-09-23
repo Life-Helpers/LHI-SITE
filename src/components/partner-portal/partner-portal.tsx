@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowRight,
+  BookOpen,
   CheckCircle2,
   Download,
   FileCheck2,
@@ -31,6 +32,7 @@ import {
 type ComplianceCategory = CmsDocument["category"];
 
 const CATEGORY_ICONS: Record<ComplianceCategory, React.ElementType> = {
+  "Organisational documents": BookOpen,
   "Registration & tax": Landmark,
   "Financial accountability": FileText,
   "Safeguarding & integrity": ShieldCheck,
@@ -106,7 +108,7 @@ export function PartnerPortal({
             yet posted publicly are shared on request within 48 working hours.
           </p>
 
-          <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
             {categories.map((category) => {
               const Icon = CATEGORY_ICONS[category];
               return (

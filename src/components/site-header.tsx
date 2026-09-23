@@ -66,7 +66,7 @@ function WhoWeAreMegaMenu({ links }: { links: NavLink[] }) {
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-4">
         <div className="flex items-center gap-2">
           <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
-            CAC/IT/NO 25301
+            CAC/IT/25232
           </span>
           <p className="text-xs text-muted-foreground">
             Non-profit humanitarian relief and sustainable development since Oct 1, 2004.

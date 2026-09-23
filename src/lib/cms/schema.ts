@@ -85,14 +85,14 @@ export const STATE_OPTIONS: FieldOption[] = [
   { value: "sokoto", label: "Sokoto" },
   { value: "zamfara", label: "Zamfara" },
   { value: "kebbi", label: "Kebbi" },
+  { value: "katsina", label: "Katsina" },
   { value: "borno", label: "Borno" },
   { value: "yobe", label: "Yobe" },
   { value: "adamawa", label: "Adamawa" },
   { value: "bauchi", label: "Bauchi" },
-  { value: "kano", label: "Kano" },
-  { value: "kaduna", label: "Kaduna" },
-  { value: "niger", label: "Niger" },
+  { value: "plateau", label: "Plateau" },
   { value: "fct", label: "FCT Abuja" },
+  { value: "ebonyi", label: "Ebonyi" },
 ];
 
 export const POST_CATEGORIES: FieldOption[] = [
@@ -157,7 +157,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "youtubeId", label: "YouTube video ID", type: "text", help: "The part after watch?v= in a YouTube link." },
       { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: opts("Active", "Completed", "Multi-Year") },
       { name: "duration", label: "Duration", type: "text", sidebar: true, required: true },
-      { name: "states", label: "States", type: "multiselect", sidebar: true, required: true, options: STATE_OPTIONS },
+      { name: "states", label: "States", type: "multiselect", sidebar: true, options: STATE_OPTIONS, help: "Pins the project on the map. Leave empty if not state-specific." },
       { name: "primaryThematic", label: "Primary thematic area", type: "select", sidebar: true, required: true, options: PILLAR_OPTIONS },
       { name: "thematicIds", label: "All thematic areas", type: "multiselect", sidebar: true, required: true, options: PILLAR_OPTIONS },
       { name: "featured", label: "Featured project", type: "boolean", sidebar: true },
@@ -177,10 +177,10 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "name", label: "Display name", type: "text", required: true },
       { name: "focus", label: "Focus statement", type: "textarea", required: true },
       { name: "office", label: "LHI office (city)", type: "text" },
-      { name: "zone", label: "Geo-political zone", type: "select", sidebar: true, required: true, options: opts("North-West", "North-East", "North-Central") },
+      { name: "zone", label: "Geo-political zone", type: "select", sidebar: true, required: true, options: opts("North-West", "North-East", "North-Central", "South-East") },
       { name: "totalLgas", label: "Total LGAs", type: "number", sidebar: true, required: true },
-      { name: "lgasCovered", label: "LGAs covered", type: "number", sidebar: true, required: true },
-      { name: "beneficiaries", label: "Beneficiaries reached", type: "number", sidebar: true, required: true },
+      { name: "lgasCovered", label: "LGAs covered", type: "number", sidebar: true, help: "0 hides the figure on the map." },
+      { name: "beneficiaries", label: "Beneficiaries reached", type: "number", sidebar: true, help: "M&E-validated figure. 0 hides it." },
     ],
   },
   partners: {
@@ -225,7 +225,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "title", label: "Title", type: "text", required: true },
       { name: "id", label: "ID", type: "slug", from: "title", required: true },
       { name: "description", label: "Description", type: "textarea", required: true },
-      { name: "category", label: "Category", type: "select", sidebar: true, required: true, options: opts("Registration & tax", "Financial accountability", "Safeguarding & integrity") },
+      { name: "category", label: "Category", type: "select", sidebar: true, required: true, options: opts("Organisational documents", "Registration & tax", "Financial accountability", "Safeguarding & integrity") },
       { name: "file", label: "Document file (PDF)", type: "file", sidebar: true, help: "Leave empty to show “Request a certified copy”." },
       { name: "href", label: "Or link to page", type: "text", sidebar: true, help: "Internal path, e.g. /impact" },
     ],
@@ -315,4 +315,16 @@ export interface ActivityEntry {
   action: string;
   target: string;
   href?: string;
+}
+
+export interface Certificate {
+  /** Public certificate code, e.g. LHI-SG-7K2Q9M. */
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  name: string;
+  email: string;
+  organization?: string;
+  score: number;
+  issuedAt: string;
 }

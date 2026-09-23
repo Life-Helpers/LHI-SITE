@@ -6,7 +6,8 @@ import { NIDAKE_KIT } from "@/data/nidake";
 import { OPERATIONAL_STATES } from "@/data/operational-states";
 import { PARTNERS_DATA } from "@/data/partners-data";
 import { siteConfig } from "@/config/site";
-import { initialBlogPosts } from "@/lib/cms-crm-store";
+import { MAGAZINE_POSTS } from "@/data/magazine-stories";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
 import type { CmsSettings } from "@/lib/cms/schema";
 import type { CmsDocument, CmsIntervention, CmsPartner, CmsPost, CmsState } from "@/lib/cms/types";
 
@@ -63,34 +64,20 @@ export function seedDocuments(): CmsDocument[] {
 }
 
 export function seedPosts(): CmsPost[] {
-  return initialBlogPosts.map((p) => ({
-    id: p.id,
-    slug: p.slug,
-    title: p.title,
-    excerpt: p.excerpt,
-    content: p.content,
-    author: p.author,
-    category: "Field Blog",
-    date: p.date,
-    featuredImage: p.featuredImage,
-    status: p.status.toLowerCase() === "published" ? "published" : "draft",
-    tags: Array.from(new Set([p.category, ...p.tags])),
-    featured: Boolean(p.featured),
-    authorId: "",
-    updatedAt: p.updatedAt ?? p.date,
-  }));
+  return MAGAZINE_POSTS.map((post) => ({ ...post, tags: [...post.tags] }));
 }
 
 export function seedSettings(): CmsSettings {
   return {
     homeFeature: {
-      enabled: false,
-      eyebrow: "Feature story",
-      title: "",
-      excerpt: "",
-      image: "",
-      linkLabel: "Read the story",
-      linkHref: "/success-stories",
+      enabled: true,
+      eyebrow: "Feature story · Cultivating Resilience",
+      title: "From eight years of struggle to renewed hope",
+      excerpt:
+        "Widowed and raising 11 children in Katsina, Murja Yari invested her ₦75,000 WFP cash transfer, delivered with LHI, into a food business that now runs from morning until evening. Hers is one of the stories from our new project magazine on the FCDO/WFP resilience project reaching 5,700 households in Sokoto and Katsina.",
+      image: LHI_PHOTOS.murja.src,
+      linkLabel: "Read Murja's story",
+      linkHref: "/blog/murja-eight-years-of-struggle-to-renewed-hope",
     },
     nidake: {
       costUsd: NIDAKE_KIT.costUsd,

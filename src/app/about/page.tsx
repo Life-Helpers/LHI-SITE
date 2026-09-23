@@ -1,36 +1,46 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { CheckCircle2, Heart, Lock, Users } from "lucide-react";
+import { ArrowRight, Heart, Lock, MapPin, Music, Users } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
-import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { FaqAccordion } from "@/components/faq-accordion";
+import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
+import {
+  ANTHEM,
+  CORE_STRATEGIES,
+  CORE_VALUES,
+  MISSION,
+  MOTTO,
+  ORG_SUMMARY,
+  PARTNER_NAMES,
+  PHILOSOPHY,
+  THEMATIC_FOCUS,
+  VISION,
+} from "@/data/organisation";
 
 export const metadata: Metadata = {
   title: "About Us | Life Helpers Initiative",
   description:
-    "Learn about Life Helpers Initiative (LHI) — our history since 2004, mission, vision, core values of Love, Honesty, and Inclusion, and operations across 11 states in Nigeria.",
+    "Life Helpers Initiative (LHI): a Nigerian NGO founded in 2004, working in development and humanitarian action across 11 states with 350+ staff and 700+ community volunteers.",
 };
 
-const partners = [
-  "UNICEF Nigeria",
-  "Plan International",
-  "ActionAid Nigeria",
-  "Nigeria Humanitarian Fund (NHF / UN OCHA)",
-  "BMZ (German Federal Ministry for Economic Cooperation and Development)",
-  "KfW Development Bank",
-  "Global Affairs Canada",
-  "Federal Ministry of Health (FMOH)",
-  "State Primary Healthcare Development Agencies (SPHCDA)",
-  "Child Protection Area of Responsibility (CP AoR)",
+const VALUE_ICONS = { Love: Heart, Honesty: Lock, Inclusion: Users } as const;
+
+const STATS = [
+  { value: siteConfig.stats.projects, label: "Projects implemented" },
+  { value: siteConfig.stats.peopleReached, label: "People directly reached" },
+  { value: siteConfig.stats.households, label: "Households" },
+  { value: siteConfig.stats.staff, label: "Staff members" },
+  { value: siteConfig.stats.volunteers, label: "Community volunteers" },
+  { value: "11", label: "States with offices" },
 ];
 
 export default function AboutPage() {
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
-      {/* Hero with African Fulfillment Demo Image */}
       <PageHeroBanner
         eyebrow="— Who We Are"
         title={
@@ -38,207 +48,200 @@ export default function AboutPage() {
             About Life Helpers <em className="font-light italic text-primary">Initiative.</em>
           </>
         }
-        subtitle="&ldquo;Putting a smile on a face&rdquo; — touching lives, transforming households, impacting communities."
-        description="Life Helpers Initiative (LHI) is an indigenous, non-governmental, and not-for-profit humanitarian and development organization established in 2004 in Sokoto State, Nigeria. We work tirelessly to maximize opportunities that empower marginalized populations across 11 frontline states."
+        subtitle={`“${MOTTO}”: ${PHILOSOPHY.toLowerCase()}`}
+        description={ORG_SUMMARY}
         image={africanFulfillmentImages.aboutHero}
       />
 
-      {/* Vision & Mission Banner */}
-      <section className="border-b border-border bg-background py-14">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8">
-              <span className="text-xs font-semibold uppercase tracking-widest text-primary">
-                Our Vision
-              </span>
-              <p className="mt-3 font-serif-display text-2xl font-light text-foreground sm:text-3xl">
-                &ldquo;{siteConfig.vision}&rdquo;
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                A world where every vulnerable child, woman, and youth enjoys dignity, universal protection, and equitable access to healthcare, education, and sustainable livelihoods.
-              </p>
+      {/* Key numbers */}
+      <section className="border-b border-border bg-card/40 py-10">
+        <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 sm:grid-cols-3 sm:px-6 lg:grid-cols-6 lg:px-8">
+          {STATS.map((s) => (
+            <div key={s.label} className="text-center">
+              <dd className="font-serif-display text-3xl text-foreground">{s.value}</dd>
+              <dt className="mt-1 text-[11px] uppercase tracking-wider text-muted-foreground">{s.label}</dt>
             </div>
+          ))}
+        </dl>
+      </section>
 
-            <div className="rounded-2xl border border-border bg-card p-8">
-              <span className="text-xs font-semibold uppercase tracking-widest text-accent">
-                Our Mission
-              </span>
-              <p className="mt-3 font-serif-display text-xl font-light text-foreground sm:text-2xl">
-                &ldquo;{siteConfig.mission}&rdquo;
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Delivering community-anchored humanitarian relief, resilient primary healthcare, child protection, girl-child schooling, and climate-smart livelihoods.
-              </p>
-            </div>
+      {/* Vision, Mission, Philosophy, Motto */}
+      <section className="border-b border-border py-14">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-2 lg:px-8">
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8">
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Our Vision</span>
+            <p className="mt-3 font-serif-display text-3xl font-light text-foreground">&ldquo;{VISION}&rdquo;</p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-8">
+            <span className="text-xs font-semibold uppercase tracking-widest text-accent">Our Mission</span>
+            <p className="mt-3 font-serif-display text-2xl font-light text-foreground">&ldquo;{MISSION}&rdquo;</p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-8">
+            <span className="text-xs font-semibold uppercase tracking-widest text-accent">Our Philosophy</span>
+            <p className="mt-3 font-serif-display text-2xl font-light text-foreground">{PHILOSOPHY}</p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-8">
+            <span className="text-xs font-semibold uppercase tracking-widest text-accent">Our Motto</span>
+            <p className="mt-3 font-serif-display text-2xl font-light text-foreground">{MOTTO}</p>
           </div>
         </div>
       </section>
 
-      {/* Core Values */}
+      {/* Core values */}
       <section className="border-b border-border py-16 md:py-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
-              Organizational DNA
-            </p>
-            <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
-              Our Three Core Values
-            </h2>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">Coined from our acronym, LHI</p>
+            <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">Our Core Values</h2>
           </div>
-
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-            <div className="rounded-2xl border border-border bg-card p-8 text-center transition-all hover:border-primary/40">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Heart className="h-7 w-7 fill-primary/20" />
-              </div>
-              <h3 className="mt-6 text-xl font-bold text-foreground">Love</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Reflected in a warm, welcoming environment, sincere kind gestures, empathy for the vulnerable, and harmonious togetherness.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-border bg-card p-8 text-center transition-all hover:border-primary/40">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Lock className="h-7 w-7" />
-              </div>
-              <h3 className="mt-6 text-xl font-bold text-foreground">Honesty</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Practicing absolute openness, forthrightness, and guaranteeing that our words perfectly match our actions and fiscal stewardship.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-border bg-card p-8 text-center transition-all hover:border-primary/40">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Users className="h-7 w-7" />
-              </div>
-              <h3 className="mt-6 text-xl font-bold text-foreground">Inclusion</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Guaranteeing universal access for all marginalized groups, championing disability access through our Disability Fund, and equal opportunities.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* History & Footprint */}
-      <section className="py-16 md:py-24 bg-background">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
-                Origin & Growth
-              </p>
-              <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground">
-                From Beulah Projects in 2004 to a National Leader
-              </h2>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                Life Helpers Initiative originated on October 1, 2004 as Beulah Projects, assisting orphans and vulnerable children in Sokoto through inclusive funfairs and emotional safe spaces. In 2006, expanding community health and education emergencies required structural formalization.
-              </p>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                In September 2007, the organization was formally registered with Nigeria&apos;s Corporate Affairs Commission ({siteConfig.cacRegistration}). Since then, LHI has strategically expanded into Kebbi (2013), Zamfara (2015), Borno, Yobe, and Adamawa (2017), Bauchi (2020), Ebonyi and Abuja (2021), Plateau (2022), and Katsina (2023).
-              </p>
-              <div className="mt-6">
-                <Link
-                  href="/our-history"
-                  className="inline-flex items-center gap-2 font-medium text-primary hover:underline text-sm"
-                >
-                  Read our full chronological history →
-                </Link>
-              </div>
-
-              {/* Heritage Image */}
-              <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-muted/40 p-2">
-                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-muted">
-                  <Image
-                    src={africanFulfillmentImages.aboutHeritage.src}
-                    alt={africanFulfillmentImages.aboutHeritage.alt}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 480px"
-                    referrerPolicy="no-referrer"
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-2.5 left-3 right-3">
-                    <p className="text-[11px] font-medium text-white/95 leading-tight">
-                      &ldquo;{africanFulfillmentImages.aboutHeritage.caption}&rdquo;
-                    </p>
+            {CORE_VALUES.map((v) => {
+              const Icon = VALUE_ICONS[v.name];
+              return (
+                <div key={v.name} className="rounded-2xl border border-border bg-card p-8 text-center transition-all hover:border-primary/40">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                    <Icon className="h-7 w-7" />
                   </div>
+                  <h3 className="mt-6 text-xl font-bold text-foreground">{v.name}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{v.text}</p>
                 </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-border bg-card p-8">
-              <h3 className="font-serif-display text-xl font-bold text-foreground">
-                Current Operational Footprint
-              </h3>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Active field operations in 11 states, coordinating over 350 full-time staff and hundreds of community volunteers.
-              </p>
-              <ul className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2 text-xs">
-                {siteConfig.operationalStates.map((st) => (
-                  <li key={st} className="flex items-center gap-2 text-foreground font-medium">
-                    <CheckCircle2 size={14} className="text-primary shrink-0" />
-                    <span>{st}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 border-t border-border pt-4 flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Headquarters: Sokoto State</span>
-                <Link href="/contact" className="font-semibold text-primary hover:underline">
-                  View All 3 Offices
-                </Link>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Institutional Partners */}
-      <section className="border-t border-border bg-muted/20 py-16">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="font-serif-display text-2xl font-light text-foreground sm:text-3xl">
-              Trusted Institutional Partners & Donors
-            </h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
-              We partner with global bodies, bilateral donors, and government ministries to deliver verifiable, high-impact programs.
+      {/* Origin */}
+      <section className="border-b border-border py-16 md:py-24">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">Origin & Growth</p>
+            <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground">From the Beulah Project to 11 states</h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Life Helpers was established on October 1, 2004, as the Beulah Project, supporting children at the orphanage. It was
+              renamed Life Helpers Initiative in 2006 as it expanded its scope, and registered with the Corporate Affairs
+              Commission, Abuja, by September 2007 ({siteConfig.cacRegistration.replace(" (September 2007)", "")}).
             </p>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              In the last two decades, LHI has implemented over 45 projects across Nigeria, directly reaching over 1.5 million
+              people in more than 400,000 households, with qualified staff, robust internal systems and a digitally-driven
+              infrastructure that deliver value for money and donor satisfaction.
+            </p>
+            <Link href="/our-history" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+              Read our full history <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            {partners.map((partner) => (
-              <div
-                key={partner}
-                className="flex items-center justify-center rounded-xl border border-border bg-card p-4 text-center text-xs font-semibold text-foreground shadow-xs"
-              >
-                {partner}
+          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-border bg-muted">
+            <Image src={LHI_PHOTOS.hqOffice.src} alt={LHI_PHOTOS.hqOffice.alt} fill sizes="(min-width: 1024px) 480px, 100vw" className="object-cover" />
+          </div>
+        </div>
+      </section>
+
+      {/* Thematic focus */}
+      <section className="border-b border-border bg-muted/20 py-16 md:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">Thematic Focus</p>
+          <h2 className="mt-2 max-w-2xl font-serif-display text-3xl font-light text-foreground">
+            Six integrated thematic areas addressing the multidimensional needs of vulnerable populations
+          </h2>
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {THEMATIC_FOCUS.map((t) => (
+              <Link key={t.id} href={t.href} className="group rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/50">
+                <h3 className="text-lg font-bold text-foreground group-hover:text-primary">{t.name}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.scope}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Strategies */}
+      <section className="border-b border-border py-16 md:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">How we work</p>
+              <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground">Our four strategies</h2>
+            </div>
+            <Link href="/our-strategies" className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+              Strategies & Strategic Plan 2026–2030 <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {CORE_STRATEGIES.map((s) => (
+              <div key={s.code} className="rounded-2xl border border-border bg-card p-6">
+                <span className="rounded-md bg-primary/10 px-2 py-0.5 font-mono text-xs font-bold text-primary">{s.code}</span>
+                <h3 className="mt-3 font-bold text-foreground">{s.name}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
               </div>
             ))}
           </div>
-
-          <div className="mt-12 flex flex-wrap justify-center gap-4">
-            <Link
-              href="/board-of-trustees"
-              className="rounded-full border border-border bg-card px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-muted"
-            >
-              Board of Trustees
-            </Link>
-            <Link
-              href="/management-team"
-              className="rounded-full border border-border bg-card px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-muted"
-            >
-              Management Team
-            </Link>
-            <Link
-              href="/our-commitment"
-              className="rounded-full bg-primary px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary/90"
-            >
-              Our Commitments & PSEA
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Frequently Asked Questions */}
+      {/* Offices */}
+      <section className="border-b border-border bg-muted/20 py-16 md:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">Our offices</p>
+          <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground">Headquarters in Sokoto, offices in 10 more states</h2>
+          <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {siteConfig.offices.map((o) => (
+              <li key={o.id} className="rounded-2xl border border-border bg-card p-5">
+                <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-accent">
+                  <MapPin size={12} /> {o.state}
+                  {o.isPrimary && " · HQ"}
+                </p>
+                <p className="mt-1.5 text-sm leading-relaxed text-foreground">
+                  {o.address}, {o.city}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Partners + Anthem */}
+      <section className="py-16 md:py-24">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+          <div className="lg:col-span-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">Wall of Fame</p>
+            <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground">Our partners</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Over two decades of impact, LHI has been privileged to work alongside a distinguished community of global and
+              national partners whose trust and collaboration have made our work possible.
+            </p>
+            <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {PARTNER_NAMES.map((name) => (
+                <li key={name} className="rounded-xl border border-border bg-card px-3 py-3 text-center text-xs font-semibold text-foreground">
+                  {name}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/board-of-trustees" className="rounded-full border border-border bg-card px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-muted">
+                Board of Trustees
+              </Link>
+              <Link href="/management-team" className="rounded-full border border-border bg-card px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-muted">
+                Management Team
+              </Link>
+              <Link href="/our-commitment" className="rounded-full bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground hover:bg-primary/90">
+                Our Commitments & PSEA
+              </Link>
+            </div>
+          </div>
+          <aside className="rounded-3xl border border-primary/20 bg-primary/5 p-8">
+            <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
+              <Music className="h-4 w-4" /> Our Anthem
+            </p>
+            <div className="mt-4 space-y-1 font-serif-display text-lg italic leading-snug text-foreground">
+              {ANTHEM.map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </section>
+
       <section className="border-t border-border bg-background py-16 sm:py-24">
         <FaqAccordion />
       </section>

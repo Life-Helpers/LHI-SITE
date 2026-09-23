@@ -5,6 +5,7 @@ import Link from "next/link";
 import nigeriaMap from "@svg-maps/nigeria";
 import { ArrowRight, Building2, Handshake, Layers, MapPin, Users, X } from "lucide-react";
 
+import { siteConfig } from "@/config/site";
 import type { InterventionProject } from "@/data/interventions-data";
 import {
   getDonorsForState,
@@ -47,14 +48,6 @@ export function OperationalMap({
     [allInterventions, selectedId],
   );
 
-  const totals = useMemo(
-    () => ({
-      lgas: states.reduce((sum, s) => sum + s.lgasCovered, 0),
-      beneficiaries: states.reduce((sum, s) => sum + s.beneficiaries, 0),
-    }),
-    [states],
-  );
-
   const select = (id: string) => {
     if (STATE_BY_ID.has(id)) setSelectedId(id as OperationalStateId);
   };
@@ -65,11 +58,11 @@ export function OperationalMap({
       <div className="relative rounded-3xl border border-border bg-card p-4 sm:p-6 lg:col-span-7">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-primary">
-            {states.length} frontline states
+            {states.length} office states
           </p>
           <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-primary" aria-hidden="true" /> LHI operational
+              <span className="h-2.5 w-2.5 rounded-sm bg-primary" aria-hidden="true" /> LHI office state
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-sm bg-muted-foreground/25" aria-hidden="true" /> Other states
@@ -80,7 +73,7 @@ export function OperationalMap({
         <svg
           viewBox={VIEWBOX}
           role="group"
-          aria-label="Map of Nigeria showing Life Helpers Initiative's 11 operational states"
+          aria-label="Map of Nigeria showing the states where Life Helpers Initiative has offices"
           className="h-auto w-full"
         >
           {LOCATIONS.map((loc) => {
@@ -148,18 +141,16 @@ export function OperationalMap({
 
         <dl className="mt-5 grid grid-cols-3 gap-3 border-t border-border pt-4 text-center">
           <div>
-            <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">States</dt>
+            <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">Office states</dt>
             <dd className="font-serif-display text-2xl text-foreground">{states.length}</dd>
           </div>
           <div>
-            <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">LGAs reached</dt>
-            <dd className="font-serif-display text-2xl text-foreground">{totals.lgas}</dd>
+            <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">Projects</dt>
+            <dd className="font-serif-display text-2xl text-foreground">{siteConfig.stats.projects}</dd>
           </div>
           <div>
-            <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">Beneficiaries</dt>
-            <dd className="font-serif-display text-2xl text-foreground">
-              {numberFormat.format(totals.beneficiaries)}
-            </dd>
+            <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">People reached</dt>
+            <dd className="font-serif-display text-2xl text-foreground">{siteConfig.stats.peopleReached}</dd>
           </div>
         </dl>
       </div>
@@ -200,13 +191,13 @@ export function OperationalMap({
               <Stat icon={Layers} label="Projects" value={String(interventions.length)} />
               <Stat
                 icon={MapPin}
-                label="LGAs covered"
-                value={`${selected.lgasCovered}/${selected.totalLgas}`}
+                label={selected.lgasCovered > 0 ? "LGAs covered" : "LGAs in state"}
+                value={selected.lgasCovered > 0 ? `${selected.lgasCovered}/${selected.totalLgas}` : String(selected.totalLgas)}
               />
               <Stat
                 icon={Users}
-                label="Reached"
-                value={numberFormat.format(selected.beneficiaries)}
+                label={selected.beneficiaries > 0 ? "Reached" : "Donor partners"}
+                value={selected.beneficiaries > 0 ? numberFormat.format(selected.beneficiaries) : String(donors.length)}
               />
             </div>
 
@@ -242,7 +233,7 @@ export function OperationalMap({
             </div>
 
             <p className="mt-auto pt-5 text-[10px] leading-relaxed text-muted-foreground">
-              LGA and beneficiary figures are provisional and pending verification by the LHI M&amp;E unit.
+              Projects listed are drawn from LHI&apos;s Organisational Profile. State reach figures appear once validated by the LHI M&amp;E unit.
             </p>
           </div>
         ) : (

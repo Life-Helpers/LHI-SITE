@@ -19,7 +19,7 @@ export function FloatingWhatsApp() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
-  const cleanPhone = siteConfig.contact.phone.replace(/[^0-9]/g, "");
+  const cleanPhone = siteConfig.contact.feedbackLine.replace(/[^0-9]/g, "");
 
   const generalWhatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
     "Hello Life Helpers Initiative, I would like to make an enquiry regarding your programs, activities, or partnerships."
@@ -118,7 +118,7 @@ export function FloatingWhatsApp() {
                   <div className="flex items-center justify-between text-muted-foreground">
                     <span>Phone:</span>
                     <a href={`tel:${cleanPhone}`} className="font-semibold text-foreground hover:text-primary">
-                      {siteConfig.contact.phoneDisplay}
+                      {siteConfig.contact.feedbackLine}
                     </a>
                   </div>
                   <div className="flex items-center justify-between text-muted-foreground">
@@ -165,7 +165,7 @@ export function FloatingWhatsApp() {
                       Hotline:
                     </span>
                     <a href={`tel:${cleanPhone}`} className="font-bold text-foreground hover:underline">
-                      {siteConfig.contact.phoneDisplay}
+                      {siteConfig.contact.feedbackLine}
                     </a>
                   </div>
                   <div className="flex items-center justify-between">

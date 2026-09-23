@@ -19,7 +19,7 @@ export function StatsSection() {
       icon: Users,
     },
     {
-      value: "250k+",
+      value: "400k+",
       label: t.home.stats.householdsReached,
       icon: Home,
     },

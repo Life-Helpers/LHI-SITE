@@ -13,7 +13,7 @@ export const impactReports: ImpactReport[] = [
     summary:
       "Two decades of grassroots and humanitarian service across 11 Nigerian states.",
     description: [
-      "Life Helpers Initiative (LHI) was established on October 1, 2004, initially founded as 'Beulah Projects' dedicated to caring for orphans and vulnerable children in Sokoto. Over more than two decades of grassroots and humanitarian service, LHI has grown into a national non-governmental, not-for-profit organization operating across 11 states in Nigeria.",
+      "Life Helpers Initiative (LHI) was established on October 1, 2004, initially founded as the Beulah Project supporting children at the orphanage in Sokoto. Over more than two decades of grassroots and humanitarian service, LHI has grown into a national non-governmental, not-for-profit organization operating across 11 states in Nigeria.",
       "These figures are cumulative organization-wide totals rather than a per-project or per-year breakdown — a real audited annual report with a full financial and per-program split would replace this page once available.",
     ],
     stats: [

@@ -47,21 +47,21 @@ export const metadata: Metadata = {
 };
 
 const institutionalDonors = [
-  { name: "Management Sciences for Health (MSH)", role: "PMI-S Malaria Consortium" },
-  { name: "Save the Children International (SCI)", role: "EU Early Recovery & Resilience" },
-  { name: "United Nations Spotlight Initiative", role: "Eliminating Violence Against Women & Girls" },
-  { name: "Plan International", role: "ASPIRED & BMZ Resilience Projects" },
-  { name: "UNICEF Nigeria", role: "MIRP, REACH & Mothers' Associations" },
-  { name: "Secours Islamique France (SIF)", role: "Stabilization & Livelihood Restoration" },
-  { name: "ZOA International", role: "Food Security & Agricultural Resilience" },
-  { name: "BMZ Germany & KfW", role: "Girls' Education & Community Resilience" },
-  { name: "Global Affairs Canada", role: "SHOW Adolescent Health Project" },
-  { name: "USAID / Palladium Group", role: "Integrated Health Program (IHP)" },
-  { name: "Nigeria Humanitarian Fund (NHF)", role: "Child Protection in Emergencies (CPiE)" },
-  { name: "ECHO & IRC Consortium", role: "ECODiN Disaster Response Coordination" },
-  { name: "FHI 360 / Gates Foundation", role: "Alive & Thrive MIYCN Nutrition" },
-  { name: "European Union / British Council", role: "EU-ACT Governance Transformation" },
-  { name: "IRI & National Democratic Institute", role: "Civic Inclusion & Democratic Rights" },
+  { name: "FCDO / World Food Programme", role: "Smallholder Farmers Resilience (Sokoto & Katsina)" },
+  { name: "European Union / UNICEF", role: "RMNCH+N Quality of Care, Sokoto" },
+  { name: "ECHO / UNICEF & IRC", role: "Education in Emergencies; Multi-Sectoral Resilience" },
+  { name: "UNOCHA Nigeria Humanitarian Fund", role: "Life-saving Health & Nutrition" },
+  { name: "USG BHA / Save the Children", role: "Multisectoral Lifesaving Assistance, Yobe" },
+  { name: "USG OHA / International Rescue Committee", role: "Integrated Emergency Response, Sokoto" },
+  { name: "FCDO / UNICEF", role: "Multi-sectoral Integrated Resilience Programme" },
+  { name: "UNESCO", role: "Family Life HIV Education & Health and Wellbeing" },
+  { name: "ZOA / Canadian Foodgrains Bank", role: "Food Security & Resilience" },
+  { name: "UNDP", role: "Lake Chad Basin Peacebuilding" },
+  { name: "CARE International", role: "EnRICH Frontline Health Workers; Child Health" },
+  { name: "USG / Palladium Group", role: "Integrated Health Program" },
+  { name: "Management Sciences for Health", role: "PMI-S Malaria" },
+  { name: "Plan International", role: "SHOW (GAC); Peace & Health (BMZ); Protection (SIDA)" },
+  { name: "UNICEF / KfW & DFID", role: "Girls' Education (GEP, G4G)" },
 ];
 
 export default async function ProjectsAndInterventionsPage() {
@@ -96,7 +96,7 @@ export default async function ProjectsAndInterventionsPage() {
           </>
         }
         subtitle="Empowering communities with sustainable solutions that bring lasting smiles."
-        description="Since 2004, Life Helpers Initiative has executed high-impact multi-sectoral projects alongside premier multilateral donors including USAID, MSH, Save the Children, UNICEF, Plan International, the Nigeria Humanitarian Fund (NHF), BMZ Germany, and Secours Islamique France."
+        description="In the last two decades, LHI has implemented over 45 projects across Nigeria, directly reaching over 1.5 million people in more than 400,000 households, with partners including FCDO, WFP, the EU, UNICEF, UNOCHA, IRC, Save the Children, CARE, Plan International and ZOA."
         image={africanFulfillmentImages.interventionsHero}
       />
 

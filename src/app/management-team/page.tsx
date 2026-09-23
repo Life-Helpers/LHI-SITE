@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { CheckCircle2, Mail, ShieldAlert, Sparkles, Target } from "lucide-react";
+import Image from "next/image";
+import { Mail, MapPin, ShieldAlert, Sparkles, Target } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { LEADERSHIP_TEAM, STATE_COORDINATORS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
   title: "Management Team | Life Helpers Initiative",
@@ -11,72 +13,48 @@ export const metadata: Metadata = {
     "Meet the executive leadership and management team executing Life Helpers Initiative (LHI) programs across 11 Nigerian states.",
 };
 
-const leaders = [
-  {
-    name: "Mr. Tayo Fatinikun",
-    title: "National Executive Director",
-    credentials: "FICA, FIMC, CMC",
+/** Directors per the Organisational Profile; unit descriptions from the Strategic Plan 2026–2030. */
+const UNIT_OVERVIEWS: Record<string, { department: string; overview: string; credentials?: string }> = {
+  "Tayo Fatinikun": {
     department: "Executive Directorate",
+    credentials: "FICA, FIMC, CMC",
     overview:
-      "Leads overall strategic trajectory, institutional partnerships, and multi-state operations. With over 20 years guiding LHI from its grassroots inception to a premier national NGO, he spearheads high-level stakeholder engagement with UN agencies, bilateral donors, and government ministries.",
+      "Provides overall leadership of LHI, working with the Board of Trustees and the National Management Team to deliver the vision of “a more fulfilled life for everyone”.",
   },
-  {
-    name: "Taiye Lawal",
-    title: "Director of Business Development, Partnership & Grant",
-    credentials: "MBA, PMP",
-    department: "Business Development & Partnerships",
+  "Hadiza Ibrahim Yaro": {
+    department: "Safeguarding, Accountability & Gender (SAG)",
     overview:
-      "Directs proposal formulation, institutional fundraising, donor relationship management, and strategic partnerships with global bodies including UNICEF, Plan International, ActionAid, and the Nigeria Humanitarian Fund.",
+      "Coordinates safeguarding, accountability to affected populations, feedback mechanisms and inclusive gender programming across all projects.",
   },
-  {
-    name: "Hadiza Ibrahim Yaro",
-    title: "Director of Gender and Social Inclusion",
-    credentials: "M.Sc Gender Studies",
-    department: "Gender & Social Inclusion (GESI)",
+  "Kolawole Adeniyi Famokun": {
+    department: "Programmes",
+    overview: "Coordinates and provides leadership across all six thematic areas of LHI's work.",
+  },
+  "Taiye Lawal": {
+    department: "Business Development, Partnership & Grant Management (BuDPaGM)",
     overview:
-      "Champions gender mainstreaming, Protection Against Sexual Exploitation and Abuse (PSEA), the LHI Disability Fund, and community-level survivor protection hubs across Northern Nigeria.",
+      "Leads resource mobilisation, partner relationships, research into fundable opportunities and overall grant management.",
   },
-  {
-    name: "Kolawole Famokun",
-    title: "Director of Programs",
-    credentials: "MPH, Project Lead",
-    department: "Programs & Field Implementation",
+  "Precious Afuaman": {
+    department: "Monitoring, Evaluation, Research & Learning (MERL)",
     overview:
-      "Oversees technical design and multi-sectoral execution across Health, Nutrition, Education in Emergencies, Livelihoods, and Climate-Smart Agriculture throughout all 11 operational state offices.",
+      "Coordinates data management, operational and programmatic research and assessment, knowledge management and learning.",
   },
-  {
-    name: "James Olasunkanmi David",
-    title: "Director of Operations",
-    credentials: "MCILT, Logistics Lead",
-    department: "Operations, Logistics & Security",
-    overview:
-      "Manages field logistics, procurement, human resources, fleet operations, and safety protocols in high-stakes and remote hard-to-reach humanitarian operational corridors.",
+  "Dapo Ogunyemi": {
+    department: "Compliance & Internal Audit (CIA)",
+    overview: "Ensures policy and procedural compliance across the organisation and upholds internal financial integrity.",
   },
-  {
-    name: "Precious Andrew",
-    title: "Director of Monitoring, Evaluation, Accountability & Feedback (MEAL)",
-    credentials: "M.Sc Biostatistics, MEAL Specialist",
-    department: "MEAL & Quality Assurance",
-    overview:
-      "Directs data governance, digital data collection, Community-Based Surveillance, beneficiary feedback desks, and impact evaluations ensuring verifiable donor accountability.",
+  "James Olasunkanmi David": {
+    department: "Operations",
+    overview: "Oversees administration, security, supply chain and general logistics.",
   },
-  {
-    name: "Ijeoma Ekpunobi",
-    title: "Director of Finance",
-    credentials: "FCA, ACCA",
-    department: "Finance & Accounts",
-    overview:
-      "Leads fiscal planning, treasury operations, sub-grant financial compliance, and budget tracking in strict accordance with International Financial Reporting Standards (IFRS).",
+  "Ijeoma Beatrice Ekpunobi": {
+    department: "Finance",
+    overview: "Coordinates and manages all financial transactions and documentation.",
   },
-  {
-    name: "Oladapo Ogunyemi",
-    title: "Internal Audit and Compliance",
-    credentials: "CIA, CFE",
-    department: "Audit & Risk Mitigation",
-    overview:
-      "Safeguards organizational integrity through independent continuous audits, internal controls verification, fraud prevention, and strict statutory compliance.",
-  },
-];
+};
+
+const leaders = LEADERSHIP_TEAM.map((person) => ({ ...person, ...UNIT_OVERVIEWS[person.name] }));
 
 export default function ManagementTeamPage() {
   return (
@@ -90,7 +68,7 @@ export default function ManagementTeamPage() {
           </>
         }
         subtitle="Dedicated professionals driving impact and putting smiles on communities across Nigeria."
-        description="Our management team brings deep technical expertise in public health, humanitarian logistics, gender inclusion, financial compliance, and monitoring & evaluation. Together, they steer over 350 full-time staff and hundreds of community volunteers in frontline communities across 11 states."
+        description="LHI has over 350 staff members and more than 700 community volunteers, with an active Board of Trustees and a National Management Team made up of the Senior Leadership Team and the State Office Coordinators, who run day-to-day operations."
         image={africanFulfillmentImages.teamHero}
       />
 
@@ -105,16 +83,19 @@ export default function ManagementTeamPage() {
                 key={leader.name}
                 className="flex flex-col rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
               >
-                <div className="border-b border-border pb-4">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-accent">
-                    {leader.department}
-                  </span>
-                  <h3 className="mt-1 text-xl font-bold text-foreground">{leader.name}</h3>
-                  <div className="mt-1 flex flex-wrap items-center gap-2">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                      {leader.title}
+                <div className="flex items-center gap-4 border-b border-border pb-4">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-muted">
+                    <Image src={leader.photo} alt={`Portrait of ${leader.name}`} fill sizes="80px" className="object-cover object-top" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-accent">
+                      {leader.department}
+                    </span>
+                    <h3 className="mt-1 text-xl font-bold text-foreground">{leader.name}</h3>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary">
+                      {leader.role}
+                      {leader.credentials && <span className="ml-1 font-normal normal-case text-muted-foreground">· {leader.credentials}</span>}
                     </p>
-                    <span className="text-xs text-muted-foreground">· {leader.credentials}</span>
                   </div>
                 </div>
 
@@ -122,20 +103,35 @@ export default function ManagementTeamPage() {
                   {leader.overview}
                 </p>
 
-                <div className="mt-6 flex items-center justify-between border-t border-border pt-4 text-xs">
-                  <span className="flex items-center gap-1.5 text-muted-foreground">
-                    <CheckCircle2 size={13} className="text-primary" />
-                    Life Helpers Initiative
-                  </span>
-                  <a
-                    href={`mailto:${siteConfig.contact.officialEmail}`}
-                    className="inline-flex items-center gap-1 text-primary hover:underline"
-                  >
-                    <Mail size={12} /> Contact Directorate
+                <div className="mt-6 border-t border-border pt-4 text-xs">
+                  <a href={`mailto:${leader.email}`} className="inline-flex items-center gap-1.5 text-primary hover:underline">
+                    <Mail size={12} /> {leader.email}
                   </a>
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* State Office Coordinators */}
+          <div className="mt-20">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">National Management Team</p>
+            <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground">State Office Coordinators</h2>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              Responsible for the day-to-day operations of LHI in each state, working with the Senior Leadership Team.
+            </p>
+            <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {STATE_COORDINATORS.map((c) => (
+                <li key={c.email} className="rounded-2xl border border-border bg-card p-5">
+                  <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-accent">
+                    <MapPin size={12} /> {c.state}
+                  </p>
+                  <p className="mt-1.5 font-bold text-foreground">{c.name}</p>
+                  <a href={`mailto:${c.email}`} className="mt-1 inline-block break-all text-xs text-primary hover:underline">
+                    {c.email}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Accountability Banner */}
@@ -145,7 +141,7 @@ export default function ManagementTeamPage() {
               <div>
                 <h4 className="text-sm font-semibold text-foreground">Field Operational Rigor</h4>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Active field presence in 11 states ensuring swift humanitarian response and continuous service delivery.
+                  Offices in 11 states, over 350 staff and 700+ community volunteers ensuring continuous service delivery.
                 </p>
               </div>
             </div>

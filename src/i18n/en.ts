@@ -96,7 +96,7 @@ export const en: Dictionary = {
     whoWeAre: {
       eyebrow: "Who We Are",
       heading: "Since 2004, working across Northern Nigeria",
-      body: "Founded as Beulah Projects in Sokoto, LHI has grown into a national NGO combining development programming, humanitarian relief, and disaster risk reduction.",
+      body: "Founded as the Beulah Project in Sokoto, LHI works in the development and humanitarian sectors to reach marginalized children, youth, women, men and people living with disabilities through community structures.",
       visionTitle: "Our Vision",
       visionBody:
         "“A more fulfilled life for everyone.”",
@@ -105,9 +105,9 @@ export const en: Dictionary = {
         "“To be a leading non-governmental organization working to maximize all opportunities to empower marginalized people.”",
       valuesTitle: "Our Core Values",
       values: [
-        "Love — friendly atmosphere, kind gestures, and togetherness",
-        "Honesty — absolute openness and aligning words with deeds",
-        "Inclusion — universal access and equal opportunities",
+        "Love — We passionately foster a friendly working environment that promotes unity and kindness as we exhibit professionalism and excellence in our services.",
+        "Honesty — We act and communicate clearly and always honor our commitments.",
+        "Inclusion — We welcome all individuals without discrimination and ensure equal access and opportunities to our clients and staff.",
       ],
       moreAboutLhi: "More about LHI",
     },

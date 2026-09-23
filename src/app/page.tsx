@@ -11,13 +11,13 @@ import { PartnersStrip } from "@/components/home/partners-strip";
 import { PhilosophyQuote } from "@/components/home/philosophy-quote";
 import { NewsletterSubscribe } from "@/components/home/newsletter-subscribe";
 import { FeatureStory } from "@/components/home/feature-story";
-import { getPartners, getSettings } from "@/lib/cms/content";
+import { getPartners, getPublishedPosts, getSettings } from "@/lib/cms/content";
 
 /** Content comes from the admin CMS; saves refresh it instantly, this is a safety net. */
 export const revalidate = 300;
 
 export default async function Home() {
-  const [partners, settings] = await Promise.all([getPartners(), getSettings()]);
+  const [partners, settings, posts] = await Promise.all([getPartners(), getSettings(), getPublishedPosts()]);
   return (
     <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
       <HeroSlider />
@@ -29,7 +29,7 @@ export default async function Home() {
       <LatestFromLHI />
       <RadioBanner />
       <TestimonialsSection />
-      <SocialFeedsSection />
+      <SocialFeedsSection posts={posts.slice(0, 4)} />
       <PartnersStrip partners={partners} />
       <PhilosophyQuote />
       <NewsletterSubscribe />
