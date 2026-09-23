@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+import { ANNIVERSARY } from "./src/config/anniversary";
+
 const PORT = 3100;
 const baseURL = `http://localhost:${PORT}`;
 
@@ -23,7 +25,7 @@ export default defineConfig({
     // (e2e/anniversary.spec.ts opts back in).
     storageState: {
       cookies: [],
-      origins: [{ origin: baseURL, localStorage: [{ name: "lhi_anniversary_22", value: '{"subscribed":true}' }] }],
+      origins: [{ origin: baseURL, localStorage: [{ name: `lhi_anniversary_${ANNIVERSARY.years}`, value: '{"subscribed":true}' }] }],
     },
     trace: "on-first-retry",
     // Only set for local sandboxes with a mismatched pre-installed browser

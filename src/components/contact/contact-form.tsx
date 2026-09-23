@@ -178,6 +178,8 @@ export function ContactForm() {
         />
       </div>
 
+      <Turnstile />
+
       {error && (
         <p role="alert" className="rounded-lg bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
           {error}

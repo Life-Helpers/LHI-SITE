@@ -96,7 +96,7 @@ export default async function EventsPage() {
                   >
                     <Rss className="h-3.5 w-3.5" aria-hidden="true" /> Apple / Outlook
                   </a>
-                  {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- calendar file, not a page */}
+                  { }
                   <a
                     href="/api/calendar"
                     download="lhi-calendar.ics"

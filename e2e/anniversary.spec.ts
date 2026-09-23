@@ -10,12 +10,12 @@ const inWindow = ANNIVERSARY.enabled && today >= ANNIVERSARY.showFrom && today <
 test("anniversary popup greets first-time visitors and can be dismissed", async ({ page }) => {
   test.skip(!inWindow, "Outside the anniversary campaign window");
   await page.goto("/");
-  const dialog = page.getByRole("dialog", { name: /celebrating 22 years/i });
+  const dialog = page.getByRole("dialog", { name: new RegExp(`celebrating ${ANNIVERSARY.years} years`, "i") });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByLabel("Email address")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
   await page.reload();
   await page.waitForTimeout(1500); // the popup opens after a short delay
-  await expect(page.getByRole("dialog", { name: /celebrating 22 years/i })).toBeHidden();
+  await expect(page.getByRole("dialog", { name: new RegExp(`celebrating ${ANNIVERSARY.years} years`, "i") })).toBeHidden();
 });

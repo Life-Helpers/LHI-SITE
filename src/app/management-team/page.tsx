@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Mail, MapPin, ShieldAlert, Sparkles, Target } from "lucide-react";
 
-import { siteConfig } from "@/config/site";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { LEADERSHIP_TEAM, STATE_COORDINATORS } from "@/data/lhi-photos";

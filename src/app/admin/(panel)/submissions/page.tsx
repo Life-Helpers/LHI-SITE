@@ -40,7 +40,7 @@ export default async function SubmissionsPage({
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Submissions" }]}
         actions={
           <>
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- file download, not a page */}
+            { }
             <a href={type === "all" ? "/api/admin/export/submissions" : `/api/admin/export/submissions?type=${type}`} download className={buttonClass.secondary}>
               <Download className="h-4 w-4" /> Export CSV
             </a>

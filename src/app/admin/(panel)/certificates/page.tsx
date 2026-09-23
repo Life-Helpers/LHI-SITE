@@ -27,7 +27,7 @@ export default async function CertificatesPage({ searchParams }: { searchParams:
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Certificates" }]}
         actions={
           <>
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- file download, not a page */}
+            { }
             <a href="/api/admin/export/certificates" download className={buttonClass.secondary}>
               <Download className="h-4 w-4" /> Export CSV
             </a>

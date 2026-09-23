@@ -16,11 +16,12 @@ import {
 } from "lucide-react";
 
 import { playFlipSound } from "@/components/magazines/flip-sound";
-import { pageImage, type Magazine } from "@/data/magazines";
+import { pageImage, PROGRESS_KEY, type Magazine } from "@/data/magazines";
 
 type PageFlipInstance = import("page-flip/dist/js/page-flip.module.js").PageFlip;
 
 const SOUND_KEY = "lhi_flip_sound";
+
 const PAGE_W = 550;
 const PAGE_H = 778; // A4 portrait
 
@@ -90,7 +91,22 @@ export function Flipbook({ magazine }: { magazine: Magazine }) {
         showPageCorners: true,
       });
       instance.loadFromHTML(book.querySelectorAll<HTMLElement>(".flipbook-page"));
-      instance.on("flip", (e) => setPage(Number(e.data)));
+      const start = Number(new URLSearchParams(window.location.search).get("page"));
+      if (Number.isInteger(start) && start > 1 && start <= total) {
+        instance.turnToPage(start - 1);
+        setPage(start - 1);
+      }
+      instance.on("flip", (e) => {
+        const index = Number(e.data);
+        setPage(index);
+        try {
+          const all = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}") as Record<string, { page: number; total: number; at: number }>;
+          all[magazine.slug] = { page: index + 1, total, at: Date.now() };
+          localStorage.setItem(PROGRESS_KEY, JSON.stringify(all));
+        } catch {
+          /* progress is a convenience only */
+        }
+      });
       instance.on("changeOrientation", (e) => setPortrait(e.data === "portrait"));
       instance.on("changeState", (e) => {
         if (e.data === "flipping" && soundRef.current) playFlipSound();
@@ -110,7 +126,7 @@ export function Flipbook({ magazine }: { magazine: Magazine }) {
       }
       host.innerHTML = "";
     };
-  }, [magazine.slug, magazine.title, total]);
+  }, [magazine, total]);
 
   const next = useCallback(() => flipRef.current?.flipNext(), []);
   const prev = useCallback(() => flipRef.current?.flipPrev(), []);

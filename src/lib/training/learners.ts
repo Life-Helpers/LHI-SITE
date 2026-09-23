@@ -13,6 +13,7 @@ const TTL_SECONDS = 60 * 60 * 24 * 30;
 
 export type PublicLearner = Omit<Learner, "passwordHash">;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const toPublic = ({ passwordHash: _omit, ...rest }: Learner): PublicLearner => rest;
 
 export const normaliseEmail = (email: string) => email.trim().toLowerCase();

@@ -161,3 +161,21 @@ export const pageImage = (m: Pick<Magazine, "slug" | "pagePrefix">, page: number
 export function getMagazine(slug: string) {
   return MAGAZINES.find((m) => m.slug === slug);
 }
+
+/** localStorage key for reading progress per magazine (flipbook → library "Continue reading"). */
+export const PROGRESS_KEY = "lhi_mag_progress";
+/** localStorage key for magazines a reader saved to their shelf. */
+export const SAVED_KEY = "lhi_mag_saved";
+
+export type ShelfCategory = "magazines" | "digest" | "newsletters";
+export const SHELF_LABELS: Record<ShelfCategory, string> = {
+  magazines: "Project magazines",
+  digest: "Helpers Digest bulletins",
+  newsletters: "Newsletters",
+};
+export function shelfOf(m: Pick<Magazine, "kind">): ShelfCategory {
+  const k = m.kind.toLowerCase();
+  if (k.includes("digest")) return "digest";
+  if (k.includes("newsletter")) return "newsletters";
+  return "magazines";
+}

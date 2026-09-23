@@ -43,7 +43,7 @@ export default async function NewsletterPage() {
         ]}
         actions={
           <>
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- file download, not a page */}
+            { }
             <a
               href="/api/admin/export/subscribers"
               download

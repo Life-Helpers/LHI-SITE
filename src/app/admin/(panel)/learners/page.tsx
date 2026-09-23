@@ -25,7 +25,7 @@ export default async function LearnersPage({ searchParams }: { searchParams: Pro
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Learners" }]}
         actions={
           <>
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- file download, not a page */}
+            { }
             <a href="/api/admin/export/learners" download className={buttonClass.secondary}>
               <Download className="h-4 w-4" /> Export CSV
             </a>
