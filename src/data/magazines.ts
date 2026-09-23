@@ -12,6 +12,8 @@ export interface Magazine {
   pdf: string;
   story: string;
   partners: string;
+  /** Folder/prefix for page images; defaults to /magazines/<slug>/. Uploaded magazines use /media/mag-<slug>-. */
+  pagePrefix?: string;
 }
 
 export const MAGAZINES: Magazine[] = [
@@ -153,7 +155,8 @@ export const MAGAZINES: Magazine[] = [
   },
 ];
 
-export const pageImage = (slug: string, page: number) => `/magazines/${slug}/${String(page).padStart(2, "0")}.webp`;
+export const pageImage = (m: Pick<Magazine, "slug" | "pagePrefix">, page: number) =>
+  `${m.pagePrefix ?? `/magazines/${m.slug}/`}${String(page).padStart(2, "0")}.webp`;
 
 export function getMagazine(slug: string) {
   return MAGAZINES.find((m) => m.slug === slug);

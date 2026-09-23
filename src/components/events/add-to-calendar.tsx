@@ -27,7 +27,7 @@ export function AddToCalendar({ event, variant = "outline", className = "" }: { 
   const styles = {
     outline: "border border-border bg-background text-foreground hover:border-primary hover:text-primary",
     solid: "bg-primary text-primary-foreground hover:bg-primary/90",
-    light: "border border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20",
+    light: "border border-white/50 bg-black/25 text-white hover:bg-black/35",
   }[variant];
   const item = "block rounded-lg px-3 py-2 text-sm text-foreground hover:bg-muted focus-visible:bg-muted focus-visible:outline-none";
 

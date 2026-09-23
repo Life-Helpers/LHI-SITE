@@ -4,26 +4,29 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, BookOpen } from "lucide-react";
 
 import { Flipbook } from "@/components/magazines/flipbook";
-import { MAGAZINES, getMagazine, pageImage } from "@/data/magazines";
+import { MAGAZINES, pageImage } from "@/data/magazines";
+import { getAllMagazines, getAnyMagazine } from "@/lib/cms/content";
+
+export const revalidate = 300;
 
 export function generateStaticParams() {
   return MAGAZINES.map((m) => ({ slug: m.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const m = getMagazine((await params).slug);
+  const m = await getAnyMagazine((await params).slug);
   if (!m) return {};
   return {
     title: `${m.title} | Project Magazines`,
     description: m.description,
-    openGraph: { title: m.title, description: m.description, images: [{ url: pageImage(m.slug, 1) }] },
+    openGraph: { title: m.title, description: m.description, images: [{ url: pageImage(m, 1) }] },
   };
 }
 
 export default async function MagazineReaderPage({ params }: { params: Promise<{ slug: string }> }) {
-  const magazine = getMagazine((await params).slug);
+  const magazine = await getAnyMagazine((await params).slug);
   if (!magazine) notFound();
-  const others = MAGAZINES.filter((m) => m.slug !== magazine.slug);
+  const others = (await getAllMagazines()).filter((m) => m.slug !== magazine.slug);
 
   return (
     <main id="main-content" tabIndex={-1} className="flex-1 pt-20">
@@ -56,7 +59,7 @@ export default async function MagazineReaderPage({ params }: { params: Promise<{
               <li key={m.slug}>
                 <Link href={`/project-magazines/${m.slug}`} className="group flex gap-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={pageImage(m.slug, 1)} alt="" loading="lazy" className="h-28 w-20 shrink-0 rounded object-cover shadow-md" />
+                  <img src={pageImage(m, 1)} alt="" loading="lazy" className="h-28 w-20 shrink-0 rounded object-cover shadow-md" />
                   <span>
                     <span className="block text-[11px] font-semibold uppercase tracking-wider text-accent">{m.kind}</span>
                     <span className="mt-1 block text-sm font-semibold text-foreground group-hover:text-primary">{m.title}</span>

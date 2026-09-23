@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Loader2, Lock } from "lucide-react";
 
-import { forgotPasswordAction, loginAction, resetPasswordAction, setupAction, type ActionResult } from "@/app/admin/actions";
+import { forgotPasswordAction, loginAction, resetPasswordAction, setupAction, verifyTwoFactorLoginAction, type ActionResult } from "@/app/admin/actions";
 
 const inputClass =
   "mt-1.5 block w-full rounded-lg border border-admin-border bg-admin-card px-3.5 py-2.5 text-sm text-admin-text outline-none placeholder:text-admin-muted focus:border-admin-primary focus:ring-3 focus:ring-admin-primary/20";
@@ -70,6 +70,37 @@ export function LoginForm() {
         <p className="text-center text-xs text-admin-muted">
           <Link href="/admin/forgot" className="font-medium text-admin-primary hover:underline">
             Forgot your password?
+          </Link>
+        </p>
+      </form>
+    </AuthCard>
+  );
+}
+
+export function TwoFactorLoginForm() {
+  const [state, action, pending] = useActionState(verifyTwoFactorLoginAction, null);
+  return (
+    <AuthCard title="Two-step verification" subtitle="Enter the 6-digit code from your authenticator app">
+      <form action={action} className="space-y-4">
+        <ErrorBox state={state} />
+        <label className="block text-sm font-medium">
+          Verification code
+          <input
+            name="code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9 ]{6,7}"
+            maxLength={7}
+            required
+            autoFocus
+            className={`${inputClass} text-center font-mono text-lg tracking-[0.5em]`}
+          />
+        </label>
+        <SubmitButton pending={pending}>Verify and sign in</SubmitButton>
+        <p className="text-center text-xs text-admin-muted">
+          Lost your phone? Ask an administrator to reset two-step verification for your account.{" "}
+          <Link href="/admin/login" className="text-admin-primary hover:underline">
+            Start again
           </Link>
         </p>
       </form>

@@ -12,14 +12,17 @@ import {
   AuthError,
   checkSetupToken,
   clearLoginFailures,
+  clearPendingTwoFactor,
   createSession,
   destroySession,
   hashPassword,
   hasAnyUsers,
   loginLocked,
+  readPendingTwoFactor,
   recordLoginFailure,
   requireUser,
   resolveRole,
+  startPendingTwoFactor,
   validatePasswordStrength,
   verifyPassword,
 } from "@/lib/cms/auth";
@@ -28,6 +31,8 @@ import {
   ALL_PERMISSIONS,
   can,
   isCollectionName,
+  REVIEW_STAGES,
+  SCORED_TYPES,
   slugify,
   type CmsSettings,
   type CmsUser,
@@ -41,6 +46,8 @@ import { validateRecord } from "@/lib/cms/validate";
 import { sendPasswordResetEmail } from "@/lib/email/notifications";
 import { consumeResetToken, createResetToken } from "@/lib/email/reset";
 import { absoluteUrl } from "@/lib/email/template";
+import { generateTotpSecret, otpauthUrl, verifyTotp } from "@/lib/cms/totp";
+import QRCode from "qrcode";
 
 export interface ActionResult {
   ok: boolean;
@@ -84,12 +91,98 @@ export async function loginAction(_prev: ActionResult | null, form: FormData): P
     return { ok: false, error: "Incorrect email or password.", values };
   }
   clearLoginFailures(email);
+  if (user.totpSecret) {
+    await startPendingTwoFactor(user.id);
+    redirect("/admin/login/verify");
+  }
+  await completeLogin(user);
+  redirect("/admin");
+}
+
+async function completeLogin(user: CmsUser) {
   await updateStore("users", (items) => ({
     items: items.map((u) => (u.id === user.id ? { ...u, lastLoginAt: new Date().toISOString() } : u)),
   }));
   await createSession(user.id);
   await logActivity(user, "logged in", "Admin");
+}
+
+/** Login step 2: the six-digit code from the authenticator app. */
+export async function verifyTwoFactorLoginAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  const uid = await readPendingTwoFactor();
+  if (!uid) return { ok: false, error: "Your sign-in has expired. Please enter your email and password again." };
+  const lockKey = `2fa:${uid}`;
+  if (loginLocked(lockKey)) return { ok: false, error: "Too many incorrect codes. Try again in 15 minutes." };
+  const user = (await readStore("users")).find((u) => u.id === uid);
+  if (!user?.totpSecret) return { ok: false, error: "Please sign in again." };
+  if (!verifyTotp(user.totpSecret, String(form.get("code") ?? ""))) {
+    recordLoginFailure(lockKey);
+    return { ok: false, error: "That code isn't right. Check your authenticator app and try again." };
+  }
+  clearLoginFailures(lockKey);
+  await clearPendingTwoFactor();
+  await completeLogin(user);
   redirect("/admin");
+}
+
+/** Profile: create a new secret to scan. Two-step verification turns on once a code is confirmed. */
+export async function startTwoFactorSetupAction(): Promise<ActionResult & { secret?: string; qr?: string }> {
+  try {
+    const user = await requireUser();
+    const secret = generateTotpSecret();
+    await updateStore("users", (items) => ({ items: items.map((u) => (u.id === user.id ? { ...u, totpPending: secret } : u)) }));
+    const qr = await QRCode.toDataURL(otpauthUrl(secret, user.email), { margin: 1, width: 220 });
+    return { ok: true, secret, qr };
+  } catch (err) {
+    if (err instanceof AuthError) return { ok: false, error: err.message };
+    throw err;
+  }
+}
+
+export async function confirmTwoFactorAction(code: string): Promise<ActionResult> {
+  return guard(async () => {
+    const user = await requireUser();
+    const record = (await readStore("users")).find((u) => u.id === user.id);
+    if (!record?.totpPending) return { ok: false, error: "Start the setup again." };
+    if (!verifyTotp(record.totpPending, code)) return { ok: false, error: "That code isn't right. Try the newest code in your app." };
+    await updateStore("users", (items) => ({
+      items: items.map((u) => (u.id === user.id ? { ...u, totpSecret: record.totpPending, totpPending: undefined } : u)),
+    }));
+    await logActivity(user, "turned on two-step verification", "Account");
+    revalidatePath("/admin/profile");
+    return { ok: true };
+  });
+}
+
+export async function disableTwoFactorAction(password: string, code: string): Promise<ActionResult> {
+  return guard(async () => {
+    const user = await requireUser();
+    const record = (await readStore("users")).find((u) => u.id === user.id);
+    if (!record?.totpSecret) return { ok: true };
+    if (!(await verifyPassword(password, record.passwordHash))) return { ok: false, error: "Your password is incorrect." };
+    if (!verifyTotp(record.totpSecret, code)) return { ok: false, error: "That code isn't right." };
+    await updateStore("users", (items) => ({
+      items: items.map((u) => (u.id === user.id ? { ...u, totpSecret: undefined, totpPending: undefined } : u)),
+    }));
+    await logActivity(user, "turned off two-step verification", "Account");
+    revalidatePath("/admin/profile");
+    return { ok: true };
+  });
+}
+
+/** Administrators can turn off two-step verification for someone who lost their phone. */
+export async function resetUserTwoFactorAction(userId: string): Promise<ActionResult> {
+  return guard(async () => {
+    const user = await requireUser("users");
+    const target = await updateStore("users", (items) => ({
+      items: items.map((u) => (u.id === userId ? { ...u, totpSecret: undefined, totpPending: undefined } : u)),
+      result: items.find((u) => u.id === userId),
+    }));
+    if (!target) return { ok: false, error: "User not found." };
+    await logActivity(user, "reset two-step verification for", target.email);
+    revalidatePath("/admin/users");
+    return { ok: true };
+  });
 }
 
 /** Team password reset, step 1: email a one-time link. Same response whether or not the account exists. */
@@ -122,8 +215,12 @@ export async function resetPasswordAction(_prev: ActionResult | null, form: Form
     result: items.find((u) => u.id === userId),
   }));
   if (!user) return { ok: false, error: "This account no longer exists." };
-  await createSession(user.id);
   await logActivity(user, "reset their password", "Account");
+  if (user.totpSecret) {
+    await startPendingTwoFactor(user.id);
+    redirect("/admin/login/verify");
+  }
+  await createSession(user.id);
   redirect("/admin");
 }
 
@@ -298,6 +395,56 @@ export async function setSubmissionStatusAction(id: string, status: SubmissionSt
       items: items.map((s) => (s.id === id ? { ...s, status } : s)),
     }));
     revalidatePath("/admin", "layout");
+    return { ok: true };
+  });
+}
+
+/** Move a submission through its review stages and record an evaluation score. */
+export async function updateSubmissionReviewAction(id: string, input: { stage: string; score?: number | null }): Promise<ActionResult> {
+  return guard(async () => {
+    const user = await requireUser("submissions");
+    const current = (await readStore("submissions")).find((s) => s.id === id);
+    if (!current) return { ok: false, error: "Submission not found." };
+    const stages = REVIEW_STAGES[current.type];
+    if (!stages?.includes(input.stage)) return { ok: false, error: "Choose a valid stage." };
+    const scored = SCORED_TYPES.includes(current.type);
+    const score = scored && input.score !== null && input.score !== undefined && Number.isFinite(input.score) ? Math.round(Math.min(100, Math.max(0, input.score))) : undefined;
+    await updateStore("submissions", (items) => ({
+      items: items.map((s) =>
+        s.id === id
+          ? {
+              ...s,
+              status: s.status === "new" ? "read" : s.status,
+              review: { stage: input.stage, ...(score !== undefined ? { score } : {}), notes: s.review?.notes ?? [], updatedAt: new Date().toISOString(), updatedBy: user.name },
+            }
+          : s,
+      ),
+    }));
+    await logActivity(user, `moved to "${input.stage}"${score !== undefined ? ` (score ${score})` : ""}:`, current.subject, `/admin/submissions/${id}`);
+    revalidatePath("/admin", "layout");
+    return { ok: true };
+  });
+}
+
+/** Add an internal note to a submission (never shown to the applicant). */
+export async function addSubmissionNoteAction(id: string, text: string): Promise<ActionResult> {
+  return guard(async () => {
+    const user = await requireUser("submissions");
+    const body = text.trim().slice(0, 2000);
+    if (!body) return { ok: false, error: "Write a note first." };
+    const found = await updateStore("submissions", (items) => {
+      const target = items.find((s) => s.id === id);
+      if (!target) return { items, result: null };
+      const stages = REVIEW_STAGES[target.type];
+      const review = target.review ?? { stage: stages?.[0] ?? "", notes: [], updatedAt: "", updatedBy: "" };
+      const note = { id: randomUUID(), author: user.name, text: body, at: new Date().toISOString() };
+      return {
+        items: items.map((s) => (s.id === id ? { ...s, review: { ...review, notes: [...review.notes, note], updatedAt: note.at, updatedBy: user.name } } : s)),
+        result: target,
+      };
+    });
+    if (!found) return { ok: false, error: "Submission not found." };
+    revalidatePath(`/admin/submissions/${id}`);
     return { ok: true };
   });
 }

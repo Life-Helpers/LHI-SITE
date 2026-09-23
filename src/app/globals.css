@@ -140,8 +140,8 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --glow-shadow: 0 0 30px rgba(245, 134, 52, 0.25);
   --glow-shadow-hover: 0 0 30px rgba(245, 134, 52, 0.45);
-  --orb-primary: rgba(235, 22, 28, 0.45);
-  --orb-accent: rgba(245, 134, 52, 0.4);
+  --orb-primary: rgba(235, 22, 28, 0.22);
+  --orb-accent: rgba(245, 134, 52, 0.16);
   --scrim-color: 10, 10, 10;
   --scrim-opacity: 0.7;
 }

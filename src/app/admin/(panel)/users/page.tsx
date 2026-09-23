@@ -50,6 +50,7 @@ export default async function UsersPage() {
                 <td className="px-5 py-3 text-admin-muted">{u.email}</td>
                 <td className="px-5 py-3">
                   <Badge tone={u.role === "administrator" ? "primary" : "neutral"}>{u.roleName}</Badge>
+                  {u.twoFactor && <Badge tone="success">2-step</Badge>}
                 </td>
                 <td className="px-5 py-3 text-admin-muted">{u.lastLoginAt ? formatDate(u.lastLoginAt, true) : "Never"}</td>
               </tr>

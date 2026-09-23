@@ -5,15 +5,18 @@ import { BookOpen, Download } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
-import { MAGAZINES, pageImage } from "@/data/magazines";
+import { pageImage } from "@/data/magazines";
+import { getAllMagazines } from "@/lib/cms/content";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Project Magazines",
   description: "Read Life Helpers Initiative's project magazines and newsletter online as flipbooks, or download them as PDF.",
 };
 
-export default function ProjectMagazinesPage() {
-  const [latest, ...rest] = MAGAZINES;
+export default async function ProjectMagazinesPage() {
+  const [latest, ...rest] = await getAllMagazines();
 
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
@@ -35,7 +38,7 @@ export default function ProjectMagazinesPage() {
           <div className="mt-6 grid grid-cols-1 items-center gap-10 md:grid-cols-2">
             <Link href={`/project-magazines/${latest.slug}`} className="group relative mx-auto block w-full max-w-sm [perspective:1600px]">
               <div className="relative aspect-[550/778] overflow-hidden rounded-r-xl rounded-l-sm shadow-[0_30px_60px_-15px_rgba(0,0,0,0.45)] transition-transform duration-500 [transform-origin:left_center] group-hover:[transform:rotateY(-14deg)]">
-                <Image src={pageImage(latest.slug, 1)} alt={`${latest.title} cover`} fill priority sizes="384px" className="object-cover" />
+                <Image src={pageImage(latest, 1)} alt={`${latest.title} cover`} fill priority sizes="384px" className="object-cover" />
                 <div className="pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/35 to-transparent" />
               </div>
             </Link>
@@ -71,7 +74,7 @@ export default function ProjectMagazinesPage() {
               <li key={m.slug}>
                 <Link href={`/project-magazines/${m.slug}`} className="group block [perspective:1400px]">
                   <div className="relative aspect-[550/778] overflow-hidden rounded-r-lg rounded-l-sm shadow-[0_20px_40px_-12px_rgba(0,0,0,0.4)] transition-transform duration-500 [transform-origin:left_center] group-hover:[transform:rotateY(-14deg)]">
-                    <Image src={pageImage(m.slug, 1)} alt={`${m.title} cover`} fill sizes="(min-width: 768px) 320px, 45vw" className="object-cover" />
+                    <Image src={pageImage(m, 1)} alt={`${m.title} cover`} fill sizes="(min-width: 768px) 320px, 45vw" className="object-cover" />
                     <div className="pointer-events-none absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/35 to-transparent" />
                   </div>
                   <p className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-accent">{m.kind}</p>

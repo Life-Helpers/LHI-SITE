@@ -19,6 +19,7 @@ export const PERMISSION_GROUPS = [
       { id: "comments", label: "Moderate comments", help: "Approve or delete reader comments." },
       { id: "episodes", label: "Radio episodes", help: "Upload and publish radio recordings." },
       { id: "events", label: "Events", help: "Add LHI events to the events calendar and home page." },
+      { id: "magazines", label: "Project magazines", help: "Upload magazine PDFs as flipbooks." },
     ],
   },
   {
@@ -220,7 +221,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "excerpt", label: "Excerpt", type: "textarea", required: true, help: "One or two sentences shown on cards and in search results." },
       { name: "content", label: "Content", type: "markdown", required: true, help: "Markdown: ## headings, **bold**, - lists, [links](https://…), ![images](/media/…)." },
       { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "draft", label: "Draft" }, { value: "published", label: "Published" }] },
-      { name: "date", label: "Publish date", type: "date", sidebar: true, required: true },
+      { name: "date", label: "Publish date", type: "date", sidebar: true, required: true, help: "Choose a future date to schedule the post; it goes live automatically on that day." },
       { name: "category", label: "Category", type: "select", sidebar: true, required: true, options: POST_CATEGORIES },
       { name: "featured", label: "Feature on home page", type: "boolean", sidebar: true },
       { name: "featuredImage", label: "Featured image", type: "image", sidebar: true },
@@ -503,6 +504,25 @@ export const SUBMISSION_TYPE_LABELS: Record<SubmissionType, string> = {
 
 export type SubmissionStatus = "new" | "read" | "archived";
 
+/** Review pipeline for submissions that are processed (applications, bids, feedback). */
+export const REVIEW_STAGES: Partial<Record<SubmissionType, string[]>> = {
+  "job-application": ["New", "Screening", "Shortlisted", "Interview", "Offer", "Hired", "Not successful"],
+  "tender-response": ["Received", "Compliance check", "Technical evaluation", "Financial evaluation", "Awarded", "Not successful"],
+  "vendor-registration": ["Received", "Verified", "Approved vendor", "Not approved"],
+  feedback: ["New", "Acknowledged", "In progress", "Resolved", "Closed"],
+  "consortium-eoi": ["New", "Under review", "Responded", "Partnered", "Declined"],
+};
+/** Types that carry a 0–100 evaluation score. */
+export const SCORED_TYPES: SubmissionType[] = ["job-application", "tender-response"];
+
+export interface SubmissionReview {
+  stage: string;
+  score?: number;
+  notes: { id: string; author: string; text: string; at: string }[];
+  updatedAt: string;
+  updatedBy: string;
+}
+
 export interface Submission {
   id: string;
   type: SubmissionType;
@@ -514,6 +534,7 @@ export interface Submission {
   fields: Record<string, string>;
   /** Private uploads (CVs, quotations) served only to signed-in editors. */
   attachments?: { filename: string; stored: string; size: number }[];
+  review?: SubmissionReview;
   createdAt: string;
 }
 
@@ -536,9 +557,15 @@ export interface CmsUser {
   passwordHash: string;
   createdAt: string;
   lastLoginAt?: string;
+  /** Base32 TOTP secret when two-step verification is on. */
+  totpSecret?: string;
+  /** Secret being set up, until the first code is confirmed. */
+  totpPending?: string;
 }
 
-export type PublicUser = Omit<CmsUser, "passwordHash"> & {
+export type PublicUser = Omit<CmsUser, "passwordHash" | "totpSecret" | "totpPending"> & {
+  /** Two-step verification is enabled. */
+  twoFactor: boolean;
   /** Resolved from the user's role at sign-in time. */
   roleName: string;
   permissions: Permission[];
@@ -648,4 +675,20 @@ export interface Unsubscribe {
   id: string;
   email: string;
   at: string;
+}
+
+/** A magazine uploaded in the admin; its pages are rendered to images in the editor's browser. */
+export interface CmsMagazine {
+  slug: string;
+  title: string;
+  kind: string;
+  period: string;
+  description: string;
+  partners: string;
+  story: string;
+  pages: number;
+  pdf: string;
+  status: "published" | "draft";
+  createdAt: string;
+  createdBy: string;
 }

@@ -8,6 +8,7 @@ import {
   type ObservanceArea,
 } from "@/data/observances";
 import { getPillarRef, type InterventionProject } from "@/data/interventions-data";
+import { MAGAZINES, type Magazine } from "@/data/magazines";
 import { readSettings, readStore } from "@/lib/cms/store";
 import type { CmsIntervention } from "@/lib/cms/types";
 
@@ -124,4 +125,30 @@ export async function getCalendarEvents(days = 366): Promise<CalendarEvent[]> {
 /** One calendar entry by id: an LHI event, or the next occurrence of an observance day. */
 export async function getCalendarEvent(id: string): Promise<CalendarEvent | undefined> {
   return (await getCalendarEvents(400)).find((e) => e.id === id);
+}
+
+/** Uploaded (published) magazines first, newest first, then the built-in editions. */
+export async function getAllMagazines(): Promise<Magazine[]> {
+  const uploaded = (await readStore("magazines"))
+    .filter((m) => m.status === "published")
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .map(
+      (m): Magazine => ({
+        slug: m.slug,
+        title: m.title,
+        kind: m.kind,
+        period: m.period,
+        description: m.description,
+        pages: m.pages,
+        pdf: m.pdf,
+        story: m.story || `/project-magazines/${m.slug}`,
+        partners: m.partners,
+        pagePrefix: `/media/mag-${m.slug}-`,
+      }),
+    );
+  return [...uploaded, ...MAGAZINES.filter((m) => !uploaded.some((u) => u.slug === m.slug))];
+}
+
+export async function getAnyMagazine(slug: string) {
+  return (await getAllMagazines()).find((m) => m.slug === slug);
 }

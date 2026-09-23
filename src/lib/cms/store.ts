@@ -9,6 +9,7 @@ import type {
   CmsRole,
   CmsSettings,
   CmsUser,
+  CmsMagazine,
   Learner,
   MediaItem,
   NewsletterCampaign,
@@ -60,6 +61,7 @@ interface StoreShape extends CollectionRecords {
   campaigns: NewsletterCampaign;
   resetTokens: ResetToken;
   unsubscribes: Unsubscribe;
+  magazines: CmsMagazine;
 }
 
 export type StoreName = keyof StoreShape;
@@ -87,6 +89,7 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   campaigns: () => [],
   resetTokens: () => [],
   unsubscribes: () => [],
+  magazines: () => [],
 };
 
 const cache = new Map<string, { mtimeMs: number; data: unknown }>();

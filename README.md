@@ -160,6 +160,21 @@ All outgoing email goes through `src/lib/email/send.ts` and is recorded in the
 - Until email is connected, a team member can open a password-reset email in the
   outbox and pass the link on personally.
 
+## Admin workflows
+
+- **Review stages** (Admin → Submissions → open an item): job applications, vendor bids and
+  registrations, partnership requests and feedback have their own stages (e.g. Screening →
+  Shortlisted → Interview for jobs; Compliance → Technical → Financial evaluation → Awarded for bids;
+  Acknowledged → In progress → Resolved for feedback). Jobs and bids also take a 0–100 score.
+  Internal notes are visible to the team only. Filter the list by stage; CSV exports include
+  stage, score and notes.
+- **Scheduled posts**: a published post with a future publish date shows as *Scheduled* and
+  goes live automatically on that date.
+- **Two-step verification**: each team member can turn it on under Profile (Google Authenticator,
+  Microsoft Authenticator or similar). Administrators can reset it for someone who loses their phone.
+- **Project magazines**: Admin → Magazines → Upload turns a PDF into a flipbook in the browser
+  (pages are rendered with pdf.js and uploaded as images) and offers the PDF for download.
+
 ## Team roles & permissions
 
 Team members sign in at `/admin` ("Team login" in the site footer). Each user has one role; a role is a set of

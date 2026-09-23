@@ -39,9 +39,11 @@ export function SubmissionActions({
 
   return (
     <div className="flex flex-wrap gap-2">
-      <a href={`mailto:${email}?subject=${encodeURIComponent(`Re: ${subject}`)}`} className={buttonClass.primary}>
-        <Mail className="h-4 w-4" /> Reply by email
-      </a>
+      {email && (
+        <a href={`mailto:${email}?subject=${encodeURIComponent(`Re: ${subject}`)}`} className={buttonClass.primary}>
+          <Mail className="h-4 w-4" /> Reply by email
+        </a>
+      )}
       {status === "archived" ? (
         <button type="button" className={buttonClass.secondary} disabled={pending} onClick={() => setStatus("read")}>
           <Inbox className="h-4 w-4" /> Move to inbox

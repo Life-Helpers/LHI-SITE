@@ -26,17 +26,22 @@ export default async function CollectionListPage({ params }: { params: Promise<{
             : "text",
     }));
 
+  const today = new Date().toISOString().slice(0, 10);
   const rows: TableRow[] = items.map((item) => {
     const id = String(item.id);
+    // Published posts dated in the future go live automatically on that date.
+    const scheduled = def.name === "posts" && item.status === "published" && String(item.date ?? "") > today;
+    const cells = Object.fromEntries(columns.map((c) => [c.key, displayValue(fieldByName.get(c.key), item[c.key])]));
+    if (scheduled && def.statusField) cells[def.statusField] = `Scheduled · ${String(item.date)}`;
     return {
       id,
       title: String(item[def.titleField] ?? ""),
       editHref: `/admin/content/${def.name}/${encodeURIComponent(id)}`,
-      viewHref: def.publicPath?.(item) ?? null,
+      viewHref: scheduled ? null : (def.publicPath?.(item) ?? null),
       thumb: imageField ? String(item[imageField.name] || "") || undefined : undefined,
       canDelete: !def.fixed,
       status: statusField ? String(item[statusField.name] ?? "") : undefined,
-      cells: Object.fromEntries(columns.map((c) => [c.key, displayValue(fieldByName.get(c.key), item[c.key])])),
+      cells,
     };
   });
 

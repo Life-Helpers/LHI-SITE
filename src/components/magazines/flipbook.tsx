@@ -62,7 +62,7 @@ export function Flipbook({ magazine }: { magazine: Magazine }) {
       el.className = "flipbook-page";
       if (i === 1 || i === total) el.dataset.density = "hard";
       const img = document.createElement("img");
-      img.src = pageImage(magazine.slug, i);
+      img.src = pageImage(magazine, i);
       img.alt = `${magazine.title}, page ${i}`;
       img.loading = i <= 4 ? "eager" : "lazy";
       img.decoding = "async";
@@ -215,7 +215,7 @@ export function Flipbook({ magazine }: { magazine: Magazine }) {
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={pageImage(magazine.slug, i + 1)} alt="" loading="lazy" className="h-24 w-[68px] object-cover" />
+                  <img src={pageImage(magazine, i + 1)} alt="" loading="lazy" className="h-24 w-[68px] object-cover" />
                 </button>
                 <span className="mt-1 block text-center text-[10px] text-white/60">{i + 1}</span>
               </li>

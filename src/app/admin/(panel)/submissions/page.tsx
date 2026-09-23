@@ -3,7 +3,7 @@ import { Download } from "lucide-react";
 
 import { Badge, buttonClass, Card, formatDate, PageHeader, statusTone } from "@/components/cms/ui";
 import { requirePageUser } from "@/lib/cms/auth";
-import { SUBMISSION_TYPE_LABELS, type SubmissionType } from "@/lib/cms/schema";
+import { REVIEW_STAGES, SUBMISSION_TYPE_LABELS, type SubmissionType } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
 export const metadata = { title: "Submissions" };
@@ -16,16 +16,21 @@ const TYPES: { id: SubmissionType | "all"; label: string }[] = [
 export default async function SubmissionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; view?: string }>;
+  searchParams: Promise<{ type?: string; view?: string; stage?: string }>;
 }) {
   await requirePageUser("submissions");
-  const { type = "all", view = "inbox" } = await searchParams;
+  const { type = "all", view = "inbox", stage = "" } = await searchParams;
   const all = await readStore("submissions");
+  const stages = type !== "all" ? REVIEW_STAGES[type as SubmissionType] : undefined;
+  const stageOf = (s: (typeof all)[number]) => s.review?.stage ?? REVIEW_STAGES[s.type]?.[0] ?? "";
   const list = all.filter(
-    (s) => (type === "all" || s.type === type) && (view === "archived" ? s.status === "archived" : s.status !== "archived"),
+    (s) =>
+      (type === "all" || s.type === type) &&
+      (view === "archived" ? s.status === "archived" : s.status !== "archived") &&
+      (!stage || stageOf(s) === stage),
   );
   const label = (t: SubmissionType) => TYPES.find((x) => x.id === t)?.label ?? t;
-  const qs = (next: Record<string, string>) => `?${new URLSearchParams({ type, view, ...next })}`;
+  const qs = (next: Record<string, string>) => `?${new URLSearchParams({ type, view, stage, ...next })}`;
 
   return (
     <>
@@ -48,7 +53,7 @@ export default async function SubmissionsPage({
             {TYPES.map((t) => (
               <Link
                 key={t.id}
-                href={qs({ type: t.id })}
+                href={qs({ type: t.id, stage: "" })}
                 className={`rounded-lg px-3 py-1.5 font-medium ${
                   type === t.id ? "bg-admin-primary-soft text-admin-primary" : "text-admin-muted hover:bg-admin-bg"
                 }`}
@@ -71,6 +76,20 @@ export default async function SubmissionsPage({
             ))}
           </div>
         </div>
+        {stages && (
+          <div className="flex flex-wrap items-center gap-1 border-b border-admin-border px-4 py-2 text-xs">
+            <span className="mr-1 font-semibold uppercase tracking-wider text-admin-muted">Stage</span>
+            {["", ...stages].map((st) => (
+              <Link
+                key={st || "all"}
+                href={qs({ stage: st })}
+                className={`rounded-md px-2.5 py-1 font-medium ${stage === st ? "bg-admin-primary-soft text-admin-primary" : "text-admin-muted hover:bg-admin-bg"}`}
+              >
+                {st || "All"} ({all.filter((s) => s.type === type && s.status !== "archived" && (!st || stageOf(s) === st)).length})
+              </Link>
+            ))}
+          </div>
+        )}
         <ul className="divide-y divide-admin-border">
           {list.map((s) => (
             <li key={s.id}>
@@ -83,6 +102,8 @@ export default async function SubmissionsPage({
                   <div className="flex flex-wrap items-center gap-2">
                     <p className={`truncate text-sm ${s.status === "new" ? "font-bold" : "font-medium"}`}>{s.name}</p>
                     <Badge tone="primary">{label(s.type)}</Badge>
+                    {REVIEW_STAGES[s.type] && <Badge tone="neutral">{stageOf(s)}</Badge>}
+                    {s.review?.score !== undefined && <Badge tone="success">Score {s.review.score}</Badge>}
                     {s.organization && <span className="truncate text-xs text-admin-muted">{s.organization}</span>}
                   </div>
                   <p className="mt-0.5 truncate text-sm text-admin-muted">{s.subject}</p>

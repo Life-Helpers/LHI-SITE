@@ -1,8 +1,7 @@
 import "server-only";
 
-import { MAGAZINES } from "@/data/magazines";
 import { COURSES } from "@/data/training/courses";
-import { getCalendarEvents, getInterventions, getPublicJobs, getPublicTenders, getPublishedPosts } from "@/lib/cms/content";
+import { getAllMagazines, getCalendarEvents, getInterventions, getPublicJobs, getPublicTenders, getPublishedPosts } from "@/lib/cms/content";
 
 export interface SearchResult {
   title: string;
@@ -71,12 +70,13 @@ const snippet = (text: string, terms: string[]) => {
 export async function searchSite(query: string): Promise<SearchResult[]> {
   const terms = norm(query).split(/\s+/).filter((t) => t.length > 1).slice(0, 8);
   if (!terms.length) return [];
-  const [posts, interventions, jobs, tenders, events] = await Promise.all([
+  const [posts, interventions, jobs, tenders, events, magazines] = await Promise.all([
     getPublishedPosts(),
     getInterventions(),
     getPublicJobs(),
     getPublicTenders(),
     getCalendarEvents(366),
+    getAllMagazines(),
   ]);
   const out: SearchResult[] = [];
   const add = (type: string, title: string, href: string, body: string, excerpt: string) => {
@@ -86,7 +86,7 @@ export async function searchSite(query: string): Promise<SearchResult[]> {
   for (const p of posts) add(p.category, p.title, `/blog/${p.slug}`, `${p.excerpt} ${p.tags.join(" ")} ${p.content}`, snippet(`${p.excerpt} ${p.content}`, terms));
   for (const i of interventions)
     add("Project", i.title, `/interventions/${i.id}`, `${i.shortTitle} ${i.donor} ${i.locations} ${i.summary} ${i.keyInterventions.join(" ")} ${i.tags.join(" ")}`, i.summary);
-  for (const m of MAGAZINES) add("Magazine", m.title, `/project-magazines/${m.slug}`, `${m.kind} ${m.period} ${m.description} ${m.partners}`, m.description);
+  for (const m of magazines) add("Magazine", m.title, `/project-magazines/${m.slug}`, `${m.kind} ${m.period} ${m.description} ${m.partners}`, m.description);
   for (const c of COURSES) add("Course", c.title, `/get-involved/training/${c.id}`, `${c.subtitle} ${c.lessons.map((l) => `${l.title} ${l.summary}`).join(" ")}`, c.subtitle);
   for (const j of [...jobs.open, ...jobs.closed]) add(jobs.isOpen(j) ? "Vacancy" : "Closed vacancy", j.title, `/careers/${j.id}`, `${j.summary} ${j.location} ${j.department}`, j.summary);
   for (const t of [...tenders.open, ...tenders.past]) add("Vendor request", t.title, `/procurement/${t.id}`, `${t.summary} ${t.reference} ${t.location}`, t.summary);

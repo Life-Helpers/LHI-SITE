@@ -83,6 +83,7 @@ export function Badge({ tone = "neutral", children }: { tone?: Tone; children: R
 }
 
 export function statusTone(value: unknown): Tone {
+  if (String(value).toLowerCase().startsWith("scheduled")) return "primary";
   switch (String(value).toLowerCase()) {
     case "published":
     case "active":

@@ -55,6 +55,43 @@ export async function createSession(userId: string) {
   });
 }
 
+/* ------------------------------------------------ Two-step verification (pending login) */
+
+const PENDING_2FA_COOKIE = "lhi_admin_2fa";
+const PENDING_TTL_SECONDS = 5 * 60;
+
+/** After a correct password, remember who is signing in until they enter their code. */
+export async function startPendingTwoFactor(userId: string) {
+  const payload = Buffer.from(JSON.stringify({ uid: userId, exp: Math.floor(Date.now() / 1000) + PENDING_TTL_SECONDS })).toString("base64url");
+  (await cookies()).set(PENDING_2FA_COOKIE, `${payload}.${sign(`2fa.${payload}`, await sessionKey())}`, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/admin",
+    maxAge: PENDING_TTL_SECONDS,
+  });
+}
+
+export async function readPendingTwoFactor(): Promise<string | null> {
+  const token = (await cookies()).get(PENDING_2FA_COOKIE)?.value;
+  if (!token) return null;
+  const [payload, signature] = token.split(".");
+  if (!payload || !signature) return null;
+  const expected = Buffer.from(sign(`2fa.${payload}`, await sessionKey()));
+  const given = Buffer.from(signature);
+  if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
+  try {
+    const { uid, exp } = JSON.parse(Buffer.from(payload, "base64url").toString()) as { uid: string; exp: number };
+    return uid && exp >= Date.now() / 1000 ? uid : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function clearPendingTwoFactor() {
+  (await cookies()).delete({ name: PENDING_2FA_COOKIE, path: "/admin" });
+}
+
 export async function destroySession() {
   (await cookies()).delete(SESSION_COOKIE);
 }
@@ -86,7 +123,7 @@ export function resolveRole(roleId: string, roles: CmsRole[]): { name: string; p
 export function toPublicUser(user: CmsUser, roles: CmsRole[] = BUILT_IN_ROLES): PublicUser {
   const { id, name, email, role, createdAt, lastLoginAt } = user;
   const resolved = resolveRole(role, roles);
-  return { id, name, email, role, createdAt, lastLoginAt, roleName: resolved.name, permissions: resolved.permissions };
+  return { id, name, email, role, createdAt, lastLoginAt, twoFactor: Boolean(user.totpSecret), roleName: resolved.name, permissions: resolved.permissions };
 }
 
 export async function getCurrentUser(): Promise<PublicUser | null> {

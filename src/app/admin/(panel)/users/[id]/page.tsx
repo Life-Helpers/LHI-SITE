@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { ResetTwoFactorButton } from "@/components/cms/reset-two-factor-button";
 import { PageHeader } from "@/components/cms/ui";
 import { UserForm } from "@/components/cms/user-forms";
 import { requirePageUser, toPublicUser } from "@/lib/cms/auth";
@@ -18,6 +19,7 @@ export default async function EditUserPage({ params }: { params: Promise<{ id: s
       <PageHeader
         title={`Edit ${user.name}`}
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Users", href: "/admin/users" }, { label: "Edit" }]}
+        actions={user.totpSecret && user.id !== me.id ? <ResetTwoFactorButton userId={user.id} name={user.name} /> : undefined}
       />
       <UserForm user={toPublicUser(user, await readStore("roles"))} isSelf={user.id === me.id} roles={await getRoleOptions()} />
     </>

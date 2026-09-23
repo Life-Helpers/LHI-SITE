@@ -36,17 +36,20 @@ export async function GET(req: Request, { params }: { params: Promise<{ kind: st
       if (type && SUBMISSION_TYPE_LABELS[type]) label = SUBMISSION_TYPE_LABELS[type].toLowerCase().replace(/[^a-z0-9]+/g, "-");
       const fieldKeys = [...new Set(items.flatMap((s) => Object.keys(s.fields)))];
       csv = toCsv(
-        ["Received", "Type", "Status", "Name", "Email", "Organisation", "Subject", ...fieldKeys, "Attachments"],
+        ["Received", "Type", "Status", "Stage", "Score", "Name", "Email", "Organisation", "Subject", ...fieldKeys, "Attachments", "Notes"],
         items.map((s) => [
           s.createdAt,
           SUBMISSION_TYPE_LABELS[s.type] ?? s.type,
           s.status,
+          s.review?.stage ?? "",
+          s.review?.score,
           s.name,
           s.email,
           s.organization,
           s.subject,
           ...fieldKeys.map((k) => s.fields[k]),
           (s.attachments ?? []).map((a) => a.filename).join("; "),
+          (s.review?.notes ?? []).map((n) => `${n.author}: ${n.text}`).join(" | "),
         ]),
       );
       break;
