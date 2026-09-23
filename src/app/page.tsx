@@ -2,6 +2,7 @@ import { HeroSlider } from "@/components/home/hero-slider";
 import { StatsSection } from "@/components/home/stats-section";
 import { WhoWeAreBand } from "@/components/home/who-we-are-band";
 import { WhatWeDoTiles } from "@/components/home/what-we-do-tiles";
+import { BeforeAfterSection } from "@/components/home/before-after-section";
 import { OperationalMapSection } from "@/components/home/operational-map-section";
 import { LatestFromLHI } from "@/components/home/latest-from-lhi";
 import { RadioBanner } from "@/components/home/radio-banner";
@@ -34,6 +35,7 @@ export default async function Home() {
       <WhoWeAreBand />
       <FeatureStory feature={settings.homeFeature} />
       <WhatWeDoTiles projectCounts={projectCounts} />
+      <BeforeAfterSection />
       <OperationalMapSection />
       <LatestFromLHI />
       <RadioBanner />
