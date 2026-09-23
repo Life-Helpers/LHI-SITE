@@ -13,7 +13,7 @@ export function LatestFromLHI() {
     {
       icon: Calendar,
       title: t.home.latest.eventsTitle,
-      href: "/events",
+      href: "/news-updates",
       note: t.home.latest.eventsNote,
       cta: t.home.latest.eventsCta,
     },

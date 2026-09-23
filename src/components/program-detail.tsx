@@ -134,7 +134,7 @@ export async function ProgramDetail({ program }: { program: Program }) {
             </div>
 
             <p className="mt-3 text-xs text-muted-foreground">
-              These field-level interventions are currently or previously implemented under our {program.name} thematic portfolio across northern Nigeria:
+              These field-level interventions are currently or previously implemented under our {program.name} thematic portfolio across Nigeria:
             </p>
 
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -183,7 +183,7 @@ export async function ProgramDetail({ program }: { program: Program }) {
                       <span>{project.duration}</span>
                     </span>
                     <Link
-                      href="/interventions/projectandintervention"
+                      href={`/interventions/${project.id}`}
                       className="font-semibold text-primary hover:underline inline-flex items-center gap-0.5"
                     >
                       <span>Full Details</span>

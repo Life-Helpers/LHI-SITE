@@ -132,9 +132,9 @@ export const fr: Dictionary = {
       blogCta: "Voir le blog",
     },
     radio: {
-      eyebrow: "Plaidoyer radiophonique",
-      heading: "La Salle de Veille des Femmes",
-      body: "Une émission de radio hebdomadaire sur les droits civiques des femmes, la santé reproductive et le développement du leadership — atteignant des communautés que la radio peut toucher là où d'autres canaux ne le peuvent pas.",
+      eyebrow: "Émission de radio",
+      heading: "WeSpeak (Muyi Magana)",
+      body: "L'émission hebdomadaire de LHI sur Radio Nigeria Royal FM 101.5, Sokoto, chaque mardi de 11 h à 12 h : santé, éducation, moyens de subsistance, agriculture et égalité des genres, avec un espace pour vos questions.",
       cta: "En savoir plus",
     },
     testimonials: {

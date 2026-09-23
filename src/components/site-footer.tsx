@@ -30,7 +30,7 @@ export function SiteFooter() {
     { label: t.whatWeDoMenu.foodSecurity, href: "/food-security" },
     { label: t.whatWeDoMenu.socialInclusion, href: "/social-inclusion" },
     { label: t.whatWeDoMenu.protection, href: "/protection" },
-    { label: t.whatWeDoMenu.radioAdvocacy, href: "/radio" },
+    { label: t.whatWeDoMenu.radioAdvocacy, href: "/blog/wespeak-muyi-magana-radio" },
   ];
 
   const impactLinks = [
@@ -38,9 +38,7 @@ export function SiteFooter() {
     { label: t.footer.impactReports, href: "/impact" },
     { label: t.impactMenu.projectsInterventions, href: "/interventions/projectandintervention" },
     { label: t.impactMenu.successStories, href: "/success-stories" },
-    { label: t.impactMenu.eventsUpdates, href: "/events" },
     { label: t.impactMenu.blog, href: "/blog" },
-    { label: t.impactMenu.radioStory, href: "/radio-story" },
     { label: t.impactMenu.newsletter, href: "/news-updates" },
   ];
 

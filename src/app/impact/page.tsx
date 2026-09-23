@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/card";
 import { impactReports } from "@/data/impact-reports";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
-import { BeforeAfterGallery } from "@/components/transformations/before-after-gallery";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
@@ -104,12 +103,6 @@ export default function ImpactPage() {
         )}
       </div>
 
-      {/* Before-and-After Visual Comparison Sliders */}
-      <section className="border-t border-border bg-muted/20 py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <BeforeAfterGallery showHeading={true} />
-        </div>
-      </section>
     </main>
   );
 }

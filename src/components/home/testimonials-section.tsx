@@ -1,34 +1,33 @@
 "use client";
 
+import Link from "next/link";
 import { Quote } from "lucide-react";
 
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { useLocale } from "@/i18n/locale-context";
 
 /**
- * No real testimonials have been collected from beneficiaries, partners,
- * or staff yet. We don't fabricate quotes or attribute invented statements
- * to real people, so this renders an honest empty state instead of three
- * placeholder testimonials until real ones exist.
+ * Quotes published in LHI's project magazines (Gidan Arziki Vol. 2 and the ABEP
+ * magazine). Each links to the full story.
  */
-const testimonials: { quote: string; name: string; role: string }[] = [
+const testimonials: { quote: string; name: string; role: string; href: string }[] = [
   {
-    quote:
-      "When my 14-month-old daughter Fatima suffered from acute malnutrition, LHI's community workers enrolled us in the CMAM clinic and taught us Tom Brown preparation. Today she is healthy, flourishing, and vibrant.",
-    name: "Amina & baby Fatima",
-    role: "Nutrition Program Beneficiary, Zamfara",
+    quote: "Coming here every morning gives me hope and makes me feel healthy. Before, the process was very tedious. Now with the machine, we finish in minutes.",
+    name: "Arajana Suleiman, 70",
+    role: "Gidan Arziki centre, Batagarawa, Katsina State",
+    href: "/blog/arajana-finding-purpose-at-70",
   },
   {
-    quote:
-      "Access to clean water from the rehabilitated solar borehole transformed our village. We eliminated cholera and now irrigate dry-season vegetable farms, feeding 40 households.",
-    name: "Mallam Usman",
-    role: "Community Elder, Gujba LGA, Yobe",
+    quote: "Life Helpers Initiative has helped us a lot in supporting farmers, especially in the local government areas. Government alone cannot reach every community.",
+    name: "Engr. Salim Suleiman",
+    role: "Managing Director, Katsina State Irrigation Development Authority",
+    href: "/blog/voices-from-batagarawa-gidan-arziki",
   },
   {
-    quote:
-      "Through LHI's Village Savings and Loan Association (VSLA), I accessed a start-up loan to purchase climate-resilient seeds. Our harvest tripled, and I am sending all four of my children to school.",
-    name: "Hadiza Mustapha",
-    role: "Women Savings Group Leader, Borno",
+    quote: "Even children who did not receive school bags still come to class every day because they genuinely want to learn.",
+    name: "Alhaji Rufai Maccido Salah",
+    role: "Village Head of Dogon Daji, Tambuwal LGA, Sokoto State",
+    href: "/blog/abep-impact-beyond-the-classroom",
   },
 ];
 
@@ -68,6 +67,9 @@ export function TestimonialsSection() {
                 <span className="block text-xs font-normal text-muted-foreground">
                   {testimonial.role}
                 </span>
+                <Link href={testimonial.href} className="mt-2 inline-block text-xs font-semibold text-primary hover:underline">
+                  Read the story →
+                </Link>
               </figcaption>
             </figure>
           ))}

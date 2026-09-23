@@ -131,8 +131,8 @@ export const ig: Dictionary = {
     },
     radio: {
       eyebrow: "Nkwuwapụta Redio",
-      heading: "Ọnụ Ụlọ Nlebara Ụmụ Nwanyị",
-      body: "Mmemme redio kwa izu banyere ikike obodo nke ụmụ nwanyị, ahụike ọmụmụ nwa, na mmepe ndu-ndu - na-eru obodo nke naanị redio nwere ike iru.",
+      heading: "WeSpeak (Muyi Magana)",
+      body: "LHI's weekly radio programme on Radio Nigeria Royal FM 101.5, Sokoto, every Tuesday 11 AM – 12 PM: health, education, livelihood, agriculture and gender equity, with space for your questions and feedback.",
       cta: "Mụtakwuo",
     },
     testimonials: {

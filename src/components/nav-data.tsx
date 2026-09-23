@@ -4,13 +4,11 @@ import type { LucideIcon } from "lucide-react";
 import {
   Award,
   BookOpen,
-  Calendar,
   Compass,
   FileText,
   FolderGit2,
   GraduationCap,
   Handshake,
-  Headphones,
   HeartHandshake,
   HeartPulse,
   Newspaper,
@@ -18,13 +16,13 @@ import {
   Scale,
   ShieldAlert,
   ShieldCheck,
-  Sliders,
   Sparkles,
   Target,
   Users,
   Wheat,
 } from "lucide-react";
 
+import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { useLocale } from "@/i18n/locale-context";
 
 export type NavCard = {
@@ -64,14 +62,14 @@ export const whoWeAreLinks: NavLink[] = [
   {
     label: "Our History",
     href: "/our-history",
-    description: "20+ years journey from Sokoto in 2004 across 11 states",
+    description: "22 years, from Sokoto in 2004 to 11 states",
     icon: Compass,
     tag: "Heritage",
   },
   {
     label: "Our Commitment",
     href: "/our-commitment",
-    description: "PSEA safeguarding, whistleblower channels & disability fund",
+    description: "Safeguarding, PSEA and feedback & complaints channels",
     icon: ShieldAlert,
     tag: "Safeguarding",
   },
@@ -85,7 +83,7 @@ export const whoWeAreLinks: NavLink[] = [
   {
     label: "NIDAKE",
     href: "/nidake",
-    description: "Me & You reusable pad enterprise & girl-child retention",
+    description: "Locally made reusable sanitary pads for girls and women",
     icon: Sparkles,
     tag: "Enterprise",
   },
@@ -110,21 +108,19 @@ export const whoWeAreFeatured: {
   nidake: FeaturedNavStory;
 } = {
   heritage: {
-    title: "20 Years of Grounded Service",
+    title: "22 Years of Service",
     subtitle:
-      "Founded in Sokoto on Oct 1, 2004 — delivering relief and sustainable progress across 11 Nigerian states.",
+      "Founded in Sokoto on 1 October 2004, now working across 11 Nigerian states.",
     href: "/our-history",
-    image:
-      "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=600&q=80",
+    image: LHI_PHOTOS.teamStrategicPlan.src,
     tag: "Our Legacy",
   },
   nidake: {
     title: "NIDAKE Social Enterprise",
     subtitle:
-      "Sustainable reusable pads keeping adolescent girls in school while providing local female tailoring jobs.",
+      "Reusable sanitary pads made at the Goshen Development Centre, Sokoto.",
     href: "/nidake",
-    image:
-      "https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=400&q=80",
+    image: LHI_PHOTOS.nidakePad.src,
     tag: "Social Enterprise",
   },
 };
@@ -133,73 +129,65 @@ export const whatWeDoCards: NavCard[] = [
   {
     label: "Health & WASH",
     href: "/health",
-    description: "Tom Brown infant nutrition, maternal care & solar clean water",
+    description: "MNCH, nutrition, WASH, malaria and HIV services",
     icon: HeartPulse,
-    image:
-      "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=500&q=80",
+    image: LHI_PHOTOS.healthScreening.src,
     tag: "Maternal & Child",
   },
   {
     label: "Education",
     href: "/education",
-    description: "Accelerated learning centers, girl-child retention & digital skills",
+    description: "Accelerated and non-formal learning for out-of-school children",
     icon: GraduationCap,
-    image:
-      "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=500&q=80",
+    image: LHI_PHOTOS.abepGirls.src,
     tag: "Basic Education",
   },
   {
     label: "Livelihood",
     href: "/livelihood",
-    description: "VSLA community savings, vocational starter kits & cash grants",
+    description: "Vocational skills, VSLAs and cash assistance",
     icon: Handshake,
-    image:
-      "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&w=500&q=80",
+    image: LHI_PHOTOS.gidanArzikiTailoring.src,
     tag: "Resilience",
   },
   {
     label: "Food Security",
     href: "/food-security",
-    description: "Climate-smart agriculture, irrigation & market linkages",
+    description: "Smallholder farming, farmers hubs and climate adaptation",
     icon: Wheat,
-    image:
-      "https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&w=500&q=80",
+    image: LHI_PHOTOS.farmerWomanHarvest.src,
     tag: "Food Systems",
   },
   {
     label: "Social Inclusion",
     href: "/social-inclusion",
-    description: "Disability rights, universal accessibility & civic advocacy",
+    description: "Governance, peacebuilding and advocacy",
     icon: Users,
-    image:
-      "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=500&q=80",
+    image: LHI_PHOTOS.communityDialogue.src,
     tag: "Equal Rights",
   },
   {
     label: "Protection & GBV",
     href: "/protection",
-    description: "One-stop GBV response, safe spaces & child safeguarding",
+    description: "Violence against women and girls; child protection",
     icon: ShieldCheck,
-    image:
-      "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=500&q=80",
+    image: LHI_PHOTOS.activismWomen.src,
     tag: "Protection",
   },
 ];
 
 export const whatWeDoExtra: NavLink = {
-  label: "Radio Advocacy",
-  href: "/radio",
-  description: "The Women Situation Room broadcasting peace in 4 languages",
+  label: "WeSpeak Radio",
+  href: "/blog/wespeak-muyi-magana-radio",
+  description: "Weekly on Royal FM 101.5 Sokoto, Tuesdays 11 AM",
   icon: Radio,
 };
 
 export const whatWeDoFeatured: FeaturedNavStory = {
-  title: "The Women Situation Room",
-  subtitle:
-    "Broadcasting maternal health, peacebuilding & legal rights in 4 languages reaching 2.5M+ listeners across Northern Nigeria.",
-  href: "/radio",
-  image:
-    "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=600&q=80",
+  title: "WeSpeak (Muyi Magana)",
+  subtitle: "LHI's weekly radio programme on health, education, livelihood, agriculture and gender equity.",
+  href: "/blog/wespeak-muyi-magana-radio",
+  image: LHI_PHOTOS.solarRadioFarmer.src,
   tag: "Radio Advocacy",
 };
 
@@ -207,7 +195,7 @@ export const impactLinks: NavLink[] = [
   {
     label: "Annual Reports",
     href: "/impact",
-    description: "Audited finances, strategic indicators & institutional reports",
+    description: "Organisation-wide results since 2004",
     icon: FileText,
     tag: "Accountability",
   },
@@ -228,51 +216,23 @@ export const impactLinks: NavLink[] = [
   {
     label: "Success Stories",
     href: "/success-stories",
-    description: "Documented beneficiary accounts & verified community recoveries",
+    description: "Stories from our magazines and newsletter",
     icon: Award,
     tag: "Human Stories",
   },
   {
     label: "LHI Field Blog",
     href: "/blog",
-    description: "Field reports, health worker perspectives & grassroots insights",
+    description: "All news, stories and magazine features",
     icon: BookOpen,
     tag: "Insights",
   },
   {
-    label: "Events & Updates",
-    href: "/events",
-    description: "Quarterly Pause & Reflect sessions, workshops & conferences",
-    icon: Calendar,
-    tag: "Convenings",
-  },
-  {
     label: "News & Bulletins",
     href: "/news-updates",
-    description: "Humanitarian press statements & quarterly field dispatches",
+    description: "News, the LHI newsletter and project magazines",
     icon: Newspaper,
     tag: "Dispatches",
-  },
-  {
-    label: "Radio Stories",
-    href: "/radio-story",
-    description: "Recorded beneficiary audio testimonials from rural airwaves",
-    icon: Radio,
-    tag: "Audio Stories",
-  },
-  {
-    label: "Before & After Visuals",
-    href: "/transformations",
-    description: "Interactive comparison sliders of community water, farming & clinic upgrades",
-    icon: Sliders,
-    tag: "Visual Proof",
-  },
-  {
-    label: "Multimedia & Radio Hub",
-    href: "/multimedia",
-    description: "Women Situation Room podcasts in Hausa, Kanuri & English",
-    icon: Headphones,
-    tag: "Audio Hub",
   },
 ];
 
@@ -281,22 +241,18 @@ export const impactFeatured: {
   water: FeaturedNavStory;
 } = {
   nutrition: {
-    title: "Tom Brown Malnutrition Recovery",
-    subtitle:
-      "How community-blend nutrition restored 1,200+ severely malnourished infants to health in Sokoto & Zamfara.",
-    href: "/success-stories",
-    image:
-      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80",
-    tag: "Nutrition Recovery",
+    title: "A Bag, A Dream",
+    subtitle: "Saudatu, 14, is back in class through the EU/UNICEF Accelerated Basic Education Programme.",
+    href: "/blog/saudatu-a-bag-a-dream",
+    image: LHI_PHOTOS.saudatu.src,
+    tag: "Education",
   },
   water: {
-    title: "Gujba Solar Borehole",
-    subtitle:
-      "Supplying 3,500+ displaced persons with potable clean water and preventing water-borne disease outbreaks.",
-    href: "/interventions/projectandintervention",
-    image:
-      "https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&w=600&q=80",
-    tag: "Clean WASH",
+    title: "Gidan Arziki Hub",
+    subtitle: "A solar-powered farmers service hub in Batagarawa, commissioned in April 2026.",
+    href: "/blog/gidan-arziki-hub-commissioned-batagarawa",
+    image: LHI_PHOTOS.gidanArzikiAerial.src,
+    tag: "Livelihoods",
   },
 };
 
@@ -315,14 +271,14 @@ export function useLocalizedNav() {
     {
       label: t.whoWeAreMenu.ourHistory,
       href: "/our-history",
-      description: "20+ years journey from Sokoto in 2004 across 11 states",
+      description: "22 years, from Sokoto in 2004 to 11 states",
       icon: Compass,
       tag: "Heritage",
     },
     {
       label: t.whoWeAreMenu.ourCommitment,
       href: "/our-commitment",
-      description: "PSEA safeguarding, whistleblower channels & disability fund",
+      description: "Safeguarding, PSEA and feedback & complaints channels",
       icon: ShieldAlert,
       tag: "Safeguarding",
     },
@@ -336,7 +292,7 @@ export function useLocalizedNav() {
     {
       label: t.whoWeAreMenu.nidake,
       href: "/nidake",
-      description: "Me & You reusable pad enterprise & girl-child retention",
+      description: "Locally made reusable sanitary pads for girls and women",
       icon: Sparkles,
       tag: "Enterprise",
     },
@@ -362,8 +318,7 @@ export function useLocalizedNav() {
       description: t.whatWeDoMenu.healthDesc,
       href: "/health",
       icon: HeartPulse,
-      image:
-        "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=500&q=80",
+      image: LHI_PHOTOS.healthScreening.src,
       tag: "Maternal & Child",
     },
     {
@@ -371,8 +326,7 @@ export function useLocalizedNav() {
       description: t.whatWeDoMenu.educationDesc,
       href: "/education",
       icon: GraduationCap,
-      image:
-        "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=500&q=80",
+      image: LHI_PHOTOS.abepGirls.src,
       tag: "Basic Education",
     },
     {
@@ -380,8 +334,7 @@ export function useLocalizedNav() {
       description: t.whatWeDoMenu.livelihoodDesc,
       href: "/livelihood",
       icon: Handshake,
-      image:
-        "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&w=500&q=80",
+      image: LHI_PHOTOS.gidanArzikiTailoring.src,
       tag: "Resilience",
     },
     {
@@ -389,8 +342,7 @@ export function useLocalizedNav() {
       description: t.whatWeDoMenu.foodSecurityDesc,
       href: "/food-security",
       icon: Wheat,
-      image:
-        "https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&w=500&q=80",
+      image: LHI_PHOTOS.farmerWomanHarvest.src,
       tag: "Food Systems",
     },
     {
@@ -398,8 +350,7 @@ export function useLocalizedNav() {
       description: t.whatWeDoMenu.socialInclusionDesc,
       href: "/social-inclusion",
       icon: Users,
-      image:
-        "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=500&q=80",
+      image: LHI_PHOTOS.communityDialogue.src,
       tag: "Equal Rights",
     },
     {
@@ -407,16 +358,15 @@ export function useLocalizedNav() {
       description: t.whatWeDoMenu.protectionDesc,
       href: "/protection",
       icon: ShieldCheck,
-      image:
-        "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=500&q=80",
+      image: LHI_PHOTOS.activismWomen.src,
       tag: "Protection",
     },
   ];
 
   const whatWeDoExtraLocalized: NavLink = {
     label: t.whatWeDoMenu.radioAdvocacy,
-    href: "/radio",
-    description: "The Women Situation Room broadcasting peace in 4 languages",
+    href: "/blog/wespeak-muyi-magana-radio",
+    description: "Weekly on Royal FM 101.5 Sokoto, Tuesdays 11 AM",
     icon: Radio,
   };
 
@@ -424,7 +374,7 @@ export function useLocalizedNav() {
     {
       label: t.impactMenu.annualReport,
       href: "/impact",
-      description: "Audited finances, strategic indicators & institutional reports",
+      description: "Organisation-wide results since 2004",
       icon: FileText,
       tag: "Accountability",
     },
@@ -445,51 +395,37 @@ export function useLocalizedNav() {
     {
       label: t.impactMenu.successStories,
       href: "/success-stories",
-      description: "Documented beneficiary accounts & verified community recoveries",
+      description: "Stories from our magazines and newsletter",
       icon: Award,
       tag: "Human Stories",
     },
     {
       label: t.impactMenu.blog,
       href: "/blog",
-      description: "Field reports, health worker perspectives & grassroots insights",
+      description: "All news, stories and magazine features",
       icon: BookOpen,
       tag: "Insights",
     },
     {
-      label: t.impactMenu.eventsUpdates,
-      href: "/events",
-      description: "Quarterly Pause & Reflect sessions, workshops & conferences",
-      icon: Calendar,
-      tag: "Convenings",
-    },
-    {
       label: t.impactMenu.newsletter,
       href: "/news-updates",
-      description: "Humanitarian press statements & quarterly field dispatches",
+      description: "News, the LHI newsletter and project magazines",
       icon: Newspaper,
       tag: "Dispatches",
     },
     {
-      label: t.impactMenu.radioStory,
-      href: "/radio-story",
-      description: "Recorded beneficiary audio testimonials from rural airwaves",
-      icon: Radio,
-      tag: "Audio Stories",
+      label: "Humanitarian Training",
+      href: "/get-involved/training",
+      description: "Free safeguarding courses with certificates",
+      icon: GraduationCap,
+      tag: "Learn",
     },
     {
-      label: "Before & After Visuals",
-      href: "/transformations",
-      description: "Interactive comparison sliders of community water, farming & clinic upgrades",
-      icon: Sliders,
-      tag: "Visual Proof",
-    },
-    {
-      label: "Multimedia & Radio Hub",
-      href: "/multimedia",
-      description: "Women Situation Room podcasts in Hausa, Kanuri & English",
-      icon: Headphones,
-      tag: "Audio Hub",
+      label: "Careers & Procurement",
+      href: "/careers",
+      description: "Vacancies, vendor requests and registration",
+      icon: Users,
+      tag: "Work with us",
     },
   ];
 

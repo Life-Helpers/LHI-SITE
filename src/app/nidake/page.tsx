@@ -103,15 +103,15 @@ export default async function NidakePage() {
                 Ending Period Absenteeism
               </h2>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                In many rural northern communities, girls miss 4 to 5 school days every month during their menstruation cycle due to lack of supplies and fear of humiliation.
+                Without affordable sanitary products, many girls miss school during their period or manage with unsafe materials.
               </p>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                By pairing NIDAKE reusable pad kits with Menstrual Hygiene Management (MHM) workshops, LHI has helped over 25,000 adolescent girls maintain continuous school attendance and complete their basic education.
+                NIDAKE reusable pads, paired with menstrual hygiene education, give girls a safe, washable option that lasts, so a period no longer has to mean missing class.
               </p>
               <div className="pt-2 space-y-2 text-xs text-foreground font-medium">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 size={14} className="text-primary shrink-0" />
-                  <span>Comprehensive Menstrual Hygiene education in over 180 schools.</span>
+                  <span>Menstrual hygiene education alongside every kit.</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 size={14} className="text-primary shrink-0" />
@@ -128,13 +128,13 @@ export default async function NidakePage() {
                 Tailoring &amp; Micro-Enterprise
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                NIDAKE pads are not imported. They are manufactured locally by trained vulnerable women, young mothers, and women living with disabilities.
+                NIDAKE reusable pads are produced locally at the Goshen Development Centre, Tamaje Bye Pass, Sokoto: &ldquo;For you, for me, for every woman.&rdquo;
               </p>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Each artisan is trained in industrial cutting, stitching, quality assurance, and packaging. They earn sustainable living wages that feed their households and fund their children&apos;s schooling.
+                Local production keeps the pads affordable and builds tailoring skills in the community.
               </p>
               <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-xs text-primary font-medium">
-                Over 120 women trained and employed across our tailoring production hubs in Sokoto and Maiduguri.
+                Orders and enquiries: 0706 650 3228 · nidakesanipad@gmail.com
               </div>
             </div>
           </div>

@@ -130,8 +130,8 @@ export const yo: Dictionary = {
     },
     radio: {
       eyebrow: "Ìpolongo Rédíò",
-      heading: "Yàrá Ìṣọ́ra Àwọn Obìnrin",
-      body: "Ètò rédíò ọ̀sọ̀ọ̀sẹ̀ lórí ẹ̀tọ́ ọmọlúàbí àwọn obìnrin, ìlera ìbímọ, àti ìdàgbàsókè olórí - ó ń dé àwọn àwùjọ tí rédíò nìkan lè dé.",
+      heading: "WeSpeak (Muyi Magana)",
+      body: "LHI's weekly radio programme on Radio Nigeria Royal FM 101.5, Sokoto, every Tuesday 11 AM – 12 PM: health, education, livelihood, agriculture and gender equity, with space for your questions and feedback.",
       cta: "Kọ́ Sí I",
     },
     testimonials: {

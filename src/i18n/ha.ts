@@ -129,9 +129,9 @@ export const ha: Dictionary = {
       blogCta: "Duba Shafin Labarai",
     },
     radio: {
-      eyebrow: "Yaɗa Sani ta Rediyo",
-      heading: "Dakin Zaman Mata",
-      body: "Shirin rediyo na mako-mako kan haƙƙin ɗan adam na mata, kiwon lafiyar haihuwa, da ci gaban jagoranci — yana kaiwa al'ummomin da rediyo kaɗai zai iya kaiwa.",
+      eyebrow: "Shirin Rediyo",
+      heading: "WeSpeak (Muyi Magana)",
+      body: "Shirin rediyo na mako-mako na LHI a Rediyo Najeriya Royal FM 101.5, Sokoto, kowace Talata ƙarfe 11 zuwa 12 na rana: lafiya, ilimi, sana'o'i, noma da daidaiton jinsi, tare da damar tambayoyi da ra'ayoyinku.",
       cta: "Ƙarin Bayani",
     },
     testimonials: {

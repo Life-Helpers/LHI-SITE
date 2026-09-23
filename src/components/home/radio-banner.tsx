@@ -39,7 +39,7 @@ export function RadioBanner() {
           </div>
 
           <Link
-            href="/radio"
+            href="/blog/wespeak-muyi-magana-radio"
             className="group inline-flex shrink-0 items-center gap-1.5 rounded-full bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition-all duration-300 hover:scale-105 hover:bg-background/90 hover:shadow-[0_0_30px_rgba(0,0,0,0.3)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             {t.home.radio.cta}

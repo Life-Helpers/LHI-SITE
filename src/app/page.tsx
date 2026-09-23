@@ -11,20 +11,29 @@ import { PartnersStrip } from "@/components/home/partners-strip";
 import { PhilosophyQuote } from "@/components/home/philosophy-quote";
 import { NewsletterSubscribe } from "@/components/home/newsletter-subscribe";
 import { FeatureStory } from "@/components/home/feature-story";
-import { getPartners, getPublishedPosts, getSettings } from "@/lib/cms/content";
+import { getInterventions, getPartners, getPublishedPosts, getSettings } from "@/lib/cms/content";
 
 /** Content comes from the admin CMS; saves refresh it instantly, this is a safety net. */
 export const revalidate = 300;
 
 export default async function Home() {
-  const [partners, settings, posts] = await Promise.all([getPartners(), getSettings(), getPublishedPosts()]);
+  const [partners, settings, posts, interventions] = await Promise.all([
+    getPartners(),
+    getSettings(),
+    getPublishedPosts(),
+    getInterventions(),
+  ]);
+  const projectCounts: Record<string, number> = {};
+  for (const project of interventions) {
+    for (const area of project.thematicAreas) projectCounts[area.id] = (projectCounts[area.id] ?? 0) + 1;
+  }
   return (
     <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
       <HeroSlider />
       <StatsSection />
       <WhoWeAreBand />
       <FeatureStory feature={settings.homeFeature} />
-      <WhatWeDoTiles />
+      <WhatWeDoTiles projectCounts={projectCounts} />
       <OperationalMapSection />
       <LatestFromLHI />
       <RadioBanner />

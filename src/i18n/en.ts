@@ -119,20 +119,20 @@ export const en: Dictionary = {
     latest: {
       heading: "Latest from LHI",
       subtitle: "Events, announcements, and stories from the field.",
-      eventsTitle: "Events & Updates",
+      eventsTitle: "News & Newsletter",
       eventsNote:
-        "Explore our stakeholder roundtables, capacity-building workshops, and community health interventions across 11 states.",
-      eventsCta: "Visit Events & Updates",
+        "Field news, the LHI newsletter and our project magazines, with free PDF downloads.",
+      eventsCta: "Read the latest",
       blogTitle: "Blog",
       blogNote:
         "Field research, thought leadership, and operational lessons authored by our frontline humanitarian specialists.",
       blogCta: "Visit Blog",
     },
     radio: {
-      eyebrow: "Radio Advocacy",
-      heading: "The Women Situation Room",
-      body: "A weekly radio program on women's civic rights, reproductive healthcare, and leadership development — reaching communities radio can access that other channels can't.",
-      cta: "Learn more",
+      eyebrow: "Radio Programme",
+      heading: "WeSpeak (Muyi Magana)",
+      body: "LHI's weekly radio programme on Radio Nigeria Royal FM 101.5, Sokoto, every Tuesday 11 AM – 12 PM: health, education, livelihood, agriculture and gender equity, with space for your questions and feedback.",
+      cta: "About the programme",
     },
     testimonials: {
       heading: "What People Say About Us",

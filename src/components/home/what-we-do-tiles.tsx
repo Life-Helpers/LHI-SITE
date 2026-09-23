@@ -15,6 +15,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { useLocale } from "@/i18n/locale-context";
 
 interface StrategicPillar {
@@ -26,114 +27,95 @@ interface StrategicPillar {
   href: string;
   icon: typeof HeartPulse;
   tag: string;
-  stat: string;
-  statLabel: string;
   accentColor: string;
   image: string;
 }
 
-const strategicPillars: StrategicPillar[] = [
+type PillarId = "health" | "education" | "livelihood" | "food-security" | "social-inclusion" | "protection";
+
+/** Thematic areas and scope from LHI's Organisational Profile; photos are LHI's own. */
+const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
   // 3 UP (Top Row)
   {
-    id: "health-wash",
+    id: "health",
     pillarNumber: "01",
-    title: "Health & WASH",
-    subtitle: "Maternal Health & Clean Water",
+    title: "Health",
+    subtitle: "MNCH, Nutrition, WASH & Malaria",
     description:
-      "Tom Brown infant nutrition, mobile clinics, maternal health, and solar clean water boreholes preventing disease.",
+      "Maternal, newborn and child health, nutrition, WASH, immunisation, malaria, sexual and reproductive health, HIV/AIDS and TB.",
     href: "/health",
     icon: HeartPulse,
-    tag: "Maternal & Child",
-    stat: "1,200+",
-    statLabel: "Infants Restored",
+    tag: "Health & Nutrition",
     accentColor: "from-emerald-500/20 to-teal-500/10",
-    image:
-      "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=600&q=80",
+    image: LHI_PHOTOS.healthScreening.src,
   },
   {
     id: "education",
     pillarNumber: "02",
     title: "Education",
-    subtitle: "Accelerated Learning & Girl-Child",
+    subtitle: "Formal & Non-Formal Learning",
     description:
-      "Non-formal learning centers, STEM kits, menstrual hygiene education, and girl-child school retention initiatives.",
+      "Early child development, formal and non-formal education, accelerated learning for out-of-school children, and education governance.",
     href: "/education",
     icon: GraduationCap,
     tag: "Basic Education",
-    stat: "25,000+",
-    statLabel: "Students Reached",
     accentColor: "from-blue-500/20 to-indigo-500/10",
-    image:
-      "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=600&q=80",
+    image: LHI_PHOTOS.abepGirls.src,
   },
   {
     id: "livelihood",
     pillarNumber: "03",
-    title: "Livelihood",
-    subtitle: "Community Savings & Enterprise",
+    title: "Livelihoods",
+    subtitle: "Skills, Savings & Enterprise",
     description:
-      "Village Savings and Loans Associations (VSLA), vocational starter kits, small grants, and female economic resilience.",
+      "Technical and vocational training, village savings and loan associations, entrepreneurship, financial literacy and multi-purpose cash assistance.",
     href: "/livelihood",
     icon: Handshake,
     tag: "Resilience & Skills",
-    stat: "85+",
-    statLabel: "VSLA Savings Hubs",
     accentColor: "from-amber-500/20 to-orange-500/10",
-    image:
-      "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&w=600&q=80",
+    image: LHI_PHOTOS.gidanArzikiTailoring.src,
   },
   // 3 DOWN (Bottom Row)
   {
     id: "food-security",
     pillarNumber: "04",
     title: "Food Security",
-    subtitle: "Climate-Smart Agriculture",
+    subtitle: "Agriculture & Climate Adaptation",
     description:
-      "Drought-resistant crops, dry-season solar irrigation, smallholder farmers' cooperatives, and nutritious harvest storage.",
+      "Smallholder agriculture, small ruminants and aquaculture, food supplies and climate adaptation, including farmers service hubs.",
     href: "/food-security",
     icon: Wheat,
     tag: "Food Systems",
-    stat: "300+",
-    statLabel: "Hectares Farmed",
     accentColor: "from-lime-500/20 to-emerald-500/10",
-    image:
-      "https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&w=600&q=80",
+    image: LHI_PHOTOS.farmerWomanHarvest.src,
   },
   {
     id: "social-inclusion",
     pillarNumber: "05",
     title: "Social Inclusion",
-    subtitle: "Disability Rights & Civic Advocacy",
-    description:
-      "Accessible infrastructure, assistive mobility devices, sign language integration, and marginalized civic voice empowerment.",
+    subtitle: "Governance & Peacebuilding",
+    description: "Governance, peacebuilding and high-level advocacy so that marginalised people have a voice in decisions that affect them.",
     href: "/social-inclusion",
     icon: Users,
-    tag: "Equal Rights & PWDs",
-    stat: "1,800+",
-    statLabel: "PWDs Supported",
+    tag: "Voice & Participation",
     accentColor: "from-purple-500/20 to-pink-500/10",
-    image:
-      "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=600&q=80",
+    image: LHI_PHOTOS.communityDialogue.src,
   },
   {
     id: "protection",
     pillarNumber: "06",
-    title: "Protection & GBV",
-    subtitle: "Safe Spaces & PSEA Safeguarding",
-    description:
-      "Confidential survivor support, trauma-informed psychological first aid, legal aid referrals, and child safeguarding.",
+    title: "Protection",
+    subtitle: "Women, Girls & Children",
+    description: "Preventing and responding to violence against women and girls, child protection, and safeguarding in every programme.",
     href: "/protection",
     icon: ShieldCheck,
-    tag: "Humanitarian Safe Spaces",
-    stat: "24/7",
-    statLabel: "Protection Helpline",
+    tag: "Safe Spaces",
     accentColor: "from-rose-500/20 to-red-500/10",
-    image:
-      "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80",
+    image: LHI_PHOTOS.activismWomen.src,
   },
 ];
 
-export function WhatWeDoTiles() {
+export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record<string, number>> }) {
   const { t } = useLocale();
   const shouldReduceMotion = useReducedMotion();
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
@@ -170,7 +152,7 @@ export function WhatWeDoTiles() {
             </h2>
             <p className="mt-3 text-base text-muted-foreground leading-relaxed">
               {t.home.whatWeDo.subtitle ||
-                "Integrated humanitarian assistance and sustainable development frameworks across 11 states in Nigeria. Interactive pillars crafted for resilience."}
+                "Integrated humanitarian and development programmes across 11 states in Nigeria."}
             </p>
           </div>
 
@@ -196,6 +178,7 @@ export function WhatWeDoTiles() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {topThree.map((pillar, index) => (
                 <JellyCard
+                  count={projectCounts[pillar.id] ?? 0}
                   key={pillar.id}
                   pillar={pillar}
                   index={index}
@@ -217,6 +200,7 @@ export function WhatWeDoTiles() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {bottomThree.map((pillar, index) => (
                 <JellyCard
+                  count={projectCounts[pillar.id] ?? 0}
                   key={pillar.id}
                   pillar={pillar}
                   index={index + 3}
@@ -238,18 +222,18 @@ export function WhatWeDoTiles() {
             </div>
             <div>
               <h4 className="text-sm font-bold text-foreground">
-                Cross-Cutting Innovation: The Women Situation Room
+                WeSpeak (Muyi Magana) on Radio Nigeria Royal FM 101.5
               </h4>
               <p className="text-xs text-muted-foreground">
-                Broadcasting in Hausa, Kanuri, Fulfulde, and English across Northern Nigeria.
+                LHI&apos;s weekly radio programme in Sokoto State, every Tuesday 11 AM – 12 PM.
               </p>
             </div>
           </div>
           <Link
-            href="/radio"
+            href="/blog/wespeak-muyi-magana-radio"
             className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-primary hover:underline shrink-0"
           >
-            <span>Explore Radio Advocacy</span>
+            <span>About the programme</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -265,8 +249,10 @@ function JellyCard({
   onHover,
   onLeave,
   reducedMotion,
+  count,
 }: {
   pillar: StrategicPillar;
+  count: number;
   index: number;
   isHovered: boolean;
   onHover: () => void;
@@ -384,16 +370,15 @@ function JellyCard({
             alt={pillar.title}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
-            referrerPolicy="no-referrer"
             className="object-cover transition-transform duration-500 group-hover:scale-108 brightness-95 dark:brightness-85"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
           <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-xs">
             <span className="font-bold text-foreground drop-shadow-sm">
-              {pillar.stat}
+              {count}
             </span>
             <span className="text-[10px] text-muted-foreground drop-shadow-sm">
-              {pillar.statLabel}
+              {count === 1 ? "profiled project" : "profiled projects"}
             </span>
           </div>
         </div>
