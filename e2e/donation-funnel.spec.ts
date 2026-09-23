@@ -1,67 +1,37 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("donation funnel", () => {
-  test("validates fields, preserves data across steps, and reaches the honest payment fallback", async ({
+test.describe("donate page", () => {
+  test("validates the email and shows an honest notice when card payments aren't configured", async ({
     page,
   }) => {
     await page.goto("/donate");
 
-    // Step 1: amount below the minimum should block progress with an error,
-    // without losing what was typed.
-    await page.getByText("Custom amount").click();
-    await page.locator("#amount").fill("2");
-    await page.getByText("Frequency").click(); // blur
-    await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText("Minimum donation is $5")).toBeVisible();
-    await expect(page.locator("#amount")).toHaveValue("2");
+    await page.getByTestId("donate-one_time-100").click();
+    await page.locator("#d-name").fill("Amina Bello");
+    await page.locator("#d-email").fill("not-an-email");
+    await page.locator('form button[type="submit"]').click();
+    // The browser's own email validation blocks submission.
+    expect(await page.locator("#d-email").evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(false);
 
-    // Fix it with a preset instead and continue.
-    await page.getByText("$100", { exact: true }).click();
-    await page.getByRole("button", { name: "Continue" }).click();
-
-    // Step 2: empty required fields should block progress.
-    await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText("Enter your full name")).toBeVisible();
-    await expect(page.getByText("Enter your email address")).toBeVisible();
-
-    // Invalid email specifically.
-    await page.locator("#donorName").fill("Jane Doe");
-    await page.locator("#donorEmail").fill("not-an-email");
-    await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText("Enter a valid email address")).toBeVisible();
-
-    // Fix and proceed to review.
-    await page.locator("#donorEmail").fill("jane@example.org");
-    await page.getByRole("button", { name: "Continue" }).click();
-
-    // Step 3: review summary reflects what was entered.
-    await expect(page.getByText("$100.00")).toBeVisible();
-    await expect(page.getByText("Jane Doe")).toBeVisible();
-    await expect(page.getByText("jane@example.org")).toBeVisible();
-
-    // No Stripe keys are configured in this environment — the funnel must
-    // show an honest notice, not a broken widget or a fake success state.
-    await expect(
-      page.getByText("Payment processing isn't configured in this environment"),
-    ).toBeVisible();
-
-    // Going back to step 1 must not have lost the entered donor info.
-    await page.getByRole("button", { name: "Back" }).click();
-    await page.getByRole("button", { name: "Back" }).click();
-    await expect(page.locator("#amount")).toHaveCount(0); // preset selected, not custom
+    // No Stripe keys in this environment: the page must say so, never fake a success.
+    await page.locator("#d-email").fill("amina@example.org");
+    await page.locator('form button[type="submit"]').click();
+    await expect(page.getByText(/Online card payments aren't available yet/)).toBeVisible();
+    await expect(page).toHaveURL(/\/donate/);
   });
 
-  test("moving forward again after navigating back keeps the chosen preset amount", async ({
-    page,
-  }) => {
+  test("a custom amount replaces the preset", async ({ page }) => {
     await page.goto("/donate");
+    await page.getByTestId("donate-one_time-100").click();
+    await page.locator("#d-custom").fill("250");
+    await expect(page.locator("#d-custom")).toHaveValue("250");
+  });
 
-    await page.getByText("$100", { exact: true }).click();
-    await page.getByRole("button", { name: "Continue" }).click();
-    await page.getByRole("button", { name: "Back" }).click();
-
-    // The $100 preset should still be the one visually/semantically selected.
-    const preset100 = page.getByRole("radio", { name: "$100" });
-    await expect(preset100).toBeChecked();
+  test("checkout API refuses instead of simulating a payment", async ({ request }) => {
+    const res = await request.post("/api/donations/checkout", {
+      data: { frequency: "one_time", custom_amount: 50, donor_email: "a@example.org" },
+    });
+    expect(res.status()).toBe(503);
+    expect((await res.json()).unavailable).toBe(true);
   });
 });

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, Loader2, Save, X } from "lucide-react";
+import { Download, ImagePlus, Loader2, Save, X } from "lucide-react";
 
 import { saveSettingsAction } from "@/app/admin/actions";
 import { MediaPicker } from "@/components/cms/media-picker";
@@ -110,6 +110,56 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
         <Row label="Phone">
           <input value={s.contact.phone} onChange={(e) => set("contact", "phone", e.target.value)} className={inputClass} />
         </Row>
+      </Card>
+
+      <Card title="Donations: bank transfer details" bodyClassName="space-y-3 p-6">
+        <textarea
+          rows={6}
+          value={s.donations.bankDetails}
+          onChange={(e) => set("donations", "bankDetails", e.target.value)}
+          className={inputClass}
+          placeholder={"Bank name (NGN)\nAccount name: Life Helpers Initiative\nAccount number: …\n\nBank name (USD domiciliary)\nAccount number: …\nSWIFT: …"}
+        />
+        <p className="text-xs text-admin-muted">
+          Shown on the donate page exactly as typed. Leave empty to hide bank transfer and ask donors to email instead. Double-check every digit.
+        </p>
+      </Card>
+
+      <Card title="Comments & alerts" bodyClassName="space-y-4 p-6">
+        <label className="flex items-start gap-3 text-sm">
+          <input
+            type="checkbox"
+            checked={s.engagement.autoApproveComments}
+            onChange={(e) => set("engagement", "autoApproveComments", e.target.checked)}
+            className="mt-1 accent-admin-primary"
+          />
+          <span>
+            <span className="block font-semibold">Auto-approve reader comments</span>
+            <span className="block text-xs text-admin-muted">
+              Comments appear on posts immediately. You can still unapprove or delete them in Comments.
+            </span>
+          </span>
+        </label>
+        <Row label="Send team alerts to">
+          <input
+            type="email"
+            value={s.engagement.alertEmail}
+            onChange={(e) => set("engagement", "alertEmail", e.target.value)}
+            className={inputClass}
+            placeholder="official@lhinigeria.org"
+          />
+        </Row>
+        <p className="text-xs text-admin-muted">New submissions, applications, bids and comments are emailed here once email is connected.</p>
+      </Card>
+
+      <Card title="Backup" bodyClassName="space-y-3 p-6">
+        <p className="text-sm text-admin-muted">
+          Download everything managed in this admin (content, submissions, learners, certificates, uploads and private CVs and bids) as one
+          file. Keep backups somewhere safe; they contain personal data.
+        </p>
+        <a href="/api/admin/backup" className={buttonClass.secondary}>
+          <Download className="h-4 w-4" /> Download backup (.tar.gz)
+        </a>
       </Card>
 
       <div className="flex justify-end xl:col-span-2">

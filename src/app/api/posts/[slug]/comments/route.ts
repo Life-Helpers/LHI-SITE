@@ -25,6 +25,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid comment." }, { status: 400 });
   }
   if (parsed.data.website) return NextResponse.json({ ok: true });
-  await addComment({ slug, postTitle: post.title, name: parsed.data.name, email: parsed.data.email, body: parsed.data.body });
-  return NextResponse.json({ ok: true });
+  const comment = await addComment({ slug, postTitle: post.title, name: parsed.data.name, email: parsed.data.email, body: parsed.data.body });
+  return NextResponse.json({ ok: true, approved: comment.status === "approved" });
 }

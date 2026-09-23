@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowRight,
   Building,
@@ -41,35 +41,17 @@ const monthlyTiers: Tier[] = [
   { id: "monthly_100", amount: 100, label: "Champion" },
 ];
 
+/** Where gifts go: LHI's thematic areas (Organisational Profile). */
 const ledgerItems = [
-  {
-    k: "$25",
-    d: "Emergency therapeutic nutrition sachets for two malnourished infants in remote frontline clinics.",
-  },
-  {
-    k: "$50/mo",
-    d: "Continuous monthly primary health screenings and essential medications for a vulnerable rural family.",
-  },
-  {
-    k: "$100",
-    d: "A complete emergency food parcel sustaining a displaced household for an entire month.",
-  },
-  {
-    k: "$250",
-    d: "School learning materials, uniforms, and psychosocial safe-space care for 10 vulnerable children.",
-  },
-  {
-    k: "$500",
-    d: "One month of clinic solar electricity, vaccine cold-chain preservation, and clean water supplies.",
-  },
-  {
-    k: "$1,000+",
-    d: "Underwrites an entire mobile medical deployment reaching hundreds of isolated villagers.",
-  },
+  { k: "Health", d: "Maternal, newborn and child health, nutrition, WASH, immunisation, malaria and HIV services." },
+  { k: "Education", d: "Learning centres and accelerated basic education for out-of-school and displaced children." },
+  { k: "Livelihoods", d: "Vocational skills, savings groups and cash assistance that help households earn and save." },
+  { k: "Food security", d: "Smallholder farming support, farmers service hubs and climate adaptation." },
+  { k: "Protection", d: "Preventing violence against women and girls, child protection and dignity kits." },
+  { k: "Inclusion", d: "Governance, peacebuilding and advocacy so marginalised people have a voice." },
 ];
 
-export function DonateView() {
-  const router = useRouter();
+export function DonateView({ bankDetails = "" }: { bankDetails?: string }) {
   const searchParams = useSearchParams();
 
   const [frequency, setFrequency] = useState<"one_time" | "monthly">("one_time");
@@ -167,13 +149,8 @@ export function DonateView() {
         throw new Error(data.error || "Unable to initiate checkout. Please try again.");
       }
 
-      // Handle external Stripe checkout (open safely) vs internal simulated checkout (router.push)
-      if (data.is_stripe || data.checkout_url.startsWith("http://") || data.checkout_url.startsWith("https://")) {
-        window.open(data.checkout_url, "_blank");
-        setIsSubmitting(false);
-      } else {
-        router.push(data.checkout_url);
-      }
+      // Stripe Checkout is hosted on stripe.com; send the donor there in the same tab.
+      window.location.assign(data.checkout_url);
     } catch (err: unknown) {
       const msg =
         err instanceof Error ? err.message : "Unable to initiate checkout. Please try again.";
@@ -226,7 +203,7 @@ export function DonateView() {
                 <em className="font-light italic text-primary">funds a life.</em>
               </h1>
               <p className="mt-8 max-w-2xl text-[16px] leading-relaxed text-muted-foreground sm:text-[18px]">
-                Your donation directly supports emergency food assistance, clinical healthcare outreaches, malnutrition stabilization, and child protection hubs across 11 frontline Nigerian states. LHI is a registered non-profit organization — every contribution compounds on the ground.
+                Your donation directly supports emergency food assistance, clinical healthcare outreaches, malnutrition stabilization, and child protection hubs across 11 frontline Nigerian states. LHI is a registered non-profit organization — every contribution goes to work on the ground.
               </p>
             </div>
           </div>
@@ -247,24 +224,24 @@ export function DonateView() {
           )}
 
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
-            {/* LEFT COLUMN: The Ledger of Compounding Kindness */}
+            {/* LEFT COLUMN: where gifts go */}
             <div className="lg:col-span-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
                 — Where it goes
               </p>
               <h2 className="mt-4 font-serif-display text-4xl font-light leading-[1.05] text-foreground md:text-5xl">
-                A ledger of
+                Where your gift
                 <br />
-                <em className="font-light italic text-primary">compounding kindness.</em>
+                <em className="font-light italic text-primary">goes to work.</em>
               </h2>
 
               <ul className="mt-10 space-y-2">
                 {ledgerItems.map((item) => (
                   <li
                     key={item.k}
-                    className="grid grid-cols-[110px_1fr] items-baseline gap-4 border-t border-border py-3.5"
+                    className="grid grid-cols-[130px_1fr] items-baseline gap-4 border-t border-border py-3.5"
                   >
-                    <span className="font-serif-display text-2xl tracking-tight text-primary">
+                    <span className="font-serif-display text-xl text-primary">
                       {item.k}
                     </span>
                     <p className="text-sm leading-relaxed text-muted-foreground">
@@ -295,7 +272,7 @@ export function DonateView() {
                       {africanFulfillmentImages.donateHero.caption}
                     </p>
                     <p className="mt-0.5 text-[10px] text-white/80">
-                      100% of public donations directly fund frontline supplies and healthcare.
+                      Registered with the Corporate Affairs Commission ({siteConfig.cacRegistration}).
                     </p>
                   </div>
                 </div>
@@ -323,62 +300,48 @@ export function DonateView() {
                     onClick={() => setShowBankDetails(!showBankDetails)}
                     className="text-xs font-semibold text-primary hover:underline"
                   >
-                    {showBankDetails ? "Hide accounts" : "Show accounts"}
+                    {showBankDetails ? "Hide" : bankDetails.trim() ? "Show accounts" : "How to give"}
                   </button>
                 </div>
 
                 {showBankDetails && (
                   <div className="mt-4 space-y-3 border-t border-border pt-3 text-xs text-muted-foreground">
-                    <p className="text-[13px] font-medium text-foreground">
-                      Life Helpers Initiative Official Accounts
-                    </p>
-                    <div className="flex items-center justify-between rounded-lg border border-border bg-background p-3">
-                      <div>
-                        <div className="font-semibold text-foreground">Zenith Bank Plc (NGN)</div>
-                        <div>Account: <strong className="text-foreground">1014298101</strong></div>
-                        <div>Name: Life Helpers Initiative</div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy("1014298101", "zenith")}
-                        className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-foreground hover:bg-muted"
-                      >
-                        {copiedField === "zenith" ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" />
-                        )}
-                        {copiedField === "zenith" ? "Copied" : "Copy"}
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-lg border border-border bg-background p-3">
-                      <div>
-                        <div className="font-semibold text-foreground">First Bank of Nigeria (USD Domiciliary)</div>
-                        <div>Account: <strong className="text-foreground">2034981120</strong></div>
-                        <div>SWIFT: FBNINGLA</div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy("2034981120", "fbn")}
-                        className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-foreground hover:bg-muted"
-                      >
-                        {copiedField === "fbn" ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-600" />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" />
-                        )}
-                        {copiedField === "fbn" ? "Copied" : "Copy"}
-                      </button>
-                    </div>
-
-                    <p className="text-[11px] italic">
-                      For bank transfers, kindly email transfer confirmation to{" "}
-                      <a href={`mailto:${siteConfig.contact.email}`} className="text-primary underline">
-                        {siteConfig.contact.email}
-                      </a>{" "}
-                      for your official tax receipt.
-                    </p>
+                    {bankDetails.trim() ? (
+                      <>
+                        <p className="text-[13px] font-medium text-foreground">Life Helpers Initiative official accounts</p>
+                        {bankDetails
+                          .trim()
+                          .split(/\n\s*\n/)
+                          .map((block, i) => (
+                            <div key={i} className="flex items-start justify-between gap-3 rounded-lg border border-border bg-background p-3">
+                              <p className="whitespace-pre-line text-foreground">{block.trim()}</p>
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(block.trim(), `bank-${i}`)}
+                                className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-foreground hover:bg-muted"
+                              >
+                                {copiedField === `bank-${i}` ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                                {copiedField === `bank-${i}` ? "Copied" : "Copy"}
+                              </button>
+                            </div>
+                          ))}
+                        <p className="text-[11px] italic">
+                          After a transfer, please email the confirmation to{" "}
+                          <a href={`mailto:${siteConfig.contact.email}`} className="text-primary underline">
+                            {siteConfig.contact.email}
+                          </a>{" "}
+                          so we can acknowledge your gift.
+                        </p>
+                      </>
+                    ) : (
+                      <p>
+                        To give by bank transfer, email{" "}
+                        <a href={`mailto:${siteConfig.contact.email}?subject=Bank%20transfer%20donation`} className="text-primary underline">
+                          {siteConfig.contact.email}
+                        </a>{" "}
+                        and our finance team will send LHI&apos;s official account details.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

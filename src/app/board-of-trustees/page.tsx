@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Award, CheckCircle2, ShieldCheck, Users } from "lucide-react";
+import { Award, ShieldCheck, Users } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
@@ -12,42 +12,19 @@ export const metadata: Metadata = {
     "Meet the Board of Trustees providing strategic governance, fiduciary stewardship, and mission alignment for Life Helpers Initiative (LHI).",
 };
 
+/** Only people and roles confirmed in LHI's Strategic Plan 2026–2030 and Organisational Profile. */
 const trustees = [
   {
     name: "Engr. Godfrey Mayuku",
-    role: "Board Chairman",
-    qualification: "FNSE, COREN Registered",
-    bio: "Brings extensive strategic leadership, engineering management, and governance experience. Provides high-level strategic direction, ensuring institutional resilience, infrastructure integrity, and corporate accountability across all LHI operations.",
+    role: "Chairman, Board of Trustees",
+    qualification: "",
+    bio: "Chairman of the LHI Board of Trustees, who presented the Strategic Plan 2026–2030 as a roadmap for LHI's growth, accountability and impact.",
   },
   {
-    name: "Mr. Tayo Fatinikun",
-    role: "National Executive Director & Trustee",
+    name: "Tayo Fatinikun",
+    role: "National Executive Director",
     qualification: "FICA, FIMC, CMC",
-    bio: "Founding visionary of Life Helpers Initiative (originally the Beulah Project in 2004). With over two decades of humanitarian programming, civil society leadership, and public policy advocacy, he steers LHI's mission, field expansions, and donor partnerships across 11 states.",
-  },
-  {
-    name: "Pharm. Iyabo Adebisi",
-    role: "Board Secretary",
-    qualification: "FPSN, Public Health Specialist",
-    bio: "A seasoned healthcare administrator and pharmaceutical leader overseeing board compliance, statutory secretarial duties, and health-sector intervention strategies, championing maternal-infant health and clinical quality assurance.",
-  },
-  {
-    name: "Barr. Joy Ihenacho",
-    role: "Board Member & Legal Counsel",
-    qualification: "LL.B, B.L, Human Rights Advocate",
-    bio: "Leads legal governance, human rights compliance, and safeguarding oversight. Guides statutory corporate compliance with CAC guidelines, statutory audits, and beneficiary protection mechanisms.",
-  },
-  {
-    name: "Pharm. Sam Olaoye",
-    role: "Board Member",
-    qualification: "M.Pharm, Supply Chain Consultant",
-    bio: "Specialist in humanitarian logistics, medical supply chain management, and clinical intervention protocols. Advises on cold-chain vaccine delivery, essential drug distribution, and emergency health readiness.",
-  },
-  {
-    name: "Mrs. Bukola Fatinikun",
-    role: "Board Member",
-    qualification: "M.Ed, Social Development Advocate",
-    bio: "A dedicated educationist and social development practitioner focused on girl-child empowerment, early childhood development, vulnerable household livelihoods, and community-level social inclusion.",
+    bio: "Leads Life Helpers Initiative's management team and programmes across 11 states, and is the editor-in-chief of LHI's project magazines.",
   },
 ];
 
@@ -125,13 +102,16 @@ export default function BoardOfTrusteesPage() {
                 <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
                   {trustee.bio}
                 </p>
-                <div className="mt-6 flex items-center gap-2 text-xs font-medium text-primary">
-                  <CheckCircle2 size={14} />
-                  <span>Trustee Member · Life Helpers Initiative</span>
-                </div>
               </div>
             ))}
           </div>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            The full list of trustees is available on request from{" "}
+            <a href={`mailto:${siteConfig.contact.email}?subject=Board%20of%20Trustees`} className="font-medium text-primary hover:underline">
+              {siteConfig.contact.email}
+            </a>
+            .
+          </p>
 
           <div className="mt-16 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center sm:p-12">
             <h2 className="font-serif-display text-2xl font-light text-foreground sm:text-3xl">

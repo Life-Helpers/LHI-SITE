@@ -110,9 +110,22 @@ original content from `src/data/*`.
 - The server needs a **persistent, writable disk** (VPS, or a Docker volume mounted
   at `CMS_DATA_DIR`). On serverless/ephemeral hosting edits would be lost; swap
   `src/lib/cms/store.ts` for a database-backed implementation in that case.
-- **Back up `CMS_DATA_DIR` regularly** — it holds all edited content, uploads and
-  user accounts.
+- **Back up `CMS_DATA_DIR` regularly** — it holds all edited content, uploads,
+  user accounts, CVs and bids. Anyone with the *Site settings* permission can
+  download a full `.tar.gz` snapshot from **Admin → Settings → Backup**
+  (`/api/admin/backup`); store it somewhere private (it contains personal data).
+  Restore by extracting it into an empty `CMS_DATA_DIR` and restarting.
 - Run a single server instance (the store serialises writes in-process).
+
+### Site settings worth filling in
+
+- **Donations → bank transfer details**: the donate page shows exactly what is
+  entered here (separate accounts with a blank line). Nothing is shown until it is set.
+- **Comments & alerts**: comments are held for moderation unless *Auto-approve
+  comments* is ticked; the alert email receives team notifications once email
+  sending is configured.
+- Card payments need the Stripe variables; without them the donate form says
+  online payments aren't available yet rather than pretending to succeed.
 
 ### Security notes
 

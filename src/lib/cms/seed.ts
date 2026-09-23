@@ -91,5 +91,12 @@ export function seedSettings(): CmsSettings {
       email: siteConfig.contact.email,
       phone: siteConfig.contact.phone,
     },
+    donations: {
+      bankDetails: "",
+    },
+    engagement: {
+      autoApproveComments: false,
+      alertEmail: siteConfig.contact.email,
+    },
   };
 }

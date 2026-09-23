@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { Check, Heart, Link2, Loader2, Mail, MessageCircle, Share2 } from "lucide-react";
 import { siFacebook, siPinterest, siReddit, siTelegram, siWhatsapp, siX } from "simple-icons";
 
@@ -57,6 +58,7 @@ export function PostEngagement({ slug, title, url, image }: { slug: string; titl
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState("");
+  const [approvedNow, setApprovedNow] = useState(false);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/posts/${encodeURIComponent(slug)}`, { cache: "no-store" }).catch(() => null);
@@ -114,6 +116,10 @@ export function PostEngagement({ slug, title, url, image }: { slug: string; titl
     }
     setBody("");
     setStatus("sent");
+    if (data?.approved) {
+      setApprovedNow(true);
+      load();
+    }
   }
 
   const input =
@@ -226,7 +232,7 @@ export function PostEngagement({ slug, title, url, image }: { slug: string; titl
 
         {status === "sent" ? (
           <p role="status" className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm text-foreground">
-            Thank you! Your comment has been received and will appear once it has been reviewed.
+            {approvedNow ? "Thank you! Your comment has been posted." : "Thank you! Your comment has been received and will appear once it has been reviewed."}
           </p>
         ) : (
           <form onSubmit={submitComment} className="relative mt-6 space-y-3 rounded-2xl border border-border bg-card p-5">
@@ -250,7 +256,7 @@ export function PostEngagement({ slug, title, url, image }: { slug: string; titl
             </label>
             {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs text-muted-foreground">Comments are moderated and appear after review.</p>
+              <p className="text-xs text-muted-foreground">Please keep comments respectful. <Link href="/terms#user-content" className="underline">Comment guidelines</Link></p>
               <button
                 type="submit"
                 disabled={status === "sending"}

@@ -238,6 +238,11 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
       },
       nidake: { costUsd: cost, yearsOfDignity: years, schoolDaysSaved: days },
       contact: { email: str(settings.contact.email, 200), phone: str(settings.contact.phone, 60) },
+      donations: { bankDetails: str(settings.donations?.bankDetails, 2000) },
+      engagement: {
+        autoApproveComments: Boolean(settings.engagement?.autoApproveComments),
+        alertEmail: str(settings.engagement?.alertEmail, 200),
+      },
     });
     await logActivity(user, "updated settings", "Site settings", "/admin/settings");
     refreshSite();

@@ -431,6 +431,16 @@ export interface CmsSettings {
     email: string;
     phone: string;
   };
+  donations: {
+    /** Bank transfer details shown on the donate page; hidden when empty. One account per paragraph. */
+    bankDetails: string;
+  };
+  engagement: {
+    /** Publish reader comments immediately instead of holding them for review. */
+    autoApproveComments: boolean;
+    /** Where new-submission alerts are sent once email is connected. */
+    alertEmail: string;
+  };
 }
 
 export type SubmissionType =

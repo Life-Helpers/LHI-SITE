@@ -138,6 +138,8 @@ export async function readSettings(): Promise<CmsSettings> {
     homeFeature: { ...defaults.homeFeature, ...stored.homeFeature },
     nidake: { ...defaults.nidake, ...stored.nidake },
     contact: { ...defaults.contact, ...stored.contact },
+    donations: { ...defaults.donations, ...stored.donations },
+    engagement: { ...defaults.engagement, ...stored.engagement },
   };
 }
 

@@ -2,14 +2,18 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import { DonateView } from "@/components/donate/donate-view";
+import { getSettings } from "@/lib/cms/content";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Donate | Support Life Helpers Initiative",
+  title: "Donate",
   description:
     "Your donation directly supports emergency food assistance, clinical care, malnutrition stabilization, and child protection hubs across 11 frontline states.",
 };
 
-export default function DonatePage() {
+export default async function DonatePage() {
+  const settings = await getSettings();
   return (
     <main id="main-content" tabIndex={-1} className="min-h-screen">
       <Suspense
@@ -19,7 +23,7 @@ export default function DonatePage() {
           </div>
         }
       >
-        <DonateView />
+        <DonateView bankDetails={settings.donations.bankDetails} />
       </Suspense>
     </main>
   );

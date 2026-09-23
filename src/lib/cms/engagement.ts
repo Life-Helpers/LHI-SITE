@@ -3,7 +3,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import type { PostComment } from "@/lib/cms/schema";
-import { readStore, updateStore } from "@/lib/cms/store";
+import { readSettings, readStore, updateStore } from "@/lib/cms/store";
 
 const MAX_COMMENTS = 20000;
 
@@ -30,7 +30,13 @@ export async function changeLikes(slug: string, delta: 1 | -1) {
 }
 
 export async function addComment(input: Omit<PostComment, "id" | "status" | "createdAt">) {
-  const comment: PostComment = { ...input, id: randomUUID(), status: "pending", createdAt: new Date().toISOString() };
+  const { engagement } = await readSettings();
+  const comment: PostComment = {
+    ...input,
+    id: randomUUID(),
+    status: engagement.autoApproveComments ? "approved" : "pending",
+    createdAt: new Date().toISOString(),
+  };
   await updateStore("comments", (items) => ({ items: [comment, ...items].slice(0, MAX_COMMENTS) }));
   return comment;
 }

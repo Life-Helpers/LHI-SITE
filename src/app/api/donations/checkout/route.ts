@@ -73,8 +73,8 @@ export async function POST(req: NextRequest) {
                     ? "NIDAKE Dignity Kit Sponsorship"
                     : `Life Helpers Initiative Support`,
                 description: isMonthly
-                  ? "Recurring monthly gift empowering frontline medical, nutrition, and relief programs across 11 Nigerian states."
-                  : "Tax-deductible gift directly empowering vulnerable communities across 11 frontline Nigerian states.",
+                  ? "A monthly gift supporting Life Helpers Initiative's programmes across 11 Nigerian states."
+                  : "A gift supporting Life Helpers Initiative's work with vulnerable communities across 11 Nigerian states.",
               },
               unit_amount: amountInCents,
               ...(isMonthly ? { recurring: { interval: "month" } } : {}),
@@ -100,17 +100,15 @@ export async function POST(req: NextRequest) {
       // Stripe not configured in preview sandbox, use seamless relative route
     }
 
-    // Sandbox / Test fallback: Return a clean relative URL so it works in preview iframes
-    const demoSessionId = `lhi_sim_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-    const checkoutUrl = `/donate/success?session_id=${demoSessionId}&amount=${amount}&kind=${frequency}&donor_name=${encodeURIComponent(
-      donor_name || "Friend"
-    )}`;
-
-    return NextResponse.json({
-      checkout_url: checkoutUrl,
-      is_stripe: false,
-      simulated: true,
-    });
+    // No payment provider configured: never pretend a payment succeeded.
+    return NextResponse.json(
+      {
+        error:
+          "Online card payments aren't available yet. You can give by bank transfer (see “Bank transfer” on this page) or email us and we'll help.",
+        unavailable: true,
+      },
+      { status: 503 },
+    );
   } catch (error: unknown) {
     console.error("Donation checkout error:", error);
     return NextResponse.json(

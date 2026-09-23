@@ -6,14 +6,14 @@ test.describe("homepage", () => {
 
     await expect(
       page.getByRole("heading", {
-        name: /Health, education, and livelihood programs across Northern Nigeria\./,
+        name: /Putting a radiant smile on every child/,
       }),
     ).toBeVisible();
 
-    await expect(page.getByRole("link", { name: "Donate now" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Donate now/i }).first()).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "What We Do", level: 2 }),
+      page.getByRole("heading", { name: /What We Do/, level: 2 }),
     ).toBeVisible();
   });
 

@@ -55,7 +55,7 @@ export default function ProgramsPage() {
               Specific Grants &amp; Field Interventions
             </h3>
             <p className="mt-1 text-xs text-muted-foreground max-w-xl">
-              Explore 18+ active and past interventions implemented with institutional donors like MSH, Save the Children, UNICEF, Plan International, and BMZ Germany.
+              Explore 39 active and past interventions delivered with partners including UNICEF, Save the Children, the International Rescue Committee, ZOA, MSH and Plan International.
             </p>
           </div>
           <Link
