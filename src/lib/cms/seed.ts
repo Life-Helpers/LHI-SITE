@@ -7,6 +7,7 @@ import { OPERATIONAL_STATES } from "@/data/operational-states";
 import { PARTNERS_DATA } from "@/data/partners-data";
 import { siteConfig } from "@/config/site";
 import { MAGAZINE_POSTS } from "@/data/magazine-stories";
+import { PUBLICATION_POSTS } from "@/data/publication-stories";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import type { CmsSettings } from "@/lib/cms/schema";
 import type { CmsDocument, CmsIntervention, CmsPartner, CmsPost, CmsState } from "@/lib/cms/types";
@@ -64,7 +65,9 @@ export function seedDocuments(): CmsDocument[] {
 }
 
 export function seedPosts(): CmsPost[] {
-  return MAGAZINE_POSTS.map((post) => ({ ...post, tags: [...post.tags] }));
+  return [...PUBLICATION_POSTS, ...MAGAZINE_POSTS]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map((post) => ({ ...post, tags: [...post.tags] }));
 }
 
 export function seedSettings(): CmsSettings {

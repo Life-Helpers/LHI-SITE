@@ -293,7 +293,7 @@ The Agricultural Farmer Management Information System, deployed on AWS at agrifi
     featuredImage: LHI_PHOTOS.solarRadioFarmer.src,
     tags: ["Radio", "Sokoto", "Accountability"],
     excerpt:
-      "Aired weekly on Radio Nigeria Royal FM 101.5, WeSpeak covers health, education, livelihood, agriculture and gender equity, and gives listeners space for questions and complaints.",
+      "Aired every Tuesday, 11 AM–12 PM, on Radio Nigeria Royal FM 101.5, WeSpeak covers health, education, livelihood, agriculture and gender equity, and gives listeners space for questions and complaints.",
     updatedAt: "2026-03-05",
     content: `**WeSpeak**, also known as **Muyi Magana**, is a weekly radio programme implemented by Life Helpers Initiative in Sokoto State and aired by Radio Nigeria (**Royal FM 101.5**). It cuts across all thematic areas: health, education, livelihood, agriculture and gender equity.
 
@@ -301,7 +301,9 @@ The platform provides timely information, encourages dialogue and creates space 
 
 The programme has touched many lives across Sokoto State by increasing awareness, promoting positive behaviour change and strengthening accountability.
 
-For feedback, suggestions, appreciation or complaints, WhatsApp or SMS **0901 715 9526** or email feedback@lhinigeria.org.`,
+**Listen:** Radio Nigeria, Royal FM 101.5 (Sokoto State), **every Tuesday, 11:00 AM – 12:00 PM (GMT)**.
+
+For feedback, suggestions, appreciation or complaints, WhatsApp or SMS **0201 330 9033** or email feedback@lhinigeria.org.`,
   },
   {
     ...base,

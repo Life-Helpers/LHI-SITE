@@ -100,6 +100,7 @@ export const POST_CATEGORIES: FieldOption[] = [
   "Success Stories",
   "Field Blog",
   "Magazine",
+  "Newsletter",
   "Press Release",
   "Events",
 ].map((c) => ({ value: c, label: c }));

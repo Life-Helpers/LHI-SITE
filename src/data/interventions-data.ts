@@ -105,6 +105,10 @@ interface ProjectInput
   tags?: string[];
 }
 
+/** Field gallery from photo-library keys. */
+const gallery = (...keys: LhiPhotoKey[]) =>
+  keys.map((k) => ({ src: LHI_PHOTOS[k].src, alt: LHI_PHOTOS[k].alt, caption: LHI_PHOTOS[k].alt }));
+
 function project({ pillars, photo, caption, tags, ...rest }: ProjectInput): InterventionProject {
   const img = LHI_PHOTOS[photo];
   return {
@@ -129,45 +133,72 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     shortTitle: "FCDO/WFP Smallholder Farmers Resilience",
     donor: "FCDO / World Food Programme (WFP)",
     status: "Active",
-    duration: "Sept 2025 – Feb 2026 reporting period (ongoing)",
+    duration: "September 2025 – ongoing",
     locations: "Sokoto (Kware & Wamakko LGAs) and Katsina (Batagarawa & Katsina LGAs)",
     states: ["sokoto", "katsina"],
     pillars: ["food-security", "livelihood"],
     photo: "jafaroCabbage",
     caption: "Jafaro Baro now harvests cabbage twice in the time it once took to grow one crop",
     summary:
-      "A multidimensional approach to the interconnected challenges facing smallholder farmers: farmer-led irrigation development (FLID), access to farming inputs and market systems, community-managed assets and non-farm income streams, with a phased exit strategy that leaves community-owned systems behind.",
+      "A multidimensional approach to the interconnected challenges facing smallholder farmers: farmer-led irrigation development (FLID), access to farming inputs and market systems, community-managed assets and non-farm income streams, with a phased exit strategy that leaves community-owned systems behind. Two farmers service hubs, Noma Tushen Arziki in Wamakko and Gidan Arziki in Batagarawa (commissioned 27 April 2026), now run as community enterprise centres.",
     keyInterventions: [
       "Cash-based transfers (₦75,000) as a safety net and seed capital for small businesses.",
       "Improved seeds, fertiliser and Good Agronomic Practice training for dry-season farming.",
       "Village Savings and Loan Associations, bank account linkage and NIMC registration.",
       "Noma Tushen Arziki Hub (Wamakko) and Gidan Arziki Farmer Service Centre (Batagarawa), plus the AgriFMIS digital farmer registry.",
+      "Gidan Arziki: agro-processing and groundnut oil extraction, cold room, charging station, car wash, tool rental and a sewing business incubator (30 trainees).",
+      "Community Facility Management Committee of 20 members (12 male, 8 female) and a reconstructed modern slaughterhouse in Batagarawa.",
     ],
-    impactMetric: "5,700 households reached directly and 37,050 household members indirectly across 42 wards.",
-    tags: ["wfp", "fcdo", "vsla", "cash-transfer", "agriculture"],
+    impactMetric:
+      "5,700 households reached directly and 37,050 household members indirectly across 42 wards; Gidan Arziki earned ₦1,075,365 in April 2026 (₦486,995 profit).",
+    tags: ["wfp", "fcdo", "vsla", "cash-transfer", "agriculture", "gidan-arziki"],
+    gallery: gallery(
+      "gidanArzikiAerial",
+      "gidanArzikiTailoring",
+      "gidanArzikiProcessing",
+      "groundnutProcessing",
+      "arajana",
+      "womenAgroProcessing",
+      "hubAerial",
+      "murja",
+    ),
     featured: true,
   }),
   project({
     id: "echo-unicef-education-in-emergencies",
-    title: "Quality and Relevant Education for Children in Emergency and Non-Emergency Settings",
-    shortTitle: "ECHO/UNICEF Education in Emergencies",
-    donor: "ECHO / UNICEF",
+    title: "Accelerated Basic Education Programme (ABEP) for Out-of-School Children in Sokoto State",
+    shortTitle: "EU/UNICEF Accelerated Basic Education (ABEP)",
+    donor: "European Union (ECHO) / UNICEF",
     status: "Active",
-    duration: "Ongoing",
-    locations: "Conflict- and displacement-affected communities",
-    states: [],
+    duration: "February 2026 – ongoing (launched 21 April 2026)",
+    locations: "Goronyo, Rabah, Tambuwal, Tangaza, Tureta and Wurno LGAs, Sokoto State",
+    states: ["sokoto"],
     pillars: ["education", "protection"],
-    photo: "learningCentre",
+    photo: "abepLearnersCelebrate",
+    caption: "ABEP learners celebrating with their new learning materials",
     summary:
-      "Quality basic education for out-of-school children, including Almajiri learners, girls and children with disabilities affected by conflict and displacement, to reduce out-of-school rates and improve completion and transition to junior secondary school.",
+      "Quality basic education for out-of-school and over-aged children, including Almajiri learners, girls and children with disabilities affected by conflict and displacement: foundational literacy, numeracy and life skills in 35 learning centres, with pathways into formal school and a crisis modifier for emergency radio learning.",
     keyInterventions: [
-      "Enrol 3,083 out-of-school children (1,850 girls, 1,233 boys) in the Alternate Basic Education Programme (ABEP).",
-      "Mainstream 924 children into formal schools.",
-      "Reach 5,819 out-of-school children through emergency radio learning.",
-      "Train 420 facilitators (105 initially and 315 under the crisis modifier).",
+      "3,255 out-of-school children enrolled in Q1 (1,410 boys, 1,845 girls), 105.6% of target, including 44 children with disabilities.",
+      "105 facilitators recruited from more than 680 applicants and trained; knowledge scores rose from 35% to 65%.",
+      "164 Community-Based Management Committee members trained in mobilisation, child protection and learner retention.",
+      "Teaching and learning materials for every enrolled learner.",
+      "Crisis modifier ready: 315 radio facilitators identified to reach 5,819 children through emergency radio learning.",
+      "Target of 924 children mainstreamed into formal schools; joint supervision with MoBSE, SAME, SUBEB and UNICEF.",
     ],
-    impactMetric: "3,083 children enrolled, 924 mainstreamed and 5,819 reached by radio learning (targets).",
-    tags: ["echo", "unicef", "oosc", "almajiri"],
+    impactMetric: "3,255 out-of-school children learning in 35 centres across 6 LGAs (Q1, February – May 2026).",
+    tags: ["eu", "echo", "unicef", "oosc", "almajiri", "abep"],
+    featured: true,
+    gallery: gallery(
+      "abepGirls",
+      "abepLearningCentre",
+      "nasiru",
+      "saudatu",
+      "abepFacilitatorTraining",
+      "cbmcMeeting",
+      "abepWriting",
+      "abepBoy",
+    ),
   }),
   project({
     id: "unocha-irc-multisector-nutrition",
@@ -409,8 +440,9 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
       "Key stakeholder engagement and advocacy for policy change.",
       "Technical and vocational skills for vulnerable adolescent girls.",
     ],
-    impactMetric: "Adolescent girls empowered across 3 LGAs of Zamfara.",
+    impactMetric: "Adolescent girls empowered across 3 LGAs of Zamfara, including survivors of child marriage such as Azima Bello, now a skilled tailoring apprentice.",
     tags: ["unicef", "child-marriage", "adolescent-girls"],
+    gallery: gallery("azima", "pledgeSchool"),
   }),
   project({
     id: "echo-irc-multisectoral-resilience",
@@ -481,14 +513,18 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     donor: "USG / Project HOPE",
     status: "Completed",
     duration: "Completed",
-    locations: "13 LGAs",
-    states: [],
+    locations: "13 LGAs, including Shagari LGA, Sokoto State",
+    states: ["sokoto"],
     pillars: ["health"],
     photo: "healthOutreach",
     summary:
       "A ₦43 million grant supporting facility-based comprehensive HIV treatment for mothers and children and activating community access, care and support.",
-    keyInterventions: ["Facility-based comprehensive HIV treatment for mothers and children.", "Community access, care and support."],
-    impactMetric: "Comprehensive HIV services across 13 LGAs.",
+    keyInterventions: [
+      "Facility-based comprehensive HIV treatment for mothers and children.",
+      "Community access, care and support.",
+      "Community-based testing and counselling with immediate linkage to treatment.",
+    ],
+    impactMetric: "Comprehensive HIV services across 13 LGAs; mothers and infants identified through community testing linked to care.",
     tags: ["project-hope", "hiv", "ace-3"],
   }),
   project({

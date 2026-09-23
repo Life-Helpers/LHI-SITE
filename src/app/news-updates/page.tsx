@@ -1,177 +1,115 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { NewsletterForm } from "@/components/news/newsletter-form";
-import { ArrowRight, Calendar, Mail, Tag } from "lucide-react";
+import { BookOpen, Download, Mail, Radio } from "lucide-react";
 
-import { PageHeroBanner } from "@/components/ui/page-hero-banner";
-import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { BlogFeed } from "@/components/blog/blog-feed";
+import { NewsletterForm } from "@/components/news/newsletter-form";
+import { SocialLinks } from "@/components/social-links";
+import { PageHeroBanner } from "@/components/ui/page-hero-banner";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
+import { PUBLICATIONS } from "@/data/publication-stories";
 import { getPublishedPosts } from "@/lib/cms/content";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "News & Updates | Life Helpers Initiative",
+  title: "News, Newsletter & Magazines | Life Helpers Initiative",
   description:
-    "Latest field updates, press releases, community milestones, and humanitarian newsletters from Life Helpers Initiative across Nigeria.",
+    "Latest news, press releases, the LHI newsletter and project magazines from Life Helpers Initiative, with free PDF downloads.",
 };
 
-const articles = [
-  {
-    id: "world-breastfeeding-week",
-    title: "World Breastfeeding Week: Scaling Community Infant & Young Child Nutrition in Rural Wards",
-    date: "August 2024",
-    category: "Health & Nutrition",
-    summary:
-      "LHI field teams across Sokoto, Kebbi, and Zamfara mobilized over 4,500 nursing mothers during World Breastfeeding Week, offering hands-on counseling on exclusive breastfeeding, early initiation, and locally formulated complementary feeding (Tom Brown).",
-  },
-  {
-    id: "world-food-day-climate",
-    title: "World Food Day: Equipping 1,200 Smallholder Farmers with Drought-Resilient Seed Varieties",
-    date: "October 2024",
-    category: "Food Security & Agriculture",
-    summary:
-      "In commemoration of World Food Day, LHI distributed certified climate-adaptive millet and sorghum seeds alongside bio-fertilizers to peasant farmer cooperatives in Yobe and Borno states to counteract irregular rainfall cycles.",
-  },
-  {
-    id: "16-days-activism-gbv",
-    title: "16 Days of Activism: Amplifying Survivor Voices and PSEA Accountability Across 11 States",
-    date: "November 2024",
-    category: "Gender & Inclusion",
-    summary:
-      "Through radio townhalls, community drama troupes, and stakeholder roundtables with traditional rulers, LHI reinforced community zero-tolerance against gender-based violence and expanded anonymous reporting channels.",
-  },
-  {
-    id: "katsina-expansion-launch",
-    title: "LHI Expands Health and Protection Interventions to Katsina State",
-    date: "January 2025",
-    category: "Institutional Growth",
-    summary:
-      "Marking its 11th operational state, Life Helpers Initiative officially launched maternal and adolescent healthcare support services in vulnerable local government areas in Katsina State in partnership with state health authorities.",
-  },
-  {
-    id: "national-savings-conference",
-    title: "Showcasing Community Financial Inclusion at the National Savings Group Conference",
-    date: "March 2025",
-    category: "Livelihoods",
-    summary:
-      "LHI presented empirical data demonstrating the self-sustaining impact of over 120 Village Savings and Loan Associations (VSLAs) in conflict-recovering communities, highlighting women's financial autonomy and credit reliability.",
-  },
-];
-
 export default async function NewsUpdatesPage() {
-  const cmsPosts = (await getPublishedPosts()).filter((p) => ["News", "Press Release", "Magazine", "Events"].includes(p.category));
+  const posts = (await getPublishedPosts()).filter((p) =>
+    ["News", "Press Release", "Events", "Newsletter"].includes(p.category),
+  );
+
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
-      {/* Hero with African Fulfillment Demo Image */}
       <PageHeroBanner
-        eyebrow="— Bulletins & Field Dispatches"
+        eyebrow="— News & Newsletter"
         title={
           <>
             News &amp; <em className="font-light italic text-primary">Updates.</em>
           </>
         }
-        subtitle="Putting a smile on communities across Nigeria: real milestones, stories, and dispatches."
-        description="Stay informed on frontline developments, community milestones, emergency responses, capacity-building workshops, and policy dialogues from Life Helpers Initiative across 11 states."
-        image={africanFulfillmentImages.newsHero}
+        subtitle="Field news, press releases, our newsletter and project magazines."
+        description="Follow the milestones of LHI's projects across Nigeria, from the Gidan Arziki hub in Katsina to learning centres in Sokoto, and download our publications."
+        image={{ ...LHI_PHOTOS.gidanArzikiCommissioning, tag: "Gidan Arziki commissioning, April 2026" }}
       />
 
-      {cmsPosts.length > 0 && (
-        <section aria-labelledby="cms-posts-heading" className="border-b border-border py-16 md:py-20">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <h2 id="cms-posts-heading" className="mb-8 font-serif-display text-3xl font-light text-foreground">
-              Latest news & magazine
-            </h2>
-            <BlogFeed posts={cmsPosts} />
-          </div>
-        </section>
-      )}
-
-      {/* Main Content */}
-      <section className="py-16 md:py-24">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
-            {/* Articles List (8 cols) */}
-            <div className="space-y-8 lg:col-span-8">
-              {articles.map((item) => (
-                <article
-                  key={item.id}
-                  className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/40 sm:p-8"
-                >
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1 font-medium text-foreground">
-                      <Calendar size={13} className="text-primary" />
-                      {item.date}
-                    </span>
-                    <span>·</span>
-                    <span className="flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-accent">
-                      <Tag size={11} />
-                      {item.category}
-                    </span>
-                  </div>
-
-                  <h2 className="mt-3 font-serif-display text-xl font-bold text-foreground sm:text-2xl">
-                    {item.title}
-                  </h2>
-
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    {item.summary}
-                  </p>
-
-                  <div className="mt-6 border-t border-border pt-4 flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Life Helpers Initiative Dispatch</span>
-                    <Link
-                      href="/contact"
-                      className="font-semibold text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      Media Inquiries <ArrowRight size={12} />
+      <section id="publications" aria-labelledby="publications-heading" className="border-b border-border bg-muted/20 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— Publications</p>
+          <h2 id="publications-heading" className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
+            Newsletter &amp; project magazines
+          </h2>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {PUBLICATIONS.map((pub) => (
+              <article key={pub.pdf} className="flex flex-col overflow-hidden rounded-3xl border border-border bg-card">
+                <div className="relative aspect-[4/3]">
+                  <Image src={pub.image.src} alt={pub.image.alt} fill sizes="(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw" className="object-cover" />
+                  <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                    {pub.kind}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">{pub.period}</p>
+                  <h3 className="mt-1 font-semibold leading-snug text-foreground">{pub.title}</h3>
+                  <p className="mt-2 flex-1 text-sm text-muted-foreground">{pub.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link href={pub.post} className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
+                      <BookOpen className="h-3.5 w-3.5" /> Read
                     </Link>
+                    <a href={pub.pdf} download className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-foreground hover:bg-muted">
+                      <Download className="h-3.5 w-3.5" /> PDF
+                    </a>
                   </div>
-                </article>
-              ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+            <div className="lg:col-span-8">
+              <h2 className="mb-8 font-serif-display text-3xl font-light text-foreground">Latest news</h2>
+              <BlogFeed posts={posts} />
             </div>
 
-            {/* Newsletter Subscription Sidebar (4 cols) */}
-            <div className="space-y-6 lg:col-span-4">
+            <aside className="lg:col-span-4">
               <div className="sticky top-28 space-y-6">
-                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
+                <div id="subscribe" className="rounded-2xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                     <Mail size={20} />
                   </div>
-                  <h3 className="mt-4 font-serif-display text-xl font-bold text-foreground">
-                    Subscribe to our Bulletin
-                  </h3>
+                  <h3 className="mt-4 font-serif-display text-xl font-bold text-foreground">Subscribe to our newsletter</h3>
                   <p className="mt-2 text-xs text-muted-foreground">
-                    Receive quarterly reports, success stories, and emergency relief updates directly in your inbox.
+                    Receive LHI news, project magazines and stories of change in your inbox.
                   </p>
-
                   <NewsletterForm />
                 </div>
 
                 <div className="rounded-2xl border border-border bg-card p-6">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
-                    Key Publications
-                  </h4>
-                  <ul className="mt-4 space-y-3 text-xs">
-                    <li>
-                      <Link href="/impact" className="text-primary hover:underline font-medium">
-                        → LHI Annual Impact &amp; Accountability Report
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/our-commitment" className="text-primary hover:underline font-medium">
-                        → Safeguarding &amp; PSEA Code of Conduct
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/radio" className="text-primary hover:underline font-medium">
-                        → Women Situation Room Broadcast Schedule
-                      </Link>
-                    </li>
-                  </ul>
+                  <Radio className="h-6 w-6 text-primary" />
+                  <h3 className="mt-3 font-semibold text-foreground">WeSpeak (Muyi Magana) on radio</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Radio Nigeria, Royal FM 101.5, Sokoto. Every Tuesday, 11:00 AM – 12:00 PM.
+                  </p>
+                  <Link href="/blog/wespeak-muyi-magana-radio" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
+                    About the programme →
+                  </Link>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-card p-6">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Follow LHI</h3>
+                  <SocialLinks className="mt-4" />
                 </div>
               </div>
-            </div>
+            </aside>
           </div>
         </div>
       </section>

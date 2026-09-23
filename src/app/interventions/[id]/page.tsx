@@ -15,7 +15,9 @@ import {
 
 import { FieldGallery } from "@/components/interventions/field-gallery";
 import { getInterventionGallery } from "@/data/intervention-media";
-import { getIntervention, getInterventions, getStates } from "@/lib/cms/content";
+import { PROJECT_STORIES } from "@/data/project-stories";
+import { getIntervention, getInterventions, getPublishedPosts, getStates } from "@/lib/cms/content";
+import { formatPostDate } from "@/lib/posts";
 
 export const revalidate = 300;
 
@@ -48,7 +50,7 @@ export default async function InterventionDossierPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [all, allStates] = await Promise.all([getInterventions(), getStates()]);
+  const [all, allStates, posts] = await Promise.all([getInterventions(), getStates(), getPublishedPosts()]);
   const project = all.find((p) => p.id === id);
   if (!project) notFound();
 
@@ -56,6 +58,11 @@ export default async function InterventionDossierPage({
   const states = allStates.filter((s) => project.states.includes(s.id));
   const index = all.findIndex((p) => p.id === project.id);
   const next = all[(index + 1) % all.length];
+  const storySlugs = PROJECT_STORIES[id] ?? [];
+  const stories = storySlugs
+    .map((slug) => posts.find((p) => p.slug === slug))
+    .filter((p): p is (typeof posts)[number] => Boolean(p))
+    .slice(0, 6);
   const related = all.filter(
     (p) => p.id !== project.id && p.primaryThematic === project.primaryThematic,
   ).slice(0, 3);
@@ -150,6 +157,30 @@ export default async function InterventionDossierPage({
                 {project.impactMetric}
               </p>
             </section>
+
+            {stories.length > 0 && (
+              <section aria-labelledby="stories-heading">
+                <h2 id="stories-heading" className="font-serif-display text-2xl font-light text-foreground">
+                  Stories from this project
+                </h2>
+                <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {stories.map((post) => (
+                    <li key={post.id}>
+                      <Link
+                        href={`/blog/${post.slug}`}
+                        className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/50"
+                      >
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-accent">
+                          {post.category} · {formatPostDate(post.date)}
+                        </span>
+                        <span className="mt-2 font-semibold text-foreground group-hover:text-primary">{post.title}</span>
+                        <span className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.excerpt}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </div>
 
           <aside className="space-y-6 lg:col-span-4">

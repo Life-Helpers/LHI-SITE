@@ -1,6 +1,7 @@
 /**
  * Real Life Helpers Initiative field photography, taken from the Organisational
- * Profile, the Strategic Plan 2026–2030 and "Cultivating Resilience" magazine Vol. 1.
+ * Profile, the Strategic Plan 2026–2030, the project magazines (Cultivating Resilience
+ * Vol. 1, Gidan Arziki Vol. 2, ABEP) and the LHI newsletter.
  * Files live in /public/images/lhi. Use these instead of stock imagery.
  */
 export interface LhiPhoto {
@@ -88,6 +89,46 @@ export const LHI_PHOTOS = {
   wallOfFame: p("partners-wall-of-fame", "LHI's Wall of Fame displaying partner logos at the head office"),
   theoryOfChange: p("theory-of-change", "LHI Theory of Change diagram, Strategic Plan 2026–2030"),
   organogram: p("organogram", "Life Helpers Initiative organogram"),
+
+  // ABEP magazine, Gidan Arziki magazine (Vol. 2) and the LHI newsletter
+  abepGirlBag: p("abep-girl-school-bag", "Smiling girl holding her new school bag at an ABEP learning centre in Sokoto State"),
+  abepLearnerClassroom: p("abep-learner-classroom", "ABEP learner showing her EU and UNICEF school bag in a learning centre classroom"),
+  abepLearnersCelebrate: p("abep-learners-celebrate", "Out-of-school children celebrating with their new learning materials at an ABEP centre"),
+  abepStakeholders: p("abep-stakeholder-engagement", "Community and education stakeholders at an ABEP engagement meeting in a Sokoto classroom"),
+  abepGirls: p("abep-girls-bags", "Girls enrolled in the Accelerated Basic Education Programme with their school bags"),
+  abepWriting: p("abep-girl-writing", "ABEP learner writing in her exercise book"),
+  abepBoy: p("abep-boy-school-bag", "Boy carrying his ABEP school bag into the learning centre"),
+  abepLearningCentre: p("abep-learning-centre", "Children learning to write at a non-formal learning centre in Sokoto State"),
+  nasiru: p("nasiru-learning", "Nasiru Umar, 18, studying at his ABEP learning centre"),
+  saudatu: p("saudatu-school-bag", "Saudatu Aliyu, 14, from Wurno LGA, with the school bag that symbolises her dream"),
+  abepFacilitatorTraining: p("abep-facilitator-training", "ABEP facilitators at a three-day capacity-strengthening workshop"),
+  dogonDajiVillageHead: p("dogon-daji-village-head", "Alhaji Rufai Maccido Salah, village head of Dogon Daji, Tambuwal LGA"),
+  cbmcMeeting: p("cbmc-meeting", "Community-Based Management Committee members meeting with community leaders"),
+  abepCommunity: p("abep-community-women", "Women and girls at an ABEP community mobilisation session"),
+  abepOutdoorSession: p("abep-outdoor-session", "Community session outside an ABEP learning centre"),
+  abepCommunityMeeting: p("abep-community-meeting", "Parents and community members at an ABEP learning centre meeting"),
+  gidanArzikiTailoring: p("gidan-arziki-tailoring", "Trainee at the Gidan Arziki vocational centre showing fabric she sewed"),
+  gidanArzikiAerial: p("gidan-arziki-aerial", "Aerial view of the solar-powered Gidan Arziki Farmers Service Hub in Batagarawa, Katsina State"),
+  gidanArzikiCommissioning: p("gidan-arziki-commissioning", "Katsina State Deputy Governor Faruk Lawal Jobe commissioning the Gidan Arziki centre"),
+  gidanArzikiProcessing: p("gidan-arziki-processing", "Agro-processing machines in the Gidan Arziki processing centre"),
+  gidanArzikiCharging: p("gidan-arziki-charging", "Phones charging at the Gidan Arziki solar charging station"),
+  gidanArzikiSewing: p("gidan-arziki-sewing", "Young woman learning to sew at the Gidan Arziki business incubation unit"),
+  groundnutProcessing: p("groundnut-processing", "Woman using a groundnut processing machine at the Gidan Arziki hub"),
+  sewingTrainee: p("sewing-trainee", "Sewing trainee at work on an industrial sewing machine"),
+  batagarawaWoman: p("batagarawa-woman-food", "Smiling woman beside food she prepared in Batagarawa"),
+  batagarawaLeader: p("batagarawa-community-leader", "Community leader speaking at the Gidan Arziki commissioning ceremony"),
+  gidanArzikiCeremony: p("gidan-arziki-ceremony-aerial", "Aerial view of the Gidan Arziki commissioning ceremony"),
+  arajana: p("arajana-groundnuts", "Arajana Suleiman, 70, sorting groundnuts at the Gidan Arziki centre"),
+  gidanArzikiGarden: p("gidan-arziki-garden", "Gidan Arziki hub with its demonstration garden and solar roofs"),
+  kuliKuli: p("kuli-kuli-production", "Woman frying groundnut paste to make kuli-kuli"),
+  womenAgroProcessing: p("women-agro-processing", "Women processing groundnuts with modern equipment at the hub"),
+  hubOfficeWall: p("hub-office-partners-wall", "LHI office at the farmers hub with a wall of partner logos"),
+  nidakePad: p("nidake-reusable-pad", "Young woman holding a NIDAKE reusable sanitary pad pack"),
+  nidakeKit: p("nidake-pad-kit", "NIDAKE reusable sanitary pad kit"),
+  fctTeam: p("lhi-fct-team", "LHI staff in branded vests at an FCT community event"),
+  ace3Mother: p("ace3-mother-hope", "Two women embracing and smiling outside their home in Shagari LGA"),
+  azima: p("azima-tailoring", "Azima Bello at her sewing machine after tailoring training"),
+  vslaGroup: p("vsla-group-sokoto", "Village savings group members seated on mats during a meeting"),
 } satisfies Record<string, LhiPhoto>;
 
 export type LhiPhotoKey = keyof typeof LHI_PHOTOS;
