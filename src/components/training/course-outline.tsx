@@ -96,7 +96,7 @@ export function CourseOutline({
               <Award className="h-6 w-6 shrink-0 text-primary" />
               <div>
                 <p className="font-bold text-foreground">Final assessment &amp; certificate</p>
-                <p className="text-sm text-muted-foreground">Score 80% or more to receive your certificate.</p>
+                <p className="text-sm text-muted-foreground">Score 100% to receive your certificate. You can retake it as many times as you need.</p>
               </div>
             </Link>
           ) : (

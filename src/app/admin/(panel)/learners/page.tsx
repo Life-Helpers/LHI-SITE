@@ -70,7 +70,7 @@ export default async function LearnersPage({ searchParams }: { searchParams: Pro
                               Certified · {p.score}%
                             </a>
                           ) : (
-                            `${p.completed.length}/${c.lessons.length} lessons`
+                            `${p.completed.length}/${c.lessons.length} lessons${p.attempts ? ` · ${p.attempts} attempt${p.attempts > 1 ? "s" : ""}, last ${p.lastScore}%` : ""}`
                           )}
                         </span>
                       </div>

@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
   }
 
   const incorrect = graded.results.filter((r) => !r.correct).map((r) => r.id);
+  await updateLearnerProgress(learner.id, courseId, (p) => ({ ...p, attempts: (p.attempts ?? 0) + 1, lastScore: graded.score }));
   if (!graded.passed) {
     return NextResponse.json({ passed: false, score: graded.score, passMark: graded.course.passMark, incorrect });
   }

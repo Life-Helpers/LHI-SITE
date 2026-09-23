@@ -454,6 +454,9 @@ export interface LearnerCourseProgress {
   completed: string[];
   certificateId?: string;
   score?: number;
+  /** Final-assessment attempts and the latest score. */
+  attempts?: number;
+  lastScore?: number;
   updatedAt?: string;
 }
 

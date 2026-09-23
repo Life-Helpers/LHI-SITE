@@ -108,11 +108,23 @@ export function Assessment({
           <XCircle className="h-5 w-5 shrink-0 text-primary" />
           <div className="text-sm">
             <p className="font-bold text-foreground">
-              You scored {result.score}%. The pass mark is {result.passMark}%.
+              You scored {result.score}%. You need {result.passMark}% to earn your certificate.
             </p>
             <p className="mt-1 text-muted-foreground">
-              {result.incorrect.length} {result.incorrect.length === 1 ? "answer needs" : "answers need"} another look (highlighted below). Review the lessons and try again.
+              {result.incorrect.length} {result.incorrect.length === 1 ? "answer needs" : "answers need"} another look (highlighted below). Review
+              the lessons, then retake the assessment.
             </p>
+            <button
+              type="button"
+              onClick={() => {
+                setResult(null);
+                setAnswers({});
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
+            >
+              <RotateCcw className="h-4 w-4" /> Retake the assessment
+            </button>
           </div>
         </div>
       )}
@@ -176,11 +188,19 @@ export function Assessment({
           {pending && <Loader2 className="h-4 w-4 animate-spin" />} Submit assessment
         </button>
         <span className="text-sm text-muted-foreground">
-          {answered} of {questions.length} answered · pass mark {passMark}%
+          {answered} of {questions.length} answered · pass mark {passMark}% (all questions correct)
         </span>
         {result && !result.passed && (
-          <button type="button" onClick={() => setResult(null)} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-            <RotateCcw className="h-4 w-4" /> Clear result
+          <button
+            type="button"
+            onClick={() => {
+              setResult(null);
+              setAnswers({});
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw className="h-4 w-4" /> Retake from the start
           </button>
         )}
       </div>
