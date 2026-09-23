@@ -36,7 +36,7 @@ export const fr: Dictionary = {
     socialInclusionDesc: "Participation civique & inclusion du handicap",
     protection: "Protection",
     protectionDesc: "Réponse aux violences basées sur le genre & sauvegarde",
-    radioAdvocacy: "LHI Radio",
+    radioAdvocacy: "Voices of the People (VOP)",
   },
   impactMenu: {
     blog: "Blog",
@@ -45,7 +45,7 @@ export const fr: Dictionary = {
     projectsInterventions: "Projets et interventions",
     eventsUpdates: "Événements et actualités",
     newsletter: "Bulletin d'information",
-    radioStory: "Récit radiophonique",
+    radioStory: "Voices of the People (VOP)",
   },
   accessibility: {
     settingsLabel: "Paramètres d'accessibilité",
@@ -122,17 +122,17 @@ export const fr: Dictionary = {
     latest: {
       heading: "Actualités de LHI",
       subtitle: "Événements, annonces et récits du terrain.",
-      eventsTitle: "Événements et actualités",
+      eventsTitle: "Événements et journées internationales",
       eventsNote:
-        "Nous n'inventons pas de dates d'événements — cette section listera les véritables événements et annonces de LHI dès qu'ils seront programmés.",
-      eventsCta: "Voir Événements et actualités",
-      blogTitle: "Blog",
+        "Les événements de LHI et les journées internationales liées à notre travail, à ajouter à votre agenda.",
+      eventsCta: "Voir l'agenda",
+      blogTitle: "Blog et bulletin",
       blogNote:
-        "Aucun article n'a encore été publié — les récits et actualités de terrain apparaîtront ici dès qu'ils existeront.",
-      blogCta: "Voir le blog",
+        "Actualités de terrain, récits de réussite, nos bulletins et magazines de projet, avec téléchargements PDF gratuits.",
+      blogCta: "Lire les dernières nouvelles",
     },
     radio: {
-      eyebrow: "Émission de radio",
+      eyebrow: "Voices of the People (VOP)",
       heading: "WeSpeak (Muyi Magana)",
       body: "L'émission hebdomadaire de LHI sur Radio Nigeria Royal FM 101.5, Sokoto, chaque mardi de 11 h à 12 h : santé, éducation, moyens de subsistance, agriculture et égalité des genres, avec un espace pour vos questions.",
       cta: "En savoir plus",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Calendar, Clock, Tag, User } from "lucide-react";
@@ -9,10 +9,29 @@ import { isUnoptimized } from "@/lib/image";
 import type { CmsPost } from "@/lib/cms/types";
 import { formatPostDate, readingTime } from "@/lib/posts";
 
-export function BlogFeed({ posts }: { posts: CmsPost[] }) {
+const PAGE_SIZE = 12;
+
+export function BlogFeed({ posts, paginate = false }: { posts: CmsPost[]; paginate?: boolean }) {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [limit, setLimit] = useState(PAGE_SIZE);
   const categories = ["All", ...Array.from(new Set(posts.map((p) => p.category)))];
-  const filtered = posts.filter((p) => (selectedCategory === "All" ? true : p.category === selectedCategory));
+  const matching = posts.filter((p) => (selectedCategory === "All" ? true : p.category === selectedCategory));
+  const filtered = paginate ? matching.slice(0, limit) : matching;
+
+  // Deep links such as /blog?category=Newsletter open with that category selected.
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get("category");
+    if (wanted && posts.some((p) => p.category === wanted)) setSelectedCategory(wanted);
+  }, [posts]);
+
+  const choose = (cat: string) => {
+    setSelectedCategory(cat);
+    setLimit(PAGE_SIZE);
+    const url = new URL(window.location.href);
+    if (cat === "All") url.searchParams.delete("category");
+    else url.searchParams.set("category", cat);
+    window.history.replaceState(null, "", url);
+  };
 
   if (posts.length === 0) {
     return <p className="py-12 text-center text-sm text-muted-foreground">No articles have been published yet.</p>;
@@ -26,7 +45,7 @@ export function BlogFeed({ posts }: { posts: CmsPost[] }) {
             <button
               key={cat}
               type="button"
-              onClick={() => setSelectedCategory(cat)}
+              onClick={() => choose(cat)}
               aria-pressed={selectedCategory === cat}
               className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
                 selectedCategory === cat
@@ -113,6 +132,18 @@ export function BlogFeed({ posts }: { posts: CmsPost[] }) {
           </article>
         ))}
       </div>
+
+      {paginate && matching.length > filtered.length && (
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => setLimit((n) => n + PAGE_SIZE)}
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:border-primary hover:text-primary"
+          >
+            Load more ({matching.length - filtered.length} more)
+          </button>
+        </div>
+      )}
     </div>
   );
 }

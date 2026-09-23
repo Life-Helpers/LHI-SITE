@@ -49,13 +49,13 @@ export function RadioStation({ episodes }: { episodes: RadioEpisode[] }) {
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1fr_1.2fr] lg:px-8">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em]">
-              <RadioIcon className="h-3.5 w-3.5" /> LHI Radio
+              <RadioIcon className="h-3.5 w-3.5" /> Voices of the People (VOP)
             </p>
             <h1 className="mt-4 font-serif-display text-4xl font-light leading-tight sm:text-6xl">
-              Voices that <em className="italic text-[#ffb347]">change lives.</em>
+              Voices of <em className="italic text-[#ffb347]">the People.</em>
             </h1>
             <p className="mt-4 max-w-xl text-base text-white/80">
-              Listen again to LHI&apos;s radio programmes: health, education, livelihood, agriculture and gender equity, with questions and feedback from
+              Voices of the People (VOP) is LHI&apos;s community radio platform. Listen again to our programmes: health, education, livelihood, agriculture and gender equity, with questions and feedback from
               communities across Sokoto State.
             </p>
             {current ? (

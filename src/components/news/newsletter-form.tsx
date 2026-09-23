@@ -7,7 +7,7 @@ import { useNewsletterSignup } from "@/components/news/use-newsletter";
 
 export function NewsletterForm() {
   const [email, setEmail] = useState("");
-  const { status, error, subscribe } = useNewsletterSignup("news-updates");
+  const { status, error, subscribe } = useNewsletterSignup("blog");
   const loading = status === "loading";
 
   const handleSubmit = async (e: React.FormEvent) => {

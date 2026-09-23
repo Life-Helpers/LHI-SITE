@@ -423,7 +423,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
       { name: "summary", label: "Summary", type: "textarea", required: true, help: "One or two sentences shown on the event card." },
       { name: "location", label: "Location", type: "text", help: "e.g. Goshen Development Center, Sokoto, or Online" },
-      { name: "link", label: "More information link", type: "text", help: "Optional. A page on this site (e.g. /news-updates/…) or a registration link (https://…)." },
+      { name: "link", label: "More information link", type: "text", help: "Optional. A page on this site (e.g. /blog/…) or a registration link (https://…)." },
       { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "published", label: "Published" }, { value: "draft", label: "Draft" }] },
       { name: "startDate", label: "Start date", type: "date", sidebar: true, required: true },
       { name: "endDate", label: "End date", type: "date", sidebar: true, help: "Leave empty for a one-day event." },
@@ -488,12 +488,14 @@ export type SubmissionType =
   | "job-application"
   | "vendor-registration"
   | "tender-response"
+  | "feedback"
   | "newsletter";
 export const SUBMISSION_TYPE_LABELS: Record<SubmissionType, string> = {
   "job-application": "Job applications",
   "tender-response": "Vendor bids",
   "vendor-registration": "Vendor registration",
   "consortium-eoi": "Consortium / RFP",
+  feedback: "Feedback",
   contact: "Contact",
   volunteer: "Volunteer",
   newsletter: "Newsletter",

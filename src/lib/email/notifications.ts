@@ -68,6 +68,14 @@ const ACKNOWLEDGEMENTS: Record<SubmissionType, (s: Submission) => { subject: str
       "LHI never charges fees for tenders.",
     ],
   }),
+  feedback: (s) => ({
+    subject: "We've received your feedback",
+    heading: "Thank you for your feedback.",
+    paragraphs: [
+      `Your ${(s.fields.feedbackType || "feedback").toLowerCase()} has been logged with reference ${s.id.slice(0, 8).toUpperCase()}. The right team will review it confidentially and respond through the channel you chose.`,
+      `To report a safeguarding concern, please use our confidential channels: email ${siteConfig.contact.pseaEmail} or call ${siteConfig.contact.feedbackLine}.`,
+    ],
+  }),
   newsletter: () => ({
     subject: `Welcome to the ${siteConfig.name} newsletter`,
     heading: "Thank you for subscribing.",
@@ -92,7 +100,7 @@ export async function notifySubmission(submission: Submission) {
         paragraphs: ack.paragraphs,
         ...(submission.type === "newsletter"
           ? {
-              cta: { label: "Read our latest stories", url: absoluteUrl("/news-updates") },
+              cta: { label: "Read our latest stories", url: absoluteUrl("/blog") },
               footer: { text: "Don't want these emails?", url: await unsubscribeUrl(submission.email), linkLabel: "Unsubscribe" },
             }
           : {}),

@@ -34,7 +34,7 @@ export const MAGAZINE_POSTS: CmsPost[] = [
 
 Covering September 2025 to February 2026, the magazine captures a season of laying strong foundations and celebrating the first fruits of resilience, growth and renewed hope.
 
-[Download the full magazine (PDF)](${MAGAZINE_PDF})
+[Download the full magazine (PDF)](${MAGAZINE_PDF}) · [Project fact sheet](/fact-sheet#resilience) · [Farmer Service Center brochure](/brochure)
 
 ## Executive message
 

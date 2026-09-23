@@ -34,7 +34,7 @@ export const yo: Dictionary = {
     socialInclusionDesc: "Ìkópa àwùjọ & ìdàpọ̀ àwọn aláàbọ̀-ara",
     protection: "Ààbò",
     protectionDesc: "Ìdáhùn sí ìwà ipá ìbálòpọ̀ & ìdáàbòbò",
-    radioAdvocacy: "LHI Radio",
+    radioAdvocacy: "Voices of the People (VOP)",
   },
   impactMenu: {
     blog: "Bùlọ́ọ̀gì",
@@ -43,7 +43,7 @@ export const yo: Dictionary = {
     projectsInterventions: "Àwọn Iṣẹ́ àti Ìdásí",
     eventsUpdates: "Àwọn Ìṣẹ̀lẹ̀ àti Ìwífún",
     newsletter: "Ìwé Ìròyìn",
-    radioStory: "Ìtàn Rédíò",
+    radioStory: "Voices of the People (VOP)",
   },
   accessibility: {
     settingsLabel: "Ètò Ìrọ̀rùn Wíwọlé",
@@ -119,17 +119,17 @@ export const yo: Dictionary = {
     latest: {
       heading: "Àwọn Ìwífún Tuntun láti ọ̀dọ̀ LHI",
       subtitle: "Àwọn ìṣẹ̀lẹ̀, ìkéde, àti àwọn ìtàn láti pápá iṣẹ́.",
-      eventsTitle: "Àwọn Ìṣẹ̀lẹ̀ àti Ìwífún",
+      eventsTitle: "Events & Observance Days",
       eventsNote:
-        "A kò dá ọjọ́ ìṣẹ̀lẹ̀ mọ̀ - apá yìí yóò ṣe àkójọ àwọn ìṣẹ̀lẹ̀ àti ìkéde LHI tòótọ́ ní kété tí a bá ṣètò wọn.",
-      eventsCta: "Wo Àwọn Ìṣẹ̀lẹ̀ àti Ìwífún",
-      blogTitle: "Bùlọ́ọ̀gì",
+        "Upcoming LHI events and the international days behind our work, ready to add to your calendar.",
+      eventsCta: "See the calendar",
+      blogTitle: "Blog & Newsletter",
       blogNote:
-        "Kò sí àpilẹ̀kọ kan tí a ti tẹ̀ jáde síbẹ̀ - àwọn ìtàn àti ìwífún láti pápá iṣẹ́ yóò farahàn níbí ní kété tí wọ́n bá wà.",
-      blogCta: "Wo Bùlọ́ọ̀gì",
+        "Field news, success stories, our newsletters, Helpers Digest bulletins and project magazines, with free PDF downloads.",
+      blogCta: "Read the latest",
     },
     radio: {
-      eyebrow: "Ìpolongo Rédíò",
+      eyebrow: "Voices of the People (VOP)",
       heading: "WeSpeak (Muyi Magana)",
       body: "LHI's weekly radio programme on Radio Nigeria Royal FM 101.5, Sokoto, every Tuesday 11 AM – 12 PM: health, education, livelihood, agriculture and gender equity, with space for your questions and feedback.",
       cta: "Kọ́ Sí I",

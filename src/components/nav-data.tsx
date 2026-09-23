@@ -3,6 +3,8 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Award,
+  BarChart3,
+  BookMarked,
   CalendarDays,
   BookOpen,
   Compass,
@@ -10,6 +12,7 @@ import {
   FolderGit2,
   GraduationCap,
   Handshake,
+  MessageSquareHeart,
   HeartHandshake,
   HeartPulse,
   Newspaper,
@@ -42,6 +45,8 @@ export type NavLink = {
   icon?: LucideIcon;
   tag?: string;
   image?: string;
+  /** Column in the Impact mega menu. */
+  group?: "accountability" | "media";
 };
 
 export type FeaturedNavStory = {
@@ -178,7 +183,7 @@ export const whatWeDoCards: NavCard[] = [
 ];
 
 export const whatWeDoExtra: NavLink = {
-  label: "LHI Radio",
+  label: "Voices of the People (VOP)",
   href: "/radio",
   description: "Weekly on Royal FM 101.5 Sokoto, Tuesdays 11 AM",
   icon: Radio,
@@ -189,65 +194,21 @@ export const whatWeDoFeatured: FeaturedNavStory = {
   subtitle: "LHI's weekly radio programme on health, education, livelihood, agriculture and gender equity.",
   href: "/radio",
   image: LHI_PHOTOS.solarRadioFarmer.src,
-  tag: "Radio Advocacy",
+  tag: "Voices of the People",
 };
 
 export const impactLinks: NavLink[] = [
-  {
-    label: "Annual Reports",
-    href: "/impact",
-    description: "Organisation-wide results since 2004",
-    icon: FileText,
-    tag: "Accountability",
-  },
-  {
-    label: "Projects & Interventions",
-    href: "/interventions/projectandintervention",
-    description: "38 profiled projects with dossiers & PDF factsheets",
-    icon: FolderGit2,
-    tag: "Active Grants",
-  },
-  {
-    label: "Partner & Bidder Portal",
-    href: "/partner-portal",
-    description: "Compliance documents & consortium / RFP expression of interest",
-    icon: Handshake,
-    tag: "For Donors",
-  },
-  {
-    label: "Project Magazines",
-    href: "/project-magazines",
-    description: "Flip through our project magazines online",
-    icon: BookOpen,
-    tag: "Read",
-  },
-  {
-    label: "Success Stories",
-    href: "/success-stories",
-    description: "Stories from our magazines and newsletter",
-    icon: Award,
-    tag: "Human Stories",
-  },
-  {
-    label: "LHI Field Blog",
-    href: "/blog",
-    description: "All news, stories and magazine features",
-    icon: BookOpen,
-    tag: "Insights",
-  },
-  {
-    label: "News & Bulletins",
-    href: "/news-updates",
-    description: "News, the LHI newsletter and project magazines",
-    icon: Newspaper,
-    tag: "Dispatches",
-  },  {
-    label: "Events & Observance Days",
-    href: "/events",
-    description: "Upcoming events and international days, add to calendar",
-    icon: CalendarDays,
-    tag: "Calendar",
-  },
+  { label: "Annual Reports", href: "/impact", description: "Organisation-wide results since 2004", icon: FileText, tag: "Accountability", group: "accountability" },
+  { label: "Fact Sheet", href: "/fact-sheet", description: "Project results in numbers, reports and presentations", icon: BarChart3, tag: "Results", group: "accountability" },
+  { label: "Brochure", href: "/brochure", description: "The Noma Tushen Arziki Farmer Service Center resilience hub", icon: BookMarked, tag: "Read", group: "accountability" },
+  { label: "Feedback", href: "/feedback", description: "Compliments, suggestions and complaints, answered by our team", icon: MessageSquareHeart, tag: "Your voice", group: "accountability" },
+  { label: "Projects & Interventions", href: "/interventions/projectandintervention", description: "38 profiled projects with dossiers & PDF factsheets", icon: FolderGit2, tag: "Active Grants", group: "accountability" },
+  { label: "Partner & Bidder Portal", href: "/partner-portal", description: "Compliance documents & consortium / RFP expression of interest", icon: Handshake, tag: "For Donors", group: "accountability" },
+  { label: "Project Magazines", href: "/project-magazines", description: "Flip through our magazines and Helpers Digest bulletins", icon: BookOpen, tag: "Read", group: "media" },
+  { label: "Success Stories", href: "/success-stories", description: "Stories from our magazines and newsletters", icon: Award, tag: "Human Stories", group: "media" },
+  { label: "LHI Blog & Newsletter", href: "/blog", description: "News, field stories, newsletters and publications", icon: Newspaper, tag: "Dispatches", group: "media" },
+  { label: "Events & Observance Days", href: "/events", description: "Upcoming events and international days, add to calendar", icon: CalendarDays, tag: "Calendar", group: "media" },
+  { label: "Voices of the People (VOP)", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "media" },
 ];
 
 export const impactFeatured: {
@@ -385,76 +346,19 @@ export function useLocalizedNav() {
   };
 
   const impact: NavLink[] = [
-    {
-      label: t.impactMenu.annualReport,
-      href: "/impact",
-      description: "Organisation-wide results since 2004",
-      icon: FileText,
-      tag: "Accountability",
-    },
-    {
-      label: t.impactMenu.projectsInterventions,
-      href: "/interventions/projectandintervention",
-      description: "38 profiled projects with dossiers & PDF factsheets",
-      icon: FolderGit2,
-      tag: "Active Grants",
-    },
-    {
-      label: "Partner & Bidder Portal",
-      href: "/partner-portal",
-      description: "Compliance documents & consortium / RFP expression of interest",
-      icon: Handshake,
-      tag: "For Donors",
-    },
-    {
-      label: "Project Magazines",
-      href: "/project-magazines",
-      description: "Flip through our project magazines online",
-      icon: BookOpen,
-      tag: "Read",
-    },
-    {
-      label: t.impactMenu.successStories,
-      href: "/success-stories",
-      description: "Stories from our magazines and newsletter",
-      icon: Award,
-      tag: "Human Stories",
-    },
-    {
-      label: t.impactMenu.blog,
-      href: "/blog",
-      description: "All news, stories and magazine features",
-      icon: BookOpen,
-      tag: "Insights",
-    },
-    {
-      label: t.impactMenu.newsletter,
-      href: "/news-updates",
-      description: "News, the LHI newsletter and project magazines",
-      icon: Newspaper,
-      tag: "Dispatches",
-    },
-    {
-      label: "Events & Observance Days",
-      href: "/events",
-      description: "Upcoming events and international days, add to calendar",
-      icon: CalendarDays,
-      tag: "Calendar",
-    },
-    {
-      label: "Humanitarian Training",
-      href: "/get-involved/training",
-      description: "Free safeguarding courses with certificates",
-      icon: GraduationCap,
-      tag: "Learn",
-    },
-    {
-      label: "Careers & Procurement",
-      href: "/careers",
-      description: "Vacancies, vendor requests and registration",
-      icon: Users,
-      tag: "Work with us",
-    },
+    { label: t.impactMenu.annualReport, href: "/impact", description: "Organisation-wide results since 2004", icon: FileText, tag: "Accountability", group: "accountability" },
+    { label: "Fact Sheet", href: "/fact-sheet", description: "Project results in numbers, reports and presentations", icon: BarChart3, tag: "Results", group: "accountability" },
+    { label: "Brochure", href: "/brochure", description: "The Noma Tushen Arziki Farmer Service Center resilience hub", icon: BookMarked, tag: "Read", group: "accountability" },
+    { label: "Feedback", href: "/feedback", description: "Compliments, suggestions and complaints, answered by our team", icon: MessageSquareHeart, tag: "Your voice", group: "accountability" },
+    { label: t.impactMenu.projectsInterventions, href: "/interventions/projectandintervention", description: "38 profiled projects with dossiers & PDF factsheets", icon: FolderGit2, tag: "Active Grants", group: "accountability" },
+    { label: "Partner & Bidder Portal", href: "/partner-portal", description: "Compliance documents & consortium / RFP expression of interest", icon: Handshake, tag: "For Donors", group: "accountability" },
+    { label: "Project Magazines", href: "/project-magazines", description: "Flip through our magazines and Helpers Digest bulletins", icon: BookOpen, tag: "Read", group: "media" },
+    { label: t.impactMenu.successStories, href: "/success-stories", description: "Stories from our magazines and newsletters", icon: Award, tag: "Human Stories", group: "media" },
+    { label: "LHI Blog & Newsletter", href: "/blog", description: "News, field stories, newsletters and publications", icon: Newspaper, tag: "Dispatches", group: "media" },
+    { label: "Events & Observance Days", href: "/events", description: "Upcoming events and international days, add to calendar", icon: CalendarDays, tag: "Calendar", group: "media" },
+    { label: "Voices of the People (VOP)", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "media" },
+    { label: "Humanitarian Training", href: "/get-involved/training", description: "Free safeguarding courses with certificates", icon: GraduationCap, tag: "Learn", group: "media" },
+    { label: "Careers & Procurement", href: "/careers", description: "Vacancies, vendor requests and registration", icon: Users, tag: "Work with us", group: "media" },
   ];
 
   return {

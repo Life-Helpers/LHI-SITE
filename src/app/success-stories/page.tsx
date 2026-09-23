@@ -49,7 +49,7 @@ export default async function SuccessStoriesPage() {
                 <Link href={`/blog/${magazine.slug}`} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
                   Read the feature
                 </Link>
-                <Link href="/news-updates#publications" className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-card">
+                <Link href="/blog#publications" className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-card">
                   <Download className="h-4 w-4" /> All magazines (PDF)
                 </Link>
               </div>

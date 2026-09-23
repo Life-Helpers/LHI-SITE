@@ -34,7 +34,7 @@ export const ha: Dictionary = {
     socialInclusionDesc: "Shiga cikin al'umma & haɗa nakasassu",
     protection: "Kariya",
     protectionDesc: "Magance cin zarafin mata & tsaro daga cin zarafi",
-    radioAdvocacy: "LHI Radio",
+    radioAdvocacy: "Voices of the People (VOP)",
   },
   impactMenu: {
     blog: "Shafin Labarai",
@@ -43,7 +43,7 @@ export const ha: Dictionary = {
     projectsInterventions: "Ayyuka da Shiga Tsakani",
     eventsUpdates: "Abubuwan da Suka Faru & Sabuntawa",
     newsletter: "Wasiƙar Labarai",
-    radioStory: "Labarin Rediyo",
+    radioStory: "Voices of the People (VOP)",
   },
   accessibility: {
     settingsLabel: "Saitunan Samun Dama",
@@ -119,17 +119,17 @@ export const ha: Dictionary = {
     latest: {
       heading: "Sabbin Labarai daga LHI",
       subtitle: "Abubuwan da suka faru, sanarwa, da labarai daga fage.",
-      eventsTitle: "Abubuwan da Suka Faru & Sabuntawa",
+      eventsTitle: "Events & Observance Days",
       eventsNote:
-        "Ba mu ƙirƙirar ranakun taro ba — wannan sashe zai lissafa ainihin abubuwan da LHI za ta yi da zarar an tsara su.",
-      eventsCta: "Duba Abubuwan da Suka Faru",
-      blogTitle: "Shafin Labarai",
+        "Upcoming LHI events and the international days behind our work, ready to add to your calendar.",
+      eventsCta: "See the calendar",
+      blogTitle: "Blog & Newsletter",
       blogNote:
-        "Ba a wallafa wata kasida ba tukuna — labarai daga fage za su bayyana nan da zarar sun kasance.",
-      blogCta: "Duba Shafin Labarai",
+        "Field news, success stories, our newsletters, Helpers Digest bulletins and project magazines, with free PDF downloads.",
+      blogCta: "Read the latest",
     },
     radio: {
-      eyebrow: "Shirin Rediyo",
+      eyebrow: "Voices of the People (VOP)",
       heading: "WeSpeak (Muyi Magana)",
       body: "Shirin rediyo na mako-mako na LHI a Rediyo Najeriya Royal FM 101.5, Sokoto, kowace Talata ƙarfe 11 zuwa 12 na rana: lafiya, ilimi, sana'o'i, noma da daidaiton jinsi, tare da damar tambayoyi da ra'ayoyinku.",
       cta: "Ƙarin Bayani",

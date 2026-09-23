@@ -193,7 +193,7 @@ export function RetroRadio({ radio, total, size = "compact" }: { radio: Radio; t
         </div>
         <div className="mt-2 flex items-center justify-between px-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#f4d9a8]/80">
           <span className="flex items-center gap-1.5">
-            <RadioIcon className="h-3.5 w-3.5" /> LHI Radio
+            <RadioIcon className="h-3.5 w-3.5" /> Voices of the People
           </span>
           <span>{total > 0 ? `Episode ${index + 1} of ${total}` : "Royal FM 101.5"}</span>
         </div>

@@ -148,6 +148,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
       "Noma Tushen Arziki Hub (Wamakko) and Gidan Arziki Farmer Service Centre (Batagarawa), plus the AgriFMIS digital farmer registry.",
       "Gidan Arziki: agro-processing and groundnut oil extraction, cold room, charging station, car wash, tool rental and a sewing business incubator (30 trainees).",
       "Community Facility Management Committee of 20 members (12 male, 8 female) and a reconstructed modern slaughterhouse in Batagarawa.",
+      "Reached 1,657 female-headed households (29.1%) and 1,384 people with disabilities (24.2%); 70% of households received smallholder farmer support and 30% cash-based transfers (see the fact sheet).",
     ],
     impactMetric:
       "5,700 households reached directly and 37,050 household members indirectly across 42 wards; Gidan Arziki earned ₦1,075,365 in April 2026 (₦486,995 profit).",

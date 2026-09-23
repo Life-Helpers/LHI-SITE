@@ -494,7 +494,7 @@ In Biu, groups were formed in 11 communities, including Bayan Tasha, Dashu, Pomp
 
 Savings knows no age: older members saved alongside young people, and in Buriya community men and women met together for their end-of-year meeting.
 
-[See the project dossier](/interventions/sif-zoa-gsla-financial-empowerment)`,
+[See the project dossier](/interventions/sif-zoa-gsla-financial-empowerment) · [View the GSLA fact sheet and presentation](/fact-sheet#gsla)`,
   },
 
   /* ------------------------------------------------------ IHP (Ebonyi) */
@@ -525,7 +525,7 @@ Scenes from the mentoring visits include:
 
 Across the programme, more than 3,200 health providers were trained across 712 PHCs and communities in Bauchi, Ebonyi, Kebbi and Sokoto States.
 
-[See the project dossier](/interventions/palladium-ihp-child-health)`,
+[See the project dossier](/interventions/palladium-ihp-child-health) · [View the IHP presentation](/fact-sheet#ihp)`,
   },
 
   /* ------------------------------------------- Agric-led livelihood (2026) */
@@ -564,7 +564,9 @@ Household surveys, focus group discussions and key informant interviews with **1
 
 ## Recommendations
 
-Improved irrigation for year-round farming; farmer cooperatives for collective bargaining; climate-smart agriculture; stronger extension services; value-chain development (processing and branding); microfinance for smallholders and women; rural roads and storage; and youth-focused agribusiness programmes.`,
+Improved irrigation for year-round farming; farmer cooperatives for collective bargaining; climate-smart agriculture; stronger extension services; value-chain development (processing and branding); microfinance for smallholders and women; rural roads and storage; and youth-focused agribusiness programmes.
+
+[See the key figures on our fact sheet](/fact-sheet#agric)`,
   },
 
   /* --------------------------------------------------- Annual Report 2024 */

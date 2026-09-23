@@ -54,7 +54,7 @@ export default function ImpactPage() {
               <a href={ANNUAL_REPORT_2024_PDF} download className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
                 <Download className="h-4 w-4" /> Download the 2024 report (PDF)
               </a>
-              <Link href="/news-updates#publications" className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-card">
+              <Link href="/blog#publications" className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-card">
                 All publications
               </Link>
             </div>

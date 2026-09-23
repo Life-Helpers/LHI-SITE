@@ -377,8 +377,8 @@ function WhatWeDoMegaMenu({
 
 /** 3. IMPACT MEGA MENU */
 function ImpactMegaMenu({ links }: { links: NavLink[] }) {
-  const reportLinks = links.slice(0, 3);
-  const mediaLinks = links.slice(3);
+  const reportLinks = links.filter((l) => l.group === "accountability");
+  const mediaLinks = links.filter((l) => l.group !== "accountability");
 
   return (
     <div className="w-full p-6">

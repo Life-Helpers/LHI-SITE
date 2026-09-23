@@ -36,7 +36,7 @@ export function NewsletterComposer({ subscriberCount, connected }: { subscriberC
           required
           rows={12}
           className={`mt-1.5 ${inputClass}`}
-          placeholder={"Write in plain text. Leave a blank line between paragraphs.\nLinks like https://lhinigeria.org/news-updates become clickable."}
+          placeholder={"Write in plain text. Leave a blank line between paragraphs.\nLinks like https://lhinigeria.org/blog become clickable."}
         />
       </label>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -46,7 +46,7 @@ export function NewsletterComposer({ subscriberCount, connected }: { subscriberC
         </label>
         <label className="block text-sm font-medium">
           Button link
-          <input name="ctaUrl" type="url" className={`mt-1.5 ${inputClass}`} placeholder="https://lhinigeria.org/news-updates" />
+          <input name="ctaUrl" type="url" className={`mt-1.5 ${inputClass}`} placeholder="https://lhinigeria.org/blog" />
         </label>
       </div>
       <p className="text-xs text-admin-muted">Every email includes the LHI header, signature and a personal unsubscribe link.</p>

@@ -35,7 +35,7 @@ export const ig: Dictionary = {
     socialInclusionDesc: "Nsonye ọha na eze & ijikọta ndị nwere nkwarụ",
     protection: "Nchebe",
     protectionDesc: "Nzaghachi ime ihe ike mmekọahụ & nchekwa",
-    radioAdvocacy: "LHI Radio",
+    radioAdvocacy: "Voices of the People (VOP)",
   },
   impactMenu: {
     blog: "Blọọgụ",
@@ -44,7 +44,7 @@ export const ig: Dictionary = {
     projectsInterventions: "Ọrụ na Nnabata Aka",
     eventsUpdates: "Mmemme na Mmelite",
     newsletter: "Akwụkwọ Akụkọ",
-    radioStory: "Akụkọ Redio",
+    radioStory: "Voices of the People (VOP)",
   },
   accessibility: {
     settingsLabel: "Ntọala Nnweta",
@@ -120,17 +120,17 @@ export const ig: Dictionary = {
     latest: {
       heading: "Akụkọ Ọhụrụ Site na LHI",
       subtitle: "Mmemme, ọkwa, na akụkọ si n'ubi ọrụ.",
-      eventsTitle: "Mmemme na Mmelite",
+      eventsTitle: "Events & Observance Days",
       eventsNote:
-        "Anyị adịghị emepụta ụbọchị mmemme - ngalaba a ga-edepụta ezigbo mmemme na ọkwa LHI ozugbo ahazi ha.",
-      eventsCta: "Lee Mmemme na Mmelite",
-      blogTitle: "Blọọgụ",
+        "Upcoming LHI events and the international days behind our work, ready to add to your calendar.",
+      eventsCta: "See the calendar",
+      blogTitle: "Blog & Newsletter",
       blogNote:
-        "Ebipụtabeghị isiokwu ọ bụla - akụkọ si n'ubi ọrụ na mmelite ga-apụta ebe a ozugbo ha dịrị.",
-      blogCta: "Lee Blọọgụ",
+        "Field news, success stories, our newsletters, Helpers Digest bulletins and project magazines, with free PDF downloads.",
+      blogCta: "Read the latest",
     },
     radio: {
-      eyebrow: "Nkwuwapụta Redio",
+      eyebrow: "Voices of the People (VOP)",
       heading: "WeSpeak (Muyi Magana)",
       body: "LHI's weekly radio programme on Radio Nigeria Royal FM 101.5, Sokoto, every Tuesday 11 AM – 12 PM: health, education, livelihood, agriculture and gender equity, with space for your questions and feedback.",
       cta: "Mụtakwuo",

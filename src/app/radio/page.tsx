@@ -12,9 +12,9 @@ import { toRadioEpisode } from "@/lib/radio";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "LHI Radio: WeSpeak (Muyi Magana)",
+  title: "Voices of the People (VOP)",
   description:
-    "Listen to Life Helpers Initiative's radio programmes. WeSpeak (Muyi Magana) airs every Tuesday, 11 AM – 12 PM on Radio Nigeria Royal FM 101.5, Sokoto.",
+    "Voices of the People (VOP): Life Helpers Initiative's community radio programmes. WeSpeak (Muyi Magana) airs every Tuesday, 11 AM – 12 PM on Radio Nigeria Royal FM 101.5, Sokoto.",
 };
 
 const features = [
@@ -93,8 +93,8 @@ export default async function RadioPage() {
             <a href="mailto:feedback@lhinigeria.org" className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-muted">
               feedback@lhinigeria.org
             </a>
-            <Link href="/news-updates" className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-muted">
-              News &amp; updates
+            <Link href="/blog" className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-muted">
+              Blog &amp; newsletter
             </Link>
           </div>
         </div>

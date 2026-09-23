@@ -38,9 +38,11 @@ export function SiteFooter() {
     { label: t.footer.impactReports, href: "/impact" },
     { label: t.impactMenu.projectsInterventions, href: "/interventions/projectandintervention" },
     { label: t.impactMenu.successStories, href: "/success-stories" },
-    { label: t.impactMenu.blog, href: "/blog" },
-    { label: t.impactMenu.newsletter, href: "/news-updates" },
+    { label: "LHI Blog & Newsletter", href: "/blog" },
     { label: "Events & Observance Days", href: "/events" },
+    { label: "Fact Sheet", href: "/fact-sheet" },
+    { label: "Brochure", href: "/brochure" },
+    { label: "Feedback", href: "/feedback" },
   ];
 
   const getInvolvedLinks = [
