@@ -5,7 +5,7 @@ import { requirePageUser } from "@/lib/cms/auth";
 export const metadata = { title: "Profile" };
 
 export default async function ProfilePage() {
-  const user = await requirePageUser("author");
+  const user = await requirePageUser();
   return (
     <>
       <PageHeader title="Profile" breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Profile" }]} />

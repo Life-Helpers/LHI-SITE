@@ -17,7 +17,7 @@ export default async function SubmissionsPage({
 }: {
   searchParams: Promise<{ type?: string; view?: string }>;
 }) {
-  await requirePageUser("editor");
+  await requirePageUser("submissions");
   const { type = "all", view = "inbox" } = await searchParams;
   const all = await readStore("submissions");
   const list = all.filter(

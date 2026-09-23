@@ -6,6 +6,7 @@ import path from "node:path";
 import type {
   ActivityEntry,
   Certificate,
+  CmsRole,
   CmsSettings,
   CmsUser,
   Learner,
@@ -14,6 +15,7 @@ import type {
   PostLikes,
   Submission,
 } from "@/lib/cms/schema";
+import { BUILT_IN_ROLES } from "@/lib/cms/schema";
 import {
   seedDocuments,
   seedInterventions,
@@ -49,6 +51,7 @@ interface StoreShape extends CollectionRecords {
   likes: PostLikes;
   comments: PostComment;
   learners: Learner;
+  roles: CmsRole;
 }
 
 export type StoreName = keyof StoreShape;
@@ -70,6 +73,7 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   likes: () => [],
   comments: () => [],
   learners: () => [],
+  roles: () => structuredClone(BUILT_IN_ROLES),
 };
 
 const cache = new Map<string, { mtimeMs: number; data: unknown }>();

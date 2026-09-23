@@ -2,13 +2,13 @@ import { LearnerActions } from "@/components/cms/learner-actions";
 import { Card, formatDate, PageHeader } from "@/components/cms/ui";
 import { COURSES } from "@/data/training/courses";
 import { requirePageUser } from "@/lib/cms/auth";
-import { hasRole } from "@/lib/cms/schema";
+import { can } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
 export const metadata = { title: "Learners" };
 
 export default async function LearnersPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const user = await requirePageUser("editor");
+  const user = await requirePageUser("training");
   const { q = "" } = await searchParams;
   const all = (await readStore("learners")).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const query = q.trim().toLowerCase();
@@ -82,7 +82,7 @@ export default async function LearnersPage({ searchParams }: { searchParams: Pro
                 })}
                 {Object.keys(l.progress).length === 0 && <li className="text-xs text-admin-muted">No lessons started yet.</li>}
               </ul>
-              <LearnerActions id={l.id} email={l.email} canDelete={hasRole(user.role, "administrator")} />
+              <LearnerActions id={l.id} email={l.email} canDelete={can(user, "training.manage")} />
             </li>
           ))}
           {list.length === 0 && <li className="px-5 py-12 text-center text-sm text-admin-muted">No learners yet.</li>}

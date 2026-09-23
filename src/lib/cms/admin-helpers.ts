@@ -3,16 +3,16 @@ import "server-only";
 import { notFound } from "next/navigation";
 
 import { requirePageUser } from "@/lib/cms/auth";
-import { COLLECTIONS, isCollectionName, type FieldDef } from "@/lib/cms/schema";
+import { can, COLLECTIONS, isCollectionName, type FieldDef } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
 export async function loadCollection(name: string) {
   if (!isCollectionName(name)) notFound();
   const def = COLLECTIONS[name];
-  const user = await requirePageUser(def.minRole);
+  const user = await requirePageUser(def.permission);
   let items = (await readStore(name)) as unknown as Record<string, unknown>[];
   // Authors only see and manage their own posts.
-  if (name === "posts" && user.role === "author") items = items.filter((i) => i.authorId === user.id);
+  if (name === "posts" && !can(user, "posts.all")) items = items.filter((i) => i.authorId === user.id);
   return { def, user, items };
 }
 

@@ -6,7 +6,7 @@ import { readSettings } from "@/lib/cms/store";
 export const metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
-  await requirePageUser("administrator");
+  await requirePageUser("settings");
   return (
     <>
       <PageHeader

@@ -28,6 +28,7 @@ import {
   Moon,
   Search,
   Settings,
+  ShieldCheck,
   Sun,
   UserCircle,
   Users,
@@ -35,13 +36,13 @@ import {
 } from "lucide-react";
 
 import { logoutAction } from "@/app/admin/actions";
-import { hasRole, ROLE_LABELS, type PublicUser, type Role } from "@/lib/cms/schema";
+import { can, type Permission, type PublicUser } from "@/lib/cms/schema";
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
-  minRole: Role;
+  permission?: Permission;
   badge?: number;
 }
 
@@ -52,51 +53,52 @@ interface NavGroup {
 
 function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
   return [
-    { label: "Home", items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard, minRole: "author" }] },
+    { label: "Home", items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard }] },
     {
       label: "Content",
       items: [
-        { label: "Posts", href: "/admin/content/posts", icon: FileText, minRole: "author" },
-        { label: "Media Library", href: "/admin/media", icon: ImageIcon, minRole: "author" },
-        { label: "Comments", href: "/admin/comments", icon: MessageSquare, minRole: "editor", badge: pendingComments },
-        { label: "Radio Episodes", href: "/admin/content/episodes", icon: Radio, minRole: "editor" },
+        { label: "Posts", href: "/admin/content/posts", icon: FileText, permission: "posts.own" },
+        { label: "Media Library", href: "/admin/media", icon: ImageIcon, permission: "media" },
+        { label: "Comments", href: "/admin/comments", icon: MessageSquare, permission: "comments", badge: pendingComments },
+        { label: "Radio Episodes", href: "/admin/content/episodes", icon: Radio, permission: "episodes" },
       ],
     },
     {
       label: "Programmes",
       items: [
-        { label: "Interventions", href: "/admin/content/interventions", icon: FolderKanban, minRole: "editor" },
-        { label: "Map States", href: "/admin/content/states", icon: Map, minRole: "editor" },
+        { label: "Interventions", href: "/admin/content/interventions", icon: FolderKanban, permission: "interventions" },
+        { label: "Map States", href: "/admin/content/states", icon: Map, permission: "states" },
       ],
     },
     {
       label: "Partnerships",
       items: [
-        { label: "Partners & Logos", href: "/admin/content/partners", icon: Handshake, minRole: "editor" },
-        { label: "Compliance Docs", href: "/admin/content/documents", icon: FileCheck2, minRole: "editor" },
-        { label: "Submissions", href: "/admin/submissions", icon: Inbox, minRole: "editor", badge: newSubmissions },
+        { label: "Partners & Logos", href: "/admin/content/partners", icon: Handshake, permission: "partners" },
+        { label: "Compliance Docs", href: "/admin/content/documents", icon: FileCheck2, permission: "documents" },
+        { label: "Submissions", href: "/admin/submissions", icon: Inbox, permission: "submissions", badge: newSubmissions },
       ],
     },
     {
       label: "Recruitment & Procurement",
       items: [
-        { label: "Jobs & Vacancies", href: "/admin/content/jobs", icon: BriefcaseBusiness, minRole: "editor" },
-        { label: "Vendor Requests", href: "/admin/content/tenders", icon: Gavel, minRole: "editor" },
+        { label: "Jobs & Vacancies", href: "/admin/content/jobs", icon: BriefcaseBusiness, permission: "jobs" },
+        { label: "Vendor Requests", href: "/admin/content/tenders", icon: Gavel, permission: "tenders" },
       ],
     },
     {
       label: "Training",
       items: [
-        { label: "Learners", href: "/admin/learners", icon: Users, minRole: "editor" },
-        { label: "Certificates", href: "/admin/certificates", icon: GraduationCap, minRole: "editor" },
+        { label: "Learners", href: "/admin/learners", icon: Users, permission: "training" },
+        { label: "Certificates", href: "/admin/certificates", icon: GraduationCap, permission: "training" },
       ],
     },
     {
       label: "Administration",
       items: [
-        { label: "Users", href: "/admin/users", icon: Users, minRole: "administrator" },
-        { label: "Settings", href: "/admin/settings", icon: Settings, minRole: "administrator" },
-        { label: "Activity Log", href: "/admin/activity", icon: Activity, minRole: "administrator" },
+        { label: "Users", href: "/admin/users", icon: Users, permission: "users" },
+        { label: "Roles & Permissions", href: "/admin/users/roles", icon: ShieldCheck, permission: "users" },
+        { label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings" },
+        { label: "Activity Log", href: "/admin/activity", icon: Activity, permission: "activity" },
       ],
     },
   ];
@@ -144,7 +146,7 @@ export function AdminShell({
   };
 
   const nav = buildNav(newSubmissions, pendingComments)
-    .map((g) => ({ ...g, items: g.items.filter((i) => hasRole(user.role, i.minRole)) }))
+    .map((g) => ({ ...g, items: g.items.filter((i) => can(user, i.permission)) }))
     .filter((g) => g.items.length > 0);
 
   const sidebar = (compact: boolean) => (
@@ -375,7 +377,7 @@ function TopBar({ user, onMenu }: { user: PublicUser; onMenu: () => void }) {
                 <p className="truncate text-sm font-semibold">{user.name}</p>
                 <p className="truncate text-xs text-admin-muted">{user.email}</p>
                 <span className="mt-1.5 inline-block rounded-full bg-admin-primary-soft px-2 py-0.5 text-[10px] font-semibold text-admin-primary">
-                  {ROLE_LABELS[user.role]}
+                  {user.roleName}
                 </span>
               </div>
               <Link

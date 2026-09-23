@@ -4,18 +4,98 @@
  * is enough for it to appear in the editor and be persisted.
  */
 
-export type Role = "administrator" | "editor" | "author";
+/** A role id: one of the built-in roles or a custom role created in Users → Roles. */
+export type Role = string;
 
-export const ROLE_LABELS: Record<Role, string> = {
-  administrator: "Administrator",
-  editor: "Editor",
-  author: "Author",
-};
+/** Everything a team member can be allowed to do in the admin. */
+export const PERMISSION_GROUPS = [
+  {
+    label: "Content",
+    items: [
+      { id: "posts.own", label: "Write posts", help: "Create posts and edit their own." },
+      { id: "posts.all", label: "Edit everyone's posts", help: "Edit, publish and delete any post." },
+      { id: "media", label: "Upload media", help: "Upload files and use the media library." },
+      { id: "media.delete", label: "Delete media", help: "Remove files from the media library." },
+      { id: "comments", label: "Moderate comments", help: "Approve or delete reader comments." },
+      { id: "episodes", label: "Radio episodes", help: "Upload and publish radio recordings." },
+    ],
+  },
+  {
+    label: "Programmes & partnerships",
+    items: [
+      { id: "interventions", label: "Projects & interventions", help: "Manage project dossiers." },
+      { id: "states", label: "Map states", help: "Edit the operational map." },
+      { id: "partners", label: "Partners & logos", help: "Manage partner profiles." },
+      { id: "documents", label: "Compliance documents", help: "Manage the partner document library." },
+    ],
+  },
+  {
+    label: "Inbox, recruitment & procurement",
+    items: [
+      { id: "submissions", label: "View submissions", help: "Read form submissions and download CVs and bids." },
+      { id: "submissions.delete", label: "Delete submissions", help: "Permanently delete submissions." },
+      { id: "jobs", label: "Jobs & vacancies", help: "Publish and close vacancies." },
+      { id: "tenders", label: "Vendor requests", help: "Publish RFQs and tenders." },
+    ],
+  },
+  {
+    label: "Training",
+    items: [
+      { id: "training", label: "Learners & certificates", help: "View learners, progress and certificates." },
+      { id: "training.manage", label: "Manage learner accounts", help: "Reset learner passwords and delete accounts." },
+    ],
+  },
+  {
+    label: "Administration",
+    items: [
+      { id: "users", label: "Users & roles", help: "Create logins, assign roles and define roles." },
+      { id: "settings", label: "Site settings", help: "Edit site-wide settings." },
+      { id: "activity", label: "Activity log", help: "See who changed what." },
+    ],
+  },
+] as const;
 
-const ROLE_RANK: Record<Role, number> = { author: 1, editor: 2, administrator: 3 };
+export type Permission = (typeof PERMISSION_GROUPS)[number]["items"][number]["id"];
 
-export function hasRole(userRole: Role, minRole: Role) {
-  return ROLE_RANK[userRole] >= ROLE_RANK[minRole];
+export const ALL_PERMISSIONS: Permission[] = PERMISSION_GROUPS.flatMap((g) => g.items.map((i) => i.id));
+
+export interface CmsRole {
+  id: string;
+  name: string;
+  description: string;
+  permissions: Permission[];
+  /** Built-in roles can't be deleted; the Administrator role always has every permission. */
+  builtIn?: boolean;
+}
+
+export const BUILT_IN_ROLES: CmsRole[] = [
+  {
+    id: "administrator",
+    name: "Administrator",
+    description: "Full access, including users, roles and settings.",
+    permissions: ALL_PERMISSIONS,
+    builtIn: true,
+  },
+  {
+    id: "editor",
+    name: "Editor",
+    description: "Manages all content, programmes, inbox, recruitment and training.",
+    permissions: ALL_PERMISSIONS.filter((p) => !["users", "settings", "activity", "submissions.delete"].includes(p)),
+    builtIn: true,
+  },
+  {
+    id: "author",
+    name: "Author",
+    description: "Writes their own posts and uploads media.",
+    permissions: ["posts.own", "media"],
+    builtIn: true,
+  },
+];
+
+/** Permission check against a signed-in user's resolved permissions. */
+export function can(user: { permissions: readonly Permission[] } | null | undefined, permission?: Permission) {
+  if (!user) return false;
+  return !permission || user.permissions.includes(permission);
 }
 
 export type FieldType =
@@ -58,7 +138,8 @@ export interface CollectionDef {
   label: string;
   singular: string;
   description: string;
-  minRole: Role;
+  /** Permission needed to manage this collection. */
+  permission: Permission;
   titleField: string;
   /** Columns shown in the list table (field names). */
   columns: string[];
@@ -114,7 +195,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     label: "Posts",
     singular: "Post",
     description: "News, success stories, field blog, magazine features and press releases.",
-    minRole: "author",
+    permission: "posts.own",
     titleField: "title",
     columns: ["title", "category", "author", "status", "date"],
     statusField: "status",
@@ -138,7 +219,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     label: "Interventions",
     singular: "Intervention",
     description: "Projects & interventions. Feeds the project directory, dossiers, factsheets and the operational map.",
-    minRole: "editor",
+    permission: "interventions",
     titleField: "title",
     columns: ["title", "donor", "status", "states"],
     statusField: "status",
@@ -171,7 +252,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     label: "Map States",
     singular: "State",
     description: "The 11 frontline states on the operational map: offices, LGAs covered and reach.",
-    minRole: "editor",
+    permission: "states",
     titleField: "name",
     columns: ["name", "zone", "lgasCovered", "beneficiaries"],
     fixed: true,
@@ -190,7 +271,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     label: "Partners",
     singular: "Partner",
     description: "Implementing partners and donors shown in the home-page logo marquee.",
-    minRole: "editor",
+    permission: "partners",
     titleField: "name",
     columns: ["name", "category", "partnershipSince", "visible"],
     fields: [
@@ -219,7 +300,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     label: "Compliance Documents",
     singular: "Document",
     description: "Due-diligence library on the Partner & Bidder Portal (CAC, tax, audits, policies).",
-    minRole: "editor",
+    permission: "documents",
     titleField: "title",
     columns: ["title", "category", "file"],
     publicPath: () => "/partner-portal",
@@ -237,7 +318,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     label: "Jobs & Vacancies",
     singular: "Vacancy",
     description: "Vacancies shown on the Careers page. Applications (with CVs) arrive in Submissions.",
-    minRole: "editor",
+    permission: "jobs",
     titleField: "title",
     columns: ["title", "department", "location", "status", "deadline"],
     statusField: "status",
@@ -264,7 +345,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     label: "Vendor Requests",
     singular: "Vendor request",
     description: "Requests for quotation, tenders and expressions of interest on the Procurement page. Vendor responses arrive in Submissions.",
-    minRole: "editor",
+    permission: "tenders",
     titleField: "title",
     columns: ["title", "reference", "category", "status", "deadline"],
     statusField: "status",
@@ -290,7 +371,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     label: "Radio Episodes",
     singular: "Episode",
     description: "Radio programme recordings played by the home-page radio and the Radio page. Upload MP3/M4A audio up to 80 MB.",
-    minRole: "editor",
+    permission: "episodes",
     titleField: "title",
     columns: ["title", "programme", "language", "status", "date"],
     statusField: "status",
@@ -407,7 +488,11 @@ export interface CmsUser {
   lastLoginAt?: string;
 }
 
-export type PublicUser = Omit<CmsUser, "passwordHash">;
+export type PublicUser = Omit<CmsUser, "passwordHash"> & {
+  /** Resolved from the user's role at sign-in time. */
+  roleName: string;
+  permissions: Permission[];
+};
 
 export interface ActivityEntry {
   id: string;

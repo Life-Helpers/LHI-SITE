@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    await requireUser("author");
+    await requireUser("media");
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 401 });
   }
@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   let user;
   try {
-    user = await requireUser("author");
+    user = await requireUser("media");
   } catch (err) {
     return NextResponse.json({ error: err instanceof AuthError ? err.message : "Unauthorized" }, { status: 401 });
   }

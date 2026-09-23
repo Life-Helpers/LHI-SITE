@@ -19,12 +19,16 @@ import {
   loginLocked,
   recordLoginFailure,
   requireUser,
+  resolveRole,
   validatePasswordStrength,
   verifyPassword,
 } from "@/lib/cms/auth";
 import {
   COLLECTIONS,
+  ALL_PERMISSIONS,
+  can,
   isCollectionName,
+  slugify,
   type CmsSettings,
   type CmsUser,
   type PublicUser,
@@ -132,7 +136,7 @@ export async function saveItemAction(
   return guard(async () => {
     if (!isCollectionName(collection)) return { ok: false, error: "Unknown collection." };
     const def = COLLECTIONS[collection];
-    const user = await requireUser(def.minRole);
+    const user = await requireUser(def.permission);
     if (def.fixed && !originalId) return { ok: false, error: `${def.label} cannot be added.` };
 
     const { record, errors } = validateRecord(def, values);
@@ -143,7 +147,7 @@ export async function saveItemAction(
     const existing = originalId ? items.find((i) => i.id === originalId) : undefined;
     if (originalId && !existing) return { ok: false, error: "This item no longer exists." };
 
-    if (isPost && user.role === "author" && existing && existing.authorId !== user.id) {
+    if (isPost && !can(user, "posts.all") && existing && existing.authorId !== user.id) {
       return { ok: false, error: "Authors can only edit their own posts." };
     }
 
@@ -179,13 +183,13 @@ export async function deleteItemAction(collection: string, id: string): Promise<
   return guard(async () => {
     if (!isCollectionName(collection)) return { ok: false, error: "Unknown collection." };
     const def = COLLECTIONS[collection];
-    const user = await requireUser(def.minRole);
+    const user = await requireUser(def.permission);
     if (def.fixed) return { ok: false, error: `${def.label} cannot be deleted.` };
 
     const items = (await readStore(collection)) as unknown as Record<string, unknown>[];
     const item = items.find((i) => i.id === id);
     if (!item) return { ok: false, error: "This item no longer exists." };
-    if (collection === "posts" && user.role === "author" && item.authorId !== user.id) {
+    if (collection === "posts" && !can(user, "posts.all") && item.authorId !== user.id) {
       return { ok: false, error: "Authors can only delete their own posts." };
     }
 
@@ -202,7 +206,7 @@ export async function deleteItemAction(collection: string, id: string): Promise<
 
 export async function saveSettingsAction(settings: CmsSettings): Promise<ActionResult> {
   return guard(async () => {
-    const user = await requireUser("administrator");
+    const user = await requireUser("settings");
     const num = (v: unknown, min: number) => {
       const n = Number(v);
       return Number.isFinite(n) && n >= min ? n : null;
@@ -245,7 +249,7 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
 
 export async function setSubmissionStatusAction(id: string, status: SubmissionStatus): Promise<ActionResult> {
   return guard(async () => {
-    await requireUser("editor");
+    await requireUser("submissions");
     if (!["new", "read", "archived"].includes(status)) return { ok: false, error: "Invalid status." };
     await updateStore("submissions", (items) => ({
       items: items.map((s) => (s.id === id ? { ...s, status } : s)),
@@ -257,7 +261,7 @@ export async function setSubmissionStatusAction(id: string, status: SubmissionSt
 
 export async function deleteSubmissionAction(id: string): Promise<ActionResult> {
   return guard(async () => {
-    const user = await requireUser("administrator");
+    const user = await requireUser("submissions.delete");
     const removed = await updateStore("submissions", (items) => ({
       items: items.filter((s) => s.id !== id),
       result: items.find((s) => s.id === id),
@@ -273,7 +277,7 @@ export async function deleteSubmissionAction(id: string): Promise<ActionResult> 
 
 export async function updateMediaAltAction(id: string, alt: string): Promise<ActionResult> {
   return guard(async () => {
-    await requireUser("author");
+    await requireUser("media");
     await updateStore("media", (items) => ({
       items: items.map((m) => (m.id === id ? { ...m, alt: alt.trim().slice(0, 300) } : m)),
     }));
@@ -283,7 +287,7 @@ export async function updateMediaAltAction(id: string, alt: string): Promise<Act
 
 export async function deleteMediaAction(id: string): Promise<ActionResult> {
   return guard(async () => {
-    const user = await requireUser("editor");
+    const user = await requireUser("media.delete");
     const item = (await readStore("media")).find((m) => m.id === id);
     if (!item) return { ok: false, error: "File not found." };
     await updateStore("media", (items) => ({ items: items.filter((m) => m.id !== id) }));
@@ -295,27 +299,28 @@ export async function deleteMediaAction(id: string): Promise<ActionResult> {
 
 /* ------------------------------------------------------------------ Users */
 
-const ROLES: Role[] = ["administrator", "editor", "author"];
-
 export async function saveUserAction(
   originalId: string | null,
   input: { name: string; email: string; role: Role; password?: string },
 ): Promise<ActionResult> {
   return guard(async () => {
-    const actor = await requireUser("administrator");
+    const actor = await requireUser("users");
     const name = input.name.trim();
     const email = input.email.trim().toLowerCase();
     const errors: FieldErrors = {};
     if (!name) errors.name = "Enter a name.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.email = "Enter a valid email address.";
-    if (!ROLES.includes(input.role)) errors.role = "Choose a role.";
+    const roles = await readStore("roles");
+    if (!roles.some((r) => r.id === input.role) && input.role !== "administrator") errors.role = "Choose a role.";
     if (!originalId || input.password) {
       const weak = validatePasswordStrength(input.password ?? "");
       if (weak) errors.password = weak;
     }
     const users = await readStore("users");
     if (users.some((u) => u.email === email && u.id !== originalId)) errors.email = "A user with this email already exists.";
-    if (originalId === actor.id && input.role !== "administrator") errors.role = "You can't remove your own administrator role.";
+    if (originalId === actor.id && !resolveRole(input.role, roles).permissions.includes("users")) {
+      errors.role = "You can't give yourself a role without access to Users & roles.";
+    }
     if (Object.keys(errors).length) return { ok: false, errors, error: "Please fix the highlighted fields." };
 
     const passwordHash = input.password ? await hashPassword(input.password) : undefined;
@@ -332,7 +337,7 @@ export async function saveUserAction(
         items: [...items, { id, name, email, role: input.role, passwordHash: passwordHash!, createdAt: new Date().toISOString() }],
       };
     });
-    await logActivity(actor, originalId ? "updated user" : "created user", `${name} (${input.role})`, "/admin/users");
+    await logActivity(actor, originalId ? "updated user" : "created user", `${name} (${resolveRole(input.role, roles).name})`, "/admin/users");
     revalidatePath("/admin/users");
     return { ok: true, id };
   });
@@ -340,7 +345,7 @@ export async function saveUserAction(
 
 export async function deleteUserAction(id: string): Promise<ActionResult> {
   return guard(async () => {
-    const actor = await requireUser("administrator");
+    const actor = await requireUser("users");
     if (id === actor.id) return { ok: false, error: "You can't delete your own account." };
     const target = (await readStore("users")).find((u) => u.id === id);
     if (!target) return { ok: false, error: "User not found." };
@@ -357,7 +362,7 @@ export async function updateProfileAction(input: {
   newPassword: string;
 }): Promise<ActionResult> {
   return guard(async (): Promise<ActionResult> => {
-    const me: PublicUser = await requireUser("author");
+    const me: PublicUser = await requireUser();
     const user = (await readStore("users")).find((u) => u.id === me.id)!;
     const name = input.name.trim();
     if (!name) return { ok: false, errors: { name: "Enter your name." } };
@@ -384,7 +389,7 @@ export async function updateProfileAction(input: {
 
 export async function setCommentStatusAction(id: string, status: "pending" | "approved"): Promise<ActionResult> {
   return guard(async () => {
-    const user = await requireUser("editor");
+    const user = await requireUser("comments");
     const comment = await updateStore("comments", (items) => ({
       items: items.map((c) => (c.id === id ? { ...c, status } : c)),
       result: items.find((c) => c.id === id),
@@ -398,7 +403,7 @@ export async function setCommentStatusAction(id: string, status: "pending" | "ap
 
 export async function deleteCommentAction(id: string): Promise<ActionResult> {
   return guard(async () => {
-    const user = await requireUser("editor");
+    const user = await requireUser("comments");
     const comment = await updateStore("comments", (items) => ({
       items: items.filter((c) => c.id !== id),
       result: items.find((c) => c.id === id),
@@ -414,7 +419,7 @@ export async function deleteCommentAction(id: string): Promise<ActionResult> {
 /** Sets a random temporary password for a learner and returns it once, for the admin to pass on. */
 export async function resetLearnerPasswordAction(id: string): Promise<ActionResult & { password?: string }> {
   try {
-    const user = await requireUser("editor");
+    const user = await requireUser("training.manage");
     const password = randomUUID().replace(/-/g, "").slice(0, 12);
     const hash = await hashPassword(password);
     const learner = await updateStore("learners", (items) => ({
@@ -432,12 +437,64 @@ export async function resetLearnerPasswordAction(id: string): Promise<ActionResu
 
 export async function deleteLearnerAction(id: string): Promise<ActionResult> {
   return guard(async () => {
-    const user = await requireUser("administrator");
+    const user = await requireUser("training.manage");
     const learner = await updateStore("learners", (items) => ({
       items: items.filter((l) => l.id !== id),
       result: items.find((l) => l.id === id),
     }));
     if (learner) await logActivity(user, "deleted learner account", learner.email);
+    revalidatePath("/admin", "layout");
+    return { ok: true };
+  });
+}
+
+/* ------------------------------------------------------------------ Roles */
+
+export async function saveRoleAction(
+  originalId: string | null,
+  input: { name: string; description: string; permissions: string[] },
+): Promise<ActionResult> {
+  return guard(async () => {
+    const actor = await requireUser("users");
+    const name = input.name.trim().slice(0, 60);
+    const description = input.description.trim().slice(0, 200);
+    const permissions = ALL_PERMISSIONS.filter((p) => input.permissions.includes(p));
+    const errors: FieldErrors = {};
+    if (!name) errors.name = "Give the role a name.";
+    if (originalId === "administrator") return { ok: false, error: "The Administrator role always has full access and can't be changed." };
+    const roles = await readStore("roles");
+    const id = originalId ?? (slugify(name) || randomUUID().slice(0, 8));
+    if (!originalId && roles.some((r) => r.id === id || r.name.toLowerCase() === name.toLowerCase())) {
+      errors.name = "A role with this name already exists.";
+    }
+    if (originalId && !roles.some((r) => r.id === originalId)) return { ok: false, error: "This role no longer exists." };
+    // Don't let an actor lock themselves out by removing Users & roles from their own role.
+    if (originalId && originalId === actor.role && !permissions.includes("users")) {
+      errors.permissions = "Your own role must keep the Users & roles permission.";
+    }
+    if (Object.keys(errors).length) return { ok: false, errors, error: "Please fix the highlighted fields." };
+
+    await updateStore("roles", (items) => ({
+      items: originalId
+        ? items.map((r) => (r.id === originalId ? { ...r, name, description, permissions } : r))
+        : [...items, { id, name, description, permissions }],
+    }));
+    await logActivity(actor, originalId ? "updated role" : "created role", name, "/admin/users/roles");
+    revalidatePath("/admin", "layout");
+    return { ok: true, id };
+  });
+}
+
+export async function deleteRoleAction(id: string): Promise<ActionResult> {
+  return guard(async () => {
+    const actor = await requireUser("users");
+    const role = (await readStore("roles")).find((r) => r.id === id);
+    if (!role) return { ok: false, error: "Role not found." };
+    if (role.builtIn) return { ok: false, error: "Built-in roles can't be deleted." };
+    const inUse = (await readStore("users")).filter((u) => u.role === id).length;
+    if (inUse) return { ok: false, error: `${inUse} user${inUse > 1 ? "s have" : " has"} this role. Assign them another role first.` };
+    await updateStore("roles", (items) => ({ items: items.filter((r) => r.id !== id) }));
+    await logActivity(actor, "deleted role", role.name);
     revalidatePath("/admin", "layout");
     return { ok: true };
   });

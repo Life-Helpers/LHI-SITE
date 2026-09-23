@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { SubmissionActions } from "@/components/cms/submission-actions";
 import { Card, formatDate, PageHeader } from "@/components/cms/ui";
 import { requirePageUser } from "@/lib/cms/auth";
-import { hasRole } from "@/lib/cms/schema";
+import { can } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
 export const metadata = { title: "Submission" };
@@ -11,7 +11,7 @@ export const metadata = { title: "Submission" };
 const humanize = (key: string) => key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase());
 
 export default async function SubmissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const user = await requirePageUser("editor");
+  const user = await requirePageUser("submissions");
   const { id } = await params;
   const s = (await readStore("submissions")).find((x) => x.id === id);
   if (!s) notFound();
@@ -23,7 +23,7 @@ export default async function SubmissionDetailPage({ params }: { params: Promise
         description={`Received ${formatDate(s.createdAt, true)}`}
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Submissions", href: "/admin/submissions" }, { label: s.name }]}
         actions={
-          <SubmissionActions id={s.id} status={s.status} email={s.email} subject={s.subject} canDelete={hasRole(user.role, "administrator")} />
+          <SubmissionActions id={s.id} status={s.status} email={s.email} subject={s.subject} canDelete={can(user, "submissions.delete")} />
         }
       />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

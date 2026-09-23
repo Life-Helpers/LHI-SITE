@@ -1,26 +1,31 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, ShieldCheck } from "lucide-react";
 
 import { Badge, buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
 import { requirePageUser, toPublicUser } from "@/lib/cms/auth";
-import { ROLE_LABELS } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
 export const metadata = { title: "Users" };
 
 export default async function UsersPage() {
-  const me = await requirePageUser("administrator");
-  const users = (await readStore("users")).map(toPublicUser);
+  const me = await requirePageUser("users");
+  const roles = await readStore("roles");
+  const users = (await readStore("users")).map((u) => toPublicUser(u, roles));
   return (
     <>
       <PageHeader
         title="Users"
-        description="Staff accounts that can sign in to the content manager."
+        description="Team accounts that can sign in to the content manager. What each person can do is set by their role."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Users" }]}
         actions={
-          <Link href="/admin/users/new" className={buttonClass.primary}>
-            <Plus className="h-4 w-4" /> Add user
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/admin/users/roles" className={buttonClass.secondary}>
+              <ShieldCheck className="h-4 w-4" /> Roles &amp; permissions
+            </Link>
+            <Link href="/admin/users/new" className={buttonClass.primary}>
+              <Plus className="h-4 w-4" /> Add user
+            </Link>
+          </div>
         }
       />
       <Card bodyClassName="overflow-x-auto p-0">
@@ -44,7 +49,7 @@ export default async function UsersPage() {
                 </td>
                 <td className="px-5 py-3 text-admin-muted">{u.email}</td>
                 <td className="px-5 py-3">
-                  <Badge tone={u.role === "administrator" ? "primary" : "neutral"}>{ROLE_LABELS[u.role]}</Badge>
+                  <Badge tone={u.role === "administrator" ? "primary" : "neutral"}>{u.roleName}</Badge>
                 </td>
                 <td className="px-5 py-3 text-admin-muted">{u.lastLoginAt ? formatDate(u.lastLoginAt, true) : "Never"}</td>
               </tr>

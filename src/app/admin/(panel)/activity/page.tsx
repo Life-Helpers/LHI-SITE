@@ -7,7 +7,7 @@ import { readStore } from "@/lib/cms/store";
 export const metadata = { title: "Activity Log" };
 
 export default async function ActivityPage() {
-  await requirePageUser("administrator");
+  await requirePageUser("activity");
   const entries = await readStore("activity");
   return (
     <>

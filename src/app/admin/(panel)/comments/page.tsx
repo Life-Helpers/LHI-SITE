@@ -8,7 +8,7 @@ import { readStore } from "@/lib/cms/store";
 export const metadata = { title: "Comments" };
 
 export default async function CommentsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
-  await requirePageUser("editor");
+  await requirePageUser("comments");
   const { view = "pending" } = await searchParams;
   const [all, likes] = await Promise.all([readStore("comments"), readStore("likes")]);
   const list = all.filter((c) => c.status === (view === "approved" ? "approved" : "pending"));

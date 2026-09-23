@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { COLLECTIONS, hasRole, slugify } from "./schema";
+import { ALL_PERMISSIONS, BUILT_IN_ROLES, can, COLLECTIONS, slugify } from "./schema";
 import { validateRecord } from "./validate";
 
 const validPost = {
@@ -56,9 +56,13 @@ describe("validateRecord", () => {
 
 describe("roles and slugs", () => {
   it("ranks roles", () => {
-    expect(hasRole("administrator", "editor")).toBe(true);
-    expect(hasRole("editor", "administrator")).toBe(false);
-    expect(hasRole("author", "author")).toBe(true);
+    const role = (id: string) => BUILT_IN_ROLES.find((r) => r.id === id)!;
+    expect(role("administrator").permissions).toEqual(ALL_PERMISSIONS);
+    expect(can(role("editor"), "interventions")).toBe(true);
+    expect(can(role("editor"), "users")).toBe(false);
+    expect(can(role("author"), "posts.own")).toBe(true);
+    expect(can(role("author"), "posts.all")).toBe(false);
+    expect(can(null, "media")).toBe(false);
   });
 
   it("slugifies accented and punctuated text", () => {

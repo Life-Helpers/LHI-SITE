@@ -5,7 +5,7 @@ import { QuickDraft } from "@/components/cms/quick-draft";
 import { Badge, buttonClass, Card, formatDate, PageHeader, statusTone } from "@/components/cms/ui";
 import { WeeklyBarChart, type WeeklyPoint } from "@/components/cms/weekly-bar-chart";
 import { requirePageUser } from "@/lib/cms/auth";
-import { hasRole, SUBMISSION_TYPE_LABELS } from "@/lib/cms/schema";
+import { can, SUBMISSION_TYPE_LABELS } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
 
@@ -28,9 +28,9 @@ function weeklyCounts(dates: string[], weeks = 12): WeeklyPoint[] {
 }
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
-  const user = await requirePageUser("author");
+  const user = await requirePageUser();
   const { denied } = await searchParams;
-  const isEditor = hasRole(user.role, "editor");
+  const isEditor = can(user, "submissions");
 
   const [posts, interventions, partners, media, submissions, activity] = await Promise.all([
     readStore("posts"),
@@ -38,7 +38,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     readStore("partners"),
     readStore("media"),
     isEditor ? readStore("submissions") : Promise.resolve([]),
-    hasRole(user.role, "administrator") ? readStore("activity") : Promise.resolve([]),
+    can(user, "activity") ? readStore("activity") : Promise.resolve([]),
   ]);
 
   const published = posts.filter((p) => p.status === "published").length;

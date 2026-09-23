@@ -8,7 +8,7 @@ import { readStore } from "@/lib/cms/store";
 export const metadata = { title: "Training Certificates" };
 
 export default async function CertificatesPage({ searchParams }: { searchParams: Promise<{ course?: string; q?: string }> }) {
-  await requirePageUser("editor");
+  await requirePageUser("training");
   const { course = "all", q = "" } = await searchParams;
   const all = await readStore("certificates");
   const query = q.trim().toLowerCase();

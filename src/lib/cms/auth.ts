@@ -5,7 +5,7 @@ import { promisify } from "node:util";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { hasRole, type CmsUser, type PublicUser, type Role } from "@/lib/cms/schema";
+import { ALL_PERMISSIONS, BUILT_IN_ROLES, can, type CmsRole, type CmsUser, type Permission, type PublicUser } from "@/lib/cms/schema";
 import { readSecret, readStore } from "@/lib/cms/store";
 
 const scryptAsync = promisify(scrypt) as (password: string, salt: Buffer, keylen: number) => Promise<Buffer>;
@@ -76,33 +76,42 @@ async function readSessionUserId(): Promise<string | null> {
   }
 }
 
-export function toPublicUser(user: CmsUser): PublicUser {
+/** Resolve a role id to its definition. The Administrator role always has every permission. */
+export function resolveRole(roleId: string, roles: CmsRole[]): { name: string; permissions: Permission[] } {
+  if (roleId === "administrator") return { name: "Administrator", permissions: ALL_PERMISSIONS };
+  const role = roles.find((r) => r.id === roleId) ?? BUILT_IN_ROLES.find((r) => r.id === roleId);
+  return role ? { name: role.name, permissions: role.permissions } : { name: "No role", permissions: [] };
+}
+
+export function toPublicUser(user: CmsUser, roles: CmsRole[] = BUILT_IN_ROLES): PublicUser {
   const { id, name, email, role, createdAt, lastLoginAt } = user;
-  return { id, name, email, role, createdAt, lastLoginAt };
+  const resolved = resolveRole(role, roles);
+  return { id, name, email, role, createdAt, lastLoginAt, roleName: resolved.name, permissions: resolved.permissions };
 }
 
 export async function getCurrentUser(): Promise<PublicUser | null> {
   const uid = await readSessionUserId();
   if (!uid) return null;
-  const user = (await readStore("users")).find((u) => u.id === uid);
-  return user ? toPublicUser(user) : null;
+  const [users, roles] = await Promise.all([readStore("users"), readStore("roles")]);
+  const user = users.find((u) => u.id === uid);
+  return user ? toPublicUser(user, roles) : null;
 }
 
-/** For pages: redirect to login (or dashboard, if the role is insufficient). */
-export async function requirePageUser(minRole: Role = "author"): Promise<PublicUser> {
+/** For pages: redirect to login, or to the dashboard if the user's role lacks the permission. */
+export async function requirePageUser(permission?: Permission): Promise<PublicUser> {
   const user = await getCurrentUser();
   if (!user) redirect("/admin/login");
-  if (!hasRole(user.role, minRole)) redirect("/admin?denied=1");
+  if (!can(user, permission)) redirect("/admin?denied=1");
   return user;
 }
 
 export class AuthError extends Error {}
 
 /** For server actions and API routes: throw instead of redirecting. */
-export async function requireUser(minRole: Role = "author"): Promise<PublicUser> {
+export async function requireUser(permission?: Permission): Promise<PublicUser> {
   const user = await getCurrentUser();
   if (!user) throw new AuthError("Your session has expired. Please log in again.");
-  if (!hasRole(user.role, minRole)) throw new AuthError("You don't have permission to do that.");
+  if (!can(user, permission)) throw new AuthError("You don't have permission to do that.");
   return user;
 }
 

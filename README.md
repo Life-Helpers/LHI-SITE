@@ -121,6 +121,15 @@ original content from `src/data/*`.
 - Uploads are limited to images, PDF and MP4 up to 15 MB; SVG is rejected.
 - Every mutation re-checks the user's role on the server.
 
+## Team roles & permissions
+
+Team members sign in at `/admin` ("Team login" in the site footer). Each user has one role; a role is a set of
+permissions (posts, media, comments, radio, projects, partners, documents, submissions, jobs, vendor requests,
+training, users & roles, settings, activity log). Built-in roles: **Administrator** (always everything, locked),
+**Editor** and **Author**; create more in **Admin → Roles & Permissions**, then assign them in **Admin → Users**.
+Pages, menu items and server actions all check the specific permission. Roles are stored in `CMS_DATA_DIR/roles.json`;
+when new permissions are added to the code, grant them to existing custom roles in the admin.
+
 ## Engagement, training, careers and procurement
 
 All of these store their data in `CMS_DATA_DIR` and are managed from the admin:
@@ -129,7 +138,8 @@ All of these store their data in `CMS_DATA_DIR` and are managed from the admin:
   share buttons (Facebook, X, LinkedIn, WhatsApp, Telegram, Reddit, Pinterest, email, copy link, device share)
   and comments. Comments are held in **Admin → Comments** until approved.
 - **Humanitarian Training** (`/get-involved/training`): three courses built from LHI's safeguarding,
-  child safeguarding and GBV materials. Lessons and assessments require a free learner account (email + password,
+  child safeguarding and GBV materials. The pass mark is 100%; learners who miss a question retake the
+  assessment. Lessons and assessments require a free learner account (email + password,
   separate from team accounts); progress is stored on the account. Learners are listed in **Admin → Learners**,
   where editors can reset a learner's password. Final-assessment answer keys live server-side in
   `src/data/training/answer-keys.ts`. Certificates are listed in **Admin → Certificates** and can be verified publicly.

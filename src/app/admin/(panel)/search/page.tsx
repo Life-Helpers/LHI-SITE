@@ -2,22 +2,22 @@ import Link from "next/link";
 
 import { Badge, Card, PageHeader } from "@/components/cms/ui";
 import { requirePageUser } from "@/lib/cms/auth";
-import { COLLECTION_NAMES, COLLECTIONS, hasRole } from "@/lib/cms/schema";
+import { can, COLLECTION_NAMES, COLLECTIONS } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
 export const metadata = { title: "Search" };
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const user = await requirePageUser("author");
+  const user = await requirePageUser();
   const q = ((await searchParams).q ?? "").trim().toLowerCase();
 
   const results: { collection: string; label: string; id: string; title: string }[] = [];
   if (q) {
     for (const name of COLLECTION_NAMES) {
       const def = COLLECTIONS[name];
-      if (!hasRole(user.role, def.minRole)) continue;
+      if (!can(user, def.permission)) continue;
       let items = (await readStore(name)) as unknown as Record<string, unknown>[];
-      if (name === "posts" && user.role === "author") items = items.filter((i) => i.authorId === user.id);
+      if (name === "posts" && !can(user, "posts.all")) items = items.filter((i) => i.authorId === user.id);
       for (const item of items) {
         const haystack = def.fields
           .filter((f) => ["text", "textarea", "markdown", "list", "slug"].includes(f.type))

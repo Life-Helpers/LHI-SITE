@@ -1,18 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, Save, Trash2 } from "lucide-react";
 
 import { deleteUserAction, saveUserAction, updateProfileAction } from "@/app/admin/actions";
 import { buttonClass, Card, inputClass } from "@/components/cms/ui";
-import { ROLE_LABELS, type PublicUser, type Role } from "@/lib/cms/schema";
+import type { PublicUser } from "@/lib/cms/schema";
 
-const ROLE_HELP: Record<Role, string> = {
-  administrator: "Full access, including users, settings and the activity log.",
-  editor: "Manages all content, partners, documents, media and submissions.",
-  author: "Writes and publishes their own posts and uploads media.",
-};
+export type RoleOption = { id: string; name: string; description: string; count: number; canManageUsers: boolean };
 
 function Row({ label, error, children, help }: { label: string; error?: string; help?: string; children: React.ReactNode }) {
   return (
@@ -37,11 +34,11 @@ function Notice({ state }: { state: { ok: boolean; text: string } | null }) {
   );
 }
 
-export function UserForm({ user, isSelf }: { user?: PublicUser; isSelf?: boolean }) {
+export function UserForm({ user, isSelf, roles }: { user?: PublicUser; isSelf?: boolean; roles: RoleOption[] }) {
   const router = useRouter();
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
-  const [role, setRole] = useState<Role>(user?.role ?? "author");
+  const [role, setRole] = useState<string>(user?.role ?? roles.find((r) => r.id === "author")?.id ?? roles[0]?.id ?? "");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
@@ -83,28 +80,34 @@ export function UserForm({ user, isSelf }: { user?: PublicUser; isSelf?: boolean
         </Row>
         <fieldset>
           <legend className="text-sm font-semibold">Role</legend>
-          <div className="mt-2 grid gap-2 sm:grid-cols-3">
-            {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
-              <label
-                key={r}
-                className={`cursor-pointer rounded-lg border p-3 text-sm ${
-                  role === r ? "border-admin-primary bg-admin-primary-soft" : "border-admin-border"
-                } ${isSelf && r !== "administrator" ? "opacity-50" : ""}`}
-              >
-                <input
-                  type="radio"
-                  name="role"
-                  value={r}
-                  checked={role === r}
-                  disabled={isSelf && r !== "administrator"}
-                  onChange={() => setRole(r)}
-                  className="sr-only"
-                />
-                <span className="block font-semibold">{ROLE_LABELS[r]}</span>
-                <span className="mt-1 block text-xs text-admin-muted">{ROLE_HELP[r]}</span>
-              </label>
-            ))}
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {roles.map((r) => {
+              const locked = isSelf && !r.canManageUsers;
+              return (
+                <label
+                  key={r.id}
+                  className={`cursor-pointer rounded-lg border p-3 text-sm ${
+                    role === r.id ? "border-admin-primary bg-admin-primary-soft" : "border-admin-border"
+                  } ${locked ? "opacity-50" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value={r.id}
+                    checked={role === r.id}
+                    disabled={locked}
+                    onChange={() => setRole(r.id)}
+                    className="sr-only"
+                  />
+                  <span className="block font-semibold">{r.name}</span>
+                  <span className="mt-1 block text-xs text-admin-muted">{r.description}</span>
+                </label>
+              );
+            })}
           </div>
+          <p className="mt-2 text-xs text-admin-muted">
+            Need different access? <Link href="/admin/users/roles" className="font-medium text-admin-primary hover:underline">Create or edit roles</Link>.
+          </p>
           {errors.role && <p className="mt-1 text-xs text-admin-danger">{errors.role}</p>}
         </fieldset>
         <Row
