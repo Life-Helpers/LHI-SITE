@@ -134,6 +134,25 @@ original content from `src/data/*`.
 - Uploads are limited to images, PDF and MP4 up to 15 MB; SVG is rejected.
 - Every mutation re-checks the user's role on the server.
 
+## Email
+
+All outgoing email goes through `src/lib/email/send.ts` and is recorded in the
+**Email Outbox** (`/admin/outbox`) first, so nothing is lost before email is set up.
+
+- **Connect**: set `EMAIL_PROVIDER` (`resend`, `sendgrid`, `postmark` or `brevo`),
+  `EMAIL_API_KEY` and `EMAIL_FROM` (optionally `EMAIL_REPLY_TO`), restart, then press
+  **Send queued now** in the outbox to deliver everything that was waiting.
+- **What is sent**: confirmations to people who submit forms (contact, volunteer,
+  partnership, job applications, vendor registration and bids, newsletter welcome),
+  team alerts to *Settings → Comments & alerts → alert email*, comment-moderation
+  alerts, certificate emails, and password-reset links for learners
+  (`/get-involved/training/forgot`) and team members (`/admin/forgot`).
+- **Newsletter** (`/admin/newsletter`): write and send to all active subscribers;
+  every email has a signed one-click unsubscribe link (`/unsubscribe`). Subscribers
+  can be exported as CSV.
+- Until email is connected, a team member can open a password-reset email in the
+  outbox and pass the link on personally.
+
 ## Team roles & permissions
 
 Team members sign in at `/admin` ("Team login" in the site footer). Each user has one role; a role is a set of

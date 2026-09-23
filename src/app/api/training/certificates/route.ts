@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+import { sendCertificateEmail } from "@/lib/email/notifications";
 import { gradeExam, issueCertificate } from "@/lib/training/grading";
 import { getCurrentLearner, updateLearnerProgress } from "@/lib/training/learners";
 
@@ -53,6 +54,10 @@ export async function POST(req: NextRequest) {
     organization: organization || learner.organization || undefined,
     score: graded.score,
   });
+  const alreadyHad = learner.progress[courseId]?.certificateId === certificate.id;
   await updateLearnerProgress(learner.id, courseId, (p) => ({ ...p, certificateId: certificate.id, score: graded.score }));
+  if (!alreadyHad) {
+    await sendCertificateEmail({ name: certificate.name, email: learner.email, courseTitle: certificate.courseTitle, code: certificate.id });
+  }
   return NextResponse.json({ passed: true, score: graded.score, incorrect, certificateId: certificate.id });
 }

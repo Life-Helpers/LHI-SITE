@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 
 import type { PostComment } from "@/lib/cms/schema";
 import { readSettings, readStore, updateStore } from "@/lib/cms/store";
+import { notifyPendingComment } from "@/lib/email/notifications";
 
 const MAX_COMMENTS = 20000;
 
@@ -38,5 +39,6 @@ export async function addComment(input: Omit<PostComment, "id" | "status" | "cre
     createdAt: new Date().toISOString(),
   };
   await updateStore("comments", (items) => ({ items: [comment, ...items].slice(0, MAX_COMMENTS) }));
+  if (comment.status === "pending") await notifyPendingComment(comment);
   return comment;
 }

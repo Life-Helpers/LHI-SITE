@@ -11,9 +11,13 @@ import type {
   CmsUser,
   Learner,
   MediaItem,
+  NewsletterCampaign,
+  OutboxEmail,
   PostComment,
   PostLikes,
+  ResetToken,
   Submission,
+  Unsubscribe,
 } from "@/lib/cms/schema";
 import { BUILT_IN_ROLES } from "@/lib/cms/schema";
 import {
@@ -52,6 +56,10 @@ interface StoreShape extends CollectionRecords {
   comments: PostComment;
   learners: Learner;
   roles: CmsRole;
+  outbox: OutboxEmail;
+  campaigns: NewsletterCampaign;
+  resetTokens: ResetToken;
+  unsubscribes: Unsubscribe;
 }
 
 export type StoreName = keyof StoreShape;
@@ -74,6 +82,10 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   comments: () => [],
   learners: () => [],
   roles: () => structuredClone(BUILT_IN_ROLES),
+  outbox: () => [],
+  campaigns: () => [],
+  resetTokens: () => [],
+  unsubscribes: () => [],
 };
 
 const cache = new Map<string, { mtimeMs: number; data: unknown }>();

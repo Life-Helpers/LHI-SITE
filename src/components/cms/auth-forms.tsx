@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Loader2, Lock } from "lucide-react";
 
-import { loginAction, setupAction, type ActionResult } from "@/app/admin/actions";
+import { forgotPasswordAction, loginAction, resetPasswordAction, setupAction, type ActionResult } from "@/app/admin/actions";
 
 const inputClass =
   "mt-1.5 block w-full rounded-lg border border-admin-border bg-admin-card px-3.5 py-2.5 text-sm text-admin-text outline-none placeholder:text-admin-muted focus:border-admin-primary focus:ring-3 focus:ring-admin-primary/20";
@@ -67,7 +67,63 @@ export function LoginForm() {
           <input name="password" type="password" autoComplete="current-password" required className={inputClass} />
         </label>
         <SubmitButton pending={pending}>Sign in</SubmitButton>
-        <p className="text-center text-xs text-admin-muted">Forgot your password? Ask an administrator to reset it.</p>
+        <p className="text-center text-xs text-admin-muted">
+          <Link href="/admin/forgot" className="font-medium text-admin-primary hover:underline">
+            Forgot your password?
+          </Link>
+        </p>
+      </form>
+    </AuthCard>
+  );
+}
+
+export function ForgotPasswordForm() {
+  const [state, action, pending] = useActionState(forgotPasswordAction, null);
+  return (
+    <AuthCard title="Reset your password" subtitle="We'll email you a one-time link that expires in one hour">
+      {state?.ok ? (
+        <div role="status" className="space-y-4 text-sm">
+          <p>If that email belongs to a team account, a reset link is on its way.</p>
+          <p className="text-admin-muted">No email? Ask an administrator to set a new password for you under Users.</p>
+          <Link href="/admin/login" className="font-medium text-admin-primary hover:underline">
+            ← Back to sign in
+          </Link>
+        </div>
+      ) : (
+        <form action={action} className="space-y-4">
+          <ErrorBox state={state} />
+          <label className="block text-sm font-medium">
+            Email
+            <input name="email" type="email" autoComplete="username" required defaultValue={state?.values?.email} className={inputClass} />
+          </label>
+          <SubmitButton pending={pending}>Send reset link</SubmitButton>
+          <p className="text-center text-xs text-admin-muted">
+            <Link href="/admin/login" className="hover:text-admin-primary">
+              Back to sign in
+            </Link>
+          </p>
+        </form>
+      )}
+    </AuthCard>
+  );
+}
+
+export function ResetPasswordForm({ token }: { token: string }) {
+  const [state, action, pending] = useActionState(resetPasswordAction, null);
+  return (
+    <AuthCard title="Choose a new password" subtitle="At least 10 characters, with letters and numbers">
+      <form action={action} className="space-y-4">
+        <ErrorBox state={state} />
+        <input type="hidden" name="token" value={token} />
+        <label className="block text-sm font-medium">
+          New password
+          <input name="password" type="password" autoComplete="new-password" required minLength={10} className={inputClass} />
+        </label>
+        <label className="block text-sm font-medium">
+          Confirm new password
+          <input name="confirm" type="password" autoComplete="new-password" required minLength={10} className={inputClass} />
+        </label>
+        <SubmitButton pending={pending}>Save and sign in</SubmitButton>
       </form>
     </AuthCard>
   );

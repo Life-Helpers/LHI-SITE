@@ -21,10 +21,12 @@ import {
   Inbox,
   LayoutDashboard,
   LogOut,
+  Mail,
   Map,
   Menu,
   Radio,
   MessageSquare,
+  Newspaper,
   Moon,
   Search,
   Settings,
@@ -90,6 +92,13 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
       items: [
         { label: "Learners", href: "/admin/learners", icon: Users, permission: "training" },
         { label: "Certificates", href: "/admin/certificates", icon: GraduationCap, permission: "training" },
+      ],
+    },
+    {
+      label: "Communications",
+      items: [
+        { label: "Newsletter", href: "/admin/newsletter", icon: Newspaper, permission: "newsletter" },
+        { label: "Email Outbox", href: "/admin/outbox", icon: Mail, permission: "email" },
       ],
     },
     {

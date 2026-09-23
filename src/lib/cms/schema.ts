@@ -46,6 +46,13 @@ export const PERMISSION_GROUPS = [
     ],
   },
   {
+    label: "Communications",
+    items: [
+      { id: "newsletter", label: "Newsletter & subscribers", help: "Send newsletters and export the subscriber list." },
+      { id: "email", label: "Email outbox", help: "See every email the site has sent or queued, and retry failures." },
+    ],
+  },
+  {
     label: "Administration",
     items: [
       { id: "users", label: "Users & roles", help: "Create logins, assign roles and define roles." },
@@ -564,4 +571,48 @@ export interface Learner {
   createdAt: string;
   lastLoginAt?: string;
   progress: Record<string, LearnerCourseProgress>;
+}
+
+/** Every email the site sends is recorded here first, so nothing is lost before a provider is connected. */
+export type OutboxStatus = "queued" | "sent" | "failed";
+
+export interface OutboxEmail {
+  id: string;
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+  /** What triggered it, e.g. "confirmation", "team-alert", "password-reset", "newsletter". */
+  kind: string;
+  status: OutboxStatus;
+  attempts: number;
+  error?: string;
+  createdAt: string;
+  sentAt?: string;
+  /** Newsletter campaign this email belongs to. */
+  campaignId?: string;
+}
+
+export interface NewsletterCampaign {
+  id: string;
+  subject: string;
+  body: string;
+  recipients: number;
+  sentBy: string;
+  sentAt: string;
+}
+
+/** One-time password reset token (only the SHA-256 hash is stored). */
+export interface ResetToken {
+  id: string;
+  kind: "learner" | "team";
+  accountId: string;
+  expiresAt: string;
+  usedAt?: string;
+}
+
+export interface Unsubscribe {
+  id: string;
+  email: string;
+  at: string;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
@@ -128,11 +129,9 @@ export function LearnerAuthForm({ next, initialMode }: { next: string; initialMo
         </button>
         {mode === "login" && (
           <p className="text-center text-xs text-muted-foreground">
-            Forgot your password? Email{" "}
-            <a href="mailto:official@lhinigeria.org?subject=Training%20account%20password" className="font-medium text-primary hover:underline">
-              official@lhinigeria.org
-            </a>{" "}
-            from your account email.
+            <Link href="/get-involved/training/forgot" className="font-medium text-primary hover:underline">
+              Forgot your password?
+            </Link>
           </p>
         )}
       </form>

@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 
 import type { Submission, SubmissionType } from "@/lib/cms/schema";
 import { updateStore } from "@/lib/cms/store";
+import { notifySubmission } from "@/lib/email/notifications";
 
 const MAX_SUBMISSIONS = 5000;
 
@@ -35,6 +36,7 @@ export async function addSubmission(input: {
     createdAt: new Date().toISOString(),
   };
   await updateStore("submissions", (items) => ({ items: [submission, ...items].slice(0, MAX_SUBMISSIONS) }));
+  await notifySubmission(submission);
   return submission;
 }
 

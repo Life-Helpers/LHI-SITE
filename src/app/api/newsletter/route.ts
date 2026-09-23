@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { readStore } from "@/lib/cms/store";
+import { readStore, updateStore } from "@/lib/cms/store";
 import { addSubmission, rateLimited } from "@/lib/cms/submissions";
 
 const schema = z.object({
@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
   const { email, name, source, website } = parsed.data;
   if (website) return NextResponse.json({ ok: true });
 
+  // Signing up again after unsubscribing re-subscribes.
+  await updateStore("unsubscribes", (items) => ({ items: items.filter((u) => u.email !== email) }));
   const already = (await readStore("submissions")).some((s) => s.type === "newsletter" && s.email === email);
   if (!already) {
     await addSubmission({

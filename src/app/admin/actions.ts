@@ -38,6 +38,9 @@ import {
 import { readStore, UPLOADS_DIR, updateStore, writeSettings } from "@/lib/cms/store";
 import type { FieldErrors } from "@/lib/cms/validate";
 import { validateRecord } from "@/lib/cms/validate";
+import { sendPasswordResetEmail } from "@/lib/email/notifications";
+import { consumeResetToken, createResetToken } from "@/lib/email/reset";
+import { absoluteUrl } from "@/lib/email/template";
 
 export interface ActionResult {
   ok: boolean;
@@ -86,6 +89,41 @@ export async function loginAction(_prev: ActionResult | null, form: FormData): P
   }));
   await createSession(user.id);
   await logActivity(user, "logged in", "Admin");
+  redirect("/admin");
+}
+
+/** Team password reset, step 1: email a one-time link. Same response whether or not the account exists. */
+export async function forgotPasswordAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  const email = normEmail(form.get("email"));
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Enter a valid email address.", values: { email } };
+  if (loginLocked(`reset:${email}`)) return { ok: true };
+  recordLoginFailure(`reset:${email}`);
+  const user = (await readStore("users")).find((u) => u.email === email);
+  if (user) {
+    const token = await createResetToken("team", user.id);
+    await sendPasswordResetEmail({ name: user.name, email: user.email, url: absoluteUrl(`/admin/reset?token=${token}`), team: true });
+    await logActivity(user, "requested a password reset", "Account");
+  }
+  return { ok: true };
+}
+
+/** Team password reset, step 2: set the new password and sign in. */
+export async function resetPasswordAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  const token = String(form.get("token") ?? "");
+  const password = String(form.get("password") ?? "");
+  if (password !== String(form.get("confirm") ?? "")) return { ok: false, error: "The two passwords don't match." };
+  const weak = validatePasswordStrength(password);
+  if (weak) return { ok: false, error: weak };
+  const userId = await consumeResetToken("team", token);
+  if (!userId) return { ok: false, error: "This reset link is invalid or has expired. Request a new one." };
+  const passwordHash = await hashPassword(password);
+  const user = await updateStore("users", (items) => ({
+    items: items.map((u) => (u.id === userId ? { ...u, passwordHash } : u)),
+    result: items.find((u) => u.id === userId),
+  }));
+  if (!user) return { ok: false, error: "This account no longer exists." };
+  await createSession(user.id);
+  await logActivity(user, "reset their password", "Account");
   redirect("/admin");
 }
 

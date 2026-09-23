@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { Download } from "lucide-react";
 
-import { Card, formatDate, PageHeader } from "@/components/cms/ui";
+import { buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
 import { COURSES } from "@/data/training/courses";
 import { requirePageUser } from "@/lib/cms/auth";
 import { readStore } from "@/lib/cms/store";
@@ -24,6 +25,14 @@ export default async function CertificatesPage({ searchParams }: { searchParams:
         title="Training Certificates"
         description="Certificates issued by the Humanitarian Training centre. Anyone can verify a code on the public training page."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Certificates" }]}
+        actions={
+          <>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- file download, not a page */}
+            <a href="/api/admin/export/certificates" download className={buttonClass.secondary}>
+              <Download className="h-4 w-4" /> Export CSV
+            </a>
+          </>
+        }
       />
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>

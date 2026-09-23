@@ -1,5 +1,7 @@
+import { Download } from "lucide-react";
+
 import { LearnerActions } from "@/components/cms/learner-actions";
-import { Card, formatDate, PageHeader } from "@/components/cms/ui";
+import { buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
 import { COURSES } from "@/data/training/courses";
 import { requirePageUser } from "@/lib/cms/auth";
 import { can } from "@/lib/cms/schema";
@@ -21,6 +23,14 @@ export default async function LearnersPage({ searchParams }: { searchParams: Pro
         title="Learners"
         description="People who signed up for the Humanitarian Training centre, with their course progress."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Learners" }]}
+        actions={
+          <>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- file download, not a page */}
+            <a href="/api/admin/export/learners" download className={buttonClass.secondary}>
+              <Download className="h-4 w-4" /> Export CSV
+            </a>
+          </>
+        }
       />
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>

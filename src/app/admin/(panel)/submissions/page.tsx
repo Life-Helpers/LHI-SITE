@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { Download } from "lucide-react";
 
-import { Badge, Card, formatDate, PageHeader, statusTone } from "@/components/cms/ui";
+import { Badge, buttonClass, Card, formatDate, PageHeader, statusTone } from "@/components/cms/ui";
 import { requirePageUser } from "@/lib/cms/auth";
 import { SUBMISSION_TYPE_LABELS, type SubmissionType } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
@@ -32,6 +33,14 @@ export default async function SubmissionsPage({
         title="Submissions"
         description="Job applications, vendor bids and registrations, contact messages, volunteer sign-ups, consortium expressions of interest and newsletter subscribers."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Submissions" }]}
+        actions={
+          <>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- file download, not a page */}
+            <a href={type === "all" ? "/api/admin/export/submissions" : `/api/admin/export/submissions?type=${type}`} download className={buttonClass.secondary}>
+              <Download className="h-4 w-4" /> Export CSV
+            </a>
+          </>
+        }
       />
       <Card bodyClassName="p-0">
         <div className="flex flex-col gap-3 border-b border-admin-border p-4 sm:flex-row sm:items-center sm:justify-between">
