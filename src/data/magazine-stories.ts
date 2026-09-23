@@ -330,7 +330,7 @@ Improved well-being, resilience, and inclusion of vulnerable populations in comm
 - Owned office complexes in Sokoto, Kebbi and Yobe
 - A dedicated Communications Unit producing videos, documentaries and radio
 
-> "This Strategic Plan is more than a document, it is a promise." Engr. Godfrey Mayuku, Chairman, Board of Trustees
+> "This Strategic Plan is more than a document, it is a promise." Engr. Godfrey Mayoku, Chairman, Board of Trustees
 
 [Read about our strategies and the plan](/our-strategies) · [Download the Strategic Plan (PDF)](/documents/lhi-strategic-plan-2026-2030.pdf)`,
   },

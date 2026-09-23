@@ -205,7 +205,7 @@ export const STRATEGIC_PLAN = {
   targetGroups:
     "Vulnerable people, especially marginalised communities, women, the girl child, people with disabilities, displaced populations, and others disadvantaged in one form or another.",
   foreword: {
-    author: "Engr. Godfrey Mayuku",
+    author: "Engr. Godfrey Mayoku",
     role: "Chairman, LHI Board of Trustees",
     quote:
       "This Strategic Plan is more than a document, it is a promise: a promise to deepen our impact across our six thematic areas, to strengthen systems, amplify advocacy, and elevate community leadership, and to uphold our core values of Love, Honesty, and Inclusion in every action we take.",

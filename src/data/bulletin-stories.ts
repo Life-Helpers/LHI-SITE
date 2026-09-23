@@ -72,7 +72,7 @@ Tayo Fatinikun, Joy Dauda Dogo, Oluwafemi Tanimowo, Adetola Olabode and Nosa Ojo
 
 With dwindling capital, her grandchildren had to leave school. That is when **ZOA, in partnership with Life Helpers Initiative**, introduced the **Group Savings and Loan Association (GSLA)** as part of an intervention to strengthen livelihoods. Ya Gabtu joined a group, and after three savings cycles ZOA/LHI provided her with business tools: 16 plates of groundnuts, a pot, a frying pan and firewood.
 
-With renewed vigour she restarted her business. Within five months her profits grew, and she diversified: she now sells a bag of rice each week, earning about **₦4,500** a week from it, and sells fresh tomatoes from the farm in the harvest season.
+With renewed vigour she restarted her business. Within five months her profits reached **₦5,000**, and she diversified: she now sells a bag of rice each week, earning about **₦4,500** a week from it, and sells fresh tomatoes from the farm in the harvest season.
 
 Life has become significantly easier. She can provide for her children and grandchildren and keep them in school, and the LHI team found her business thriving when they visited her busy sales point.
 

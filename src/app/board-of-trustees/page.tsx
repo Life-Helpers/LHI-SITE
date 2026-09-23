@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 /** Board members and roles as published by LHI (Strategic Plan 2026–2030 and LHI's board listing). */
 const trustees = [
-  { name: "Engr. Godfrey Mayuku", role: "Board Chairman", qualification: "", photo: "/images/lhi/board/godfrey-mayuku.jpg" },
+  { name: "Engr. Godfrey Mayoku", role: "Board Chairman", qualification: "", photo: "/images/lhi/board/godfrey-mayoku.jpg" },
   { name: "Mr Tayo Fatinikun", role: "National Executive Director", qualification: "FICA, FIMC, CMC", photo: "/images/lhi/board/tayo-fatinikun.jpg" },
   { name: "Pharm. Iyabo Adebisi", role: "Board Secretary", qualification: "", photo: "/images/lhi/board/iyabo-adebisi.jpg" },
   { name: "Barr. Joy Ihenacho", role: "Board Member", qualification: "", photo: "/images/lhi/board/joy-ihenacho.jpg" },
