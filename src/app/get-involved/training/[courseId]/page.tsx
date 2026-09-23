@@ -51,6 +51,7 @@ export default async function CoursePage({ params }: { params: Promise<{ courseI
             <CourseOutline
               signedIn={Boolean(learner)}
               courseId={course.id}
+              passMark={course.passMark}
               lessons={course.lessons.map(({ id, title, summary, minutes }) => ({ id, title, summary, minutes }))}
             />
           </div>

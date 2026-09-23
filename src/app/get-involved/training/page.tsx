@@ -20,7 +20,7 @@ const steps = [
   { icon: Users, title: "Create a free account", text: "Sign up with your email so your progress and certificates are saved to your account." },
   { icon: BookOpenCheck, title: "Study the lessons", text: "Short, self-paced lessons drawn from LHI's safeguarding, child safeguarding and GBV training." },
   { icon: ShieldCheck, title: "Pass each knowledge check", text: "Answer every practice question correctly to complete a lesson." },
-  { icon: GraduationCap, title: "Take the final assessment", text: "Answer every question correctly (100%) to pass. If you miss any, review the lessons and retake the assessment." },
+  { icon: GraduationCap, title: "Take the final assessment", text: "Score 80% or more to pass and earn your certificate. If you fall short, review the lessons and retake the assessment." },
   { icon: Award, title: "Download your certificate", text: "Receive a PDF certificate with a unique code anyone can verify on this page." },
 ];
 

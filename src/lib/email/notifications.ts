@@ -140,7 +140,7 @@ export async function notifyPendingComment(input: { postTitle: string; name: str
   }
 }
 
-export async function sendCertificateEmail(input: { name: string; email: string; courseTitle: string; code: string }) {
+export async function sendCertificateEmail(input: { name: string; email: string; courseTitle: string; code: string; score: number }) {
   try {
     await sendEmail({
       to: input.email,
@@ -150,7 +150,7 @@ export async function sendCertificateEmail(input: { name: string; email: string;
         greeting: greet(input.name),
         heading: "Congratulations on completing your course.",
         paragraphs: [
-          `You have completed ${input.courseTitle} with a score of 100%.`,
+          `You have completed ${input.courseTitle} with a score of ${input.score}%.`,
           `Your certificate code is ${input.code}. Anyone can confirm it on our verification page.`,
         ],
         cta: { label: "Verify or download your certificate", url: absoluteUrl(`/get-involved/training/verify/${encodeURIComponent(input.code)}`) },

@@ -62,7 +62,7 @@ const safeguarding: Course = {
   audience: "Staff, volunteers, interns, consultants, vendors and partners",
   facilitator: "Hadiza Ibrahim Yaro, Director, Safeguarding, Accountability & Gender",
   photo: "caseManagement",
-  passMark: 100,
+  passMark: 80,
   lessons: [
     {
       id: "what-is-safeguarding",
@@ -517,7 +517,7 @@ const childSafeguardingPolicy: Course = {
   audience: "Everyone who represents LHI, including trustees, contractors and visitors",
   facilitator: "LHI Safeguarding, Accountability & Gender Unit",
   photo: "pledgeSchool",
-  passMark: 100,
+  passMark: 80,
   lessons: [
     {
       id: "scope-and-objectives",
@@ -760,7 +760,7 @@ const gbvHumanitarian: Course = {
   audience: "Staff, volunteers, LEMC members, community leaders and humanitarian partners",
   facilitator: "Hadiza Ibrahim Yaro, Director, Safeguarding, Accountability & Gender",
   photo: "activismWomen",
-  passMark: 100,
+  passMark: 80,
   lessons: [
     {
       id: "understanding-gbv",

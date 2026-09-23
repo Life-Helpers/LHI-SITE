@@ -188,7 +188,7 @@ export function Assessment({
           {pending && <Loader2 className="h-4 w-4 animate-spin" />} Submit assessment
         </button>
         <span className="text-sm text-muted-foreground">
-          {answered} of {questions.length} answered · pass mark {passMark}% (all questions correct)
+          {answered} of {questions.length} answered · pass mark {passMark}%
         </span>
         {result && !result.passed && (
           <button

@@ -170,7 +170,7 @@ All of these store their data in `CMS_DATA_DIR` and are managed from the admin:
   share buttons (Facebook, X, LinkedIn, WhatsApp, Telegram, Reddit, Pinterest, email, copy link, device share)
   and comments. Comments are held in **Admin → Comments** until approved.
 - **Humanitarian Training** (`/get-involved/training`): three courses built from LHI's safeguarding,
-  child safeguarding and GBV materials. The pass mark is 100%; learners who miss a question retake the
+  child safeguarding and GBV materials. The pass mark is 80%; learners who score below it retake the
   assessment. Lessons and assessments require a free learner account (email + password,
   separate from team accounts); progress is stored on the account. Learners are listed in **Admin → Learners**,
   where editors can reset a learner's password. Final-assessment answer keys live server-side in

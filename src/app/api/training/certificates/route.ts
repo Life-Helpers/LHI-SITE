@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   const alreadyHad = learner.progress[courseId]?.certificateId === certificate.id;
   await updateLearnerProgress(learner.id, courseId, (p) => ({ ...p, certificateId: certificate.id, score: graded.score }));
   if (!alreadyHad) {
-    await sendCertificateEmail({ name: certificate.name, email: learner.email, courseTitle: certificate.courseTitle, code: certificate.id });
+    await sendCertificateEmail({ name: certificate.name, email: learner.email, courseTitle: certificate.courseTitle, code: certificate.id, score: graded.score });
   }
   return NextResponse.json({ passed: true, score: graded.score, incorrect, certificateId: certificate.id });
 }

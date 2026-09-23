@@ -50,7 +50,7 @@ const sections: LegalSection[] = [
       <>
         <p>
           Training is free. You are responsible for keeping your account password confidential and for providing your real name, which appears on
-          your certificate. Certificates are issued when you complete every lesson and score 100% on the final assessment.
+          your certificate. Certificates are issued when you complete every lesson and score at least 80% on the final assessment.
         </p>
         <p>
           Certificates confirm completion of an LHI online course; they are not a professional licence. We may revoke a certificate obtained
