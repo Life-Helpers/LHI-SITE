@@ -401,3 +401,22 @@ export interface Certificate {
   score: number;
   issuedAt: string;
 }
+
+/** Reader engagement on posts (likes are anonymous counts; comments are moderated). */
+export interface PostLikes {
+  id: string; // post slug
+  likes: number;
+}
+
+export type CommentStatus = "pending" | "approved";
+
+export interface PostComment {
+  id: string;
+  slug: string;
+  postTitle: string;
+  name: string;
+  email: string;
+  body: string;
+  status: CommentStatus;
+  createdAt: string;
+}

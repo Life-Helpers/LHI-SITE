@@ -23,6 +23,7 @@ import {
   LogOut,
   Map,
   Menu,
+  MessageSquare,
   Moon,
   Search,
   Settings,
@@ -48,7 +49,7 @@ interface NavGroup {
   items: NavItem[];
 }
 
-function buildNav(newSubmissions: number): NavGroup[] {
+function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
   return [
     { label: "Home", items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard, minRole: "author" }] },
     {
@@ -56,6 +57,7 @@ function buildNav(newSubmissions: number): NavGroup[] {
       items: [
         { label: "Posts", href: "/admin/content/posts", icon: FileText, minRole: "author" },
         { label: "Media Library", href: "/admin/media", icon: ImageIcon, minRole: "author" },
+        { label: "Comments", href: "/admin/comments", icon: MessageSquare, minRole: "editor", badge: pendingComments },
       ],
     },
     {
@@ -104,10 +106,12 @@ function isActive(pathname: string, href: string) {
 export function AdminShell({
   user,
   newSubmissions,
+  pendingComments = 0,
   children,
 }: {
   user: PublicUser;
   newSubmissions: number;
+  pendingComments?: number;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -136,7 +140,7 @@ export function AdminShell({
     });
   };
 
-  const nav = buildNav(newSubmissions)
+  const nav = buildNav(newSubmissions, pendingComments)
     .map((g) => ({ ...g, items: g.items.filter((i) => hasRole(user.role, i.minRole)) }))
     .filter((g) => g.items.length > 0);
 

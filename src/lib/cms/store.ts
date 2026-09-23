@@ -3,7 +3,16 @@ import "server-only";
 import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import type { ActivityEntry, Certificate, CmsSettings, CmsUser, MediaItem, Submission } from "@/lib/cms/schema";
+import type {
+  ActivityEntry,
+  Certificate,
+  CmsSettings,
+  CmsUser,
+  MediaItem,
+  PostComment,
+  PostLikes,
+  Submission,
+} from "@/lib/cms/schema";
 import {
   seedDocuments,
   seedInterventions,
@@ -36,6 +45,8 @@ interface StoreShape extends CollectionRecords {
   submissions: Submission;
   activity: ActivityEntry;
   certificates: Certificate;
+  likes: PostLikes;
+  comments: PostComment;
 }
 
 export type StoreName = keyof StoreShape;
@@ -53,6 +64,8 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   submissions: () => [],
   activity: () => [],
   certificates: () => [],
+  likes: () => [],
+  comments: () => [],
 };
 
 const cache = new Map<string, { mtimeMs: number; data: unknown }>();

@@ -379,3 +379,32 @@ export async function updateProfileAction(input: {
   });
 }
 
+
+/* --------------------------------------------------------------- Comments */
+
+export async function setCommentStatusAction(id: string, status: "pending" | "approved"): Promise<ActionResult> {
+  return guard(async () => {
+    const user = await requireUser("editor");
+    const comment = await updateStore("comments", (items) => ({
+      items: items.map((c) => (c.id === id ? { ...c, status } : c)),
+      result: items.find((c) => c.id === id),
+    }));
+    if (!comment) return { ok: false, error: "This comment no longer exists." };
+    await logActivity(user, status === "approved" ? "approved comment on" : "unapproved comment on", comment.postTitle, `/blog/${comment.slug}`);
+    revalidatePath("/admin", "layout");
+    return { ok: true };
+  });
+}
+
+export async function deleteCommentAction(id: string): Promise<ActionResult> {
+  return guard(async () => {
+    const user = await requireUser("editor");
+    const comment = await updateStore("comments", (items) => ({
+      items: items.filter((c) => c.id !== id),
+      result: items.find((c) => c.id === id),
+    }));
+    if (comment) await logActivity(user, "deleted comment on", comment.postTitle);
+    revalidatePath("/admin", "layout");
+    return { ok: true };
+  });
+}

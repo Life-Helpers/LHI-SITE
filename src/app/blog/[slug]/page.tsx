@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Calendar, Clock, Tag, User } from "lucide-react";
 
+import { PostEngagement } from "@/components/blog/post-engagement";
+import { siteConfig } from "@/config/site";
 import { getPostBySlug, getPublishedPosts } from "@/lib/cms/content";
 import { isUnoptimized } from "@/lib/image";
 import { formatPostDate, readingTime } from "@/lib/posts";
@@ -79,6 +81,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             ))}
           </div>
         )}
+
+        <PostEngagement
+          slug={post.slug}
+          title={post.title}
+          url={`${siteConfig.url}/blog/${post.slug}`}
+          image={post.featuredImage ? new URL(post.featuredImage, siteConfig.url).toString() : undefined}
+        />
 
         {related.length > 0 && (
           <aside className="mt-14">
