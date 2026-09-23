@@ -6,13 +6,12 @@ import { ArrowLeft, Clock } from "lucide-react";
 
 import { KnowledgeCheck } from "@/components/training/knowledge-check";
 import { LessonContent } from "@/components/training/lesson-content";
-import { COURSES, coursePhoto, getCourse } from "@/data/training/courses";
+import { coursePhoto, getCourse } from "@/data/training/courses";
+import { requireLearnerPage } from "@/lib/training/learners";
 
 type Params = Promise<{ courseId: string; lessonId: string }>;
 
-export function generateStaticParams() {
-  return COURSES.flatMap((c) => c.lessons.map((l) => ({ courseId: c.id, lessonId: l.id })));
-}
+export const dynamic = "force-dynamic";
 
 async function load(params: Params) {
   const { courseId, lessonId } = await params;
@@ -31,6 +30,7 @@ export default async function LessonPage({ params }: { params: Params }) {
   const data = await load(params);
   if (!data) notFound();
   const { course, lesson, index } = data;
+  await requireLearnerPage(`/get-involved/training/${course.id}/${lesson.id}`);
   const next = course.lessons[index + 1];
   const photo = coursePhoto(lesson);
   const base = `/get-involved/training/${course.id}`;

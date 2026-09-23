@@ -3,7 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Award, BookOpenCheck, Clock, GraduationCap, ShieldCheck, Users } from "lucide-react";
 
+import { LearnerBar } from "@/components/training/learner-bar";
 import { VerifyCertificateForm } from "@/components/training/verify-form";
+import { getCurrentLearner } from "@/lib/training/learners";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { COURSES, coursePhoto } from "@/data/training/courses";
@@ -15,13 +17,17 @@ export const metadata: Metadata = {
 };
 
 const steps = [
-  { icon: BookOpenCheck, title: "Study the lessons", text: "Short, self-paced lessons drawn from LHI's safeguarding training and policies." },
+  { icon: Users, title: "Create a free account", text: "Sign up with your email so your progress and certificates are saved to your account." },
+  { icon: BookOpenCheck, title: "Study the lessons", text: "Short, self-paced lessons drawn from LHI's safeguarding, child safeguarding and GBV training." },
   { icon: ShieldCheck, title: "Pass each knowledge check", text: "Answer every practice question correctly to complete a lesson." },
   { icon: GraduationCap, title: "Take the final assessment", text: "Score 80% or more on the final assessment. You can retake it as often as you need." },
   { icon: Award, title: "Download your certificate", text: "Receive a PDF certificate with a unique code anyone can verify on this page." },
 ];
 
-export default function TrainingPage() {
+export const dynamic = "force-dynamic";
+
+export default async function TrainingPage() {
+  const learner = await getCurrentLearner();
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       <PageHeroBanner
@@ -38,7 +44,8 @@ export default function TrainingPage() {
 
       <section className="py-16 md:py-20" aria-labelledby="courses-heading">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— Course catalogue</p>
+          <LearnerBar learner={learner && { name: learner.name, email: learner.email }} next="/get-involved/training" />
+          <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— Course catalogue</p>
           <h2 id="courses-heading" className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
             Available courses
           </h2>
@@ -81,7 +88,7 @@ export default function TrainingPage() {
       <section className="border-y border-border bg-muted/20 py-16" aria-labelledby="how-heading">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 id="how-heading" className="font-serif-display text-3xl font-light text-foreground">How it works</h2>
-          <ol className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {steps.map((s, i) => (
               <li key={s.title} className="rounded-2xl border border-border bg-card p-5">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -94,7 +101,7 @@ export default function TrainingPage() {
             ))}
           </ol>
           <p className="mt-6 text-xs text-muted-foreground">
-            Your lesson progress is saved in this browser. Certificates are recorded by LHI and can be re-downloaded with their code.
+            Your progress is saved to your learner account, so you can continue on any device. Certificates can be re-downloaded with their code.
           </p>
         </div>
       </section>

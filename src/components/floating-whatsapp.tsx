@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { siWhatsapp } from "simple-icons";
 import { MessageCircle, ShieldAlert, X, Phone, Mail, CheckCircle2, ChevronRight, ExternalLink } from "lucide-react";
 import { siteConfig } from "@/config/site";
 
@@ -199,7 +200,7 @@ export function FloatingWhatsApp() {
         type="button"
         id="floating-whatsapp-btn"
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xl hover:bg-emerald-500 hover:scale-105 active:scale-95 transition-all focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-emerald-500"
+        className="group relative isolate flex h-14 w-14 items-center justify-center rounded-full border-2 border-white bg-[#25D366] text-white opacity-100 shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-all hover:scale-105 hover:bg-[#1ebe5b] active:scale-95 focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-emerald-500 dark:border-[#25D366]"
         aria-label="Open WhatsApp Chat and PSEA abuse reporting options"
         aria-expanded={isOpen}
       >
@@ -212,7 +213,9 @@ export function FloatingWhatsApp() {
         {isOpen ? (
           <X className="h-7 w-7" />
         ) : (
-          <MessageCircle className="h-7 w-7 fill-white text-emerald-600" />
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="h-7 w-7" fill="#ffffff">
+            <path d={siWhatsapp.path} />
+          </svg>
         )}
       </button>
     </aside>

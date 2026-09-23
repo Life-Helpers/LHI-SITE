@@ -33,11 +33,11 @@ export function validatePasswordStrength(password: string): string | null {
   return null;
 }
 
-async function sessionKey() {
+export async function sessionKey() {
   return process.env.CMS_SESSION_SECRET || readSecret("session", () => randomBytes(32).toString("base64"));
 }
 
-function sign(payload: string, key: string) {
+export function sign(payload: string, key: string) {
   return createHmac("sha256", key).update(payload).digest("base64url");
 }
 

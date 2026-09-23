@@ -408,3 +408,37 @@ export async function deleteCommentAction(id: string): Promise<ActionResult> {
     return { ok: true };
   });
 }
+
+/* --------------------------------------------------------------- Learners */
+
+/** Sets a random temporary password for a learner and returns it once, for the admin to pass on. */
+export async function resetLearnerPasswordAction(id: string): Promise<ActionResult & { password?: string }> {
+  try {
+    const user = await requireUser("editor");
+    const password = randomUUID().replace(/-/g, "").slice(0, 12);
+    const hash = await hashPassword(password);
+    const learner = await updateStore("learners", (items) => ({
+      items: items.map((l) => (l.id === id ? { ...l, passwordHash: hash } : l)),
+      result: items.find((l) => l.id === id),
+    }));
+    if (!learner) return { ok: false, error: "Learner not found." };
+    await logActivity(user, "reset training password for", learner.email);
+    return { ok: true, password };
+  } catch (err) {
+    if (err instanceof AuthError) return { ok: false, error: err.message };
+    throw err;
+  }
+}
+
+export async function deleteLearnerAction(id: string): Promise<ActionResult> {
+  return guard(async () => {
+    const user = await requireUser("administrator");
+    const learner = await updateStore("learners", (items) => ({
+      items: items.filter((l) => l.id !== id),
+      result: items.find((l) => l.id === id),
+    }));
+    if (learner) await logActivity(user, "deleted learner account", learner.email);
+    revalidatePath("/admin", "layout");
+    return { ok: true };
+  });
+}

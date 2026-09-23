@@ -17,7 +17,9 @@ export function Assessment({
   lessonIds,
   questions,
   passMark,
+  learner,
 }: {
+  learner: { name: string; email: string; organization?: string };
   courseId: string;
   courseTitle: string;
   lessonIds: string[];
@@ -26,9 +28,8 @@ export function Assessment({
 }) {
   const { progress, loaded, update } = useCourseProgress(courseId);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [organization, setOrganization] = useState("");
+  const [name, setName] = useState(learner.name);
+  const [organization, setOrganization] = useState(learner.organization ?? "");
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
@@ -78,7 +79,7 @@ export function Assessment({
       const res = await fetch("/api/training/certificates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId, name, email, organization, answers }),
+        body: JSON.stringify({ courseId, name, organization, answers }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Submission failed.");
@@ -149,10 +150,10 @@ export function Assessment({
             Full name (as on certificate)
             <input required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" className="mt-1.5 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
           </label>
-          <label className="text-sm font-medium text-foreground">
-            Email
-            <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" className="mt-1.5 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
-          </label>
+          <div className="text-sm font-medium text-foreground">
+            Email (your account)
+            <p className="mt-1.5 truncate rounded-lg border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">{learner.email}</p>
+          </div>
           <label className="text-sm font-medium text-foreground">
             Organisation (optional)
             <input value={organization} onChange={(e) => setOrganization(e.target.value)} className="mt-1.5 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
@@ -169,7 +170,7 @@ export function Assessment({
       <div className="flex flex-wrap items-center gap-4">
         <button
           type="submit"
-          disabled={pending || answered < questions.length || !name.trim() || !email.trim()}
+          disabled={pending || answered < questions.length || !name.trim()}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
           {pending && <Loader2 className="h-4 w-4 animate-spin" />} Submit assessment

@@ -3,11 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Assessment } from "@/components/training/assessment";
-import { COURSES, getCourse } from "@/data/training/courses";
+import { getCourse } from "@/data/training/courses";
+import { requireLearnerPage } from "@/lib/training/learners";
 
-export function generateStaticParams() {
-  return COURSES.map((c) => ({ courseId: c.id }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }): Promise<Metadata> {
   const course = getCourse((await params).courseId);
@@ -17,6 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ courseId:
 export default async function AssessmentPage({ params }: { params: Promise<{ courseId: string }> }) {
   const course = getCourse((await params).courseId);
   if (!course) notFound();
+  const learner = await requireLearnerPage(`/get-involved/training/${course.id}/assessment`);
 
   return (
     <main id="main-content" tabIndex={-1} className="flex-1 pb-20 pt-24">
@@ -38,6 +38,7 @@ export default async function AssessmentPage({ params }: { params: Promise<{ cou
             lessonIds={course.lessons.map((l) => l.id)}
             questions={course.exam}
             passMark={course.passMark}
+            learner={{ name: learner.name, email: learner.email, organization: learner.organization }}
           />
         </div>
       </div>

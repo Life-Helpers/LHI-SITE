@@ -74,7 +74,7 @@ export const ig: Dictionary = {
     privacy: "Iwu Nzuzo",
     terms: "Usoro Ojiji",
     rights: "Echedoro ikike niile.",
-    adminLogin: "Nbanye Onye Nlekọta",
+    adminLogin: "Nbanye ndị otu",
     whoWeAreHeading: "Onye Anyị Bụ",
     programsHeading: "Mmemme Anyị",
     impactHeading: "Mmetụta & Mmelite",

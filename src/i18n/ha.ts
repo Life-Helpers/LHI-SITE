@@ -73,7 +73,7 @@ export const ha: Dictionary = {
     privacy: "Manufar Sirri",
     terms: "Sharuɗɗan Amfani",
     rights: "An kiyaye duk haƙƙoƙi.",
-    adminLogin: "Shiga Admin",
+    adminLogin: "Shiga Ma'aikata",
     whoWeAreHeading: "Wane ne Mu",
     programsHeading: "Shirye-shiryenmu",
     impactHeading: "Tasiri & Sabuntawa",

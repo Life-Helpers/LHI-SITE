@@ -8,46 +8,41 @@ export interface CourseProgress {
   score?: number;
 }
 
-const KEY = "lhi_training_progress_v1";
-
-function readAll(): Record<string, CourseProgress> {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "{}") as Record<string, CourseProgress>;
-  } catch {
-    return {};
-  }
-}
-
-/** Per-learner course progress, kept in this browser only. */
+/** The signed-in learner's progress in a course, stored on their LHI training account. */
 export function useCourseProgress(courseId: string) {
   const [progress, setProgress] = useState<CourseProgress>({ completed: [] });
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setProgress(readAll()[courseId] ?? { completed: [] });
-    setLoaded(true);
+    let cancelled = false;
+    fetch(`/api/training/progress?course=${encodeURIComponent(courseId)}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled) return;
+        if (data?.progress) setProgress(data.progress);
+        setLoaded(true);
+      })
+      .catch(() => !cancelled && setLoaded(true));
+    return () => {
+      cancelled = true;
+    };
   }, [courseId]);
 
-  const update = useCallback(
-    (fn: (p: CourseProgress) => CourseProgress) => {
-      setProgress((prev) => {
-        const next = fn(prev);
-        try {
-          const all = readAll();
-          all[courseId] = next;
-          localStorage.setItem(KEY, JSON.stringify(all));
-        } catch {
-          /* storage unavailable: progress lasts for this visit only */
-        }
-        return next;
-      });
-    },
-    [courseId],
-  );
+  /** Local update after the server has recorded something (e.g. a certificate). */
+  const update = useCallback((fn: (p: CourseProgress) => CourseProgress) => setProgress((prev) => fn(prev)), []);
 
   const completeLesson = useCallback(
-    (lessonId: string) => update((p) => (p.completed.includes(lessonId) ? p : { ...p, completed: [...p.completed, lessonId] })),
-    [update],
+    async (lessonId: string) => {
+      setProgress((p) => (p.completed.includes(lessonId) ? p : { ...p, completed: [...p.completed, lessonId] }));
+      const res = await fetch("/api/training/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId, lessonId }),
+      }).catch(() => null);
+      const data = await res?.json().catch(() => null);
+      if (data?.progress) setProgress(data.progress);
+    },
+    [courseId],
   );
 
   return { progress, loaded, completeLesson, update };

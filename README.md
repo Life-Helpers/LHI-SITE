@@ -129,7 +129,9 @@ All of these store their data in `CMS_DATA_DIR` and are managed from the admin:
   share buttons (Facebook, X, LinkedIn, WhatsApp, Telegram, Reddit, Pinterest, email, copy link, device share)
   and comments. Comments are held in **Admin → Comments** until approved.
 - **Humanitarian Training** (`/get-involved/training`): three courses built from LHI's safeguarding,
-  child safeguarding and GBV materials. Final-assessment answer keys live server-side in
+  child safeguarding and GBV materials. Lessons and assessments require a free learner account (email + password,
+  separate from team accounts); progress is stored on the account. Learners are listed in **Admin → Learners**,
+  where editors can reset a learner's password. Final-assessment answer keys live server-side in
   `src/data/training/answer-keys.ts`. Certificates are listed in **Admin → Certificates** and can be verified publicly.
 - **Careers** (`/careers`) and **Procurement** (`/procurement`): vacancies and vendor requests are managed in
   **Admin → Jobs & Vacancies / Vendor Requests**. CVs and bid documents are stored under `CMS_DATA_DIR/private`

@@ -87,6 +87,7 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
     {
       label: "Training",
       items: [
+        { label: "Learners", href: "/admin/learners", icon: Users, minRole: "editor" },
         { label: "Certificates", href: "/admin/certificates", icon: GraduationCap, minRole: "editor" },
       ],
     },

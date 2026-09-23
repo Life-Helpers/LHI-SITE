@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Award, CheckCircle2, Circle, Clock, Lock } from "lucide-react";
+import { Award, CheckCircle2, Circle, Clock, Lock, UserRound } from "lucide-react";
 
 import { useCourseProgress } from "@/components/training/use-progress";
 
 export function CourseOutline({
   courseId,
   lessons,
+  signedIn,
 }: {
+  signedIn: boolean;
   courseId: string;
   lessons: { id: string; title: string; summary: string; minutes: number }[];
 }) {
@@ -18,8 +20,28 @@ export function CourseOutline({
   const unlocked = done === lessons.length;
   const nextLesson = lessons.find((l) => !progress.completed.includes(l.id));
 
+  const signIn = `/get-involved/training/login?next=${encodeURIComponent(`/get-involved/training/${courseId}`)}`;
+
   return (
     <div className="space-y-6">
+      {!signedIn ? (
+        <div className="rounded-3xl border border-primary/30 bg-primary/5 p-6">
+          <p className="flex items-center gap-2 font-semibold text-foreground">
+            <UserRound className="h-5 w-5 text-primary" /> Sign in to start learning
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Create a free learner account with your email to take the lessons, save your progress on any device and earn your certificate.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href={`${signIn}&mode=signup`} className="rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
+              Create free account
+            </Link>
+            <Link href={signIn} className="rounded-full border border-border px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-muted">
+              Sign in
+            </Link>
+          </div>
+        </div>
+      ) : (
       <div className="rounded-3xl border border-border bg-card p-6">
         <div className="flex items-center justify-between text-sm">
           <span className="font-semibold text-foreground">Your progress</span>
@@ -43,13 +65,14 @@ export function CourseOutline({
           )}
         </div>
       </div>
+      )}
 
       <ol className="space-y-3">
         {lessons.map((lesson, i) => {
           const complete = progress.completed.includes(lesson.id);
           return (
             <li key={lesson.id}>
-              <Link href={`/get-involved/training/${courseId}/${lesson.id}`} className="group flex items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/50">
+              <Link href={signedIn ? `/get-involved/training/${courseId}/${lesson.id}` : signIn} className="group flex items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/50">
                 {complete ? (
                   <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-emerald-600" aria-label="Completed" />
                 ) : (

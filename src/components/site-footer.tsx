@@ -100,20 +100,6 @@ export function SiteFooter() {
 
             <SocialLinks className="mt-4" />
 
-            {/* Prominent Admin Login pill button in footer */}
-            <div className="mt-4 pt-3 border-t border-border/60">
-              <Link
-                href="/admin/login"
-                id="footer-admin-login-cta"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 text-xs font-medium text-foreground shadow-xs hover:border-primary/40 hover:bg-muted/60 transition-all focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-              >
-                <Lock className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                <span>{t.footer.adminLogin}</span>
-                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                  Staff Only
-                </span>
-              </Link>
-            </div>
           </div>
 
           {/* Navigation Links Columns */}
@@ -191,16 +177,6 @@ export function SiteFooter() {
                     </Link>
                   </li>
                 ))}
-                <li>
-                  <Link
-                    href="/admin/login"
-                    id="footer-admin-login-link"
-                    className="inline-flex items-center gap-1.5 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                  >
-                    <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-                    {t.footer.adminLogin}
-                  </Link>
-                </li>
               </ul>
             </div>
           </div>

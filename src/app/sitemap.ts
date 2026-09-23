@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...MAGAZINES.map((m) => `/project-magazines/${m.slug}`),
     "/procurement",
     "/get-involved/training",
-    ...COURSES.flatMap((c) => [`/get-involved/training/${c.id}`, ...c.lessons.map((l) => `/get-involved/training/${c.id}/${l.id}`)]),
+    ...COURSES.map((c) => `/get-involved/training/${c.id}`),
   ].map((path) => ({
     url: `${siteConfig.url}${path}`,
     changeFrequency: "weekly" as const,

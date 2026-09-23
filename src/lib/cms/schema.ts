@@ -448,3 +448,22 @@ export interface PostComment {
   status: CommentStatus;
   createdAt: string;
 }
+
+/** Humanitarian Training learner account (separate from admin users). */
+export interface LearnerCourseProgress {
+  completed: string[];
+  certificateId?: string;
+  score?: number;
+  updatedAt?: string;
+}
+
+export interface Learner {
+  id: string;
+  name: string;
+  email: string;
+  organization?: string;
+  passwordHash: string;
+  createdAt: string;
+  lastLoginAt?: string;
+  progress: Record<string, LearnerCourseProgress>;
+}

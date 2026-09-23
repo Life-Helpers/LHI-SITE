@@ -73,7 +73,7 @@ export const yo: Dictionary = {
     privacy: "Ìlànà Àṣírí",
     terms: "Àwọn Òfin Lílò",
     rights: "Gbogbo ẹ̀tọ́ ni a dáàbò bò.",
-    adminLogin: "Wọlé Alábòójútó",
+    adminLogin: "Wọlé ẹgbẹ́",
     whoWeAreHeading: "Ta ni Wa",
     programsHeading: "Àwọn Ètò Wa",
     impactHeading: "Ipa & Àwọn Ìròyìn",

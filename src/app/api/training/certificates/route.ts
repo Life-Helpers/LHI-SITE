@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { gradeExam, issueCertificate } from "@/lib/training/grading";
+import { getCurrentLearner, updateLearnerProgress } from "@/lib/training/learners";
 
 const schema = z.object({
   courseId: z.string().min(1).max(80),
   name: z.string().trim().min(2, "Enter your full name as it should appear on the certificate.").max(80),
-  email: z.string().trim().email("Enter a valid email address."),
   organization: z.string().trim().max(120).optional(),
   answers: z.record(z.string(), z.number().int().min(0).max(10)),
 });
@@ -24,13 +24,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Too many attempts. Please try again in an hour." }, { status: 429 });
   }
 
+  const learner = await getCurrentLearner();
+  if (!learner) return NextResponse.json({ error: "Sign in to take the assessment." }, { status: 401 });
+
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid submission." }, { status: 400 });
   }
-  const { courseId, name, email, organization, answers } = parsed.data;
+  const { courseId, name, organization, answers } = parsed.data;
   const graded = gradeExam(courseId, answers);
   if (!graded) return NextResponse.json({ error: "Unknown course." }, { status: 404 });
+  const done = learner.progress[courseId]?.completed ?? [];
+  if (!graded.course.lessons.every((l) => done.includes(l.id))) {
+    return NextResponse.json({ error: "Complete every lesson before taking the final assessment." }, { status: 403 });
+  }
 
   const incorrect = graded.results.filter((r) => !r.correct).map((r) => r.id);
   if (!graded.passed) {
@@ -41,9 +48,10 @@ export async function POST(req: NextRequest) {
     courseId,
     courseTitle: graded.course.title,
     name,
-    email,
-    organization: organization || undefined,
+    email: learner.email,
+    organization: organization || learner.organization || undefined,
     score: graded.score,
   });
+  await updateLearnerProgress(learner.id, courseId, (p) => ({ ...p, certificateId: certificate.id, score: graded.score }));
   return NextResponse.json({ passed: true, score: graded.score, incorrect, certificateId: certificate.id });
 }

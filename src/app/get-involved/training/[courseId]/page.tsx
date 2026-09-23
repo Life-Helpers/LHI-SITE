@@ -5,11 +5,11 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Award, BookOpenCheck, Clock, UserRound, Users } from "lucide-react";
 
 import { CourseOutline } from "@/components/training/course-outline";
-import { COURSES, coursePhoto, getCourse } from "@/data/training/courses";
+import { LearnerBar } from "@/components/training/learner-bar";
+import { coursePhoto, getCourse } from "@/data/training/courses";
+import { getCurrentLearner } from "@/lib/training/learners";
 
-export function generateStaticParams() {
-  return COURSES.map((c) => ({ courseId: c.id }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }): Promise<Metadata> {
   const course = getCourse((await params).courseId);
@@ -20,6 +20,7 @@ export default async function CoursePage({ params }: { params: Promise<{ courseI
   const course = getCourse((await params).courseId);
   if (!course) notFound();
   const photo = coursePhoto(course);
+  const learner = await getCurrentLearner();
   const minutes = course.lessons.reduce((sum, l) => sum + l.minutes, 0);
 
   return (
@@ -42,9 +43,13 @@ export default async function CoursePage({ params }: { params: Promise<{ courseI
       </section>
 
       <section className="py-14">
+        <div className="mx-auto mb-8 max-w-6xl px-4 sm:px-6 lg:px-8">
+          <LearnerBar learner={learner && { name: learner.name, email: learner.email }} next={`/get-involved/training/${course.id}`} />
+        </div>
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
           <div className="lg:col-span-2">
             <CourseOutline
+              signedIn={Boolean(learner)}
               courseId={course.id}
               lessons={course.lessons.map(({ id, title, summary, minutes }) => ({ id, title, summary, minutes }))}
             />

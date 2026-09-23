@@ -8,6 +8,7 @@ import type {
   Certificate,
   CmsSettings,
   CmsUser,
+  Learner,
   MediaItem,
   PostComment,
   PostLikes,
@@ -47,6 +48,7 @@ interface StoreShape extends CollectionRecords {
   certificates: Certificate;
   likes: PostLikes;
   comments: PostComment;
+  learners: Learner;
 }
 
 export type StoreName = keyof StoreShape;
@@ -67,6 +69,7 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   certificates: () => [],
   likes: () => [],
   comments: () => [],
+  learners: () => [],
 };
 
 const cache = new Map<string, { mtimeMs: number; data: unknown }>();

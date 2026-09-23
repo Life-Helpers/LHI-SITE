@@ -72,7 +72,7 @@ export const en: Dictionary = {
     privacy: "Privacy Policy",
     terms: "Terms of Service",
     rights: "All rights reserved.",
-    adminLogin: "Admin Login",
+    adminLogin: "Team login",
     whoWeAreHeading: "Who We Are",
     programsHeading: "Our Programs",
     impactHeading: "Impact & Updates",
