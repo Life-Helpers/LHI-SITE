@@ -19,6 +19,12 @@ export default defineConfig({
     : "list",
   use: {
     baseURL,
+    // Suppress the seasonal anniversary popup so it doesn't cover pages under test
+    // (e2e/anniversary.spec.ts opts back in).
+    storageState: {
+      cookies: [],
+      origins: [{ origin: baseURL, localStorage: [{ name: "lhi_anniversary_22", value: '{"subscribed":true}' }] }],
+    },
     trace: "on-first-retry",
     // Only set for local sandboxes with a mismatched pre-installed browser
     // cache; CI and normal dev machines resolve the browser normally via

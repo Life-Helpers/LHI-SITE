@@ -11,6 +11,7 @@ import { PublicChrome } from "@/components/public-chrome";
 import { AccessibilityProvider } from "@/components/accessibility/accessibility-context";
 import { BokehBackground } from "@/components/effects/bokeh-background";
 import { FloatingWhatsApp } from "@/components/floating-whatsapp";
+import { AnniversaryPopup } from "@/components/anniversary/anniversary-popup";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { LocaleProvider } from "@/i18n/locale-context";
 import { GoogleTranslateBridge } from "@/components/google-translate-bridge";
@@ -149,6 +150,7 @@ export default function RootLayout({
               <PublicChrome>
                 <SiteFooter />
                 <FloatingWhatsApp />
+                <AnniversaryPopup />
               </PublicChrome>
             </LocaleProvider>
           </AccessibilityProvider>
