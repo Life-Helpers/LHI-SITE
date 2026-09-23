@@ -39,9 +39,9 @@ export function ParallaxBackground({ src, strength = 0.25, children, className =
   return (
     <div ref={sectionRef} className={`relative isolate overflow-hidden ${className}`}>
       <div ref={imageRef} aria-hidden="true" className="absolute inset-0 -z-20 scale-[1.15] will-change-transform">
-        <Image src={src} alt="" fill sizes="100vw" className="object-cover opacity-45 dark:opacity-35" />
+        <Image src={src} alt="" fill sizes="100vw" className="object-cover opacity-80 dark:opacity-60" />
       </div>
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-background/90 via-background/75 to-background/90" />
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-background/75 via-background/35 to-background/75" />
       {children}
     </div>
   );

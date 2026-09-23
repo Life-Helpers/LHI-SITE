@@ -27,7 +27,6 @@ export function PhilosophyQuote() {
               <Smile className="h-10 w-10 shrink-0 motion-safe:animate-[bounce_2.4s_ease-in-out_infinite] sm:h-14 sm:w-14" aria-hidden="true" />
             </p>
           </blockquote>
-          <p className="mt-8 text-sm text-muted-foreground">{p.attribution}</p>
         </div>
       </ScrollReveal>
     </section>

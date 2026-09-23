@@ -32,6 +32,13 @@ const testimonials: { quote: string; name: string; role: string; href: string; t
     href: "/blog/abep-impact-beyond-the-classroom",
     tone: "from-[#7d0c10] to-[#4a0709]",
   },
+  {
+    quote: "I thought it was a lie. But when I finally received the ₦75,000 WFP Cash-Based Transfer support, it felt like someone had given me one million naira.",
+    name: "Murja Yari",
+    role: "WFP cash transfer beneficiary, Katsina State",
+    href: "/blog/murja-eight-years-of-struggle-to-renewed-hope",
+    tone: "from-[#b45309] to-[#7c2d12]",
+  },
 ];
 
 const initials = (name: string) =>
@@ -58,7 +65,7 @@ export function TestimonialsSection() {
 
   return (
     <section aria-labelledby="testimonials-heading" className="relative overflow-hidden bg-muted/30 py-20 sm:py-24">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal className="mb-14 flex flex-col items-center gap-3 text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— In their own words</p>
           <h2 id="testimonials-heading" className="font-serif-display text-3xl font-light sm:text-5xl">
@@ -67,9 +74,9 @@ export function TestimonialsSection() {
           <p className="max-w-xl text-muted-foreground">{t.home.testimonials.subtitle}</p>
         </ScrollReveal>
 
-        <div className="grid gap-10 md:grid-cols-3 md:gap-6">
+        <div className="grid gap-10 sm:grid-cols-2 sm:gap-8 xl:grid-cols-4 xl:gap-6">
           {testimonials.map((item, i) => (
-            <figure key={item.name} className={`group relative ${i === 1 ? "md:-translate-y-6" : ""}`}>
+            <figure key={item.name} className={`group relative ${i % 2 === 1 ? "xl:-translate-y-6" : ""}`}>
               {/* Offset colour layer behind the card */}
               <div
                 aria-hidden="true"
@@ -83,7 +90,7 @@ export function TestimonialsSection() {
                   <Quote className="h-5 w-5 fill-current" />
                 </span>
                 <Stars />
-                <blockquote className="mt-4 flex-1 font-serif-display text-lg italic leading-relaxed text-foreground">
+                <blockquote className="mt-4 flex-1 font-serif-display text-base italic leading-relaxed sm:text-lg text-foreground">
                   “{item.quote}”
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-3 border-t border-dashed border-border pt-5">
