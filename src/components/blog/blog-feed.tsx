@@ -1,76 +1,65 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Calendar, Clock, Tag, User } from "lucide-react";
-import { type BlogPost, initialBlogPosts } from "@/lib/cms-crm-store";
 
-export function BlogFeed() {
-  const [posts, setPosts] = useState<BlogPost[]>(initialBlogPosts);
+import { isUnoptimized } from "@/lib/image";
+import type { CmsPost } from "@/lib/cms/types";
+import { formatPostDate, readingTime } from "@/lib/posts";
+
+export function BlogFeed({ posts }: { posts: CmsPost[] }) {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const categories = ["All", ...Array.from(new Set(posts.map((p) => p.category)))];
+  const filtered = posts.filter((p) => (selectedCategory === "All" ? true : p.category === selectedCategory));
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("lhi_cms_posts");
-        if (saved) {
-          const parsed = JSON.parse(saved) as BlogPost[];
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setPosts(parsed);
-          }
-        }
-      } catch (e) {
-        console.error("Failed to load blog posts from localStorage", e);
-      }
-    }
-  }, []);
-
-  // Filter only published posts for the public view
-  const publishedPosts = posts.filter((p) => p.status.toLowerCase() === "published");
-  const categories = ["All", ...Array.from(new Set(publishedPosts.map((p) => p.category)))];
-
-  const filtered = publishedPosts.filter((p) =>
-    selectedCategory === "All" ? true : p.category === selectedCategory
-  );
+  if (posts.length === 0) {
+    return <p className="py-12 text-center text-sm text-muted-foreground">No articles have been published yet.</p>;
+  }
 
   return (
     <div className="space-y-8">
-      {/* Category Pills */}
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
-              selectedCategory === cat
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-card border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+      {categories.length > 2 && (
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCategory(cat)}
+              aria-pressed={selectedCategory === cat}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
+                selectedCategory === cat
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-card border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {/* Grid of articles */}
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         {filtered.map((post) => (
           <article
             key={post.id}
-            className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card transition-all hover:border-primary/50 hover:shadow-xl"
+            className="group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card transition-all hover:border-primary/50 hover:shadow-xl"
           >
-            <div className="relative aspect-16/9 w-full bg-muted overflow-hidden">
-              <Image
-                src={post.featuredImage}
-                alt={post.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute top-3 left-3">
-                <span className="rounded-full bg-primary/90 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-white shadow-sm">
+            <div className="relative aspect-16/9 w-full overflow-hidden bg-muted">
+              {post.featuredImage && (
+                <Image
+                  src={post.featuredImage}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  unoptimized={isUnoptimized(post.featuredImage)}
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+              )}
+              <div className="absolute left-3 top-3">
+                <span className="rounded-full bg-primary/90 px-3 py-1 text-[11px] font-bold text-white shadow-sm backdrop-blur-md">
                   {post.category}
                 </span>
               </div>
@@ -80,48 +69,45 @@ export function BlogFeed() {
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-3.5 w-3.5 text-primary" />
-                  {post.date}
+                  {formatPostDate(post.date)}
                 </span>
                 <span>·</span>
                 <span className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5 text-primary" />
-                  {post.readTime}
+                  {readingTime(post.content)}
                 </span>
               </div>
 
               <h2 className="mt-3 text-xl font-bold tracking-tight text-foreground transition-colors group-hover:text-primary sm:text-2xl">
-                {post.title}
+                <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
+                  {post.title}
+                </Link>
               </h2>
 
-              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
-                {post.excerpt}
-              </p>
+              <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">{post.excerpt}</p>
 
-              <div className="mt-6 flex flex-wrap gap-1.5">
-                {post.tags.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
-                  >
-                    <Tag className="h-2.5 w-2.5" />
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              {post.tags.length > 0 && (
+                <div className="mt-6 flex flex-wrap gap-1.5">
+                  {post.tags.slice(0, 3).map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                    >
+                      <Tag className="h-2.5 w-2.5" />
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-6 flex items-center justify-between border-t border-border pt-4 text-xs">
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <User className="h-3.5 w-3.5 text-primary" />
                   <span className="font-medium text-foreground">{post.author}</span>
                 </div>
-
-                <Link
-                  href={`/contact?subject=${encodeURIComponent(`Inquiry on ${post.title}`)}`}
-                  className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
-                >
-                  <span>Discuss Article</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+                <span className="inline-flex items-center gap-1 font-semibold text-primary">
+                  Read article <ArrowRight className="h-3.5 w-3.5" />
+                </span>
               </div>
             </div>
           </article>

@@ -15,17 +15,12 @@ import {
 
 import { FieldGallery } from "@/components/interventions/field-gallery";
 import { getInterventionGallery } from "@/data/intervention-media";
-import { INTERVENTIONS_DATA } from "@/data/interventions-data";
-import { OPERATIONAL_STATES } from "@/data/operational-states";
+import { getIntervention, getInterventions, getStates } from "@/lib/cms/content";
 
-export const dynamicParams = false;
+export const revalidate = 300;
 
-function getProject(id: string) {
-  return INTERVENTIONS_DATA.find((project) => project.id === id);
-}
-
-export function generateStaticParams() {
-  return INTERVENTIONS_DATA.map((project) => ({ id: project.id }));
+export async function generateStaticParams() {
+  return (await getInterventions()).map((project) => ({ id: project.id }));
 }
 
 export async function generateMetadata({
@@ -34,7 +29,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const project = getProject(id);
+  const project = await getIntervention(id);
   if (!project) return {};
   return {
     title: `${project.shortTitle} | Project Dossier | Life Helpers Initiative`,
@@ -53,14 +48,15 @@ export default async function InterventionDossierPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const project = getProject(id);
+  const [all, allStates] = await Promise.all([getInterventions(), getStates()]);
+  const project = all.find((p) => p.id === id);
   if (!project) notFound();
 
   const gallery = getInterventionGallery(project);
-  const states = OPERATIONAL_STATES.filter((s) => project.states.includes(s.id));
-  const index = INTERVENTIONS_DATA.findIndex((p) => p.id === project.id);
-  const next = INTERVENTIONS_DATA[(index + 1) % INTERVENTIONS_DATA.length];
-  const related = INTERVENTIONS_DATA.filter(
+  const states = allStates.filter((s) => project.states.includes(s.id));
+  const index = all.findIndex((p) => p.id === project.id);
+  const next = all[(index + 1) % all.length];
+  const related = all.filter(
     (p) => p.id !== project.id && p.primaryThematic === project.primaryThematic,
   ).slice(0, 3);
 

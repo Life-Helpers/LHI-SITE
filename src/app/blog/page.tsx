@@ -5,6 +5,9 @@ import { BookOpen } from "lucide-react";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { BlogFeed } from "@/components/blog/blog-feed";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { getPublishedPosts } from "@/lib/cms/content";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "LHI Field Blog | Life Helpers Initiative",
@@ -12,7 +15,8 @@ export const metadata: Metadata = {
     "Field reflections, humanitarian insights, and development research authored by Life Helpers Initiative technical advisors and community practitioners.",
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await getPublishedPosts();
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}
@@ -31,7 +35,7 @@ export default function BlogPage() {
       {/* Blog Posts Grid with Dynamic CMS Integration */}
       <section className="py-16 md:py-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <BlogFeed />
+          <BlogFeed posts={posts} />
 
           <div className="mt-16 rounded-2xl border border-border bg-muted/40 p-8 text-center sm:p-12">
             <BookOpen className="mx-auto h-8 w-8 text-primary" />

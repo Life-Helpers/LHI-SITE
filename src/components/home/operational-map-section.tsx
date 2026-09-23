@@ -2,8 +2,10 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { OperationalMap } from "@/components/operational-map";
+import { getInterventions, getStates } from "@/lib/cms/content";
 
-export function OperationalMapSection() {
+export async function OperationalMapSection() {
+  const [states, interventions] = await Promise.all([getStates(), getInterventions()]);
   return (
     <section aria-labelledby="operational-map-heading" className="border-y border-border bg-muted/30 py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -31,7 +33,7 @@ export function OperationalMapSection() {
             All interventions <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
-        <OperationalMap />
+        <OperationalMap states={states} interventions={interventions} />
       </div>
     </section>
   );

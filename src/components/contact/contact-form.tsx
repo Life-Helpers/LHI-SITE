@@ -15,13 +15,26 @@ export function ContactForm() {
     message: "",
   });
 
+  const [error, setError] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate swift submission
-    await new Promise((r) => setTimeout(r, 600));
-    setLoading(false);
-    setSubmitted(true);
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "We couldn't send your message. Please try again.");
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "We couldn't send your message. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -158,6 +171,12 @@ export function ContactForm() {
           className="mt-1.5 w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
+
+      {error && (
+        <p role="alert" className="rounded-lg bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
+          {error}
+        </p>
+      )}
 
       <button
         type="submit"

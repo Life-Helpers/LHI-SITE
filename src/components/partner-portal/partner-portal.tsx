@@ -19,18 +19,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  COMPLIANCE_DOCUMENTS,
-  type ComplianceCategory,
-  type ComplianceDocument,
-} from "@/data/compliance-documents";
-import { OPERATIONAL_STATES } from "@/data/operational-states";
+import type { OperationalState } from "@/data/operational-states";
+import type { CmsDocument } from "@/lib/cms/types";
 import {
   FUNDING_AGENCIES,
   REQUEST_TYPES,
   consortiumEoiSchema,
   type ConsortiumEoiValues,
 } from "@/lib/validations/consortium-eoi";
+
+type ComplianceCategory = CmsDocument["category"];
 
 const CATEGORY_ICONS: Record<ComplianceCategory, React.ElementType> = {
   "Registration & tax": Landmark,
@@ -41,7 +39,13 @@ const CATEGORY_ICONS: Record<ComplianceCategory, React.ElementType> = {
 const selectClass =
   "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-invalid:border-destructive";
 
-export function PartnerPortal() {
+export function PartnerPortal({
+  documents,
+  states,
+}: {
+  documents: CmsDocument[];
+  states: OperationalState[];
+}) {
   const [result, setResult] = useState<{ reference: string; message: string } | null>(null);
   const [serverError, setServerError] = useState("");
 
@@ -62,7 +66,7 @@ export function PartnerPortal() {
     },
   });
 
-  const requestDocument = (doc: ComplianceDocument) => {
+  const requestDocument = (doc: CmsDocument) => {
     setValue("requestType", "Due-diligence document request");
     const current = getValues("documents") ?? [];
     if (!current.includes(doc.title)) setValue("documents", [...current, doc.title]);
@@ -86,7 +90,7 @@ export function PartnerPortal() {
     }
   };
 
-  const categories = Array.from(new Set(COMPLIANCE_DOCUMENTS.map((d) => d.category)));
+  const categories = Array.from(new Set(documents.map((d) => d.category)));
 
   return (
     <>
@@ -111,7 +115,7 @@ export function PartnerPortal() {
                     <Icon className="h-4 w-4 text-primary" aria-hidden="true" /> {category}
                   </h3>
                   <ul className="mt-4 space-y-4">
-                    {COMPLIANCE_DOCUMENTS.filter((d) => d.category === category).map((doc) => (
+                    {documents.filter((d) => d.category === category).map((doc) => (
                       <li key={doc.id} className="border-t border-border pt-4 first:border-0 first:pt-0">
                         <p className="text-sm font-medium text-foreground">{doc.title}</p>
                         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{doc.description}</p>
@@ -165,7 +169,7 @@ export function PartnerPortal() {
             </p>
             <ul className="mt-6 space-y-2 text-sm text-foreground">
               {[
-                "Field presence across 11 northern states",
+                `Field presence across ${states.length} northern states`,
                 "Offices in Sokoto, Zamfara, Kebbi, Borno, Yobe, Adamawa, Bauchi and Abuja",
                 "Track record with UN, EU, USAID and German cooperation partners",
               ].map((item) => (
@@ -237,7 +241,7 @@ export function PartnerPortal() {
                 <fieldset>
                   <legend className="text-sm font-medium text-foreground">Target states</legend>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {OPERATIONAL_STATES.map((s) => (
+                    {states.map((s) => (
                       <label
                         key={s.id}
                         className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs text-foreground has-[:checked]:border-primary has-[:checked]:bg-primary/10"
@@ -252,7 +256,7 @@ export function PartnerPortal() {
                 <fieldset>
                   <legend className="text-sm font-medium text-foreground">Documents requested (optional)</legend>
                   <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-                    {COMPLIANCE_DOCUMENTS.filter((d) => !d.href).map((d) => (
+                    {documents.filter((d) => !d.href).map((d) => (
                       <label key={d.id} className="inline-flex items-center gap-2 text-xs text-foreground">
                         <input type="checkbox" value={d.title} className="accent-primary" {...register("documents")} />
                         {d.title}

@@ -1,4 +1,4 @@
-import { INTERVENTIONS_DATA } from "@/data/interventions-data";
+import type { InterventionProject } from "@/data/interventions-data";
 
 /** Ids match the location ids used by the `@svg-maps/nigeria` map geometry. */
 export type OperationalStateId =
@@ -143,10 +143,10 @@ export const OPERATIONAL_STATES: OperationalState[] = [
   },
 ];
 
-export function getInterventionsForState(id: OperationalStateId) {
-  return INTERVENTIONS_DATA.filter((project) => project.states.includes(id));
+export function getInterventionsForState(interventions: InterventionProject[], id: OperationalStateId) {
+  return interventions.filter((project) => project.states.includes(id));
 }
 
-export function getDonorsForState(id: OperationalStateId) {
-  return Array.from(new Set(getInterventionsForState(id).map((project) => project.donor)));
+export function getDonorsForState(interventions: InterventionProject[], id: OperationalStateId) {
+  return Array.from(new Set(getInterventionsForState(interventions, id).map((project) => project.donor)));
 }

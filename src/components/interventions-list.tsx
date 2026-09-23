@@ -24,12 +24,14 @@ import {
 } from "lucide-react";
 
 import {
-  INTERVENTIONS_DATA,
   THEMATIC_PILLARS,
+  type InterventionProject,
   type ThematicPillarId,
 } from "@/data/interventions-data";
+import { isUnoptimized } from "@/lib/image";
 
 interface InterventionsListProps {
+  projects: InterventionProject[];
   initialFilter?: ThematicPillarId | "all";
 }
 
@@ -42,23 +44,23 @@ const THEMATIC_ICONS: Record<ThematicPillarId, React.ElementType> = {
   protection: ShieldCheck,
 };
 
-export function InterventionsList({ initialFilter = "all" }: InterventionsListProps) {
+export function InterventionsList({ projects, initialFilter = "all" }: InterventionsListProps) {
   const [selectedPillar, setSelectedPillar] = useState<ThematicPillarId | "all">(initialFilter);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<"all" | "Active" | "Completed" | "Multi-Year">("all");
 
   const filterCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: INTERVENTIONS_DATA.length };
+    const counts: Record<string, number> = { all: projects.length };
     (Object.keys(THEMATIC_PILLARS) as ThematicPillarId[]).forEach((pId) => {
-      counts[pId] = INTERVENTIONS_DATA.filter((item) =>
+      counts[pId] = projects.filter((item) =>
         item.thematicAreas.some((t) => t.id === pId)
       ).length;
     });
     return counts;
-  }, []);
+  }, [projects]);
 
   const filteredProjects = useMemo(() => {
-    return INTERVENTIONS_DATA.filter((project) => {
+    return projects.filter((project) => {
       // Thematic area filter
       if (selectedPillar !== "all") {
         const matchesThematic = project.thematicAreas.some((t) => t.id === selectedPillar);
@@ -87,7 +89,7 @@ export function InterventionsList({ initialFilter = "all" }: InterventionsListPr
 
       return true;
     });
-  }, [selectedPillar, selectedStatus, searchQuery]);
+  }, [projects, selectedPillar, selectedStatus, searchQuery]);
 
   return (
     <div className="space-y-10">
@@ -301,7 +303,7 @@ export function InterventionsList({ initialFilter = "all" }: InterventionsListPr
       <div className="flex items-center justify-between border-b border-border pb-3 text-xs text-muted-foreground">
         <div>
           Showing <span className="font-semibold text-foreground">{filteredProjects.length}</span> of{" "}
-          <span className="font-semibold text-foreground">{INTERVENTIONS_DATA.length}</span> projects &amp; interventions
+          <span className="font-semibold text-foreground">{projects.length}</span> projects &amp; interventions
           {selectedPillar !== "all" && (
             <> in thematic area <strong className="text-primary">{THEMATIC_PILLARS[selectedPillar].name}</strong></>
           )}
@@ -349,6 +351,7 @@ export function InterventionsList({ initialFilter = "all" }: InterventionsListPr
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
                   <Image
                     src={project.image.src}
+                    unoptimized={isUnoptimized(project.image.src)}
                     alt={project.image.alt}
                     fill
                     sizes="(min-width: 1024px) 50vw, 100vw"

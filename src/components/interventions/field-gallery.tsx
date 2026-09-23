@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
 
 import type { FulfillmentImage } from "@/data/african-fulfillment-images";
+import { isUnoptimized } from "@/lib/image";
 
 interface FieldGalleryProps {
   images: FulfillmentImage[];
@@ -51,6 +52,7 @@ export function FieldGallery({ images, youtubeId, title }: FieldGalleryProps) {
             <Image
               key={current.src}
               src={current.src}
+              unoptimized={isUnoptimized(current.src)}
               alt={current.alt}
               fill
               sizes="(min-width: 1024px) 800px, 100vw"
@@ -101,7 +103,7 @@ export function FieldGallery({ images, youtubeId, title }: FieldGalleryProps) {
                 i === index ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"
               }`}
             >
-              <Image src={img.src} alt="" fill sizes="80px" referrerPolicy="no-referrer" className="object-cover" />
+              <Image src={img.src} alt="" fill sizes="80px" unoptimized={isUnoptimized(img.src)} referrerPolicy="no-referrer" className="object-cover" />
             </button>
           ))}
           {youtubeId && (

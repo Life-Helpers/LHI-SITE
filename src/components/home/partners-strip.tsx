@@ -14,19 +14,45 @@ import {
 } from "lucide-react";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { useLocale } from "@/i18n/locale-context";
-import {
-  PARTNERS_DATA,
-  PartnerItem,
-} from "@/data/partners-data";
+import { PARTNERS_DATA } from "@/data/partners-data";
+import type { CmsPartner } from "@/lib/cms/types";
 
-export function PartnersStrip() {
+type PartnerItem = CmsPartner & { logo: React.ReactNode; categoryBadgeColor: string };
+
+const BUILT_IN = new Map(PARTNERS_DATA.map((p) => [p.id, p]));
+
+const CATEGORY_BADGES: Record<CmsPartner["category"], string> = {
+  "UN Agencies": "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+  "Bilateral Donors": "bg-blue-600/10 text-blue-700 dark:text-blue-400 border-blue-600/20",
+  "International NGOs": "bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 border-emerald-600/20",
+  "Government & Clusters": "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+};
+
+/** Uploaded logo from the CMS first, then the built-in mark, then the acronym. */
+function toDisplay(partner: CmsPartner): PartnerItem {
+  const builtIn = BUILT_IN.get(partner.id);
+  const logo = partner.logoUrl ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={partner.logoUrl} alt="" className="max-h-full max-w-full object-contain" />
+  ) : (
+    builtIn?.logo ?? <span className="text-sm font-bold tracking-wide text-foreground">{partner.acronym}</span>
+  );
+  return {
+    ...partner,
+    logo,
+    categoryBadgeColor: builtIn?.categoryBadgeColor ?? CATEGORY_BADGES[partner.category] ?? CATEGORY_BADGES["International NGOs"],
+  };
+}
+
+export function PartnersStrip({ partners: rawPartners }: { partners: CmsPartner[] }) {
   const { t } = useLocale();
   const [selectedPartner, setSelectedPartner] = useState<PartnerItem | null>(null);
+  const partners = React.useMemo(() => rawPartners.map(toDisplay), [rawPartners]);
 
   // Split all partners into two balanced tracks for the continuous dual-row marquee
-  const halfLength = Math.ceil(PARTNERS_DATA.length / 2);
-  const rowOnePartners = PARTNERS_DATA.slice(0, halfLength);
-  const rowTwoPartners = PARTNERS_DATA.slice(halfLength);
+  const halfLength = Math.ceil(partners.length / 2);
+  const rowOnePartners = partners.slice(0, halfLength);
+  const rowTwoPartners = partners.slice(halfLength);
 
   // Close modal on Escape key
   useEffect(() => {

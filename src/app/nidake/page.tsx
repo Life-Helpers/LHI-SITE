@@ -5,6 +5,9 @@ import { CheckCircle2, Heart, Leaf, ShieldCheck, Sparkles, Users } from "lucide-
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { NidakeImpactCalculator } from "@/components/nidake/impact-calculator";
 import { donateHrefForKits } from "@/data/nidake";
+import { getSettings } from "@/lib/cms/content";
+
+export const revalidate = 300;
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
@@ -13,7 +16,8 @@ export const metadata: Metadata = {
     "NIDAKE ('Me & You') is LHI's social enterprise producing affordable, reusable, and eco-friendly sanitary pads to eradicate period poverty and empower women.",
 };
 
-export default function NidakePage() {
+export default async function NidakePage() {
+  const { nidake } = await getSettings();
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}
@@ -85,7 +89,7 @@ export default function NidakePage() {
         </div>
       </section>
 
-      <NidakeImpactCalculator />
+      <NidakeImpactCalculator kit={nidake} />
 
       {/* Dual Impact: Health & Livelihoods */}
       <section className="py-16 md:py-24 bg-background">
@@ -141,11 +145,11 @@ export default function NidakePage() {
               Sponsor a NIDAKE Dignity Kit
             </h3>
             <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
-              A single NIDAKE kit provides a girl with washable pads, sanitary soap, and an underwear pack: three years of menstrual dignity and around 180 school days she no longer misses.
+              A single NIDAKE kit provides a girl with washable pads, sanitary soap, and an underwear pack: {nidake.yearsOfDignity} years of menstrual dignity and around {nidake.schoolDaysSaved} school days she no longer misses.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Link
-                href={donateHrefForKits(1)}
+                href={donateHrefForKits(1, nidake.costUsd)}
                 className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
               >
                 Donate a Dignity Kit →

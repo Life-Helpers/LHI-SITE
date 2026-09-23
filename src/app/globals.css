@@ -6,6 +6,46 @@
    dark as the default, so `dark:` targets `.dark` on the html element. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ---------------------------------------------------------------------------
+ * Admin CMS (Phoenix "darknav" style): dark sidebar, light content canvas.
+ * ------------------------------------------------------------------------- */
+.admin-root {
+  --a-bg: #f5f7fa;
+  --a-card: #ffffff;
+  --a-border: #e3e6ed;
+  --a-text: #141824;
+  --a-muted: #6e7891;
+  --a-primary: #3874ff;
+  --a-primary-soft: #e5edff;
+  --a-nav: #141824;
+  --a-nav-hover: #222834;
+  --a-nav-text: #9fa6bc;
+  --a-success: #1c9a00;
+  --a-success-soft: #e6f6de;
+  --a-warning: #d06f00;
+  --a-warning-soft: #fff1dc;
+  --a-danger: #e32400;
+  --a-danger-soft: #ffe7e3;
+}
+
+.dark .admin-root {
+  --a-bg: #0f111a;
+  --a-card: #141824;
+  --a-border: #31374a;
+  --a-text: #eff2f6;
+  --a-muted: #9fa6bc;
+  --a-primary: #6e9bff;
+  --a-primary-soft: rgba(56, 116, 255, 0.16);
+  --a-nav: #0b0d14;
+  --a-nav-hover: #1c2130;
+  --a-success: #5fd23b;
+  --a-success-soft: rgba(37, 176, 3, 0.16);
+  --a-warning: #ffae47;
+  --a-warning-soft: rgba(229, 120, 11, 0.16);
+  --a-danger: #ff6b52;
+  --a-danger-soft: rgba(237, 32, 0, 0.16);
+}
+
 :root {
   --radius: 0.625rem;
 
@@ -106,6 +146,22 @@
 }
 
 @theme inline {
+  --color-admin-bg: var(--a-bg);
+  --color-admin-card: var(--a-card);
+  --color-admin-border: var(--a-border);
+  --color-admin-text: var(--a-text);
+  --color-admin-muted: var(--a-muted);
+  --color-admin-primary: var(--a-primary);
+  --color-admin-primary-soft: var(--a-primary-soft);
+  --color-admin-nav: var(--a-nav);
+  --color-admin-nav-hover: var(--a-nav-hover);
+  --color-admin-nav-text: var(--a-nav-text);
+  --color-admin-success: var(--a-success);
+  --color-admin-success-soft: var(--a-success-soft);
+  --color-admin-warning: var(--a-warning);
+  --color-admin-warning-soft: var(--a-warning-soft);
+  --color-admin-danger: var(--a-danger);
+  --color-admin-danger-soft: var(--a-danger-soft);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -357,3 +413,26 @@ body {
   display: none !important;
 }
 
+
+/* Rendered Markdown: public posts (.prose-post) and the admin preview (.prose-admin). */
+.prose-post,
+.prose-admin {
+  color: var(--foreground);
+  line-height: 1.75;
+}
+.prose-admin {
+  color: var(--a-text);
+}
+.prose-post { font-size: 1.0625rem; }
+.prose-post > * + *,
+.prose-admin > * + * { margin-top: 1.1em; }
+.prose-post h2, .prose-admin h2 { font-size: 1.6em; font-weight: 600; line-height: 1.25; margin-top: 1.8em; }
+.prose-post h3, .prose-admin h3 { font-size: 1.25em; font-weight: 600; line-height: 1.3; margin-top: 1.6em; }
+.prose-post a, .prose-admin a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.prose-post ul, .prose-admin ul { list-style: disc; padding-left: 1.4em; }
+.prose-post ol, .prose-admin ol { list-style: decimal; padding-left: 1.4em; }
+.prose-post li + li, .prose-admin li + li { margin-top: 0.35em; }
+.prose-post blockquote, .prose-admin blockquote { border-left: 3px solid var(--primary); padding-left: 1em; font-style: italic; opacity: 0.9; }
+.prose-post img, .prose-admin img { border-radius: 1rem; max-width: 100%; height: auto; }
+.prose-post strong, .prose-admin strong { font-weight: 700; }
+.prose-post code, .prose-admin code { font-size: 0.9em; background: color-mix(in oklab, currentColor 8%, transparent); padding: 0.1em 0.35em; border-radius: 0.3em; }

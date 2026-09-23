@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { PartnerPortal } from "@/components/partner-portal/partner-portal";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { getDocuments, getStates } from "@/lib/cms/content";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Partner & Bidder Portal | Life Helpers Initiative",
@@ -12,7 +15,8 @@ export const metadata: Metadata = {
 
 const DONORS = ["USAID", "European Union", "United Nations", "FCDO", "GIZ / BMZ"];
 
-export default function PartnerPortalPage() {
+export default async function PartnerPortalPage() {
+  const [documents, states] = await Promise.all([getDocuments(), getStates()]);
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       <PageHeroBanner
@@ -36,7 +40,7 @@ export default function PartnerPortalPage() {
         </div>
       </section>
 
-      <PartnerPortal />
+      <PartnerPortal documents={documents} states={states} />
     </main>
   );
 }

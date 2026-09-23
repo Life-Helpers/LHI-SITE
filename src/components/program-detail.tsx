@@ -13,12 +13,14 @@ import {
 
 import { Button } from "@/components/ui/button";
 import type { Program } from "@/types/content";
-import { INTERVENTIONS_DATA, type ThematicPillarId } from "@/data/interventions-data";
+import type { ThematicPillarId } from "@/data/interventions-data";
+import { getInterventions } from "@/lib/cms/content";
 
-export function ProgramDetail({ program }: { program: Program }) {
+export async function ProgramDetail({ program }: { program: Program }) {
+  const allProjects = await getInterventions();
   // Find all projects linked to this thematic pillar
   const pillarId = program.id as ThematicPillarId;
-  const linkedProjects = INTERVENTIONS_DATA.filter((proj) =>
+  const linkedProjects = allProjects.filter((proj) =>
     proj.thematicAreas.some((t) => t.id === pillarId)
   );
 
@@ -126,7 +128,7 @@ export function ProgramDetail({ program }: { program: Program }) {
                 href="/interventions/projectandintervention"
                 className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
               >
-                <span>View All Interventions ({INTERVENTIONS_DATA.length})</span>
+                <span>View All Interventions ({allProjects.length})</span>
                 <ArrowRight size={12} />
               </Link>
             </div>

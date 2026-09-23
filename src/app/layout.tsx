@@ -7,6 +7,7 @@ import { EmergencyAlertBanner } from "@/components/emergency-alert-banner";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PublicChrome } from "@/components/public-chrome";
 import { AccessibilityProvider } from "@/components/accessibility/accessibility-context";
 import { BokehBackground } from "@/components/effects/bokeh-background";
 import { FloatingWhatsApp } from "@/components/floating-whatsapp";
@@ -128,21 +129,27 @@ export default function RootLayout({
           <AccessibilityProvider>
             <LocaleProvider>
               <GoogleTranslateBridge />
-              <BokehBackground />
+              <PublicChrome>
+                <BokehBackground />
+              </PublicChrome>
               <a
                 href="#main-content"
                 className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 Skip to content
               </a>
-              <EmergencyAlertBanner alerts={activeAlerts} />
-              <SiteHeader />
+              <PublicChrome>
+                <EmergencyAlertBanner alerts={activeAlerts} />
+                <SiteHeader />
+              </PublicChrome>
               <Suspense fallback={null}>
                 <GoogleAnalytics />
               </Suspense>
               {children}
-              <SiteFooter />
-              <FloatingWhatsApp />
+              <PublicChrome>
+                <SiteFooter />
+                <FloatingWhatsApp />
+              </PublicChrome>
             </LocaleProvider>
           </AccessibilityProvider>
         </ThemeProvider>

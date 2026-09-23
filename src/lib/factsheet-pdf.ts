@@ -6,7 +6,7 @@ import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf
 
 import { siteConfig } from "@/config/site";
 import type { InterventionProject } from "@/data/interventions-data";
-import { OPERATIONAL_STATES } from "@/data/operational-states";
+import type { OperationalState } from "@/data/operational-states";
 
 const BRAND = rgb(0xeb / 255, 0x16 / 255, 0x1c / 255);
 const INK = rgb(0.12, 0.12, 0.14);
@@ -45,7 +45,10 @@ function wrap(text: string, font: PDFFont, size: number, width: number) {
   return lines;
 }
 
-export async function buildFactsheetPdf(project: InterventionProject): Promise<Uint8Array> {
+export async function buildFactsheetPdf(
+  project: InterventionProject,
+  { states, contact }: { states: OperationalState[]; contact: { email: string; phone: string } },
+): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.setTitle(`${sanitize(project.title)} - Factsheet`);
   doc.setAuthor("Life Helpers Initiative");
@@ -108,7 +111,7 @@ export async function buildFactsheetPdf(project: InterventionProject): Promise<U
   text(project.donor, { size: 10, color: MUTED, gap: 8 });
 
   // Key facts grid
-  const stateNames = OPERATIONAL_STATES.filter((s) => project.states.includes(s.id)).map((s) => s.name);
+  const stateNames = states.filter((s) => project.states.includes(s.id)).map((s) => s.name);
   const facts: [string, string][] = [
     ["Donor / Lead partner", project.donor],
     ["Status", `${project.status} (${project.duration})`],
@@ -146,10 +149,9 @@ export async function buildFactsheetPdf(project: InterventionProject): Promise<U
   });
 
   // Footer
-  const hq = siteConfig.offices?.[0];
   page.drawLine({ start: { x: MARGIN, y: 64 }, end: { x: PAGE_W - MARGIN, y: 64 }, thickness: 0.6, color: RULE });
   const footer = [
-    `Life Helpers Initiative (LHI) | ${siteConfig.url.replace(/^https?:\/\//, "")} | ${hq?.email ?? "official@lhinigeria.org"} | ${hq?.phone ?? ""}`,
+    `Life Helpers Initiative (LHI) | ${siteConfig.url.replace(/^https?:\/\//, "")} | ${contact.email} | ${contact.phone}`,
     `Prepared for donor compliance, M&E reporting and consortium proposals. Generated ${new Date().toISOString().slice(0, 10)}.`,
   ];
   footer.forEach((line, i) => {

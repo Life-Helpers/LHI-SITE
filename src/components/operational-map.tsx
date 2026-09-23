@@ -5,10 +5,11 @@ import Link from "next/link";
 import nigeriaMap from "@svg-maps/nigeria";
 import { ArrowRight, Building2, Handshake, Layers, MapPin, Users, X } from "lucide-react";
 
+import type { InterventionProject } from "@/data/interventions-data";
 import {
-  OPERATIONAL_STATES,
   getDonorsForState,
   getInterventionsForState,
+  type OperationalState,
   type OperationalStateId,
 } from "@/data/operational-states";
 
@@ -21,27 +22,37 @@ interface MapLocation {
 const LOCATIONS = (nigeriaMap as { viewBox: string; locations: MapLocation[] }).locations;
 const VIEWBOX = (nigeriaMap as { viewBox: string }).viewBox;
 
-const STATE_BY_ID = new Map(OPERATIONAL_STATES.map((s) => [s.id as string, s]));
-
 const numberFormat = new Intl.NumberFormat("en-NG");
 
-export function OperationalMap({ className = "" }: { className?: string }) {
+export function OperationalMap({
+  states,
+  interventions: allInterventions,
+  className = "",
+}: {
+  states: OperationalState[];
+  interventions: InterventionProject[];
+  className?: string;
+}) {
+  const STATE_BY_ID = useMemo(() => new Map(states.map((s) => [s.id as string, s])), [states]);
   const [selectedId, setSelectedId] = useState<OperationalStateId | null>("sokoto");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const selected = selectedId ? STATE_BY_ID.get(selectedId) : undefined;
   const interventions = useMemo(
-    () => (selectedId ? getInterventionsForState(selectedId) : []),
-    [selectedId],
+    () => (selectedId ? getInterventionsForState(allInterventions, selectedId) : []),
+    [allInterventions, selectedId],
   );
-  const donors = useMemo(() => (selectedId ? getDonorsForState(selectedId) : []), [selectedId]);
+  const donors = useMemo(
+    () => (selectedId ? getDonorsForState(allInterventions, selectedId) : []),
+    [allInterventions, selectedId],
+  );
 
   const totals = useMemo(
     () => ({
-      lgas: OPERATIONAL_STATES.reduce((sum, s) => sum + s.lgasCovered, 0),
-      beneficiaries: OPERATIONAL_STATES.reduce((sum, s) => sum + s.beneficiaries, 0),
+      lgas: states.reduce((sum, s) => sum + s.lgasCovered, 0),
+      beneficiaries: states.reduce((sum, s) => sum + s.beneficiaries, 0),
     }),
-    [],
+    [states],
   );
 
   const select = (id: string) => {
@@ -54,7 +65,7 @@ export function OperationalMap({ className = "" }: { className?: string }) {
       <div className="relative rounded-3xl border border-border bg-card p-4 sm:p-6 lg:col-span-7">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-primary">
-            11 frontline states
+            {states.length} frontline states
           </p>
           <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
@@ -118,7 +129,7 @@ export function OperationalMap({ className = "" }: { className?: string }) {
 
         {/* State chips (mobile-friendly, keyboard-friendly alternative to the map) */}
         <div className="mt-4 flex flex-wrap gap-2">
-          {OPERATIONAL_STATES.map((s) => (
+          {states.map((s) => (
             <button
               key={s.id}
               type="button"
@@ -138,7 +149,7 @@ export function OperationalMap({ className = "" }: { className?: string }) {
         <dl className="mt-5 grid grid-cols-3 gap-3 border-t border-border pt-4 text-center">
           <div>
             <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">States</dt>
-            <dd className="font-serif-display text-2xl text-foreground">{OPERATIONAL_STATES.length}</dd>
+            <dd className="font-serif-display text-2xl text-foreground">{states.length}</dd>
           </div>
           <div>
             <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">LGAs reached</dt>

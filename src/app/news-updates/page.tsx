@@ -5,6 +5,10 @@ import { ArrowRight, Calendar, Mail, Tag } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { BlogFeed } from "@/components/blog/blog-feed";
+import { getPublishedPosts } from "@/lib/cms/content";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "News & Updates | Life Helpers Initiative",
@@ -55,7 +59,8 @@ const articles = [
   },
 ];
 
-export default function NewsUpdatesPage() {
+export default async function NewsUpdatesPage() {
+  const cmsPosts = (await getPublishedPosts()).filter((p) => ["News", "Press Release", "Magazine", "Events"].includes(p.category));
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}
@@ -70,6 +75,17 @@ export default function NewsUpdatesPage() {
         description="Stay informed on frontline developments, community milestones, emergency responses, capacity-building workshops, and policy dialogues from Life Helpers Initiative across 11 states."
         image={africanFulfillmentImages.newsHero}
       />
+
+      {cmsPosts.length > 0 && (
+        <section aria-labelledby="cms-posts-heading" className="border-b border-border py-16 md:py-20">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <h2 id="cms-posts-heading" className="mb-8 font-serif-display text-3xl font-light text-foreground">
+              Latest news & magazine
+            </h2>
+            <BlogFeed posts={cmsPosts} />
+          </div>
+        </section>
+      )}
 
       {/* Main Content */}
       <section className="py-16 md:py-24">

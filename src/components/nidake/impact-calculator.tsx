@@ -4,11 +4,17 @@ import { useId, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CalendarCheck, GraduationCap, Heart, Package } from "lucide-react";
 
-import { NIDAKE_KIT, SPONSOR_PACKS, donateHrefForKits } from "@/data/nidake";
+import { SPONSOR_PACKS, donateHrefForKits } from "@/data/nidake";
+
+interface KitEconomics {
+  costUsd: number;
+  yearsOfDignity: number;
+  schoolDaysSaved: number;
+}
 
 const fmt = new Intl.NumberFormat("en-US");
 
-export function NidakeImpactCalculator() {
+export function NidakeImpactCalculator({ kit: NIDAKE_KIT }: { kit: KitEconomics }) {
   const [kits, setKits] = useState(10);
   const inputId = useId();
 
@@ -65,7 +71,7 @@ export function NidakeImpactCalculator() {
 
           <div className="mt-8 flex justify-center">
             <Link
-              href={donateHrefForKits(safeKits)}
+              href={donateHrefForKits(safeKits, NIDAKE_KIT.costUsd)}
               className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
             >
               Sponsor {fmt.format(safeKits)} {safeKits === 1 ? "kit" : "kits"} <ArrowRight className="h-4 w-4" />
@@ -93,7 +99,7 @@ export function NidakeImpactCalculator() {
               </ul>
               <div className="mt-auto pt-5">
                 <Link
-                  href={donateHrefForKits(pack.kits)}
+                  href={donateHrefForKits(pack.kits, NIDAKE_KIT.costUsd)}
                   className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-primary py-2 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground"
                 >
                   Give this pack <ArrowRight className="h-3.5 w-3.5" />

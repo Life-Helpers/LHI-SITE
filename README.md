@@ -70,3 +70,53 @@ signature.
   WCAG 2.2 AA contrast-checked (4.5:1+ for text pairings).
 - Path alias `@/*` maps to `src/*`.
 - `npm run lint` runs ESLint (`eslint-config-next`).
+
+## Admin CMS (`/admin`)
+
+A WordPress-style content manager (dark "Phoenix" sidebar layout) for editing the
+live site without touching code.
+
+| Section | What it manages | Where it appears |
+|---|---|---|
+| Posts | News, success stories, field blog, magazine, press releases (Markdown) | `/blog`, `/blog/[slug]`, `/success-stories`, `/news-updates` |
+| Media Library | Uploaded photos, logos, PDFs, video (served from `/media/...`) | Everywhere via the image/file pickers |
+| Interventions | The project directory, dossiers, gallery photos, YouTube video | `/interventions/*`, factsheet PDFs, programme pages, map |
+| Map States | Offices, LGAs covered and reach for the 11 states | Operational map (home + interventions) |
+| Partners & Logos | Partner details and **uploaded official logos** | Home-page partner marquee |
+| Compliance Docs | CAC, tax clearance, audits, PSEA/safeguarding/anti-fraud PDFs | `/partner-portal` |
+| Submissions | Contact, volunteer and consortium/RFP forms (inbox) | Admin only |
+| Users | Accounts with roles: Administrator, Editor, Author | Admin only |
+| Settings | Home feature story, NIDAKE kit figures, factsheet contact details | Home page, `/nidake`, PDFs |
+| Activity Log | Sign-ins, edits, uploads, deletions | Admin only |
+
+Saving in the admin refreshes the public pages immediately (on-demand revalidation);
+pages also re-check every 5 minutes.
+
+### First-time setup
+
+1. Set `CMS_SETUP_TOKEN` (any long random string) in the server environment.
+2. Visit `/admin` — with no users yet you are sent to `/admin/setup`.
+3. Enter the token and create the first **Administrator** account.
+4. Add other staff under **Users**. Setup is disabled once any user exists.
+
+In local development (`npm run dev`) the setup token is not required.
+
+### Storage — read before deploying
+
+Content is stored as JSON files (plus uploads) in `CMS_DATA_DIR` (default
+`./cms-data`, git-ignored). Until a section is first saved, the site shows the
+original content from `src/data/*`.
+
+- The server needs a **persistent, writable disk** (VPS, or a Docker volume mounted
+  at `CMS_DATA_DIR`). On serverless/ephemeral hosting edits would be lost; swap
+  `src/lib/cms/store.ts` for a database-backed implementation in that case.
+- **Back up `CMS_DATA_DIR` regularly** — it holds all edited content, uploads and
+  user accounts.
+- Run a single server instance (the store serialises writes in-process).
+
+### Security notes
+
+- Passwords are hashed with scrypt; sessions are signed, HTTP-only cookies (12 h).
+- Failed logins are throttled (5 attempts per email per 15 minutes).
+- Uploads are limited to images, PDF and MP4 up to 15 MB; SVG is rejected.
+- Every mutation re-checks the user's role on the server.

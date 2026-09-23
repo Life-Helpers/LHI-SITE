@@ -22,7 +22,7 @@ export const SPONSOR_PACKS: SponsorPack[] = [
   { id: "school", name: "Whole-School Pack", kits: 100, audience: "Every girl in a rural secondary school" },
 ];
 
-export function donateHrefForKits(kits: number) {
-  const amount = kits * NIDAKE_KIT.costUsd;
+export function donateHrefForKits(kits: number, costUsd: number = NIDAKE_KIT.costUsd) {
+  const amount = kits * costUsd;
   return `/donate?amount=${amount}&designation=nidake&kits=${kits}`;
 }

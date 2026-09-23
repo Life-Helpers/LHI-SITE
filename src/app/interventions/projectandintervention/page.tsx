@@ -18,6 +18,9 @@ import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { InterventionsList } from "@/components/interventions-list";
 import { OperationalMap } from "@/components/operational-map";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { getInterventions, getStates } from "@/lib/cms/content";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Projects & Interventions | Life Helpers Initiative",
@@ -61,7 +64,8 @@ const institutionalDonors = [
   { name: "IRI & National Democratic Institute", role: "Civic Inclusion & Democratic Rights" },
 ];
 
-export default function ProjectsAndInterventionsPage() {
+export default async function ProjectsAndInterventionsPage() {
+  const [projects, states] = await Promise.all([getInterventions(), getStates()]);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -105,7 +109,7 @@ export default function ProjectsAndInterventionsPage() {
                 <Sparkles size={20} />
               </div>
               <div>
-                <div className="text-xl font-bold text-foreground">18+</div>
+                <div className="text-xl font-bold text-foreground">{projects.length}</div>
                 <div className="text-[11px] text-muted-foreground">Strategic Interventions</div>
               </div>
             </div>
@@ -115,7 +119,7 @@ export default function ProjectsAndInterventionsPage() {
                 <MapPin size={20} />
               </div>
               <div>
-                <div className="text-xl font-bold text-foreground">11 States</div>
+                <div className="text-xl font-bold text-foreground">{states.length} States</div>
                 <div className="text-[11px] text-muted-foreground">Operational Footprint</div>
               </div>
             </div>
@@ -149,14 +153,14 @@ export default function ProjectsAndInterventionsPage() {
           <h2 id="map-heading" className="mb-8 font-serif-display text-3xl font-light text-foreground">
             Interventions by <em className="italic text-primary">state.</em>
           </h2>
-          <OperationalMap />
+          <OperationalMap states={states} interventions={projects} />
         </div>
       </section>
 
       {/* Main Interactive Projects Directory */}
       <section className="py-14 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <InterventionsList initialFilter="all" />
+          <InterventionsList projects={projects} initialFilter="all" />
         </div>
       </section>
 

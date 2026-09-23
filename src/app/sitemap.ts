@@ -3,10 +3,12 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
 import { emergencies } from "@/data/emergencies";
 import { impactReports } from "@/data/impact-reports";
-import { INTERVENTIONS_DATA } from "@/data/interventions-data";
+import { getInterventions, getPublishedPosts } from "@/lib/cms/content";
 import { programs } from "@/data/programs";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const revalidate = 3600;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     "",
     "/programs",
@@ -52,10 +54,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "yearly" as const,
   }));
 
-  const interventionRoutes = INTERVENTIONS_DATA.map((project) => ({
+  const interventionRoutes = (await getInterventions()).map((project) => ({
     url: `${siteConfig.url}/interventions/${project.id}`,
     changeFrequency: "monthly" as const,
   }));
 
-  return [...staticRoutes, ...programRoutes, ...emergencyRoutes, ...impactRoutes, ...interventionRoutes];
+  const postRoutes = (await getPublishedPosts()).map((post) => ({
+    url: `${siteConfig.url}/blog/${post.slug}`,
+    lastModified: post.updatedAt,
+    changeFrequency: "monthly" as const,
+  }));
+
+  return [...staticRoutes, ...programRoutes, ...emergencyRoutes, ...impactRoutes, ...interventionRoutes, ...postRoutes];
 }

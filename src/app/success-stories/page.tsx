@@ -5,6 +5,10 @@ import { CheckCircle2, MapPin, Quote, Sparkles } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { BlogFeed } from "@/components/blog/blog-feed";
+import { getPublishedPosts } from "@/lib/cms/content";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Success Stories | Life Helpers Initiative",
@@ -93,7 +97,8 @@ const stories = [
   },
 ];
 
-export default function SuccessStoriesPage() {
+export default async function SuccessStoriesPage() {
+  const cmsPosts = (await getPublishedPosts()).filter((p) => ["Success Stories"].includes(p.category));
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}
@@ -108,6 +113,17 @@ export default function SuccessStoriesPage() {
         description="Behind every statistic is a human face. Read how Life Helpers Initiative's integrated health, education, livelihood, and protection interventions transform households and build lasting resilience across Nigeria."
         image={africanFulfillmentImages.successStoriesHero}
       />
+
+      {cmsPosts.length > 0 && (
+        <section aria-labelledby="cms-posts-heading" className="border-b border-border py-16 md:py-20">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <h2 id="cms-posts-heading" className="mb-8 font-serif-display text-3xl font-light text-foreground">
+              Latest success stories
+            </h2>
+            <BlogFeed posts={cmsPosts} />
+          </div>
+        </section>
+      )}
 
       {/* Stories Grid */}
       <section className="py-16 md:py-24">
