@@ -127,6 +127,13 @@ original content from `src/data/*`.
 - Card payments need the Stripe variables; without them the donate form says
   online payments aren't available yet rather than pretending to succeed.
 
+### Spam protection
+
+Every public form (contact, volunteer, feedback, partnership, job applications, vendor
+registration and bids, comments) is rate-limited per IP and has a hidden honeypot field.
+To add a visible human check, create a Cloudflare Turnstile widget and set
+`NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, then rebuild.
+
 ### Security notes
 
 - Passwords are hashed with scrypt; sessions are signed, HTTP-only cookies (12 h).

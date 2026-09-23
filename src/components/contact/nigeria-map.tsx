@@ -1029,7 +1029,7 @@ export function NigeriaMap({
               fill="currentColor"
               fontSize="11"
               letterSpacing="0.18em"
-              className="text-muted-foreground/40 font-bold uppercase"
+              className="text-muted-foreground font-bold uppercase"
             >
               Gulf of Guinea (Atlantic Ocean)
             </text>
@@ -1152,7 +1152,7 @@ export function NigeriaMap({
                             : "text-primary font-bold"
                           : isOperational
                           ? "text-foreground/80"
-                          : "text-muted-foreground/35"
+                          : "text-muted-foreground"
                       }`}
                     >
                       {state.code}
@@ -1524,7 +1524,7 @@ export function NigeriaMap({
                     <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">
                       {selectedOffice.zone} Zone
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-400">
                       <ShieldCheck className="h-3.5 w-3.5" />
                       Verified Location
                     </span>

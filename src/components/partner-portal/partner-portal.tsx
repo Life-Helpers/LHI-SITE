@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,7 @@ import {
   consortiumEoiSchema,
   type ConsortiumEoiValues,
 } from "@/lib/validations/consortium-eoi";
+import { Turnstile, turnstileHeaders } from "@/components/forms/turnstile";
 
 type ComplianceCategory = CmsDocument["category"];
 
@@ -50,6 +51,7 @@ export function PartnerPortal({
 }) {
   const [result, setResult] = useState<{ reference: string; message: string } | null>(null);
   const [serverError, setServerError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
 
   const {
     register,
@@ -77,11 +79,12 @@ export function PartnerPortal({
 
   const onSubmit = async (values: ConsortiumEoiValues) => {
     setServerError("");
+    const website = String(formRef.current ? new FormData(formRef.current).get("website") ?? "" : "");
     try {
       const res = await fetch("/api/consortium-eoi", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json", ...turnstileHeaders(formRef.current) },
+        body: JSON.stringify({ ...values, website }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Submission failed. Please try again.");
@@ -201,10 +204,14 @@ export function PartnerPortal({
               </div>
             ) : (
               <form
+                ref={formRef}
                 onSubmit={handleSubmit(onSubmit)}
                 noValidate
-                className="space-y-5 rounded-3xl border border-border bg-card p-6 sm:p-8"
+                className="relative space-y-5 rounded-3xl border border-border bg-card p-6 sm:p-8"
               >
+                <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                  <input name="website" tabIndex={-1} autoComplete="off" />
+                </div>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <Field label="Request type" error={errors.requestType?.message} htmlFor="requestType">
                     <select id="requestType" className={selectClass} {...register("requestType")}>
@@ -277,6 +284,7 @@ export function PartnerPortal({
                   />
                 </Field>
 
+                <Turnstile />
                 {serverError && (
                   <p role="alert" className="text-sm text-destructive">
                     {serverError}

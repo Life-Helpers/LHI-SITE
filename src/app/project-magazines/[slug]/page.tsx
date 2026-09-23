@@ -38,7 +38,7 @@ export default async function MagazineReaderPage({ params }: { params: Promise<{
             </p>
             <h1 className="mt-1 font-serif-display text-2xl font-light text-foreground sm:text-3xl">{magazine.title}</h1>
           </div>
-          <Link href={magazine.story} className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+          <Link href={magazine.story} className="inline-flex items-center gap-2 rounded-full bg-background px-3 py-1 text-sm font-semibold text-primary hover:underline">
             <BookOpen className="h-4 w-4" /> Read as an article
           </Link>
         </div>

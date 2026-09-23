@@ -3,15 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { getJob } from "@/lib/cms/content";
 import { file, isEmail, text } from "@/lib/cms/form-data";
 import { savePrivateUpload } from "@/lib/cms/private-uploads";
-import { addSubmission, rateLimited } from "@/lib/cms/submissions";
+import { addSubmission } from "@/lib/cms/submissions";
+import { checkSpam } from "@/lib/spam";
 
 export async function POST(req: NextRequest) {
-  if (rateLimited(req, "apply", 10)) {
-    return NextResponse.json({ error: "Too many applications from this connection. Please try again later." }, { status: 429 });
-  }
   const form = await req.formData().catch(() => null);
   if (!form) return NextResponse.json({ error: "Invalid submission." }, { status: 400 });
-  if (text(form, "website")) return NextResponse.json({ ok: true }); // honeypot
+  const spam = await checkSpam(req, { key: "apply", max: 10, honeypot: text(form, "website"), token: text(form, "cf-turnstile-response", 4000) });
+  if ("blocked" in spam) return spam.blocked;
+  if ("drop" in spam) return NextResponse.json({ ok: true });
 
   const found = await getJob(text(form, "jobId", 120));
   if (!found) return NextResponse.json({ error: "This vacancy no longer exists." }, { status: 404 });

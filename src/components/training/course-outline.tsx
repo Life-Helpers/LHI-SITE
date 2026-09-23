@@ -78,7 +78,7 @@ export function CourseOutline({
                 {complete ? (
                   <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-emerald-600" aria-label="Completed" />
                 ) : (
-                  <Circle className="mt-0.5 h-6 w-6 shrink-0 text-muted-foreground/50" aria-label="Not started" />
+                  <Circle className="mt-0.5 h-6 w-6 shrink-0 text-muted-foreground" aria-label="Not started" />
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Lesson {i + 1}</p>

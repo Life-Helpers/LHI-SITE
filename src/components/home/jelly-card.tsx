@@ -134,7 +134,7 @@ export function JellyCard({
                 {tag}
               </motion.span>
 
-              <span className="text-[11px] font-mono font-medium text-muted-foreground/80">
+              <span className="text-[11px] font-mono font-medium text-muted-foreground">
                 {roll === "upper" ? "ROLL 1" : "ROLL 2"} · 0{roleNumber}
               </span>
             </div>

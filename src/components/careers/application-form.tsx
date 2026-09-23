@@ -2,6 +2,7 @@
 
 import { Field, FileField, FormError, FormSuccess, Honeypot, SubmitButton } from "@/components/forms/form-bits";
 import { fieldClass, labelClass, useMultipartSubmit } from "@/components/forms/use-multipart-submit";
+import { Turnstile } from "@/components/forms/turnstile";
 
 export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: string }) {
   const { status, error, onSubmit } = useMultipartSubmit("/api/careers/apply");
@@ -49,6 +50,7 @@ export function ApplicationForm({ jobId, jobTitle }: { jobId: string; jobTitle: 
         </span>
       </label>
       <FormError message={error} />
+      <Turnstile />
       <SubmitButton loading={status === "loading"}>Submit application</SubmitButton>
     </form>
   );

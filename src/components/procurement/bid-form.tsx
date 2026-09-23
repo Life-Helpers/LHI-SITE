@@ -2,6 +2,7 @@
 
 import { Field, FileField, FormError, FormSuccess, Honeypot, SubmitButton } from "@/components/forms/form-bits";
 import { fieldClass, labelClass, useMultipartSubmit } from "@/components/forms/use-multipart-submit";
+import { Turnstile } from "@/components/forms/turnstile";
 
 export function BidForm({ tenderId, reference }: { tenderId: string; reference: string }) {
   const { status, error, onSubmit } = useMultipartSubmit("/api/procurement/respond");
@@ -40,6 +41,7 @@ export function BidForm({ tenderId, reference }: { tenderId: string; reference: 
         </span>
       </label>
       <FormError message={error} />
+      <Turnstile />
       <SubmitButton loading={status === "loading"}>Submit response</SubmitButton>
     </form>
   );

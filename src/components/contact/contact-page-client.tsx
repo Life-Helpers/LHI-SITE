@@ -72,9 +72,9 @@ export function ContactPageClient() {
               {/* Confidential Safeguarding (PSEA) Box */}
               <div className="rounded-2xl border border-red-500/30 bg-red-500/5 p-5">
                 <div className="flex items-start gap-3">
-                  <ShieldAlert className="h-5 w-5 shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
+                  <ShieldAlert className="h-5 w-5 shrink-0 text-red-700 dark:text-red-400 mt-0.5" />
                   <div>
-                    <h4 className="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">
+                    <h4 className="text-sm font-bold text-red-700 dark:text-red-400 uppercase tracking-wide">
                       Confidential Whistleblowing & PSEA Reporting
                     </h4>
                     <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
@@ -83,14 +83,14 @@ export function ContactPageClient() {
                     <div className="mt-3 flex flex-wrap gap-4 text-xs font-semibold">
                       <a
                         href={`mailto:${siteConfig.contact.pseaEmail}?subject=CONFIDENTIAL%20PSEA%20REPORT`}
-                        className="text-red-600 dark:text-red-400 hover:underline inline-flex items-center gap-1"
+                        className="text-red-700 dark:text-red-400 hover:underline inline-flex items-center gap-1"
                       >
                         <Mail className="h-3.5 w-3.5" />
                         {siteConfig.contact.pseaEmail}
                       </a>
                       <a
                         href={`tel:${siteConfig.contact.pseaHotline}`}
-                        className="text-red-600 dark:text-red-400 hover:underline inline-flex items-center gap-1"
+                        className="text-red-700 dark:text-red-400 hover:underline inline-flex items-center gap-1"
                       >
                         <Phone className="h-3.5 w-3.5" />
                         {siteConfig.contact.pseaHotline}

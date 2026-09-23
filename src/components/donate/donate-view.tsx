@@ -457,7 +457,7 @@ export function DonateView({ bankDetails = "" }: { bankDetails?: string }) {
                             />
                           )}
                         </div>
-                        <span className="mt-2 block text-[11px] uppercase tracking-[0.22em] opacity-80 font-medium">
+                        <span className="mt-2 block text-[11px] uppercase tracking-[0.22em] font-medium">
                           {tier.label}
                         </span>
                       </button>

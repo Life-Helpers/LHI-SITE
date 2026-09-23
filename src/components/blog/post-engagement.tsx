@@ -6,6 +6,7 @@ import { Check, Heart, Link2, Loader2, Mail, MessageCircle, Share2 } from "lucid
 import { siFacebook, siPinterest, siReddit, siTelegram, siWhatsapp, siX } from "simple-icons";
 
 import { LINKEDIN_PATH, SocialIcon } from "@/components/social-links";
+import { Turnstile, turnstileHeaders } from "@/components/forms/turnstile";
 
 type Comment = { id: string; name: string; body: string; createdAt: string };
 
@@ -105,7 +106,7 @@ export function PostEngagement({ slug, title, url, image }: { slug: string; titl
     const website = (new FormData(e.currentTarget).get("website") as string) || undefined;
     const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/comments`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...turnstileHeaders(e.currentTarget) },
       body: JSON.stringify({ name, email, body, website }),
     }).catch(() => null);
     const data = await res?.json().catch(() => ({}));
@@ -254,6 +255,7 @@ export function PostEngagement({ slug, title, url, image }: { slug: string; titl
               <span className="sr-only">Comment</span>
               <textarea required value={body} onChange={(e) => setBody(e.target.value)} rows={4} maxLength={2000} placeholder="Write your comment…" className={input} />
             </label>
+            <Turnstile />
             {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs text-muted-foreground">Please keep comments respectful. <Link href="/terms#user-content" className="underline">Comment guidelines</Link></p>

@@ -2,6 +2,7 @@
 
 import { Field, FileField, FormError, FormSuccess, Honeypot, SubmitButton } from "@/components/forms/form-bits";
 import { fieldClass, labelClass, useMultipartSubmit } from "@/components/forms/use-multipart-submit";
+import { Turnstile } from "@/components/forms/turnstile";
 
 const CATEGORIES = [
   "Food & agricultural inputs",
@@ -68,6 +69,7 @@ export function VendorRegistrationForm() {
         </span>
       </label>
       <FormError message={error} />
+      <Turnstile />
       <SubmitButton loading={status === "loading"}>Register as a vendor</SubmitButton>
     </form>
   );

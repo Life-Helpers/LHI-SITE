@@ -6,6 +6,7 @@ import { CheckCircle2, EyeOff, Loader2 } from "lucide-react";
 
 import { fieldClass, labelClass } from "@/components/forms/use-multipart-submit";
 import { FEEDBACK_PROGRAMMES, FEEDBACK_TYPES, RESPONSE_CHANNELS } from "@/data/feedback";
+import { Turnstile, turnstileHeaders } from "@/components/forms/turnstile";
 
 const STATES = ["Sokoto", "Kebbi", "Zamfara", "Katsina", "Borno", "Yobe", "Adamawa", "Bauchi", "Plateau", "Ebonyi", "FCT Abuja", "Other"];
 
@@ -61,7 +62,7 @@ export function FeedbackForm() {
         try {
           const res = await fetch("/api/feedback", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...turnstileHeaders(e.currentTarget) },
             body: JSON.stringify({
               feedbackType: type,
               programme: value("programme") || undefined,
@@ -202,6 +203,8 @@ export function FeedbackForm() {
           <input name="website" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
+
+      <Turnstile />
 
       {error && (
         <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { Turnstile, turnstileHeaders } from "@/components/forms/turnstile";
 
 interface FormData {
   name: string;
@@ -134,7 +135,7 @@ const cards = [
   },
 ];
 
-export function GetInvolvedView() {
+export function GetInvolvedView({ openings = [] }: { openings?: { id: string; title: string; location: string; deadline: string }[] }) {
   const [formData, setFormData] = useState<FormData>(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -150,8 +151,10 @@ export function GetInvolvedView() {
       setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    const website = String(new FormData(form).get("website") ?? "");
     setErrorMessage("");
 
     if (!formData.name.trim()) {
@@ -169,8 +172,8 @@ export function GetInvolvedView() {
     try {
       const response = await fetch("/api/volunteer", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json", ...turnstileHeaders(form) },
+        body: JSON.stringify({ ...formData, website }),
       });
 
       if (!response.ok) {
@@ -327,8 +330,31 @@ export function GetInvolvedView() {
                 <em className="font-light italic text-primary">help.</em>
               </h2>
               <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-                Share a few details and our volunteer coordinator will respond within a week. Every application matters — every gift finds its place.
+                Share a few details and our volunteer coordinator will get back to you. Every application matters — every gift finds its place.
               </p>
+
+              <div className="mt-6 rounded-xl border border-primary/20 bg-primary/5 p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">Current volunteer openings</p>
+                {openings.length ? (
+                  <ul className="mt-3 space-y-3">
+                    {openings.map((o) => (
+                      <li key={o.id}>
+                        <Link href={`/careers/${o.id}`} className="text-sm font-semibold text-foreground hover:text-primary">
+                          {o.title}
+                        </Link>
+                        <p className="text-xs text-muted-foreground">
+                          {o.location} · apply by{" "}
+                          {new Date(`${o.deadline}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    There are no specific openings right now. Send a general application below and we&apos;ll contact you when a role near you opens.
+                  </p>
+                )}
+              </div>
 
               {/* Key reassurance bullet points */}
               <div className="mt-8 space-y-4 rounded-xl border border-border/70 bg-card/60 p-5 text-xs text-muted-foreground backdrop-blur-sm">
@@ -392,8 +418,11 @@ export function GetInvolvedView() {
                 <form
                   onSubmit={handleSubmit}
                   aria-label="Volunteer Application Form"
-                  className="grid grid-cols-1 gap-5 rounded-2xl border border-border/80 bg-card p-6 sm:p-10 md:grid-cols-2 shadow-xs"
+                  className="relative grid grid-cols-1 gap-5 rounded-2xl border border-border/80 bg-card p-6 sm:p-10 md:grid-cols-2 shadow-xs"
                 >
+                  <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                    <input name="website" tabIndex={-1} autoComplete="off" />
+                  </div>
                   {errorMessage && (
                     <div
                       role="alert"
@@ -418,7 +447,7 @@ export function GetInvolvedView() {
                       value={formData.name}
                       onChange={handleChange("name")}
                       placeholder="Maryam Bello"
-                      className="w-full rounded-lg border border-border bg-muted/30 px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
+                      className="w-full rounded-lg border border-border bg-muted/30 px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
                     />
                   </div>
 
@@ -437,7 +466,7 @@ export function GetInvolvedView() {
                       value={formData.email}
                       onChange={handleChange("email")}
                       placeholder="maryam@example.org"
-                      className="w-full rounded-lg border border-border bg-muted/30 px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
+                      className="w-full rounded-lg border border-border bg-muted/30 px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
                     />
                   </div>
 
@@ -455,7 +484,7 @@ export function GetInvolvedView() {
                       value={formData.phone}
                       onChange={handleChange("phone")}
                       placeholder="+234 803 000 0000"
-                      className="w-full rounded-lg border border-border bg-muted/30 px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
+                      className="w-full rounded-lg border border-border bg-muted/30 px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
                     />
                   </div>
 
@@ -543,8 +572,12 @@ export function GetInvolvedView() {
                       value={formData.message}
                       onChange={handleChange("message")}
                       placeholder="Your background, skills, languages spoken (Hausa, Kanuri, Fulfulde, etc.), or why LHI resonates with you…"
-                      className="w-full resize-y rounded-lg border border-border bg-muted/30 px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
+                      className="w-full resize-y rounded-lg border border-border bg-muted/30 px-4 py-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
                     />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <Turnstile />
                   </div>
 
                   {/* Bottom footer: privacy note & submit button */}

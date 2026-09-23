@@ -3,6 +3,7 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import QRCode from "qrcode";
 
 import { siteConfig } from "@/config/site";
 import type { Certificate } from "@/lib/cms/schema";
@@ -72,9 +73,13 @@ export async function buildCertificatePdf(cert: Certificate): Promise<Uint8Array
   sig(W - 300, "Tayo Fatinikun", "Executive Director");
 
   const verify = `${siteConfig.url.replace(/\/$/, "")}/get-involved/training/verify/${cert.id}`;
-  center(`Certificate ID: ${cert.id}`, 70, sansBold, 9, INK);
-  center(`Verify at ${verify}`, 57, sans, 8, MUTED);
-  center("Putting A Smile On A Face", 42, serifItalic, 9, RED);
+  // QR code to the public verification page, between the signatures.
+  const qr = await doc.embedPng(await QRCode.toBuffer(verify, { errorCorrectionLevel: "M", margin: 1, width: 240, color: { dark: "#1f1f24", light: "#fffbf8" } }));
+  page.drawImage(qr, { x: (W - 62) / 2, y: 86, width: 62, height: 62 });
+  center("Scan to verify", 79, sans, 7, MUTED);
+  center(`Certificate ID: ${cert.id}`, 66, sansBold, 9, INK);
+  center(`Verify at ${verify}`, 54, sans, 8, MUTED);
+  center("Putting A Smile On A Face", 41, serifItalic, 9, RED);
 
   return doc.save();
 }

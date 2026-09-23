@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { getPostBySlug } from "@/lib/cms/content";
 import { addComment } from "@/lib/cms/engagement";
-import { rateLimited } from "@/lib/cms/submissions";
+import { checkSpam } from "@/lib/spam";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Enter your name.").max(80),
@@ -14,9 +14,6 @@ const schema = z.object({
 
 /** New comments are held for moderation in Admin → Comments before they appear. */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
-  if (rateLimited(req, "comment", 10)) {
-    return NextResponse.json({ error: "Too many comments from this connection. Please try again later." }, { status: 429 });
-  }
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -24,7 +21,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid comment." }, { status: 400 });
   }
-  if (parsed.data.website) return NextResponse.json({ ok: true });
+  const spam = await checkSpam(req, { key: "comment", max: 10, honeypot: parsed.data.website });
+  if ("blocked" in spam) return spam.blocked;
+  if ("drop" in spam) return NextResponse.json({ ok: true });
   const comment = await addComment({ slug, postTitle: post.title, name: parsed.data.name, email: parsed.data.email, body: parsed.data.body });
   return NextResponse.json({ ok: true, approved: comment.status === "approved" });
 }

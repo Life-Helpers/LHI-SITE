@@ -112,7 +112,7 @@ export function OperationalMap({
             );
           })}
         </svg>
-        <p className="mt-1 text-right text-[9px] text-muted-foreground/70">
+        <p className="mt-1 text-right text-[9px] text-muted-foreground">
           Map data:{" "}
           <a href="https://github.com/VictorCazanave/svg-maps" className="underline" rel="noopener noreferrer" target="_blank">
             svg-maps

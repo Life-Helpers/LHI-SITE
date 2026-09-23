@@ -73,11 +73,12 @@
    * redesign keeps these exact tokens rather than swapping in an unrelated
    * red/orange pair, so the site stays visually tied to the real logo.
    */
-  --primary: #eb161c;
+  /* Brand red, deepened slightly from #eb161c so red text and white-on-red meet WCAG AA contrast. */
+  --primary: #d51319;
   --primary-foreground: #ffffff;
   --secondary: #f4ede7;
   --secondary-foreground: #0a0a0a;
-  --accent: #c05709;
+  --accent: #a84b07;
   --accent-foreground: #ffffff;
   --destructive: #bb1015;
   --destructive-foreground: #ffffff;
@@ -95,8 +96,8 @@
   --glass-blur: 20px;
   --glow-shadow: 0 0 30px rgba(235, 22, 28, 0.25);
   --glow-shadow-hover: 0 0 30px rgba(235, 22, 28, 0.4);
-  --orb-primary: rgba(235, 22, 28, 0.35);
-  --orb-accent: rgba(192, 87, 9, 0.3);
+  --orb-primary: rgba(235, 22, 28, 0.2);
+  --orb-accent: rgba(192, 87, 9, 0.16);
   --scrim-color: 255, 255, 255;
   --scrim-opacity: 0.85;
 
@@ -530,4 +531,15 @@ body {
 .legal-body a {
   color: var(--primary);
   font-weight: 500;
+}
+
+/* Dark mode: red fills stay brand red, but red text uses a lighter tint for AA contrast. */
+.dark .text-primary {
+  color: #f25a5f;
+}
+
+/* Red text on a red-tinted chip or panel needs a deeper red to stay readable. */
+.text-primary:where([class*="bg-primary/"]),
+:where([class*="bg-primary/"]) .text-primary {
+  color: #a80f14;
 }

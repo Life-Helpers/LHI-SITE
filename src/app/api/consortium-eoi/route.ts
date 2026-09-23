@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { addSubmission } from "@/lib/cms/submissions";
+import { checkSpam } from "@/lib/spam";
 import { consortiumEoiSchema } from "@/lib/validations/consortium-eoi";
 
 export async function POST(req: NextRequest) {
@@ -15,6 +16,9 @@ export async function POST(req: NextRequest) {
   }
 
   const d = parsed.data;
+  const spam = await checkSpam(req, { key: "eoi", max: 10, honeypot: (body as { website?: unknown } | null)?.website });
+  if ("blocked" in spam) return spam.blocked;
+  if ("drop" in spam) return NextResponse.json({ ok: true, reference: "RECEIVED", message: "Received." });
   const submission = await addSubmission({
     type: "consortium-eoi",
     name: d.contactName,

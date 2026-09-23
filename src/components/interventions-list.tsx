@@ -242,7 +242,7 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
             <span
               className={`rounded-full px-1.5 py-0.2 text-[10px] ${
                 selectedPillar === "all"
-                  ? "bg-primary-foreground/20 text-primary-foreground"
+                  ? "bg-black/25 text-primary-foreground"
                   : "bg-muted text-muted-foreground"
               }`}
             >
@@ -272,7 +272,7 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
                 <span
                   className={`rounded-full px-1.5 py-0.2 text-[10px] ${
                     isSelected
-                      ? "bg-primary-foreground/20 text-primary-foreground"
+                      ? "bg-black/25 text-primary-foreground"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
@@ -322,7 +322,7 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
       {/* Projects Cards List */}
       {filteredProjects.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border p-12 text-center">
-          <Filter className="mx-auto h-8 w-8 text-muted-foreground/60" />
+          <Filter className="mx-auto h-8 w-8 text-muted-foreground" />
           <h4 className="mt-3 text-sm font-bold text-foreground">No interventions found</h4>
           <p className="mt-1 text-xs text-muted-foreground">
             No active or past interventions match your search query &ldquo;{searchQuery}&rdquo;. Try another term or reset your filters.

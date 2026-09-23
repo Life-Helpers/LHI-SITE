@@ -85,7 +85,7 @@ export function FloatingWhatsApp() {
               onClick={() => setActiveTab("psea")}
               className={`flex-1 rounded-lg py-2 font-medium transition-all flex items-center justify-center gap-1.5 ${
                 activeTab === "psea"
-                  ? "bg-red-500/10 text-red-600 dark:text-red-400 shadow-xs font-semibold"
+                  ? "bg-red-500/10 text-red-700 dark:text-red-400 shadow-xs font-semibold"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -134,9 +134,9 @@ export function FloatingWhatsApp() {
               <div className="space-y-3">
                 <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-3">
                   <div className="flex items-start gap-2">
-                    <ShieldAlert className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
+                    <ShieldAlert className="h-4 w-4 shrink-0 text-red-700 dark:text-red-400 mt-0.5" />
                     <div>
-                      <h3 className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">
+                      <h3 className="text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-wide">
                         Confidential PSEA Reporting
                       </h3>
                       <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { FEEDBACK_TYPES, RESPONSE_CHANNELS } from "@/data/feedback";
-import { addSubmission, rateLimited } from "@/lib/cms/submissions";
+import { addSubmission } from "@/lib/cms/submissions";
+import { checkSpam } from "@/lib/spam";
 
 const schema = z
   .object({
@@ -28,13 +29,12 @@ const schema = z
 
 /** Community feedback and response mechanism: compliments, suggestions, complaints and questions. */
 export async function POST(req: NextRequest) {
-  if (rateLimited(req, "feedback", 10)) {
-    return NextResponse.json({ error: "Too many messages from this connection. Please try again later." }, { status: 429 });
-  }
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid feedback." }, { status: 400 });
   const d = parsed.data;
-  if (d.website) return NextResponse.json({ ok: true, reference: "RECEIVED" });
+  const spam = await checkSpam(req, { key: "feedback", max: 10, honeypot: d.website });
+  if ("blocked" in spam) return spam.blocked;
+  if ("drop" in spam) return NextResponse.json({ ok: true, reference: "RECEIVED" });
 
   const anonymous = Boolean(d.anonymous);
   const submission = await addSubmission({

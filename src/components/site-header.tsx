@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Menu, Radio, Sparkles, X } from "lucide-react";
+import { ArrowRight, Menu, Radio, Search, Sparkles, X } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -745,7 +745,14 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
         </NavigationMenu>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className={`hidden items-center gap-1.5 sm:flex ${isHeroGlass ? "[&_button]:border-white/30 [&_button]:text-white [&_button:hover]:border-white/60" : ""}`}>
+          <div className={`hidden items-center gap-1.5 sm:flex ${isHeroGlass ? "[&_button]:border-white/30 [&_button]:text-white [&_button:hover]:border-white/60 [&>a]:border-white/30 [&>a]:text-white [&>a:hover]:border-white/60" : ""}`}>
+            <Link
+              href="/search"
+              aria-label="Search the site"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground hover:border-accent focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <Search className="h-4 w-4" aria-hidden="true" />
+            </Link>
             <LanguageSwitcher />
             <AccessibilityToolbar />
             <ThemeToggle />
@@ -848,6 +855,14 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
           <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
             <LanguageSwitcher />
             <div className="flex items-center gap-1.5">
+              <Link
+                href="/search"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Search the site"
+                className="relative flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground hover:border-accent"
+              >
+                <Search className="h-4 w-4" aria-hidden="true" />
+              </Link>
               <AccessibilityToolbar />
               <ThemeToggle />
             </div>

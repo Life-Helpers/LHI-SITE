@@ -32,16 +32,16 @@ export function UpcomingEvents({ events, today }: { events: CalendarEvent[]; tod
           }`}
         >
           <div className="flex items-start gap-5">
-            <EventDateTile event={next} size="lg" className={lhi ? "border-white/40 bg-white text-primary" : ""} />
+            <EventDateTile event={next} size="lg" inverse={lhi} />
             <div className="min-w-0">
-              <p className={`text-[11px] font-semibold uppercase tracking-[0.25em] ${lhi ? "text-white/85" : "text-accent"}`}>
+              <p className={`text-[11px] font-semibold uppercase tracking-[0.25em] ${lhi ? "text-white" : "text-accent"}`}>
                 {countdownLabel(daysUntil(today, next.start))} · {OBSERVANCE_AREAS[next.area].label}
               </p>
               <h3 className="mt-2 font-serif-display text-3xl font-light leading-tight sm:text-4xl">{next.title}</h3>
-              <p className={`mt-1 text-sm ${lhi ? "text-white/85" : "text-muted-foreground"}`}>{formatEventDate(next)}</p>
+              <p className={`mt-1 text-sm ${lhi ? "text-white" : "text-muted-foreground"}`}>{formatEventDate(next)}</p>
             </div>
           </div>
-          <p className={`mt-5 max-w-xl leading-relaxed ${lhi ? "text-white/90" : "text-foreground/80"}`}>{next.description}</p>
+          <p className={`mt-5 max-w-xl leading-relaxed ${lhi ? "text-white" : "text-foreground/80"}`}>{next.description}</p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <AddToCalendar event={next} variant={lhi ? "light" : "solid"} />
             <Link href={`/events#${next.id}`} className={`text-sm font-semibold hover:underline ${lhi ? "text-white" : "text-primary"}`}>

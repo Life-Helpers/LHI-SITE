@@ -350,7 +350,7 @@ export function FaqAccordion({
         {/* Accordion List */}
         {filteredFaqs.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-12 text-center bg-card/40">
-            <HelpCircle className="h-10 w-10 text-muted-foreground/60 mx-auto mb-3" />
+            <HelpCircle className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
             <h3 className="text-lg font-bold text-foreground">No questions found</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               We couldn&apos;t find any questions matching &ldquo;{searchQuery}&rdquo;.
@@ -443,7 +443,7 @@ export function FaqAccordion({
                           {faq.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="text-[11px] font-medium text-muted-foreground/80 bg-muted/60 px-2 py-0.5 rounded-md"
+                              className="text-[11px] font-medium text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-md"
                             >
                               #{tag}
                             </span>
@@ -479,7 +479,7 @@ export function FaqAccordion({
                 <Mail className="h-4 w-4 text-primary" />
                 <span>official@lhinigeria.org</span>
               </a>
-              <span className="text-muted-foreground/40">•</span>
+              <span className="text-muted-foreground">•</span>
               <a
                 href="tel:+2348030000000"
                 className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"

@@ -136,7 +136,7 @@ export function WhoWeAreBand() {
                   isActive ? "translate-y-0 opacity-100 delay-150" : "pointer-events-none translate-y-4 opacity-0"
                 }`}
               >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/80">{panel.label}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white">{panel.label}</p>
                 <h3 className="text-5xl font-black uppercase leading-none tracking-tight sm:text-6xl lg:text-7xl">{panel.word}</h3>
                 <div className="max-w-3xl">{panel.body}</div>
               </div>

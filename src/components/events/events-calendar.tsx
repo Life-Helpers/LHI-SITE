@@ -35,7 +35,7 @@ export function EventsCalendar({ events, today }: { events: CalendarEvent[]; tod
         area === value ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground hover:border-primary hover:text-primary"
       }`}
     >
-      {label} <span className="opacity-70">({n})</span>
+      {label} <span className={area === value ? "" : "text-muted-foreground"}>({n})</span>
     </button>
   );
 
