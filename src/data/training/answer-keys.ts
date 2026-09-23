@@ -8,4 +8,7 @@ export const ANSWER_KEYS: Record<string, Record<string, number>> = {
   "child-safeguarding-policy": {
     c1: 1, c2: 1, c3: 1, c4: 0, c5: 1, c6: 1, c7: 0, c8: 0, c9: 0, c10: 0,
   },
+  "gbv-in-humanitarian-settings": {
+    g1: 1, g2: 1, g3: 0, g4: 2, g5: 0, g6: 1, g7: 0, g8: 1, g9: 1, g10: 0, g11: 1, g12: 0, g13: 1, g14: 0, g15: 1,
+  },
 };

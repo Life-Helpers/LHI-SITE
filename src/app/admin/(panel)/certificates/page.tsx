@@ -25,7 +25,7 @@ export default async function CertificatesPage({ searchParams }: { searchParams:
         description="Certificates issued by the Humanitarian Training centre. Anyone can verify a code on the public training page."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Certificates" }]}
       />
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <p className="text-xs uppercase tracking-wider text-admin-muted">Total issued</p>
           <p className="mt-1 text-2xl font-bold">{all.length}</p>

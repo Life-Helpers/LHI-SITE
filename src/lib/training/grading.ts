@@ -10,7 +10,7 @@ import { readStore, updateStore } from "@/lib/cms/store";
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 function certificateCode(courseId: string) {
-  const prefix = courseId === "comprehensive-safeguarding" ? "SG" : "CS";
+  const prefix = ({ "comprehensive-safeguarding": "SG", "child-safeguarding-policy": "CS", "gbv-in-humanitarian-settings": "GBV" } as Record<string, string>)[courseId] ?? "TR";
   let code = "";
   for (let i = 0; i < 8; i++) code += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)];
   return `LHI-${prefix}-${code}`;

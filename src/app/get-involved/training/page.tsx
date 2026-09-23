@@ -42,7 +42,7 @@ export default function TrainingPage() {
           <h2 id="courses-heading" className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
             Available courses
           </h2>
-          <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {COURSES.map((course) => {
               const photo = coursePhoto(course);
               const minutes = course.lessons.reduce((sum, l) => sum + l.minutes, 0);

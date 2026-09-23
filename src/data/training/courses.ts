@@ -750,7 +750,317 @@ const childSafeguardingPolicy: Course = {
   ],
 };
 
-export const COURSES: Course[] = [safeguarding, childSafeguardingPolicy];
+const gbvHumanitarian: Course = {
+  id: "gbv-in-humanitarian-settings",
+  title: "Gender-Based Violence in Humanitarian Settings",
+  subtitle: "Understanding, preventing and responding to GBV in emergencies",
+  description:
+    "What GBV is, why crises increase the risk, its impact on survivors, families and communities, the international frameworks that guide humanitarian action, how to prevent and mitigate risks across sectors, the response services survivors need, and the roles of humanitarian actors and Local Emergency Management Committees (LEMCs).",
+  level: "Foundation",
+  audience: "Staff, volunteers, LEMC members, community leaders and humanitarian partners",
+  facilitator: "Hadiza Ibrahim Yaro, Director, Safeguarding, Accountability & Gender",
+  photo: "activismWomen",
+  passMark: 80,
+  lessons: [
+    {
+      id: "understanding-gbv",
+      title: "Understanding gender-based violence",
+      summary: "Why GBV matters in crises, what it is, and the forms it takes.",
+      minutes: 6,
+      photo: "activismMarch",
+      blocks: [
+        {
+          type: "p",
+          text: "Gender-based violence is widespread in crises because of insecurity, displacement and the breakdown of the systems that normally protect people. Addressing GBV is essential to save lives and protect dignity.",
+        },
+        {
+          type: "callout",
+          tone: "info",
+          title: "Definition",
+          text: "Gender-based violence (GBV) is any harmful act based on gender that results in physical, sexual, psychological or economic harm. Examples include rape, exploitation, early or forced marriage, and denial of resources.",
+        },
+        {
+          type: "list",
+          title: "Forms of GBV",
+          items: [
+            "Physical violence: beating, killing",
+            "Sexual violence: rape, exploitation, trafficking",
+            "Psychological abuse: intimidation, humiliation",
+            "Economic abuse: denial of work or resources",
+            "Harmful practices: female genital mutilation (FGM), child marriage",
+          ],
+        },
+      ],
+      check: [
+        {
+          prompt: "Which best defines gender-based violence?",
+          options: [
+            "Any harmful act based on gender that results in physical, sexual, psychological or economic harm",
+            "Only physical fights between men",
+            "Any disagreement within a family",
+          ],
+          answer: 0,
+          explain: "GBV covers physical, sexual, psychological and economic harm based on gender.",
+        },
+        {
+          prompt: "Denying a woman access to work or money is an example of…",
+          options: ["Economic abuse", "A harmful practice", "Not GBV"],
+          answer: 0,
+          explain: "Denial of work or resources is economic abuse.",
+        },
+        {
+          prompt: "Child marriage and FGM are classified as…",
+          options: ["Psychological abuse", "Harmful practices", "Economic abuse"],
+          answer: 1,
+          explain: "FGM and child marriage are harmful practices.",
+        },
+      ],
+    },
+    {
+      id: "gbv-in-crises",
+      title: "GBV in humanitarian contexts and its impact",
+      summary: "What makes people more vulnerable during emergencies, and how GBV harms individuals, families, communities and society.",
+      minutes: 6,
+      photo: "hubAerial",
+      blocks: [
+        {
+          type: "list",
+          title: "Vulnerability increases because of",
+          items: [
+            "Displacement and overcrowding",
+            "Loss of family and community protection",
+            "Poverty and lack of resources",
+            "Insecurity and weak law enforcement",
+          ],
+        },
+        {
+          type: "list",
+          title: "The impact of GBV",
+          items: [
+            "Individual: trauma, injuries, unwanted pregnancies, sexually transmitted infections and stigma",
+            "Family: broken trust and economic burden",
+            "Community: fear, exclusion of women and reduced resilience",
+            "Society: GBV undermines peace and recovery",
+          ],
+        },
+        {
+          type: "callout",
+          tone: "warning",
+          title: "Remember",
+          text: "GBV is life-threatening and a violation of human rights. Its effects reach far beyond the survivor.",
+        },
+      ],
+      check: [
+        {
+          prompt: "Which of these increases the risk of GBV in an emergency?",
+          options: ["Displacement and overcrowding", "Strong law enforcement", "Stable family networks"],
+          answer: 0,
+          explain: "Displacement, loss of protection, poverty and insecurity all raise vulnerability.",
+        },
+        {
+          prompt: "At community level, GBV can lead to…",
+          options: ["Fear, exclusion of women and reduced resilience", "Higher incomes", "Better coordination"],
+          answer: 0,
+          explain: "Communities experience fear, exclusion of women and reduced resilience.",
+        },
+      ],
+    },
+    {
+      id: "frameworks-and-prevention",
+      title: "International frameworks, risk mitigation and prevention",
+      summary: "The standards that guide humanitarian action on GBV, and how every sector can reduce risk.",
+      minutes: 7,
+      photo: "communityDialogue",
+      blocks: [
+        {
+          type: "list",
+          title: "International frameworks",
+          items: [
+            "CEDAW: the rights of women",
+            "UN Security Council Resolution 1325: Women, Peace and Security",
+            "IASC GBV Guidelines: GBV in humanitarian action",
+            "Sphere Standards: protection principles",
+          ],
+        },
+        {
+          type: "list",
+          title: "Risk mitigation and prevention",
+          items: [
+            "Integrate GBV risk reduction across sectors: WASH, shelter, food and livelihoods",
+            "Ensure safe facilities: lighting, separate latrines and safe spaces",
+            "Community awareness and engagement",
+            "Involve men and boys in prevention",
+          ],
+        },
+        {
+          type: "callout",
+          tone: "success",
+          title: "Case example",
+          text: "A safe space for women in an IDP camp led to increased reporting of GBV and stronger peer support among women.",
+        },
+      ],
+      check: [
+        {
+          prompt: "Which framework focuses on Women, Peace and Security?",
+          options: ["UNSCR 1325", "Sphere Standards", "CEDAW"],
+          answer: 0,
+          explain: "UN Security Council Resolution 1325 is the Women, Peace and Security agenda.",
+        },
+        {
+          prompt: "Which is a practical risk-mitigation measure in a camp?",
+          options: ["Good lighting and separate latrines for women and men", "Shared unlit latrines", "Distributions at night in isolated places"],
+          answer: 0,
+          explain: "Safe facilities with lighting, separate latrines and safe spaces reduce risk.",
+        },
+        {
+          prompt: "Who should be involved in GBV prevention?",
+          options: ["Only women", "Everyone, including men and boys", "Only the police"],
+          answer: 1,
+          explain: "Involving men and boys is a core prevention strategy.",
+        },
+      ],
+    },
+    {
+      id: "response-services",
+      title: "GBV response services and referral pathways",
+      summary: "The core services survivors need and why clear referral systems matter.",
+      minutes: 6,
+      photo: "healthScreening",
+      blocks: [
+        {
+          type: "list",
+          title: "Response services",
+          items: [
+            "Health: clinical management of rape and trauma care",
+            "Protection: case management and safe shelters",
+            "Psychosocial: counselling and support groups",
+            "Referral pathways: clear systems that link survivors to services",
+          ],
+        },
+        {
+          type: "callout",
+          tone: "info",
+          title: "A survivor-centred approach",
+          text: "Put the survivor's safety, dignity, confidentiality and choices first. Refer with the survivor's consent to the services they want, and never share their information without it.",
+        },
+      ],
+      check: [
+        {
+          prompt: "Clinical management of rape belongs to which response service?",
+          options: ["Health", "Livelihoods", "Education"],
+          answer: 0,
+          explain: "Clinical management of rape and trauma care are health services.",
+        },
+        {
+          prompt: "What is the purpose of a referral pathway?",
+          options: ["To link survivors to health, protection and psychosocial services", "To publish survivors' names", "To replace all services"],
+          answer: 0,
+          explain: "Referral pathways are clear systems that connect survivors to the support they need.",
+        },
+      ],
+    },
+    {
+      id: "roles-and-lemcs",
+      title: "Roles of humanitarian actors and LEMCs",
+      summary: "What organisations and Local Emergency Management Committees can do, the challenges, and recommendations.",
+      minutes: 7,
+      photo: "communityLeaders",
+      blocks: [
+        {
+          type: "list",
+          title: "Role of humanitarian actors",
+          items: [
+            "Mainstream GBV risk mitigation in all programmes",
+            "Train staff on PSEA (Prevention of Sexual Exploitation and Abuse)",
+            "Establish safe and confidential reporting channels",
+            "Collaborate with government, civil society and traditional leaders",
+          ],
+        },
+        {
+          type: "list",
+          title: "Role of the Local Emergency Management Committee (LEMC)",
+          items: [
+            "Awareness creation: educating communities on GBV and how to report",
+            "Coordination: linking survivors to health, protection and legal services",
+            "Community mobilisation: engaging gatekeepers, leaders, youth and women's groups",
+            "Early warning and referrals: identifying risks and guiding survivors to support services",
+          ],
+        },
+        {
+          type: "list",
+          title: "Challenges in addressing GBV",
+          items: [
+            "Stigma and cultural barriers",
+            "Under-reporting due to fear or shame",
+            "Insecurity in conflict zones",
+            "Weak coordination among actors",
+            "Limited resources and services",
+          ],
+        },
+        {
+          type: "list",
+          title: "Recommendations",
+          items: [
+            "Strengthen coordination through the GBV sub-cluster and protection cluster",
+            "Increase funding for GBV services",
+            "Build the capacity of local actors and LEMCs",
+            "Use a survivor-centred approach",
+            "Monitoring and accountability",
+          ],
+        },
+        {
+          type: "callout",
+          tone: "success",
+          title: "Key message",
+          text: "There is no humanitarian response without protection, and no protection without addressing GBV. Collaboration means stronger protection.",
+        },
+        {
+          type: "steps",
+          title: "Group activity (for facilitated sessions)",
+          items: [
+            "In groups of 4–6, identify common forms of GBV in humanitarian settings in your community.",
+            "Discuss the main barriers survivors face in reporting or accessing services.",
+            "Agree at least two practical strategies your group could apply to prevent or respond to GBV.",
+            "Present your findings in plenary (5 minutes per group).",
+          ],
+        },
+      ],
+      check: [
+        {
+          prompt: "Which is a role of the LEMC?",
+          options: ["Early warning and referrals", "Investigating and punishing perpetrators themselves", "Keeping GBV cases secret from services"],
+          answer: 0,
+          explain: "LEMCs raise awareness, coordinate, mobilise communities, and provide early warning and referrals.",
+        },
+        {
+          prompt: "Why is GBV often under-reported?",
+          options: ["Fear and shame", "Too many reporting channels", "Survivors prefer not to receive help"],
+          answer: 0,
+          explain: "Fear, shame, stigma and cultural barriers keep many survivors silent.",
+        },
+      ],
+    },
+  ],
+  exam: [
+    { id: "g1", prompt: "Gender-based violence is any harmful act based on gender that results in…", options: ["Only physical injury", "Physical, sexual, psychological or economic harm", "Only financial loss", "Only harm to men"] },
+    { id: "g2", prompt: "Trafficking and exploitation are forms of…", options: ["Economic abuse", "Sexual violence", "Harmful practices", "Psychological abuse"] },
+    { id: "g3", prompt: "Intimidation and humiliation are forms of…", options: ["Psychological abuse", "Physical violence", "Economic abuse", "Harmful practices"] },
+    { id: "g4", prompt: "Which is NOT a reason vulnerability to GBV rises in humanitarian settings?", options: ["Displacement and overcrowding", "Loss of family protection", "Strong law enforcement", "Poverty"] },
+    { id: "g5", prompt: "At the individual level, GBV can cause…", options: ["Trauma, injuries, unwanted pregnancies, STIs and stigma", "Better health", "Increased income", "No lasting effects"] },
+    { id: "g6", prompt: "Which framework protects the rights of women?", options: ["Sphere Standards", "CEDAW", "IASC Guidelines", "UNSCR 1325"] },
+    { id: "g7", prompt: "The IASC GBV Guidelines relate to…", options: ["Humanitarian action", "Tax law", "School curricula", "Road safety"] },
+    { id: "g8", prompt: "Which is a GBV risk-mitigation measure?", options: ["Remove lighting from camps", "Integrate GBV risk reduction into WASH, shelter, food and livelihoods", "Hold distributions in isolated places", "Exclude men and boys from all activities"] },
+    { id: "g9", prompt: "Case management and safe shelters are part of which response service?", options: ["Health", "Protection", "Psychosocial", "Livelihoods"] },
+    { id: "g10", prompt: "Counselling and support groups are…", options: ["Psychosocial services", "Legal services", "Health services", "Food assistance"] },
+    { id: "g11", prompt: "Humanitarian actors should…", options: ["Handle reports publicly", "Establish safe and confidential reporting channels", "Avoid working with traditional leaders", "Skip PSEA training"] },
+    { id: "g12", prompt: "Which is a role of the Local Emergency Management Committee?", options: ["Coordination: linking survivors to health, protection and legal services", "Collecting fees from survivors", "Deciding cases in court", "Publishing survivors' names"] },
+    { id: "g13", prompt: "Which is a recognised challenge in addressing GBV?", options: ["Too much funding", "Under-reporting due to fear or shame", "Too few actors", "Survivors refuse all help"] },
+    { id: "g14", prompt: "Which recommendation strengthens coordination?", options: ["Working through the GBV sub-cluster and protection cluster", "Each actor working alone", "Ending monitoring", "Reducing funding"] },
+    { id: "g15", prompt: "Complete the key message: \"There is no humanitarian response without protection, and no protection without…\"", options: ["More food", "Addressing GBV", "New buildings", "Media coverage"] },
+  ],
+};
+
+export const COURSES: Course[] = [safeguarding, childSafeguardingPolicy, gbvHumanitarian];
 
 export function getCourse(id: string) {
   return COURSES.find((c) => c.id === id);
