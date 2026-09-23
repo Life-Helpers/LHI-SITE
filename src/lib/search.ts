@@ -31,7 +31,7 @@ const PAGES: { title: string; href: string; excerpt: string }[] = [
   { title: "Brochure", href: "/brochure", excerpt: "Noma Tushen Arziki Farmer Service Center resilience hub." },
   { title: "Feedback", href: "/feedback", excerpt: "Compliments, suggestions, complaints and questions." },
   { title: "Events & observance days", href: "/events", excerpt: "Upcoming events and international days, add to calendar." },
-  { title: "Voices of the People (VOP)", href: "/radio", excerpt: "WeSpeak (Muyi Magana) radio programme, Royal FM 101.5 Sokoto." },
+  { title: "Radio Program", href: "/radio", excerpt: "WeSpeak (Muyi Magana) radio programme, Royal FM 101.5 Sokoto." },
   { title: "Humanitarian Training", href: "/get-involved/training", excerpt: "Free online courses with certificates." },
   { title: "Get involved and volunteer", href: "/get-involved", excerpt: "Volunteer, partner or support our work." },
   { title: "Donate", href: "/donate", excerpt: "Support our work." },

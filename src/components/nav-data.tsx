@@ -183,7 +183,7 @@ export const whatWeDoCards: NavCard[] = [
 ];
 
 export const whatWeDoExtra: NavLink = {
-  label: "Voices of the People (VOP)",
+  label: "Radio Program",
   href: "/radio",
   description: "Weekly on Royal FM 101.5 Sokoto, Tuesdays 11 AM",
   icon: Radio,
@@ -194,7 +194,7 @@ export const whatWeDoFeatured: FeaturedNavStory = {
   subtitle: "LHI's weekly radio programme on health, education, livelihood, agriculture and gender equity.",
   href: "/radio",
   image: LHI_PHOTOS.solarRadioFarmer.src,
-  tag: "Voices of the People",
+  tag: "Radio Program",
 };
 
 export const impactLinks: NavLink[] = [
@@ -208,7 +208,7 @@ export const impactLinks: NavLink[] = [
   { label: "Success Stories", href: "/success-stories", description: "Stories from our magazines and newsletters", icon: Award, tag: "Human Stories", group: "media" },
   { label: "LHI Blog & Newsletter", href: "/blog", description: "News, field stories, newsletters and publications", icon: Newspaper, tag: "Dispatches", group: "media" },
   { label: "Events & Observance Days", href: "/events", description: "Upcoming events and international days, add to calendar", icon: CalendarDays, tag: "Calendar", group: "media" },
-  { label: "Voices of the People (VOP)", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "media" },
+  { label: "Radio Program", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "media" },
 ];
 
 export const impactFeatured: {
@@ -356,7 +356,7 @@ export function useLocalizedNav() {
     { label: t.impactMenu.successStories, href: "/success-stories", description: "Stories from our magazines and newsletters", icon: Award, tag: "Human Stories", group: "media" },
     { label: "LHI Blog & Newsletter", href: "/blog", description: "News, field stories, newsletters and publications", icon: Newspaper, tag: "Dispatches", group: "media" },
     { label: "Events & Observance Days", href: "/events", description: "Upcoming events and international days, add to calendar", icon: CalendarDays, tag: "Calendar", group: "media" },
-    { label: "Voices of the People (VOP)", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "media" },
+    { label: "Radio Program", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "media" },
     { label: "Humanitarian Training", href: "/get-involved/training", description: "Free safeguarding courses with certificates", icon: GraduationCap, tag: "Learn", group: "media" },
     { label: "Careers & Procurement", href: "/careers", description: "Vacancies, vendor requests and registration", icon: Users, tag: "Work with us", group: "media" },
   ];

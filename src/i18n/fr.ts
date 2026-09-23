@@ -36,7 +36,7 @@ export const fr: Dictionary = {
     socialInclusionDesc: "Participation civique & inclusion du handicap",
     protection: "Protection",
     protectionDesc: "Réponse aux violences basées sur le genre & sauvegarde",
-    radioAdvocacy: "Voices of the People (VOP)",
+    radioAdvocacy: "Radio Program",
   },
   impactMenu: {
     blog: "Blog",
@@ -45,7 +45,7 @@ export const fr: Dictionary = {
     projectsInterventions: "Projets et interventions",
     eventsUpdates: "Événements et actualités",
     newsletter: "Bulletin d'information",
-    radioStory: "Voices of the People (VOP)",
+    radioStory: "Émission de radio",
   },
   accessibility: {
     settingsLabel: "Paramètres d'accessibilité",
@@ -132,7 +132,7 @@ export const fr: Dictionary = {
       blogCta: "Lire les dernières nouvelles",
     },
     radio: {
-      eyebrow: "Voices of the People (VOP)",
+      eyebrow: "Émission de radio",
       heading: "WeSpeak (Muyi Magana)",
       body: "L'émission hebdomadaire de LHI sur Radio Nigeria Royal FM 101.5, Sokoto, chaque mardi de 11 h à 12 h : santé, éducation, moyens de subsistance, agriculture et égalité des genres, avec un espace pour vos questions.",
       cta: "En savoir plus",

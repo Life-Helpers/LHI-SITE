@@ -77,6 +77,15 @@ test.describe("content hierarchy", () => {
     ).toBeVisible();
   });
 
+  test("contact page shows every office on the Nigeria map and in the address list", async ({ page }) => {
+    await page.goto("/contact");
+    const pins = page.locator("#presence-map button[aria-label$=' State'], #presence-map button[aria-label$='Territory']");
+    await expect(pins).toHaveCount(11);
+    await page.getByRole("button", { name: /^Jos Office, / }).click();
+    await expect(page.locator("#presence-map h3").first()).toHaveText("Jos Office");
+    await expect(page.locator("iframe[title^='Google Map of the']")).toHaveCount(12);
+  });
+
   test("robots.txt and sitemap.xml are served", async ({ request }) => {
     const robots = await request.get("/robots.txt");
     expect(robots.ok()).toBe(true);

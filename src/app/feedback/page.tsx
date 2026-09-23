@@ -99,7 +99,7 @@ export default function FeedbackPage() {
             <Link href="/radio" className="flex gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary">
               <Radio className="h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
               <span>
-                <span className="block font-semibold text-foreground">On air: Voices of the People (VOP)</span>
+                <span className="block font-semibold text-foreground">On air: Radio Program</span>
                 <span className="block text-sm text-muted-foreground">
                   Ask questions and raise concerns live on WeSpeak (Muyi Magana), Royal FM 101.5 Sokoto, Tuesdays 11 AM – 12 PM.
                 </span>

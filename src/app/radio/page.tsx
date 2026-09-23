@@ -12,9 +12,9 @@ import { toRadioEpisode } from "@/lib/radio";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Voices of the People (VOP)",
+  title: "Radio Program: WeSpeak (Muyi Magana)",
   description:
-    "Voices of the People (VOP): Life Helpers Initiative's community radio programmes. WeSpeak (Muyi Magana) airs every Tuesday, 11 AM – 12 PM on Radio Nigeria Royal FM 101.5, Sokoto.",
+    "Life Helpers Initiative's Radio Program. WeSpeak (Muyi Magana) airs every Tuesday, 11 AM – 12 PM on Radio Nigeria Royal FM 101.5, Sokoto.",
 };
 
 const features = [

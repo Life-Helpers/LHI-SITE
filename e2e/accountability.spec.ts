@@ -48,9 +48,9 @@ test.describe("accountability pages", () => {
     await expect(page.locator("#subscribe")).toBeAttached();
   });
 
-  test("radio is Voices of the People (VOP)", async ({ page }) => {
+  test("radio page is the Radio Program", async ({ page }) => {
     await page.goto("/vop");
     await expect(page).toHaveURL(/\/radio$/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Voices of");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Voices that");
   });
 });

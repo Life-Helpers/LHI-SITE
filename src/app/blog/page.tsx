@@ -85,12 +85,12 @@ export default async function BlogPage() {
 
               <div className="rounded-2xl border border-border bg-card p-6">
                 <Radio className="h-6 w-6 text-primary" aria-hidden="true" />
-                <h3 className="mt-3 font-semibold text-foreground">Voices of the People (VOP)</h3>
+                <h3 className="mt-3 font-semibold text-foreground">Radio Program</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   WeSpeak (Muyi Magana) on Radio Nigeria, Royal FM 101.5, Sokoto. Every Tuesday, 11:00 AM – 12:00 PM.
                 </p>
                 <Link href="/radio" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
-                  Listen to VOP →
+                  Listen to the Radio Program →
                 </Link>
               </div>
 

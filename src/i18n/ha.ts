@@ -34,7 +34,7 @@ export const ha: Dictionary = {
     socialInclusionDesc: "Shiga cikin al'umma & haɗa nakasassu",
     protection: "Kariya",
     protectionDesc: "Magance cin zarafin mata & tsaro daga cin zarafi",
-    radioAdvocacy: "Voices of the People (VOP)",
+    radioAdvocacy: "Radio Program",
   },
   impactMenu: {
     blog: "Shafin Labarai",
@@ -43,7 +43,7 @@ export const ha: Dictionary = {
     projectsInterventions: "Ayyuka da Shiga Tsakani",
     eventsUpdates: "Abubuwan da Suka Faru & Sabuntawa",
     newsletter: "Wasiƙar Labarai",
-    radioStory: "Voices of the People (VOP)",
+    radioStory: "Shirin Rediyo",
   },
   accessibility: {
     settingsLabel: "Saitunan Samun Dama",
@@ -129,7 +129,7 @@ export const ha: Dictionary = {
       blogCta: "Read the latest",
     },
     radio: {
-      eyebrow: "Voices of the People (VOP)",
+      eyebrow: "Shirin Rediyo",
       heading: "WeSpeak (Muyi Magana)",
       body: "Shirin rediyo na mako-mako na LHI a Rediyo Najeriya Royal FM 101.5, Sokoto, kowace Talata ƙarfe 11 zuwa 12 na rana: lafiya, ilimi, sana'o'i, noma da daidaiton jinsi, tare da damar tambayoyi da ra'ayoyinku.",
       cta: "Ƙarin Bayani",

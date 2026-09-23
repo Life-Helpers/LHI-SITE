@@ -57,7 +57,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 909 504 9086",
       mapQuery: "Goshen Development Center Tamaje Area Eastern Byepass Road Sokoto",
-      coordinates: { x: 19, y: 18 }, // SVG percent coords on Nigeria Map
+      geo: { lat: 13.0059, lng: 5.2476 },
+      mapStateId: "sokoto",
     },
     {
       id: "adamawa-office",
@@ -72,7 +73,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "House 7, Jos Street Off Capital School Damsawo Jimeta Adamawa",
-      coordinates: { x: 80, y: 55 },
+      geo: { lat: 9.2795, lng: 12.4584 },
+      mapStateId: "adamawa",
     },
     {
       id: "bauchi-office",
@@ -87,7 +89,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "Suite 51 Ibrosulada Plaza Opposite Keystone Bank, Bank Road, Bauchi",
-      coordinates: { x: 59, y: 40 },
+      geo: { lat: 10.3158, lng: 9.8442 },
+      mapStateId: "bauchi",
     },
     {
       id: "kebbi-office",
@@ -102,7 +105,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "Plot: 130 & 131 off Sani Abacha By-pass Behind Leisure City Garden & Event Centre Kawara Area Birnin-Kebbi, Kebbi State",
-      coordinates: { x: 11, y: 28 },
+      geo: { lat: 12.4539, lng: 4.1975 },
+      mapStateId: "kebbi",
     },
     {
       id: "zamfara-office",
@@ -117,7 +121,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "Behind Haido Filling Station Gada Biyu Gusau Zamfara",
-      coordinates: { x: 32, y: 26 },
+      geo: { lat: 12.1628, lng: 6.6614 },
+      mapStateId: "zamfara",
     },
     {
       id: "maiduguri-office",
@@ -132,7 +137,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "House 12, Gidan Giwa, Sale Kida Street, Close to ICRC, Off Damboa Road, Maiduguri",
-      coordinates: { x: 88, y: 27 },
+      geo: { lat: 11.8311, lng: 13.151 },
+      mapStateId: "borno",
     },
     {
       id: "yobe-office",
@@ -147,7 +153,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "Maiduguri Bypass Damaturu Yobe",
-      coordinates: { x: 76, y: 28 },
+      geo: { lat: 11.747, lng: 11.9608 },
+      mapStateId: "yobe",
     },
     {
       id: "ebonyi-office",
@@ -162,7 +169,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "Engr Dave Eze Street Ebebe Junction Abakaliki Ebonyi",
-      coordinates: { x: 48, y: 80 },
+      geo: { lat: 6.3249, lng: 8.1137 },
+      mapStateId: "ebonyi",
     },
     {
       id: "jos-office",
@@ -177,7 +185,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "28 Jengre Road British American Junction Jos Plateau",
-      coordinates: { x: 52, y: 47 },
+      geo: { lat: 9.8965, lng: 8.8583 },
+      mapStateId: "plateau",
     },
     {
       id: "abuja-office",
@@ -192,7 +201,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "3rd Avenue Gwarimpa Abuja",
-      coordinates: { x: 38, y: 53 },
+      geo: { lat: 9.1087, lng: 7.4072 },
+      mapStateId: "fct",
     },
     {
       id: "katsina-office",
@@ -207,7 +217,8 @@ export const siteConfig = {
       email: "official@lhinigeria.org",
       phone: "+234 901 715 9526",
       mapQuery: "Plot No 14 Bayajidda Road, Along INEC State Office Behind ICPC GRA Katsina",
-      coordinates: { x: 42, y: 19 },
+      geo: { lat: 12.9908, lng: 7.6018 },
+      mapStateId: "katsina",
     },
   ],
   address: {

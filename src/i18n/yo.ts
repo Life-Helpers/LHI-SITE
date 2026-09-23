@@ -34,7 +34,7 @@ export const yo: Dictionary = {
     socialInclusionDesc: "Ìkópa àwùjọ & ìdàpọ̀ àwọn aláàbọ̀-ara",
     protection: "Ààbò",
     protectionDesc: "Ìdáhùn sí ìwà ipá ìbálòpọ̀ & ìdáàbòbò",
-    radioAdvocacy: "Voices of the People (VOP)",
+    radioAdvocacy: "Radio Program",
   },
   impactMenu: {
     blog: "Bùlọ́ọ̀gì",
@@ -43,7 +43,7 @@ export const yo: Dictionary = {
     projectsInterventions: "Àwọn Iṣẹ́ àti Ìdásí",
     eventsUpdates: "Àwọn Ìṣẹ̀lẹ̀ àti Ìwífún",
     newsletter: "Ìwé Ìròyìn",
-    radioStory: "Voices of the People (VOP)",
+    radioStory: "Ìtàn Rédíò",
   },
   accessibility: {
     settingsLabel: "Ètò Ìrọ̀rùn Wíwọlé",
@@ -129,7 +129,7 @@ export const yo: Dictionary = {
       blogCta: "Read the latest",
     },
     radio: {
-      eyebrow: "Voices of the People (VOP)",
+      eyebrow: "Ètò Rédíò",
       heading: "WeSpeak (Muyi Magana)",
       body: "LHI's weekly radio programme on Radio Nigeria Royal FM 101.5, Sokoto, every Tuesday 11 AM – 12 PM: health, education, livelihood, agriculture and gender equity, with space for your questions and feedback.",
       cta: "Kọ́ Sí I",

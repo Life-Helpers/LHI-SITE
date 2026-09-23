@@ -10,7 +10,7 @@ export const FEEDBACK_PROGRAMMES = [
   "Protection & GBV",
   "Emergency response",
   "Humanitarian Training (online courses)",
-  "Voices of the People (VOP) radio",
+  "Radio Program",
   "Recruitment or procurement",
   "Website",
   "Other / general",
