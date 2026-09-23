@@ -1,7 +1,7 @@
 /**
  * Real Life Helpers Initiative field photography, taken from the Organisational
  * Profile, the Strategic Plan 2026–2030, the project magazines (Cultivating Resilience
- * Vol. 1, Gidan Arziki Vol. 2, ABEP) and the LHI newsletter.
+ * Vol. 1, Gidan Arziki Vol. 2, ABEP), the LHI newsletters and the Helpers Digest bulletins.
  * Files live in /public/images/lhi. Use these instead of stock imagery.
  */
 export interface LhiPhoto {
@@ -163,6 +163,14 @@ export const LHI_PHOTOS = {
   gslaBoxOpen: p("gsla-savings-box-open", "The GSLA savings box opened at the first meeting of the year"),
   gslaFacilitator: p("gsla-facilitator-records", "GSLA facilitator in Anka taking records"),
   dignityKitHandover: p("zamfara-dignity-kit-handover", "Dignity kit handover under the UNICEF and FCDO Multi-Sectoral Integrated Resilience Programme in Zamfara"),
+
+  // Helpers Digest bulletins (September 2022, October 2023)
+  yaGabtuStall: p("ya-gabtu-kuli-kuli-stall", "Ya Gabtu Shattima at her kuli-kuli and groundnut oil stall, restarted with ZOA/LHI GSLA support"),
+  falmataBusiness: p("falmata-chin-chin-business", "Falmata Bulama preparing chin-chin in her kitchen in Gongulong, Jere LGA, Borno State"),
+  groundnutInputs: p("groundnut-business-inputs", "Groundnuts provided as business inputs to a GSLA member"),
+  ihpMuacScreening: p("ihp-muac-screening-ebonyi", "LHI health worker showing a MUAC tape used to screen children for malnutrition in Ebonyi State"),
+  dumsaiGarden: p("dumsai-phc-garden-harvest", "Health worker harvesting tomatoes from the Dumsai PHC garden, Yobe State"),
+  dumsaiMeeting: p("dumsai-community-meeting", "Community members gathered at the Dumsai PHC garden, Yobe State"),
 } satisfies Record<string, LhiPhoto>;
 
 export type LhiPhotoKey = keyof typeof LHI_PHOTOS;
