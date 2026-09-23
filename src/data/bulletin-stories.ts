@@ -6,7 +6,10 @@ import type { CmsPost } from "@/lib/cms/types";
  * August and September 2023 newsletters, plus an anonymised summary of the August 2022
  * survivor-support newsletter. That newsletter named child survivors of sexual violence,
  * so under LHI's Child Safeguarding Policy it is not republished and no identifying
- * details are used. Seeded as CMS posts; editable in Admin → Posts.
+ * details are used. Also: Helpers Digest December 2023 (IPT-G champions of change),
+ * the IHP success stories compendium, "Reaching for the Stars" (September 2021) and
+ * "CBHVs, Agents of Change" (4th bulletin, September 2019).
+ * Seeded as CMS posts; editable in Admin → Posts.
  */
 
 export const DIGEST_OCT_2023_PDF = "/documents/helpers-digest-october-2023.pdf";
@@ -247,5 +250,178 @@ In her own words, one of them said she is grateful for "a second chance and a fr
 Anyone can report a concern confidentially: email **psea@lhinigeria.org** or call **+234 201 330 9033**.
 
 *Adapted from the LHI Newsletter, 1 August 2022, in line with our [Child Safeguarding Policy](/our-commitment).*`,
+  },
+  /* ------------------------------------------------ Helpers Digest, December 2023 */
+  {
+    ...base,
+    id: "digest-dec-2023",
+    slug: "helpers-digest-december-2023",
+    title: "Helpers Digest, December 2023: Champions of Change",
+    category: "Newsletter",
+    date: "2023-12-21",
+    featuredImage: LHI_PHOTOS.iptgMasud.src,
+    tags: ["Newsletter", "Helpers Digest", "Plan International", "Mental health", "IPT-G", "Sokoto"],
+    excerpt:
+      "Five young people in Sokoto find their way out of depression and isolation through Interpersonal Psychotherapy for Groups (IPT-G), with Plan International and LHI.",
+    updatedAt: "2023-12-21",
+    content: `The December 2023 **Helpers Digest** shares *Champion of Change* stories from **Interpersonal Psychotherapy for Groups (IPT-G)**, delivered by **Plan International in partnership with Life Helpers Initiative** in Sokoto State.
+
+[Read the flipbook](/project-magazines/helpers-digest-december-2023) · [Download the PDF](/documents/helpers-digest-december-2023.pdf)
+
+## In this edition
+
+- [Champions of change: young people overcoming depression through group therapy](/blog/ipt-g-champions-of-change-sokoto)
+
+## Editorial team
+
+Tayo Fatinikun, Joy Dauda Dogo, Oluwafemi Tanimowo, Adetola Olabode, Tade Adeogo and Nosa Ojo.`,
+  },
+  {
+    ...base,
+    id: "story-ipt-g-champions",
+    slug: "ipt-g-champions-of-change-sokoto",
+    title: "Champions of Change: Young People Overcoming Depression Through Group Therapy",
+    category: "Success Stories",
+    date: "2023-12-20",
+    featuredImage: LHI_PHOTOS.iptgHalima.src,
+    tags: ["Health", "Mental health", "IPT-G", "Plan International", "Youth", "Sokoto", "Helpers Digest"],
+    excerpt:
+      "Through Interpersonal Psychotherapy for Groups, young people in Sokoto who had withdrawn from school, work and friends found support, skills and hope again.",
+    updatedAt: "2023-12-20",
+    content: `Depression can quietly take young people away from school, work and the people who love them. In 2023, **Plan International and Life Helpers Initiative** brought **Interpersonal Psychotherapy for Groups (IPT-G)** to communities in Sokoto State. Trained facilitators screen young people with the PHQ questionnaire, bring them into small peer groups, visit their homes and follow up until they are well.
+
+## Mas'ud: from isolation to a tailor's bench
+
+Mas'ud, 21, from **Bodinga LGA**, finished secondary school in 2018 but could not secure admission anywhere. He stopped talking to people and shut himself indoors. His facilitator introduced him to an IPT-G group; he resisted at first, but found comfort in the sessions, and singing and dancing with the group became his turning point. He is now active, happy and learning new sewing designs at work.
+
+> "Duk abin da aka ce ya kamata maki, ko kasance mai laushi." (Whatever you are told is right for you, be gentle with yourself.)
+
+## Babangida: back on the path to school
+
+Babangida, from **Toma ward, Bodinga LGA**, lost his father during his first year at the School of Health in Sokoto and had to drop out when the family could no longer pay. Mocked by friends, he spent nights in tears. A friend referred him to an IPT-G group; the facilitator, Fahad, visited his home, and Babangida went on to volunteer to lead the group and learn to sew. He now plans to return to school and to start a group of his own for young people facing depression.
+
+## Halima: from darkness to light
+
+Halima, 19, was sent from Zamfara to live with her uncle in **Sokoto South LGA** as insecurity grew at home. Cut off from her parents, she fell from a B student to failing grades and withdrew completely. One-on-one counselling helped her open up, and with support from her group mentor and uncle her parents moved to Sokoto. Reunited with her family, her results have recovered and she hopes to become a doctor.
+
+> "Ina so ka yi rayuwa! Kada ka yi kyau a damuwa…" (I want you to live! Don't let your troubles hold you down; people around you can help.)
+
+## Hadiza: triumph over trials
+
+Hadiza, a young woman from Zamfara State, was sent to Sokoto because of insecurity, then carried a heavy family crisis alone and left school. After she took the PHQ-2 and joined a group, counselling and her facilitators helped her and her family through it. She learned hair braiding as a source of income, returned to school, set aside early-marriage plans and now dreams of becoming a lawyer or teacher.
+
+> "I have seen a sad-looking young lady turn into a joyful, active and skilful young lady." Her facilitator
+
+## Abubakar: breaking chains
+
+Abubakar, from **Magajin Gari ward, Sokoto South LGA**, grew up with a widowed mother who worked as a cleaner for 17 years. He graduated from the College of Education, Sokoto, at 25, but broken promises left him in deep despair. In the IPT-G group he found "love, care and attention" he had never known, and now helps neighbours with errands to support his family.
+
+> "Sometimes you need other people's troubles to change you… don't be afraid of change; everything you do will help you." Abubakar's advice to other young men
+
+*From [Helpers Digest, December 2023](/blog/helpers-digest-december-2023). [Read it as a flipbook](/project-magazines/helpers-digest-december-2023).*`,
+  },
+
+  /* ------------------------------------------------ Compendium of IHP success stories */
+  {
+    ...base,
+    id: "ihp-compendium",
+    slug: "compendium-of-ihp-success-stories",
+    title: "Compendium of IHP Success Stories: Better Child Health Care in Sokoto and Kebbi",
+    category: "Newsletter",
+    date: "2022-12-01",
+    featuredImage: LHI_PHOTOS.ihpTrainingSession.src,
+    tags: ["Health", "IHP", "USAID", "Child health", "Malaria", "Nutrition", "Sokoto", "Kebbi", "Helpers Digest"],
+    excerpt:
+      "Health workers at 17 facilities in Sokoto and Kebbi describe how LDHF clinical skills training changed the way they test, treat, counsel and refer sick children.",
+    updatedAt: "2022-12-01",
+    content: `Pneumonia, diarrhoea and malaria, together with preterm birth, birth asphyxia and congenital anomalies, remain the leading causes of death for children under five, and nutrition-related factors contribute to about **45%** of these deaths. Through the **USAID Integrated Health Program (IHP)**, Life Helpers Initiative facilitated facility-based clinical skills training for health workers on integrated child health, nutrition, malaria and routine immunisation, using the **low-dose, high-frequency (LDHF)** approach in Sokoto, Kebbi and Bauchi States.
+
+This Helpers Digest compendium gathers what trainees and trainers told us during follow-up visits to facilities in **Sokoto** (Chimola, Salame, Tambagarka, Mammade, Gidan Diya, Gumbi, Wammakko, Binji and Jamali) and **Kebbi** (Dakin Gari, Barbarejo, Aljannare, Bandam, Tungar Magaji, MCH Koko, Koko Town and K/Damba).
+
+[Read the flipbook](/project-magazines/ihp-success-stories-compendium) · [Download the PDF](/documents/ihp-success-stories-compendium.pdf)
+
+## What changed in the clinics
+
+- **Test before treating malaria.** Facilities that once treated fever "blindly" with chloroquine or quinine now confirm malaria with a rapid diagnostic test and treat with ACT, reading each kit's leaflet for the right number of drops.
+- **The right drugs for diarrhoea and pneumonia.** Diarrhoea is now classified and treated with ORS and zinc instead of antibiotics; pneumonia with amoxicillin.
+- **Assess, classify, treat, refer.** The Chart Booklet and Sick Child Recording Form guide every step: green to counsel, yellow to treat at the facility, pink to give pre-referral treatment and refer with a referral form and follow-up.
+- **Danger signs.** Workers can now tell a cough or cold from pneumonia, count breathing with a timer and recognise a convulsing or drowsy child.
+- **Nutrition.** Weighing scales, height rulers and MUAC tapes that once sat unused are part of every visit. Mothers are counselled on colostrum, exclusive breastfeeding for six months and complementary feeding.
+- **Immunisation and antenatal care.** Teams track defaulters, plan immunisation sessions and give SP and tetanus toxoid to pregnant women.
+
+> "This training has changed our professional and even our personal lives." Health workers at Binji Health Post, Sokoto
+
+> "I just placed the MUAC tape anyhow on the arm and didn't understand the colours. Now I use it well and give the right counsel." A health worker at Aljannare, Kebbi
+
+At Tungar Magaji, a mother who had refused immunisation after hearing of a friend's baby's death was counselled during our visit and changed her mind: a small example of how better-trained health workers build trust in their communities.
+
+## Editorial team
+
+Tayo Fatinikun, Maria Oyebimpe Oyedeji, Joy Dauda Dogo, James Bassey and Oluwafemi Tanimowo.`,
+  },
+
+  /* ------------------------------------------------ Reaching for the Stars, September 2021 */
+  {
+    ...base,
+    id: "digest-reaching-for-the-stars",
+    slug: "reaching-for-the-stars-g4g-yobe",
+    title: "Reaching for the Stars: A Girl's Road Back to School in Yobe",
+    category: "Success Stories",
+    date: "2021-09-22",
+    featuredImage: LHI_PHOTOS.g4gReadingFestival.src,
+    tags: ["Education", "Girls' education", "G4G", "UNICEF", "KfW", "Yobe", "Helpers Digest"],
+    excerpt:
+      "A 13-year-old who hawked to support her family watched Girls for Girls sessions through a classroom window, then persuaded her parents to let her enrol.",
+    updatedAt: "2021-09-22",
+    content: `**Fatima**, 13, lives in **Damagum, Fune LGA, Yobe State**. Her parents had no formal education, could barely afford two meals a day and saw schooling for a girl as a waste of money. So Fatima hawked goods and did chores in other people's homes to help support her siblings.
+
+Then **Girls for Girls (G4G)**, a **UNICEF** programme delivered with **Life Helpers Initiative** and funded by **KfW**, came to the only government primary school in her community, promoting girls' education through quality learning in a safe environment and life skills that help girls overcome everyday challenges.
+
+On her hawking rounds, Fatima would slip into **Dogon Rijiya Primary School** to watch the pupils learning and singing G4G songs.
+
+> "Hearing them sing and speak in English amused me, but being able to sing and speak a few words like them makes me feel bigger and better."
+
+She found the courage to tell her parents she wanted to go back to school, promising to keep up her duties at home and to hawk after school. Her father agreed. The transition wasn't easy, but with determination, patience and her parents' support, Fatima is now a lively member of the G4G group in her school.
+
+## Photo news
+
+G4G activities this quarter included quarterly review meetings with G4G reading facilitators, monthly review meetings with G4G mentors, a spelling bee and reading festival, supportive supervision for G4G and He4She, and the biannual G4G radio programme.
+
+[Read the flipbook](/project-magazines/helpers-digest-reaching-for-the-stars) · [Download the PDF](/documents/helpers-digest-reaching-for-the-stars.pdf)`,
+  },
+
+  /* ------------------------------------------------ 4th bulletin: CBHVs, September 2019 */
+  {
+    ...base,
+    id: "digest-cbhvs-agents-of-change",
+    slug: "cbhvs-agents-of-change-show-sokoto",
+    title: "CBHVs, Agents of Change: 770 Women Improving Maternal and Child Health in Sokoto",
+    category: "News",
+    date: "2019-09-03",
+    featuredImage: LHI_PHOTOS.cbhvCounselling.src,
+    tags: ["Health", "MNCH", "SHOW", "Plan International", "Global Affairs Canada", "Sokoto", "Helpers Digest"],
+    excerpt:
+      "Under the SHOW project, 770 women community-based health volunteers help mothers use health services, and pass life-saving community data to the State Ministry of Health.",
+    updatedAt: "2019-09-03",
+    content: `The **Supporting Health Outcomes for Women and Children (SHOW)** project, funded by **Global Affairs Canada** and delivered by **Plan International with Life Helpers Initiative**, aims to reduce maternal and child deaths across all 23 LGAs of **Sokoto State**. One of its first goals is for more women of childbearing age, adolescent girls, newborns and children under five living in poverty to use essential health services.
+
+LHI delivers the project in **seven LGAs: Tureta, Shagari, Bodinga, Yabo, Dange Shuni, Kware and Rabah**, through capacity building, community mobilisation, referrals and follow-up, strengthened by **Community-Based Health Volunteers (CBHVs)**.
+
+## Who the CBHVs are
+
+CBHVs are local women, of reproductive age or past childbearing, from the communities the project serves. Using counselling cards and a gender lens, they promote household practices for maternal, newborn and child health (MNCH) and sexual and reproductive health (SRH), including child spacing, nutrition and hygiene, and encourage women to attend health facilities.
+
+## What they have achieved
+
+The **770 CBHVs, all women,** have been active for almost three years. They have:
+
+- helped women understand why and how to use health services, and removed barriers by talking openly with women, husbands, families and the wider community about maternal, newborn and child health and family planning;
+- **saved lives** of pregnant women and children, including malnourished children, by identifying, referring and following them up;
+- kept counselling cards in use and advocated for community systems that support healthy behaviour, leaving local capacity for government and other partners;
+- collected community data on MNCH and family planning services, sent to the **State Ministry of Health** through LGA health directorates.
+
+These women have truly become agents of change in their communities.
+
+[Read the flipbook](/project-magazines/helpers-digest-cbhvs-agents-of-change) · [Download the PDF](/documents/helpers-digest-cbhvs-agents-of-change.pdf)`,
   },
 ];

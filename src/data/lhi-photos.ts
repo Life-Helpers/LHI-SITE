@@ -171,6 +171,15 @@ export const LHI_PHOTOS = {
   ihpMuacScreening: p("ihp-muac-screening-ebonyi", "LHI health worker showing a MUAC tape used to screen children for malnutrition in Ebonyi State"),
   dumsaiGarden: p("dumsai-phc-garden-harvest", "Health worker harvesting tomatoes from the Dumsai PHC garden, Yobe State"),
   dumsaiMeeting: p("dumsai-community-meeting", "Community members gathered at the Dumsai PHC garden, Yobe State"),
+  ihpTrainingSession: p("ihp-ldhf-training-session", "Health workers in a low-dose, high-frequency child health training session under the Integrated Health Program"),
+  g4gMentorsMeeting: p("g4g-mentors-review-meeting", "Monthly review meeting with Girls for Girls (G4G) mentors in Yobe State"),
+  g4gReadingFestival: p("g4g-spelling-bee-reading-festival", "Girls taking part in a G4G spelling bee and reading festival"),
+  g4gRadio: p("g4g-radio-programme", "Girls at the G4G biannual radio programme"),
+  cbhvCounselling: p("cbhv-counselling-session", "Community-based health volunteer counselling a mother with a counselling card under the SHOW project, Sokoto"),
+  cbhvTraining: p("cbhv-training", "Community-based health volunteers in a training session, Sokoto State"),
+  iptgMasud: p("ipt-g-masud-sewing", "Mas'ud at his sewing machine after joining an IPT-G group in Bodinga, Sokoto"),
+  iptgAbubakar: p("ipt-g-abubakar", "Abubakar, an IPT-G group member in Sokoto South"),
+  iptgHalima: p("ipt-g-halima-friend", "Halima and a friend smiling in front of an ASPIRE Nigeria banner"),
 } satisfies Record<string, LhiPhoto>;
 
 export type LhiPhotoKey = keyof typeof LHI_PHOTOS;

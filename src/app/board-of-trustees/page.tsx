@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Award, ShieldCheck, Users } from "lucide-react";
 
@@ -12,20 +13,14 @@ export const metadata: Metadata = {
     "Meet the Board of Trustees providing strategic governance, fiduciary stewardship, and mission alignment for Life Helpers Initiative (LHI).",
 };
 
-/** Only people and roles confirmed in LHI's Strategic Plan 2026–2030 and Organisational Profile. */
+/** Board members and roles as published by LHI (Strategic Plan 2026–2030 and LHI's board listing). */
 const trustees = [
-  {
-    name: "Engr. Godfrey Mayuku",
-    role: "Chairman, Board of Trustees",
-    qualification: "",
-    bio: "Chairman of the LHI Board of Trustees, who presented the Strategic Plan 2026–2030 as a roadmap for LHI's growth, accountability and impact.",
-  },
-  {
-    name: "Tayo Fatinikun",
-    role: "National Executive Director",
-    qualification: "FICA, FIMC, CMC",
-    bio: "Leads Life Helpers Initiative's management team and programmes across 11 states, and is the editor-in-chief of LHI's project magazines.",
-  },
+  { name: "Engr. Godfrey Mayuku", role: "Board Chairman", qualification: "", photo: "/images/lhi/board/godfrey-mayuku.jpg" },
+  { name: "Mr Tayo Fatinikun", role: "National Executive Director", qualification: "FICA, FIMC, CMC", photo: "/images/lhi/board/tayo-fatinikun.jpg" },
+  { name: "Pharm. Iyabo Adebisi", role: "Board Secretary", qualification: "", photo: "/images/lhi/board/iyabo-adebisi.jpg" },
+  { name: "Barr. Joy Ihenacho", role: "Board Member", qualification: "", photo: "/images/lhi/board/joy-ihenacho.jpg" },
+  { name: "Pharm. Sam Olaoye", role: "Board Member", qualification: "", photo: "/images/lhi/board/sam-olaoye.jpg" },
+  { name: "Mrs Bukola Fatinikun", role: "Board Member", qualification: "", photo: "/images/lhi/board/bukola-fatinikun.jpg" },
 ];
 
 export default function BoardOfTrusteesPage() {
@@ -82,36 +77,29 @@ export default function BoardOfTrusteesPage() {
       {/* Trustees Grid */}
       <section className="py-16 md:py-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {trustees.map((trustee) => (
-              <div
+              <li
                 key={trustee.name}
-                className="flex flex-col rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
+                className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
               >
-                <div className="flex items-baseline justify-between border-b border-border pb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground">{trustee.name}</h3>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                      {trustee.role}
-                    </p>
-                  </div>
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {trustee.qualification}
-                  </span>
+                <div className="relative aspect-[9/10] bg-white">
+                  <Image
+                    src={trustee.photo}
+                    alt={`Portrait of ${trustee.name}`}
+                    fill
+                    sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
+                    className="object-contain object-bottom transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
                 </div>
-                <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
-                  {trustee.bio}
-                </p>
-              </div>
+                <div className="border-t border-border p-5">
+                  <h3 className="text-lg font-semibold text-foreground">{trustee.name}</h3>
+                  <p className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-primary">{trustee.role}</p>
+                  {trustee.qualification && <p className="mt-1 text-xs text-muted-foreground">{trustee.qualification}</p>}
+                </div>
+              </li>
             ))}
-          </div>
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            The full list of trustees is available on request from{" "}
-            <a href={`mailto:${siteConfig.contact.email}?subject=Board%20of%20Trustees`} className="font-medium text-primary hover:underline">
-              {siteConfig.contact.email}
-            </a>
-            .
-          </p>
+          </ul>
 
           <div className="mt-16 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center sm:p-12">
             <h2 className="font-serif-display text-2xl font-light text-foreground sm:text-3xl">
