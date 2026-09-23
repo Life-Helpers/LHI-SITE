@@ -133,10 +133,11 @@ export function AnniversaryPopup() {
             <Image src="/images/lhi/lhi-team-strategic-plan.jpg" alt="" fill sizes="(min-width: 768px) 300px, 100vw" className="object-cover opacity-35" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#7d0c10] via-[#7d0c10]/60 to-transparent" />
             <div className="relative">
-              <p className="font-serif-display text-[92px] font-light leading-none tracking-tight sm:text-[112px]">
-                {ANNIVERSARY.years}
-                <span className="align-top text-3xl">nd</span>
+              <p className="flex items-start font-serif-display font-light leading-none tracking-tight">
+                <span className="text-[92px] sm:text-[112px]">{ANNIVERSARY.years}</span>
+                <span className="mt-3 text-3xl">nd</span>
               </p>
+              <p className="mt-1 text-sm font-semibold uppercase tracking-[0.2em]">Anniversary</p>
               <p className="mt-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/85">
                 {ANNIVERSARY.foundedYear} – {ANNIVERSARY.foundedYear + ANNIVERSARY.years}
               </p>
@@ -151,7 +152,7 @@ export function AnniversaryPopup() {
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               Since 1 October {ANNIVERSARY.foundedYear}, Life Helpers Initiative has grown from a small initiative in Sokoto into an organisation working
-              across 11 states, with more than {siteConfig.stats.projects} projects and over {siteConfig.stats.peopleReached} people reached. Thank you
+              across 11 states, with {siteConfig.stats.projects} projects and {siteConfig.stats.peopleReached} people reached. Thank you
               to every community, partner, volunteer and staff member who made it possible.
             </p>
 

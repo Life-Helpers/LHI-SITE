@@ -120,3 +120,22 @@ original content from `src/data/*`.
 - Failed logins are throttled (5 attempts per email per 15 minutes).
 - Uploads are limited to images, PDF and MP4 up to 15 MB; SVG is rejected.
 - Every mutation re-checks the user's role on the server.
+
+## Engagement, training, careers and procurement
+
+All of these store their data in `CMS_DATA_DIR` and are managed from the admin:
+
+- **Posts:** every post (`/blog/[slug]`: news, success stories, newsletter, magazines) has a like button,
+  share buttons (Facebook, X, LinkedIn, WhatsApp, Telegram, Reddit, Pinterest, email, copy link, device share)
+  and comments. Comments are held in **Admin → Comments** until approved.
+- **Humanitarian Training** (`/get-involved/training`): three courses built from LHI's safeguarding,
+  child safeguarding and GBV materials. Final-assessment answer keys live server-side in
+  `src/data/training/answer-keys.ts`. Certificates are listed in **Admin → Certificates** and can be verified publicly.
+- **Careers** (`/careers`) and **Procurement** (`/procurement`): vacancies and vendor requests are managed in
+  **Admin → Jobs & Vacancies / Vendor Requests**. CVs and bid documents are stored under `CMS_DATA_DIR/private`
+  and are downloadable only by signed-in editors from **Admin → Submissions**.
+- **Newsletter:** all signup forms (including the anniversary popup, configured in `src/config/anniversary.ts`)
+  add subscribers to **Admin → Submissions → Newsletter**.
+
+Seed content (posts, projects) is only used until a collection is first saved; on a site whose `posts.json`
+already exists, new seed stories must be added through the admin.
