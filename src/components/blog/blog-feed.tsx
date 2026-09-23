@@ -78,7 +78,7 @@ export function BlogFeed({ posts }: { posts: CmsPost[] }) {
                 </span>
               </div>
 
-              <h2 className="mt-3 text-xl font-bold tracking-tight text-foreground transition-colors group-hover:text-primary sm:text-2xl">
+              <h2 className="font-serif-display mt-3 text-xl font-light text-foreground transition-colors group-hover:text-primary sm:text-2xl">
                 <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
                   {post.title}
                 </Link>

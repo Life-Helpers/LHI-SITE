@@ -14,7 +14,7 @@ import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
-  title: "Our Commitment | Life Helpers Initiative",
+  title: "Our Commitment",
   description:
     "Life Helpers Initiative's core values of Love, Honesty, and Inclusion, accompanied by our strict PSEA safeguarding policies, accountability standards, and Disability Fund.",
 };

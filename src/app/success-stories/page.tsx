@@ -12,7 +12,7 @@ import { getPublishedPosts } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Success Stories | Life Helpers Initiative",
+  title: "Success Stories",
   description:
     "Real stories of change from LHI's projects: farmers, women entrepreneurs, learners and survivors across Sokoto, Katsina and Zamfara, from LHI's magazines and newsletter.",
 };

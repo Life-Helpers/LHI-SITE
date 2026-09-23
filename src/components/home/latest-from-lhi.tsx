@@ -32,7 +32,7 @@ export function LatestFromLHI() {
       className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6"
     >
       <ScrollReveal className="mb-8 flex flex-col gap-2">
-        <h2 id="latest-heading" className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <h2 id="latest-heading" className="font-serif-display text-3xl font-light sm:text-4xl">
           {t.home.latest.heading}
         </h2>
         <p className="max-w-xl text-muted-foreground">{t.home.latest.subtitle}</p>

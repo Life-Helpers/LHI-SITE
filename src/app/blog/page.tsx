@@ -10,7 +10,7 @@ import { getPublishedPosts } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "LHI Field Blog | Life Helpers Initiative",
+  title: "LHI Field Blog",
   description:
     "Field reflections, humanitarian insights, and development research authored by Life Helpers Initiative technical advisors and community practitioners.",
 };

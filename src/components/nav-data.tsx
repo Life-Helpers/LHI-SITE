@@ -177,7 +177,7 @@ export const whatWeDoCards: NavCard[] = [
 ];
 
 export const whatWeDoExtra: NavLink = {
-  label: "WeSpeak Radio",
+  label: "LHI Radio",
   href: "/radio",
   description: "Weekly on Royal FM 101.5 Sokoto, Tuesdays 11 AM",
   icon: Radio,

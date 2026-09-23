@@ -896,14 +896,14 @@ export function NigeriaMap({
             onClick={() => setIsAutoPlaying((prev) => !prev)}
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all border ${
               isAutoPlaying
-                ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/40 ring-2 ring-amber-500/20"
+                ? "bg-primary/15 text-primary dark:text-primary border-primary/40 ring-2 ring-primary/20"
                 : "bg-card text-foreground border-border hover:border-primary/40"
             }`}
             title="Automatically step through each state office"
           >
             {isAutoPlaying ? (
               <>
-                <Pause className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 animate-pulse" />
+                <Pause className="h-3.5 w-3.5 text-primary dark:text-primary animate-pulse" />
                 <span>Pause Tour</span>
               </>
             ) : (
@@ -941,7 +941,7 @@ export function NigeriaMap({
 
           <div className="flex items-center gap-3 text-xs">
             <div className="flex items-center gap-1.5">
-              <span className="h-3 w-3 rounded-full bg-amber-500 ring-2 ring-amber-500/30" />
+              <span className="h-3 w-3 rounded-full bg-primary ring-2 ring-primary/30" />
               <span className="font-semibold text-foreground">Sokoto HQ</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -965,26 +965,26 @@ export function NigeriaMap({
             <defs>
               {/* Radial gradient for Sokoto National Headquarters beacon */}
               <radialGradient id="hqRadarGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
-                <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+                <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.8" />
+                <stop offset="50%" stopColor="var(--primary)" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
               </radialGradient>
 
               {/* Radial pulse gradient for field offices */}
               <radialGradient id="fieldPinPulse" cx="50%" cy="50%" r="50%">
                 <stop
                   offset="0%"
-                  stopColor="var(--color-primary, #059669)"
+                  stopColor="var(--accent)"
                   stopOpacity="0.7"
                 />
                 <stop
                   offset="60%"
-                  stopColor="var(--color-primary, #059669)"
+                  stopColor="var(--accent)"
                   stopOpacity="0.25"
                 />
                 <stop
                   offset="100%"
-                  stopColor="var(--color-primary, #059669)"
+                  stopColor="var(--accent)"
                   stopOpacity="0"
                 />
               </radialGradient>
@@ -997,8 +997,8 @@ export function NigeriaMap({
                 x2="100%"
                 y2="100%"
               >
-                <stop offset="0%" stopColor="#059669" stopOpacity="0.28" />
-                <stop offset="100%" stopColor="#10b981" stopOpacity="0.12" />
+                <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.28" />
+                <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.12" />
               </linearGradient>
 
               {/* HQ Active state highlight */}
@@ -1009,8 +1009,8 @@ export function NigeriaMap({
                 x2="100%"
                 y2="100%"
               >
-                <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.32" />
-                <stop offset="100%" stopColor="#d97706" stopOpacity="0.16" />
+                <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.32" />
+                <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.16" />
               </linearGradient>
             </defs>
 
@@ -1021,7 +1021,7 @@ export function NigeriaMap({
               width="500"
               height="80"
               fill="currentColor"
-              className="text-sky-500/5"
+              className="text-accent/5"
             />
             <text
               x="220"
@@ -1037,7 +1037,7 @@ export function NigeriaMap({
             {/* Lake Chad Basin Ambient Representation */}
             <path
               d="M 810 140 Q 860 170 835 220 Z"
-              fill="#0284c7"
+              fill="var(--accent)"
               opacity="0.18"
             />
             <text
@@ -1045,7 +1045,7 @@ export function NigeriaMap({
               y="160"
               fill="currentColor"
               fontSize="9"
-              className="text-sky-600 dark:text-sky-400 font-semibold"
+              className="text-accent dark:text-accent font-semibold"
               opacity="0.8"
             >
               Lake Chad
@@ -1084,13 +1084,13 @@ export function NigeriaMap({
                     fillClass = isSelected
                       ? ""
                       : isHovered
-                      ? "text-amber-500/30"
-                      : "text-amber-500/15 hover:text-amber-500/25";
+                      ? "text-primary/30"
+                      : "text-primary/15 hover:text-primary/25";
                     strokeClass = isSelected
-                      ? "stroke-amber-500 stroke-[2.5]"
+                      ? "stroke-primary stroke-[2.5]"
                       : isHovered
-                      ? "stroke-amber-500/80 stroke-[2]"
-                      : "stroke-amber-500/40 hover:stroke-amber-500/70";
+                      ? "stroke-primary/80 stroke-[2]"
+                      : "stroke-primary/40 hover:stroke-primary/70";
                   } else {
                     fill = isSelected
                       ? "url(#activeStateGradient)"
@@ -1148,7 +1148,7 @@ export function NigeriaMap({
                       className={`pointer-events-none transition-all duration-200 ${
                         isSelected
                           ? isHQ
-                            ? "text-amber-700 dark:text-amber-300 font-bold"
+                            ? "text-primary dark:text-primary font-bold"
                             : "text-primary font-bold"
                           : isOperational
                           ? "text-foreground/80"
@@ -1168,7 +1168,7 @@ export function NigeriaMap({
               <path
                 d="M 140 220 Q 210 260 280 320 T 385 390"
                 fill="none"
-                stroke="#0284c7"
+                stroke="var(--accent)"
                 strokeWidth="2.2"
                 strokeDasharray="4 3"
               />
@@ -1176,7 +1176,7 @@ export function NigeriaMap({
               <path
                 d="M 720 330 Q 560 350 385 390"
                 fill="none"
-                stroke="#0284c7"
+                stroke="var(--accent)"
                 strokeWidth="2.2"
                 strokeDasharray="4 3"
               />
@@ -1184,18 +1184,18 @@ export function NigeriaMap({
               <path
                 d="M 385 390 Q 400 460 370 550"
                 fill="none"
-                stroke="#0284c7"
+                stroke="var(--accent)"
                 strokeWidth="2.6"
                 strokeDasharray="4 3"
               />
               {/* Lokoja Confluence Mark */}
-              <circle cx="385" cy="390" r="3.5" fill="#0284c7" />
+              <circle cx="385" cy="390" r="3.5" fill="var(--accent)" />
               <text
                 x="340"
                 y="405"
                 fill="currentColor"
                 fontSize="8"
-                className="text-sky-600 dark:text-sky-400 font-semibold"
+                className="text-accent dark:text-accent font-semibold"
               >
                 Niger-Benue Confluence
               </text>
@@ -1231,7 +1231,7 @@ export function NigeriaMap({
                           cy={office.y}
                           r="22"
                           fill="none"
-                          stroke="#f59e0b"
+                          stroke="var(--primary)"
                           strokeWidth="1.5"
                           strokeDasharray="3 3"
                           className="animate-spin"
@@ -1263,8 +1263,8 @@ export function NigeriaMap({
                         fill="none"
                         stroke={
                           office.isPrimary
-                            ? "#f59e0b"
-                            : "var(--color-primary, #059669)"
+                            ? "var(--primary)"
+                            : "var(--accent)"
                         }
                         strokeWidth="2.5"
                         className="animate-ping"
@@ -1297,10 +1297,10 @@ export function NigeriaMap({
                       }
                       fill={
                         office.isPrimary
-                          ? "#f59e0b"
+                          ? "var(--primary)"
                           : isSelected
-                          ? "var(--color-primary, #059669)"
-                          : "#059669"
+                          ? "var(--accent)"
+                          : "var(--accent)"
                       }
                       stroke="#ffffff"
                       strokeWidth={office.isPrimary ? "3" : "2"}
@@ -1342,7 +1342,7 @@ export function NigeriaMap({
                         rx="9.5"
                         fill={
                           office.isPrimary
-                            ? "#f59e0b"
+                            ? "var(--primary)"
                             : isSelected
                             ? "#0f172a"
                             : "#1e293b"
@@ -1377,7 +1377,7 @@ export function NigeriaMap({
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-[11px] text-muted-foreground border-t border-border/40 pt-2.5">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-amber-500" />
+              <span className="h-2 w-2 rounded-full bg-primary" />
               Sokoto Central HQ
             </span>
             <span className="flex items-center gap-1">
@@ -1385,7 +1385,7 @@ export function NigeriaMap({
               Field Offices & Hubs
             </span>
             <span className="flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-sky-500" />
+              <span className="h-2 w-2 rounded-full bg-accent" />
               Niger & Benue River Systems
             </span>
           </div>
@@ -1450,7 +1450,7 @@ export function NigeriaMap({
                 className={`flex shrink-0 w-64 snap-center flex-col text-left rounded-2xl border p-3.5 transition-all ${
                   isSelected
                     ? office.isPrimary
-                      ? "border-amber-500 bg-amber-500/10 ring-2 ring-amber-500/30 shadow-sm"
+                      ? "border-primary bg-primary/10 ring-2 ring-primary/30 shadow-sm"
                       : "border-primary bg-primary/10 ring-2 ring-primary/30 shadow-sm"
                     : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
                 }`}
@@ -1459,7 +1459,7 @@ export function NigeriaMap({
                   <span
                     className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                       office.isPrimary
-                        ? "bg-amber-500/20 text-amber-700 dark:text-amber-300"
+                        ? "bg-primary/20 text-primary dark:text-primary"
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
@@ -1503,7 +1503,7 @@ export function NigeriaMap({
             transition={{ duration: 0.25 }}
             className={`overflow-hidden rounded-3xl border bg-card shadow-sm ${
               selectedOffice.isPrimary
-                ? "border-amber-500/40 ring-1 ring-amber-500/20"
+                ? "border-primary/40 ring-1 ring-primary/20"
                 : "border-border"
             }`}
           >
@@ -1515,7 +1515,7 @@ export function NigeriaMap({
                     <span
                       className={`rounded-full px-3 py-0.5 text-xs font-bold uppercase tracking-wider ${
                         selectedOffice.isPrimary
-                          ? "bg-amber-500/20 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/30"
+                          ? "bg-primary/20 text-primary dark:text-primary ring-1 ring-primary/30"
                           : "bg-primary/15 text-primary font-semibold"
                       }`}
                     >

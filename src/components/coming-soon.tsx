@@ -13,7 +13,7 @@ export function ComingSoon({
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="font-serif-display text-3xl font-light sm:text-4xl">
           {title}
         </h1>
 

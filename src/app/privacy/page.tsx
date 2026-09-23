@@ -35,7 +35,7 @@ export default function PrivacyPage() {
           policy.
         </div>
 
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="font-serif-display text-3xl font-light sm:text-4xl">
           Privacy Policy
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">

@@ -27,7 +27,7 @@ export function RadioBanner({ episodes }: { episodes: RadioEpisode[] }) {
               <Radio className="h-7 w-7" aria-hidden="true" />
               <Eyebrow className="text-primary-foreground">{t.home.radio.eyebrow}</Eyebrow>
             </div>
-            <h2 id="radio-heading" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 id="radio-heading" className="font-serif-display mt-3 text-3xl font-light sm:text-4xl">
               {t.home.radio.heading}
             </h2>
             <p className="mt-3 max-w-xl text-primary-foreground/90">{t.home.radio.body}</p>

@@ -3,7 +3,7 @@ import { AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import type { LessonBlock } from "@/data/training/courses";
 
 const TONES = {
-  info: { icon: Info, className: "border-blue-500/30 bg-blue-500/5 text-blue-900 dark:text-blue-200" },
+  info: { icon: Info, className: "border-accent/30 bg-accent/5 text-foreground" },
   warning: { icon: AlertTriangle, className: "border-primary/30 bg-primary/5 text-foreground" },
   success: { icon: CheckCircle2, className: "border-emerald-500/30 bg-emerald-500/5 text-emerald-900 dark:text-emerald-200" },
 };

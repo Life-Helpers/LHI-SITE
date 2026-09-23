@@ -34,11 +34,11 @@ export function PageHeroBanner({
             {/* Text Column */}
             <div className="lg:col-span-7">
               {eyebrow && (
-                <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-primary">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
                   {eyebrow}
                 </p>
               )}
-              <h1 className="mt-3 font-serif-display text-3xl font-light tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
+              <h1 className="mt-3 font-serif-display text-3xl font-light text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
                 {title}
               </h1>
               {subtitle && (
@@ -96,11 +96,11 @@ export function PageHeroBanner({
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           {eyebrow && (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-primary">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
               {eyebrow}
             </p>
           )}
-          <h1 className="mt-3 font-serif-display text-3xl font-light tracking-tight text-foreground sm:text-4xl md:text-5xl">
+          <h1 className="mt-3 font-serif-display text-3xl font-light text-foreground sm:text-4xl md:text-5xl">
             {title}
           </h1>
           {subtitle && (

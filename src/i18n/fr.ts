@@ -36,7 +36,7 @@ export const fr: Dictionary = {
     socialInclusionDesc: "Participation civique & inclusion du handicap",
     protection: "Protection",
     protectionDesc: "Réponse aux violences basées sur le genre & sauvegarde",
-    radioAdvocacy: "Plaidoyer radiophonique",
+    radioAdvocacy: "LHI Radio",
   },
   impactMenu: {
     blog: "Blog",

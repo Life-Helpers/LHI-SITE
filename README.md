@@ -150,3 +150,14 @@ All of these store their data in `CMS_DATA_DIR` and are managed from the admin:
 
 Seed content (posts, projects) is only used until a collection is first saved; on a site whose `posts.json`
 already exists, new seed stories must be added through the admin.
+
+## Brand system
+
+- **Typefaces:** Cormorant Garamond (`font-serif-display`, light weight) for page and section headings;
+  Sora for small UI headings (cards, labels; the default for `h1`–`h6`); Inter for body text.
+- **Eyebrow labels** above headings: `text-[11px] font-semibold uppercase tracking-[0.3em] text-primary`
+  (or the `Eyebrow` component).
+- **Colour:** `primary` (LHI red) and `accent` (orange) with neutral foreground/muted tokens. Green is reserved
+  for status (active, success) and WhatsApp; don't introduce other hues for categories.
+- **Contact:** use `siteConfig.contact` (official@lhinigeria.org, feedback@, psea@) rather than hard-coded addresses.
+- **Page titles:** set only the page name; the layout appends "| Life Helpers Initiative".

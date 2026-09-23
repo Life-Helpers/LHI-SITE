@@ -22,10 +22,10 @@ type PartnerItem = CmsPartner & { logo: React.ReactNode; categoryBadgeColor: str
 const BUILT_IN = new Map(PARTNERS_DATA.map((p) => [p.id, p]));
 
 const CATEGORY_BADGES: Record<CmsPartner["category"], string> = {
-  "UN Agencies": "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
-  "Bilateral Donors": "bg-blue-600/10 text-blue-700 dark:text-blue-400 border-blue-600/20",
-  "International NGOs": "bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 border-emerald-600/20",
-  "Government & Clusters": "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+  "UN Agencies": "bg-primary/10 text-primary border-primary/20",
+  "Bilateral Donors": "bg-accent/10 text-accent border-accent/25",
+  "International NGOs": "bg-foreground/5 text-foreground border-foreground/15",
+  "Government & Clusters": "bg-foreground/5 text-foreground border-foreground/15",
 };
 
 /** Uploaded logo from the CMS first, then the built-in mark, then the acronym. */
@@ -82,7 +82,7 @@ export function PartnersStrip({ partners: rawPartners }: { partners: CmsPartner[
         <ScrollReveal className="text-center flex flex-col items-center max-w-3xl mx-auto">
           <h2
             id="partners-heading"
-            className="font-serif-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground"
+            className="font-serif-display text-3xl sm:text-4xl md:text-5xl font-light text-foreground"
           >
             {t.home.partners.heading || "Implementing Partners"}
           </h2>
@@ -237,7 +237,7 @@ function PartnerDetailModal({ partner, onClose }: PartnerDetailModalProps) {
             </div>
             <h3
               id="partner-modal-title"
-              className="font-serif-display text-xl sm:text-2xl font-bold tracking-tight text-foreground"
+              className="font-serif-display text-xl sm:text-2xl font-medium tracking-tight text-foreground"
             >
               {partner.name}
             </h3>
@@ -255,7 +255,7 @@ function PartnerDetailModal({ partner, onClose }: PartnerDetailModalProps) {
             <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
               {partner.statsHeadline}
             </span>
-            <p className="font-serif-display text-2xl font-bold text-foreground">
+            <p className="font-serif-display text-2xl font-medium text-foreground">
               {partner.statsValue}
             </p>
           </div>

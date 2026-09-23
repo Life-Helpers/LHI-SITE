@@ -219,7 +219,7 @@ export const siteConfig = {
   },
   contact: {
     officialEmail: "official@lhinigeria.org",
-    email: "info@lhinigeria.org",
+    email: "official@lhinigeria.org",
     feedbackEmail: "feedback@lhinigeria.org",
     recruitmentEmail: "recruitment@lhinigeria.org",
     pseaEmail: "psea@lhinigeria.org",

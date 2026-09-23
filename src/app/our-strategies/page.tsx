@@ -9,7 +9,7 @@ import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { CORE_STRATEGIES, STRATEGIC_PLAN as SP } from "@/data/organisation";
 
 export const metadata: Metadata = {
-  title: "Our Strategies & Strategic Plan 2026–2030 | Life Helpers Initiative",
+  title: "Our Strategies & Strategic Plan 2026–2030",
   description:
     "LHI's four strategies (capacities, systems, partnership, networking) and the Strategic Plan 2026–2030: goal, expected results, key strategies, theory of change and strategic imperatives.",
 };

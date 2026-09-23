@@ -101,7 +101,7 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
               <Layers size={14} />
               <span>What We Do · 6 Thematic Pillars</span>
             </div>
-            <h3 className="font-serif-display text-xl font-bold text-foreground sm:text-2xl">
+            <h3 className="font-serif-display text-xl font-medium text-foreground sm:text-2xl">
               Projects Mapped to Our 6 Thematic Areas
             </h3>
           </div>
@@ -369,7 +369,7 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
                           project.status === "Active"
                             ? "bg-emerald-500 animate-pulse"
                             : project.status === "Multi-Year"
-                            ? "bg-blue-500"
+                            ? "bg-accent"
                             : "bg-muted-foreground"
                         }`}
                       />
@@ -416,7 +416,7 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
                   </div>
 
                   {/* Title & Location */}
-                  <h3 className="mt-3 font-serif-display text-lg font-bold text-foreground sm:text-xl group-hover:text-primary transition-colors">
+                  <h3 className="mt-3 font-serif-display text-lg font-medium text-foreground sm:text-xl group-hover:text-primary transition-colors">
                     <Link href={`/interventions/${project.id}`} className="hover:underline">
                       {project.title}
                     </Link>

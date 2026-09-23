@@ -34,7 +34,7 @@ export const en: Dictionary = {
     socialInclusionDesc: "Civic participation & disability inclusion",
     protection: "Protection",
     protectionDesc: "GBV response & safeguarding",
-    radioAdvocacy: "Radio Advocacy",
+    radioAdvocacy: "LHI Radio",
   },
   impactMenu: {
     blog: "Blog",

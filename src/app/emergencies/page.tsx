@@ -6,7 +6,7 @@ import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
-  title: "Emergencies | Life Helpers Initiative",
+  title: "Emergencies",
   description:
     "Active and past crisis responses coordinated by Life Helpers Initiative bringing relief, dignity, and smiles in challenging times.",
 };
@@ -32,7 +32,7 @@ export default function EmergenciesPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mb-10 flex flex-col gap-2">
-          <h2 className="font-serif-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          <h2 className="font-serif-display text-2xl font-light text-foreground sm:text-3xl">
             Crisis Declarations &amp; Deployments
           </h2>
           <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">

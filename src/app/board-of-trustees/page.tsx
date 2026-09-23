@@ -7,7 +7,7 @@ import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
-  title: "Board of Trustees | Life Helpers Initiative",
+  title: "Board of Trustees",
   description:
     "Meet the Board of Trustees providing strategic governance, fiduciary stewardship, and mission alignment for Life Helpers Initiative (LHI).",
 };

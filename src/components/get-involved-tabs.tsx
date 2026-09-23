@@ -85,7 +85,7 @@ export function GetInvolvedTabs() {
 
       {tabs.map((tab) => (
         <TabsContent key={tab.value} value={tab.value}>
-          <h2 className="text-2xl font-bold tracking-tight">{tab.heading}</h2>
+          <h2 className="font-serif-display text-2xl font-light">{tab.heading}</h2>
           <p className="mt-3 max-w-xl text-muted-foreground">{tab.body}</p>
           <Button asChild size="lg" className="mt-6">
             {tab.cta.kind === "internal" ? (

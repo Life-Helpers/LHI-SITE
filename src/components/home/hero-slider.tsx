@@ -287,7 +287,7 @@ export function HeroSlider({ slides = heroChildSlides }: HeroSliderProps) {
 
                   {/* Campaign Details */}
                   <div className="min-w-0">
-                    <h4 className="font-serif-display font-bold text-sm sm:text-base leading-tight text-slate-900 dark:text-white line-clamp-2">
+                    <h4 className="font-serif-display font-medium text-sm sm:text-base leading-tight text-slate-900 dark:text-white line-clamp-2">
                       {currentSlide.caption || "A Journey Towards Equality and Strength"}
                     </h4>
                     <p className="mt-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5">

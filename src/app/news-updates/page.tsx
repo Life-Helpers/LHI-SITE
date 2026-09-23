@@ -15,7 +15,7 @@ import { getPublishedPosts } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "News, Newsletter & Magazines | Life Helpers Initiative",
+  title: "News, Newsletter & Magazines",
   description:
     "Latest news, press releases, the LHI newsletter and project magazines from Life Helpers Initiative, with free PDF downloads.",
 };
@@ -95,7 +95,7 @@ export default async function NewsUpdatesPage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                     <Mail size={20} />
                   </div>
-                  <h3 className="mt-4 font-serif-display text-xl font-bold text-foreground">Subscribe to our newsletter</h3>
+                  <h3 className="mt-4 font-serif-display text-xl font-medium text-foreground">Subscribe to our newsletter</h3>
                   <p className="mt-2 text-xs text-muted-foreground">
                     Receive LHI news, project magazines and stories of change in your inbox.
                   </p>

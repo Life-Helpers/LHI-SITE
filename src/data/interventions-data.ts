@@ -52,37 +52,37 @@ export const THEMATIC_PILLARS: Record<
   health: {
     name: "Health & WASH",
     href: "/health",
-    badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    badgeColor: "bg-primary/10 text-primary border-primary/20",
     description: "Maternal & infant care, clinical malaria mitigation, Tom Brown nutrition, solar clean water.",
   },
   education: {
     name: "Education",
     href: "/education",
-    badgeColor: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    badgeColor: "bg-primary/10 text-primary border-primary/20",
     description: "Accelerated learning centers, girl-child retention, literacy hubs & non-formal learning.",
   },
   livelihood: {
     name: "Livelihood",
     href: "/livelihood",
-    badgeColor: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    badgeColor: "bg-primary/10 text-primary border-primary/20",
     description: "VSLA community savings, vocational start-up kits (tailoring, soap making), and cash grants.",
   },
   "food-security": {
     name: "Food Security",
     href: "/food-security",
-    badgeColor: "bg-lime-500/10 text-lime-600 dark:text-lime-400 border-lime-500/20",
+    badgeColor: "bg-primary/10 text-primary border-primary/20",
     description: "Climate-smart agriculture, dry-season irrigation, small ruminant livestock & market linkages.",
   },
   "social-inclusion": {
     name: "Social Inclusion",
     href: "/social-inclusion",
-    badgeColor: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
+    badgeColor: "bg-primary/10 text-primary border-primary/20",
     description: "Civic governance, women in decision-making, disability rights & civic dialogues.",
   },
   protection: {
     name: "Protection & GBV",
     href: "/protection",
-    badgeColor: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+    badgeColor: "bg-primary/10 text-primary border-primary/20",
     description: "Spotlight Initiative, safe spaces, SGBV survivor psycho-social aid & child safeguarding.",
   },
 };

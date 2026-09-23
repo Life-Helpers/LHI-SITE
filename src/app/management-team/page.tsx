@@ -8,7 +8,7 @@ import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { LEADERSHIP_TEAM, STATE_COORDINATORS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
-  title: "Management Team | Life Helpers Initiative",
+  title: "Management Team",
   description:
     "Meet the executive leadership and management team executing Life Helpers Initiative (LHI) programs across 11 Nigerian states.",
 };

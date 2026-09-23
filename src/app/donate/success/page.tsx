@@ -96,7 +96,7 @@ function DonateSuccessContent() {
         {status === "loading" && (
           <div>
             <Loader2 size={40} className="mx-auto animate-spin text-primary" />
-            <h1 className="font-serif-display mt-8 text-4xl tracking-tight text-foreground md:text-5xl">
+            <h1 className="font-serif-display mt-8 text-4xl text-foreground md:text-5xl">
               Confirming your gift…
             </h1>
             <p className="mt-4 text-muted-foreground">This may take a few seconds.</p>
@@ -109,11 +109,11 @@ function DonateSuccessContent() {
               <CheckCircle2 size={32} className="text-emerald-600 dark:text-emerald-400" />
             </div>
 
-            <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.32em] text-primary">
+            <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
               — Gift received
             </p>
 
-            <h1 className="font-serif-display mt-4 text-5xl font-light leading-[1.02] tracking-tight text-foreground md:text-7xl">
+            <h1 className="font-serif-display mt-4 text-5xl font-light leading-[1.02] text-foreground md:text-7xl">
               Thank you
               <br />
               <em className="font-light italic text-primary">from all of us.</em>
@@ -151,7 +151,7 @@ function DonateSuccessContent() {
 
         {status === "pending" && (
           <div>
-            <h1 className="font-serif-display text-4xl tracking-tight text-foreground md:text-5xl">
+            <h1 className="font-serif-display text-4xl text-foreground md:text-5xl">
               Payment processing.
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
@@ -173,7 +173,7 @@ function DonateSuccessContent() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
               <XCircle size={32} className="text-destructive" />
             </div>
-            <h1 className="font-serif-display mt-8 text-4xl tracking-tight text-foreground md:text-5xl">
+            <h1 className="font-serif-display mt-8 text-4xl text-foreground md:text-5xl">
               Unable to verify donation
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-muted-foreground">

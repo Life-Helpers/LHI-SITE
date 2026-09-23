@@ -42,7 +42,7 @@ export function TestimonialsSection() {
       <ScrollReveal className="mb-8 flex flex-col gap-2">
         <h2
           id="testimonials-heading"
-          className="text-2xl font-bold tracking-tight sm:text-3xl"
+          className="font-serif-display text-3xl font-light sm:text-4xl"
         >
           {t.home.testimonials.heading}
         </h2>

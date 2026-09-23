@@ -23,7 +23,7 @@ import { getInterventions, getStates } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Projects & Interventions | Life Helpers Initiative",
+  title: "Projects & Interventions",
   description:
     "Explore active and past humanitarian, health, education, and livelihood interventions implemented by Life Helpers Initiative across 11 Nigerian states alongside MSH, Save the Children, UNICEF, Plan International, SIF, ZOA, and BMZ.",
   keywords: [

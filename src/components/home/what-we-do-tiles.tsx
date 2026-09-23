@@ -46,7 +46,7 @@ const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
     href: "/health",
     icon: HeartPulse,
     tag: "Health & Nutrition",
-    accentColor: "from-emerald-500/20 to-teal-500/10",
+    accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.healthScreening.src,
   },
   {
@@ -59,7 +59,7 @@ const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
     href: "/education",
     icon: GraduationCap,
     tag: "Basic Education",
-    accentColor: "from-blue-500/20 to-indigo-500/10",
+    accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.abepGirls.src,
   },
   {
@@ -72,7 +72,7 @@ const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
     href: "/livelihood",
     icon: Handshake,
     tag: "Resilience & Skills",
-    accentColor: "from-amber-500/20 to-orange-500/10",
+    accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.gidanArzikiTailoring.src,
   },
   // 3 DOWN (Bottom Row)
@@ -86,7 +86,7 @@ const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
     href: "/food-security",
     icon: Wheat,
     tag: "Food Systems",
-    accentColor: "from-lime-500/20 to-emerald-500/10",
+    accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.farmerWomanHarvest.src,
   },
   {
@@ -98,7 +98,7 @@ const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
     href: "/social-inclusion",
     icon: Users,
     tag: "Voice & Participation",
-    accentColor: "from-purple-500/20 to-pink-500/10",
+    accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.communityDialogue.src,
   },
   {
@@ -110,7 +110,7 @@ const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
     href: "/protection",
     icon: ShieldCheck,
     tag: "Safe Spaces",
-    accentColor: "from-rose-500/20 to-red-500/10",
+    accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.activismWomen.src,
   },
 ];
@@ -146,7 +146,7 @@ export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record
             </div>
             <h2
               id="what-we-do-heading"
-              className="mt-3 font-serif-display text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-foreground"
+              className="mt-3 font-serif-display text-3xl sm:text-4xl lg:text-5xl font-light text-foreground"
             >
               What We Do — <span className="italic text-primary font-serif">Community Impact</span>
             </h2>

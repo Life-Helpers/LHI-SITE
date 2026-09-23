@@ -34,7 +34,7 @@ export const yo: Dictionary = {
     socialInclusionDesc: "Ìkópa àwùjọ & ìdàpọ̀ àwọn aláàbọ̀-ara",
     protection: "Ààbò",
     protectionDesc: "Ìdáhùn sí ìwà ipá ìbálòpọ̀ & ìdáàbòbò",
-    radioAdvocacy: "Ìpolongo Rédíò",
+    radioAdvocacy: "LHI Radio",
   },
   impactMenu: {
     blog: "Bùlọ́ọ̀gì",

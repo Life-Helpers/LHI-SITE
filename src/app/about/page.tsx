@@ -22,7 +22,7 @@ import {
 } from "@/data/organisation";
 
 export const metadata: Metadata = {
-  title: "About Us | Life Helpers Initiative",
+  title: "About Us",
   description:
     "Life Helpers Initiative (LHI): a Nigerian NGO founded in 2004, working in development and humanitarian action across 11 states with 350+ staff and 700+ community volunteers.",
 };

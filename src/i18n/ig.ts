@@ -35,7 +35,7 @@ export const ig: Dictionary = {
     socialInclusionDesc: "Nsonye ọha na eze & ijikọta ndị nwere nkwarụ",
     protection: "Nchebe",
     protectionDesc: "Nzaghachi ime ihe ike mmekọahụ & nchekwa",
-    radioAdvocacy: "Nkwuwapụta Redio",
+    radioAdvocacy: "LHI Radio",
   },
   impactMenu: {
     blog: "Blọọgụ",

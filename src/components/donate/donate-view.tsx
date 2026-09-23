@@ -211,7 +211,7 @@ export function DonateView() {
           <div className="grid grid-cols-1 items-end gap-6 lg:grid-cols-12">
             {/* Eyebrow Column */}
             <div className="lg:col-span-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-primary">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
                 — Donate
               </p>
               <p className="mt-2 text-xs text-muted-foreground">
@@ -249,10 +249,10 @@ export function DonateView() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
             {/* LEFT COLUMN: The Ledger of Compounding Kindness */}
             <div className="lg:col-span-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-primary">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
                 — Where it goes
               </p>
-              <h2 className="mt-4 font-serif-display text-4xl font-light leading-[1.05] tracking-tight text-foreground md:text-5xl">
+              <h2 className="mt-4 font-serif-display text-4xl font-light leading-[1.05] text-foreground md:text-5xl">
                 A ledger of
                 <br />
                 <em className="font-light italic text-primary">compounding kindness.</em>

@@ -34,7 +34,7 @@ export async function generateMetadata({
   const project = await getIntervention(id);
   if (!project) return {};
   return {
-    title: `${project.shortTitle} | Project Dossier | Life Helpers Initiative`,
+    title: `${project.shortTitle} | Project Dossier`,
     description: project.summary,
     openGraph: {
       title: project.title,

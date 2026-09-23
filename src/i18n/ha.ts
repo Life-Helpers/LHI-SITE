@@ -34,7 +34,7 @@ export const ha: Dictionary = {
     socialInclusionDesc: "Shiga cikin al'umma & haɗa nakasassu",
     protection: "Kariya",
     protectionDesc: "Magance cin zarafin mata & tsaro daga cin zarafi",
-    radioAdvocacy: "Yaɗa Sani ta Rediyo",
+    radioAdvocacy: "LHI Radio",
   },
   impactMenu: {
     blog: "Shafin Labarai",

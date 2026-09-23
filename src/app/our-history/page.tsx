@@ -6,7 +6,7 @@ import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
-  title: "Our History | Life Helpers Initiative",
+  title: "Our History",
   description:
     "The journey of Life Helpers Initiative: from the Beulah Project in 2004 to a national humanitarian and development organization operating across 11 states in Nigeria.",
 };
@@ -157,7 +157,7 @@ export default function OurHistoryPage() {
                 </div>
 
                 <div className="flex flex-wrap items-baseline gap-3">
-                  <span className="font-serif-display text-2xl font-bold text-primary sm:text-3xl">
+                  <span className="font-serif-display text-2xl font-medium text-primary sm:text-3xl">
                     {m.year}
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">

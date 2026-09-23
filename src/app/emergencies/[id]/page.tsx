@@ -72,7 +72,7 @@ export default async function EmergencyDetailPage({
           </span>
         </div>
 
-        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="font-serif-display mt-2 text-3xl font-light sm:text-4xl">
           {emergency.title}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">

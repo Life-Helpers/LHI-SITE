@@ -35,7 +35,7 @@ export function ContactPageClient() {
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/20 px-3.5 py-1 text-xs font-semibold uppercase tracking-widest text-primary-foreground backdrop-blur-md">
             LHI Nationwide Network
           </span>
-          <h1 className="mt-4 font-serif-display text-3xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-white">
+          <h1 className="mt-4 font-serif-display text-3xl sm:text-5xl lg:text-6xl font-light text-white">
             Contact <span className="italic text-primary font-serif">Life Helpers Initiative</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base sm:text-lg text-zinc-200 leading-relaxed">
@@ -55,7 +55,7 @@ export function ContactPageClient() {
                   <Compass className="h-3.5 w-3.5" />
                   <span>Interactive Nigeria Presence Map</span>
                 </div>
-                <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                <h2 className="font-serif-display mt-2 text-2xl font-light text-foreground sm:text-3xl">
                   Our 11 Operational Offices Across Nigeria
                 </h2>
                 <p className="mt-1.5 text-sm text-muted-foreground">

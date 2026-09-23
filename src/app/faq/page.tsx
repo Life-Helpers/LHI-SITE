@@ -4,7 +4,7 @@ import { FaqAccordion } from "@/components/faq-accordion";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions (FAQ) | Life Helpers Initiative",
+  title: "Frequently Asked Questions (FAQ)",
   description:
     "Find answers to frequently asked questions about Life Helpers Initiative (LHI), our health, education, and protection programs, governance, and donation processes.",
   openGraph: {

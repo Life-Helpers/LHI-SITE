@@ -80,7 +80,7 @@ export async function ProgramDetail({ program }: { program: Program }) {
           )}
         </div>
 
-        <h1 className="mt-2 font-serif-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        <h1 className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
           {program.name}
         </h1>
 
@@ -120,7 +120,7 @@ export async function ProgramDetail({ program }: { program: Program }) {
                   <FolderGit2 size={14} />
                   <span>Impact &middot; Projects &amp; Interventions</span>
                 </div>
-                <h2 className="mt-1 font-serif-display text-xl font-bold text-foreground sm:text-2xl">
+                <h2 className="mt-1 font-serif-display text-xl font-light text-foreground sm:text-2xl">
                   Active Projects in {program.name}
                 </h2>
               </div>

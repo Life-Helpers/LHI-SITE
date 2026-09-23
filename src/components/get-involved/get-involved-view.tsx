@@ -223,7 +223,7 @@ export function GetInvolvedView() {
           <div className="grid grid-cols-1 items-end gap-6 lg:grid-cols-12">
             {/* Left eyebrow column */}
             <div className="lg:col-span-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-muted-foreground">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
                 — Get Involved
               </p>
               <p className="mt-2 text-xs text-muted-foreground">
@@ -317,10 +317,10 @@ export function GetInvolvedView() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14">
             {/* Left intro & details column */}
             <div className="lg:col-span-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-muted-foreground">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
                 — Volunteer form
               </p>
-              <h2 className="mt-4 font-serif-display text-4xl font-light leading-[1.08] tracking-tight text-foreground md:text-5xl">
+              <h2 className="mt-4 font-serif-display text-4xl font-light leading-[1.08] text-foreground md:text-5xl">
                 Tell us where
                 <br />
                 you&apos;d like to{" "}
@@ -571,7 +571,7 @@ export function GetInvolvedView() {
       {/* 4. CAREERS, TRAINING & PROCUREMENT */}
       <section id="careers" className="border-t border-border bg-card/40 py-16 sm:py-24" aria-labelledby="more-ways-heading">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-muted-foreground">— More ways to work with LHI</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— More ways to work with LHI</p>
           <h2 id="more-ways-heading" className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
             Careers, training and procurement
           </h2>

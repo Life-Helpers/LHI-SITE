@@ -8,7 +8,7 @@ export default function NotFound() {
         <span className="rounded-full bg-primary/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
           404 Error
         </span>
-        <h1 className="mt-4 font-serif text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+        <h1 className="mt-4 font-serif-display text-4xl font-light text-foreground sm:text-5xl">
           Page Not Found
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">

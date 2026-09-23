@@ -18,7 +18,7 @@ import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { ANNUAL_REPORT_2024_PDF } from "@/data/publication-stories";
 
 export const metadata: Metadata = {
-  title: "Impact Reports | Life Helpers Initiative",
+  title: "Impact Reports",
   description:
     "Annual reports and organisation-wide results from Life Helpers Initiative across 11 states in Nigeria.",
 };
@@ -64,7 +64,7 @@ export default function ImpactPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mb-10 flex flex-col gap-2">
-          <h2 className="font-serif-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          <h2 className="font-serif-display text-2xl font-light text-foreground sm:text-3xl">
             Published Impact Reports
           </h2>
           <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">

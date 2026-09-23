@@ -69,7 +69,7 @@ export function WhoWeAreBand() {
     <section aria-labelledby="who-we-are-heading" className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <ScrollReveal className="mb-8 flex flex-col gap-2">
         <Eyebrow>{w.eyebrow}</Eyebrow>
-        <h2 id="who-we-are-heading" className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <h2 id="who-we-are-heading" className="font-serif-display text-3xl font-light sm:text-4xl">
           {w.heading}
         </h2>
         <p className="max-w-2xl text-muted-foreground">{w.body}</p>

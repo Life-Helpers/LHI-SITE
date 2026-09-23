@@ -30,7 +30,7 @@ export function NewsletterSubscribe() {
             <Mail className="h-6 w-6 text-primary" aria-hidden="true" />
             <h2
               id="newsletter-heading"
-              className="text-2xl font-bold tracking-tight sm:text-3xl"
+              className="font-serif-display text-3xl font-light sm:text-4xl"
             >
               {t.home.newsletter.heading}
             </h2>

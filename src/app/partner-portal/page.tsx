@@ -8,7 +8,7 @@ import { getDocuments, getStates } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Partner & Bidder Portal | Life Helpers Initiative",
+  title: "Partner & Bidder Portal",
   description:
     "Institutional donor and consortium bidding hub: CAC registration, tax clearance, audited financial statements, PSEA, child safeguarding and anti-fraud policies, plus an expedited RFP expression-of-interest intake.",
 };

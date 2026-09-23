@@ -372,10 +372,10 @@ export function FaqAccordion({
               const isExpanded = !!expandedIds[faq.id];
               const categoryBadge =
                 faq.category === "organization"
-                  ? { label: "Organization", color: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20" }
+                  ? { label: "Organization", color: "bg-primary/10 text-primary border-primary/20" }
                   : faq.category === "programs"
-                  ? { label: "Programs", color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" }
-                  : { label: "Donations", color: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" };
+                  ? { label: "Programs", color: "bg-accent/10 text-accent border-accent/25" }
+                  : { label: "Donations", color: "bg-foreground/5 text-foreground border-foreground/15" };
 
               return (
                 <div
