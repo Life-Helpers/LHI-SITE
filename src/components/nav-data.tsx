@@ -214,6 +214,13 @@ export const impactLinks: NavLink[] = [
     tag: "For Donors",
   },
   {
+    label: "Project Magazines",
+    href: "/project-magazines",
+    description: "Flip through our project magazines online",
+    icon: BookOpen,
+    tag: "Read",
+  },
+  {
     label: "Success Stories",
     href: "/success-stories",
     description: "Stories from our magazines and newsletter",
@@ -391,6 +398,13 @@ export function useLocalizedNav() {
       description: "Compliance documents & consortium / RFP expression of interest",
       icon: Handshake,
       tag: "For Donors",
+    },
+    {
+      label: "Project Magazines",
+      href: "/project-magazines",
+      description: "Flip through our project magazines online",
+      icon: BookOpen,
+      tag: "Read",
     },
     {
       label: t.impactMenu.successStories,

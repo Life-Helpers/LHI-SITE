@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { rememberSubscriber } from "@/lib/subscriber";
+
 type Status = "idle" | "loading" | "done" | "error";
 
 /** Shared newsletter signup: posts to /api/newsletter (stored in the admin Submissions inbox). */
@@ -20,6 +22,7 @@ export function useNewsletterSignup(source: string) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not subscribe. Please try again.");
+      rememberSubscriber(email);
       setStatus("done");
       return true;
     } catch (e) {

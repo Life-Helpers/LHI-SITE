@@ -134,6 +134,12 @@ All of these store their data in `CMS_DATA_DIR` and are managed from the admin:
 - **Careers** (`/careers`) and **Procurement** (`/procurement`): vacancies and vendor requests are managed in
   **Admin → Jobs & Vacancies / Vendor Requests**. CVs and bid documents are stored under `CMS_DATA_DIR/private`
   and are downloadable only by signed-in editors from **Admin → Submissions**.
+- **Project magazines** (`/project-magazines`, in the Impact menu): flipbook reader with page-turn animation,
+  synthesised flip sound, thumbnails, full screen and keyboard control. Page images are pre-rendered WebP files in
+  `public/magazines/<slug>/`; add a magazine by rendering its pages there and adding it to `src/data/magazines.ts`.
+- **Download gate:** the first document a visitor downloads (any `.pdf`/`.doc(x)`/`.xls(x)`/`.ppt(x)`/`.zip` link on
+  the site, including job ads and vendor request packs) asks them to subscribe; subscribers are remembered in the
+  browser. Use `data-gate="off"` on a link to skip it or `data-gate="on"` to force it.
 - **Newsletter:** all signup forms (including the anniversary popup, configured in `src/config/anniversary.ts`)
   add subscribers to **Admin → Submissions → Newsletter**.
 

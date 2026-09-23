@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen, Download, Mail, Radio } from "lucide-react";
+import { BookOpen, BookOpenText, Download, Mail, Radio } from "lucide-react";
 
 import { BlogFeed } from "@/components/blog/blog-feed";
 import { NewsletterForm } from "@/components/news/newsletter-form";
 import { SocialLinks } from "@/components/social-links";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
+import { MAGAZINES } from "@/data/magazines";
 import { PUBLICATIONS } from "@/data/publication-stories";
 import { getPublishedPosts } from "@/lib/cms/content";
 
@@ -58,6 +59,14 @@ export default async function NewsUpdatesPage() {
                   <h3 className="mt-1 font-semibold leading-snug text-foreground">{pub.title}</h3>
                   <p className="mt-2 flex-1 text-sm text-muted-foreground">{pub.description}</p>
                   <div className="mt-4 flex flex-wrap gap-2">
+                    {MAGAZINES.some((m) => m.pdf === pub.pdf) && (
+                      <Link
+                        href={`/project-magazines/${MAGAZINES.find((m) => m.pdf === pub.pdf)!.slug}`}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-background hover:opacity-90"
+                      >
+                        <BookOpenText className="h-3.5 w-3.5" /> Flip
+                      </Link>
+                    )}
                     <Link href={pub.post} className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
                       <BookOpen className="h-3.5 w-3.5" /> Read
                     </Link>

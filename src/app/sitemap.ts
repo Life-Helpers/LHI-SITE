@@ -6,6 +6,7 @@ import { impactReports } from "@/data/impact-reports";
 import { getInterventions, getPublishedPosts } from "@/lib/cms/content";
 import { programs } from "@/data/programs";
 import { COURSES } from "@/data/training/courses";
+import { MAGAZINES } from "@/data/magazines";
 
 export const revalidate = 3600;
 
@@ -33,6 +34,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/interventions/projectandintervention",
     "/partner-portal",
     "/careers",
+    "/project-magazines",
+    ...MAGAZINES.map((m) => `/project-magazines/${m.slug}`),
     "/procurement",
     "/get-involved/training",
     ...COURSES.flatMap((c) => [`/get-involved/training/${c.id}`, ...c.lessons.map((l) => `/get-involved/training/${c.id}/${l.id}`)]),
