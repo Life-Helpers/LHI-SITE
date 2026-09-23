@@ -1,5 +1,12 @@
 import "server-only";
 
+import {
+  compareEvents,
+  OBSERVANCE_AREAS,
+  upcomingObservances,
+  type CalendarEvent,
+  type ObservanceArea,
+} from "@/data/observances";
 import { getPillarRef, type InterventionProject } from "@/data/interventions-data";
 import { readSettings, readStore } from "@/lib/cms/store";
 import type { CmsIntervention } from "@/lib/cms/types";
@@ -91,4 +98,30 @@ export async function getEpisodes() {
   return (await readStore("episodes"))
     .filter((e) => e.status === "published" && e.audio && e.date <= today)
     .sort((a, b) => Number(b.featured) - Number(a.featured) || b.date.localeCompare(a.date));
+}
+
+/** Upcoming observance days plus published LHI events, soonest first. */
+export async function getCalendarEvents(days = 366): Promise<CalendarEvent[]> {
+  const today = todayInLagos();
+  const events: CalendarEvent[] = (await readStore("events"))
+    .filter((e) => e.status === "published" && e.startDate && (e.endDate || e.startDate) >= today)
+    .map((e) => ({
+      id: e.id,
+      title: e.title,
+      start: e.startDate,
+      end: e.endDate && e.endDate >= e.startDate ? e.endDate : e.startDate,
+      area: (e.area in OBSERVANCE_AREAS ? e.area : "lhi") as ObservanceArea,
+      description: e.summary,
+      location: e.location || undefined,
+      time: e.time || undefined,
+      href: e.link || `/events#${e.id}`,
+      yearly: false,
+      kind: "event",
+    }));
+  return [...events, ...upcomingObservances(today, days)].sort(compareEvents);
+}
+
+/** One calendar entry by id: an LHI event, or the next occurrence of an observance day. */
+export async function getCalendarEvent(id: string): Promise<CalendarEvent | undefined> {
+  return (await getCalendarEvents(400)).find((e) => e.id === id);
 }

@@ -4,13 +4,15 @@ import Link from "next/link";
 import { BookOpen, BookOpenText, Download, Mail, Radio } from "lucide-react";
 
 import { BlogFeed } from "@/components/blog/blog-feed";
+import { EventDateTile } from "@/components/events/event-date-tile";
 import { NewsletterForm } from "@/components/news/newsletter-form";
 import { SocialLinks } from "@/components/social-links";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { MAGAZINES } from "@/data/magazines";
 import { PUBLICATIONS } from "@/data/publication-stories";
-import { getPublishedPosts } from "@/lib/cms/content";
+import { OBSERVANCE_AREAS } from "@/data/observances";
+import { getCalendarEvents, getPublishedPosts } from "@/lib/cms/content";
 
 export const revalidate = 300;
 
@@ -21,6 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewsUpdatesPage() {
+  const upcoming = (await getCalendarEvents(120)).slice(0, 4);
   const posts = (await getPublishedPosts()).filter((p) =>
     ["News", "Press Release", "Events", "Newsletter"].includes(p.category),
   );
@@ -101,6 +104,28 @@ export default async function NewsUpdatesPage() {
                   </p>
                   <NewsletterForm />
                 </div>
+
+                {upcoming.length > 0 && (
+                  <div className="rounded-2xl border border-border bg-card p-6">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Upcoming days &amp; events</h3>
+                    <ul className="mt-4 space-y-4">
+                      {upcoming.map((e) => (
+                        <li key={`${e.id}-${e.start}`} className="flex items-center gap-3">
+                          <EventDateTile event={e} />
+                          <div className="min-w-0">
+                            <Link href={`/events#${e.id}`} className="text-sm font-semibold leading-snug text-foreground hover:text-primary">
+                              {e.title}
+                            </Link>
+                            <p className="text-xs text-muted-foreground">{OBSERVANCE_AREAS[e.area].label}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link href="/events" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
+                      Full calendar &amp; add to calendar →
+                    </Link>
+                  </div>
+                )}
 
                 <div className="rounded-2xl border border-border bg-card p-6">
                   <Radio className="h-6 w-6 text-primary" />

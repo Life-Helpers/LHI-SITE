@@ -73,6 +73,7 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   jobs: () => [],
   tenders: () => [],
   episodes: () => [],
+  events: () => [],
   users: () => [],
   media: () => [],
   submissions: () => [],

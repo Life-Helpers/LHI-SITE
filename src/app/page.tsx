@@ -12,19 +12,21 @@ import { PartnersStrip } from "@/components/home/partners-strip";
 import { PhilosophyQuote } from "@/components/home/philosophy-quote";
 import { NewsletterSubscribe } from "@/components/home/newsletter-subscribe";
 import { FeatureStory } from "@/components/home/feature-story";
-import { getEpisodes, getInterventions, getPartners, getPublishedPosts, getSettings } from "@/lib/cms/content";
+import { UpcomingEvents } from "@/components/home/upcoming-events";
+import { getCalendarEvents, getEpisodes, getInterventions, getPartners, getPublishedPosts, getSettings, todayInLagos } from "@/lib/cms/content";
 import { toRadioEpisode } from "@/lib/radio";
 
 /** Content comes from the admin CMS; saves refresh it instantly, this is a safety net. */
 export const revalidate = 300;
 
 export default async function Home() {
-  const [partners, settings, posts, interventions, episodes] = await Promise.all([
+  const [partners, settings, posts, interventions, episodes, events] = await Promise.all([
     getPartners(),
     getSettings(),
     getPublishedPosts(),
     getInterventions(),
     getEpisodes(),
+    getCalendarEvents(120),
   ]);
   const projectCounts: Record<string, number> = {};
   for (const project of interventions) {
@@ -39,6 +41,7 @@ export default async function Home() {
       <WhatWeDoTiles projectCounts={projectCounts} />
       <BeforeAfterSection />
       <OperationalMapSection />
+      <UpcomingEvents events={events.slice(0, 5)} today={todayInLagos()} />
       <LatestFromLHI />
       <RadioBanner episodes={episodes.slice(0, 12).map(toRadioEpisode)} />
       <TestimonialsSection />

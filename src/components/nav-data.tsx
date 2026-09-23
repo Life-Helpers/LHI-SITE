@@ -3,6 +3,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Award,
+  CalendarDays,
   BookOpen,
   Compass,
   FileText,
@@ -240,6 +241,12 @@ export const impactLinks: NavLink[] = [
     description: "News, the LHI newsletter and project magazines",
     icon: Newspaper,
     tag: "Dispatches",
+  },  {
+    label: "Events & Observance Days",
+    href: "/events",
+    description: "Upcoming events and international days, add to calendar",
+    icon: CalendarDays,
+    tag: "Calendar",
   },
 ];
 
@@ -426,6 +433,13 @@ export function useLocalizedNav() {
       description: "News, the LHI newsletter and project magazines",
       icon: Newspaper,
       tag: "Dispatches",
+    },
+    {
+      label: "Events & Observance Days",
+      href: "/events",
+      description: "Upcoming events and international days, add to calendar",
+      icon: CalendarDays,
+      tag: "Calendar",
     },
     {
       label: "Humanitarian Training",

@@ -40,6 +40,7 @@ export function SiteFooter() {
     { label: t.impactMenu.successStories, href: "/success-stories" },
     { label: t.impactMenu.blog, href: "/blog" },
     { label: t.impactMenu.newsletter, href: "/news-updates" },
+    { label: "Events & Observance Days", href: "/events" },
   ];
 
   const getInvolvedLinks = [

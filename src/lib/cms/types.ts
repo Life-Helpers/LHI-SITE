@@ -95,6 +95,19 @@ export interface CmsEpisode {
   featured: boolean;
 }
 
+export interface CmsEvent {
+  id: string;
+  title: string;
+  summary: string;
+  location: string;
+  link: string;
+  status: "published" | "draft";
+  startDate: string;
+  endDate: string;
+  time: string;
+  area: string;
+}
+
 export interface CollectionRecords {
   posts: CmsPost;
   interventions: CmsIntervention;
@@ -104,4 +117,5 @@ export interface CollectionRecords {
   jobs: CmsJob;
   tenders: CmsTender;
   episodes: CmsEpisode;
+  events: CmsEvent;
 }

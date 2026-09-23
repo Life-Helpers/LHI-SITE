@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   Activity,
+  CalendarDays,
   ChevronDown,
   ChevronsLeft,
   ExternalLink,
@@ -63,6 +64,7 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
         { label: "Media Library", href: "/admin/media", icon: ImageIcon, permission: "media" },
         { label: "Comments", href: "/admin/comments", icon: MessageSquare, permission: "comments", badge: pendingComments },
         { label: "Radio Episodes", href: "/admin/content/episodes", icon: Radio, permission: "episodes" },
+        { label: "Events", href: "/admin/content/events", icon: CalendarDays, permission: "events" },
       ],
     },
     {

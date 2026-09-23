@@ -18,6 +18,7 @@ export const PERMISSION_GROUPS = [
       { id: "media.delete", label: "Delete media", help: "Remove files from the media library." },
       { id: "comments", label: "Moderate comments", help: "Approve or delete reader comments." },
       { id: "episodes", label: "Radio episodes", help: "Upload and publish radio recordings." },
+      { id: "events", label: "Events", help: "Add LHI events to the events calendar and home page." },
     ],
   },
   {
@@ -159,7 +160,7 @@ export interface CollectionDef {
   fields: FieldDef[];
 }
 
-export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents" | "jobs" | "tenders" | "episodes";
+export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents" | "jobs" | "tenders" | "episodes" | "events";
 
 export const PILLAR_OPTIONS: FieldOption[] = [
   { value: "health", label: "Health & WASH" },
@@ -168,6 +169,12 @@ export const PILLAR_OPTIONS: FieldOption[] = [
   { value: "food-security", label: "Food Security" },
   { value: "social-inclusion", label: "Social Inclusion" },
   { value: "protection", label: "Protection & GBV" },
+];
+
+export const EVENT_AREA_OPTIONS: FieldOption[] = [
+  { value: "lhi", label: "LHI (organisation-wide)" },
+  { value: "humanitarian", label: "Humanitarian" },
+  ...PILLAR_OPTIONS,
 ];
 
 export const STATE_OPTIONS: FieldOption[] = [
@@ -398,6 +405,30 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "station", label: "Station", type: "text", sidebar: true, help: "e.g. Radio Nigeria Royal FM 101.5, Sokoto" },
       { name: "cover", label: "Cover image", type: "image", sidebar: true },
       { name: "featured", label: "Play first on the home page", type: "boolean", sidebar: true },
+    ],
+  },
+  events: {
+    name: "events",
+    label: "Events",
+    singular: "Event",
+    description:
+      "LHI events (launches, trainings, campaigns, community days). They appear with the international observance days on the Events page and, when next up, on the home page, with Add to calendar.",
+    permission: "events",
+    titleField: "title",
+    columns: ["title", "startDate", "location", "area", "status"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "published" ? `/events#${item.id}` : null),
+    fields: [
+      { name: "title", label: "Event title", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
+      { name: "summary", label: "Summary", type: "textarea", required: true, help: "One or two sentences shown on the event card." },
+      { name: "location", label: "Location", type: "text", help: "e.g. Goshen Development Center, Sokoto, or Online" },
+      { name: "link", label: "More information link", type: "text", help: "Optional. A page on this site (e.g. /news-updates/…) or a registration link (https://…)." },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "published", label: "Published" }, { value: "draft", label: "Draft" }] },
+      { name: "startDate", label: "Start date", type: "date", sidebar: true, required: true },
+      { name: "endDate", label: "End date", type: "date", sidebar: true, help: "Leave empty for a one-day event." },
+      { name: "time", label: "Time", type: "text", sidebar: true, help: "e.g. 10:00 AM – 1:00 PM (WAT)" },
+      { name: "area", label: "Thematic area", type: "select", sidebar: true, required: true, options: EVENT_AREA_OPTIONS },
     ],
   },
 };
