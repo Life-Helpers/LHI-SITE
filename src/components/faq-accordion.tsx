@@ -80,7 +80,7 @@ const FAQ_DATA: FaqItem[] = [
     question: "What are LHI's key core thematic programmatic areas?",
     answer:
       "LHI works in six thematic areas:\n1. Health: MNCH, nutrition, WASH, immunisation, malaria, SRH, HIV/AIDS and TB.\n2. Education: early child development, formal and non-formal education, education governance and complementary services.\n3. Livelihoods: technical and vocational training, savings and loan associations, entrepreneurship, financial literacy and multi-purpose cash assistance.\n4. Food Security: agriculture, small ruminants and aquaculture, food supplies and climate adaptation.\n5. Protection: violence against women and girls, and child protection.\n6. Social Inclusion: governance, peacebuilding and high-level advocacy.",
-    tags: ["pillars", "thematic", "health", "education", "protection", "livelihoods"],
+    tags: ["thematic areas", "thematic", "health", "education", "protection", "livelihoods"],
     featured: true,
   },
   {

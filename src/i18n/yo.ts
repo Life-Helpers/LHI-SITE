@@ -148,8 +148,8 @@ export const yo: Dictionary = {
     },
     philosophy: {
       heading: "Ìmọ̀ Ọgbọ́n Wa",
-      quote:
-        "“Fífi ẹ̀rín músẹ́ sí ojú - fífọwọ́kan ìwàláàyè, yíyí ilé ká, níṣẹ́ lórí àwùjọ.”",
+      quote: "Fífọwọ́kan ìwàláàyè, yíyí ilé ká, níṣẹ́ lórí àwùjọ;",
+      highlight: "Fífi ẹ̀rín músẹ́ sí ojú!",
       attribution: "Ọ̀rọ̀ ìpìlẹ̀ṣẹ̀ LHI, láti ọdún 2004",
     },
     newsletter: {

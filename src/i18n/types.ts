@@ -137,6 +137,7 @@ export type Dictionary = {
     philosophy: {
       heading: string;
       quote: string;
+      highlight: string;
       attribution: string;
     };
     newsletter: {

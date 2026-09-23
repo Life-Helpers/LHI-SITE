@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Eye, HeartHandshake, Target } from "lucide-react";
 
@@ -25,6 +25,36 @@ export function WhoWeAreBand() {
   const { t } = useLocale();
   const w = t.home.whoWeAre;
   const [active, setActive] = useState(0);
+  const trackRef = useRef<HTMLElement>(null);
+  const hovering = useRef(false);
+
+  // Scroll control: on wider screens the band pins while the page scrolls through it,
+  // opening Vision, then Mission, then Values (and back again when scrolling up).
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const wide = window.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)");
+    let last = -1;
+    const onScroll = () => {
+      if (!wide.matches || hovering.current) return;
+      const rect = track.getBoundingClientRect();
+      const travel = rect.height - window.innerHeight;
+      if (travel <= 0) return;
+      const progress = Math.min(1, Math.max(0, -rect.top / travel));
+      const step = Math.min(2, Math.floor(progress * 3));
+      if (step !== last) {
+        last = step;
+        setActive(step);
+      }
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    wide.addEventListener("change", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      wide.removeEventListener("change", onScroll);
+    };
+  }, []);
 
   const panels: Panel[] = [
     {
@@ -66,7 +96,8 @@ export function WhoWeAreBand() {
   ];
 
   return (
-    <section aria-labelledby="who-we-are-heading" className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <section aria-labelledby="who-we-are-heading" ref={trackRef} className="relative md:h-[260vh] motion-reduce:md:h-auto">
+      <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 md:sticky md:top-0 md:flex md:min-h-screen md:flex-col md:justify-center md:py-10 lg:px-8 motion-reduce:md:static">
       <ScrollReveal className="mb-8 flex flex-col gap-2">
         <Eyebrow>{w.eyebrow}</Eyebrow>
         <h2 id="who-we-are-heading" className="font-serif-display text-3xl font-light sm:text-4xl">
@@ -75,7 +106,11 @@ export function WhoWeAreBand() {
         <p className="max-w-2xl text-muted-foreground">{w.body}</p>
       </ScrollReveal>
 
-      <div className="flex h-[640px] flex-col gap-2 md:h-[440px] md:flex-row">
+      <div
+        className="flex h-[640px] flex-col gap-2 md:h-[440px] md:flex-row"
+        onMouseEnter={() => (hovering.current = true)}
+        onMouseLeave={() => (hovering.current = false)}
+      >
         {panels.map((panel, i) => {
           const isActive = i === active;
           const Icon = panel.icon;
@@ -152,6 +187,13 @@ export function WhoWeAreBand() {
         {w.moreAboutLhi}
         <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
       </Link>
+      <div className="mt-4 hidden items-center gap-2 md:flex" aria-hidden="true">
+        {panels.map((panel, i) => (
+          <span key={panel.id} className={`h-1.5 rounded-full transition-all duration-500 ${i === active ? "w-10 bg-primary" : "w-4 bg-border"}`} />
+        ))}
+        <span className="ml-2 text-[11px] uppercase tracking-widest text-muted-foreground">Scroll or hover to explore</span>
+      </div>
+      </div>
     </section>
   );
 }

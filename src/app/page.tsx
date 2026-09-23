@@ -11,7 +11,9 @@ import { SocialFeedsSection } from "@/components/home/social-feeds-section";
 import { PartnersStrip } from "@/components/home/partners-strip";
 import { PhilosophyQuote } from "@/components/home/philosophy-quote";
 import { NewsletterSubscribe } from "@/components/home/newsletter-subscribe";
-import { FeatureStory } from "@/components/home/feature-story";
+import { FeatureStory, type FeatureSlide } from "@/components/home/feature-story";
+import { FEATURED_STORY_BY_AREA } from "@/data/featured-stories";
+import { THEMATIC_PILLARS } from "@/data/interventions-data";
 import { UpcomingEvents } from "@/components/home/upcoming-events";
 import { getCalendarEvents, getEpisodes, getInterventions, getPartners, getPublishedPosts, getSettings, todayInLagos } from "@/lib/cms/content";
 import { toRadioEpisode } from "@/lib/radio";
@@ -32,13 +34,34 @@ export default async function Home() {
   for (const project of interventions) {
     for (const area of project.thematicAreas) projectCounts[area.id] = (projectCounts[area.id] ?? 0) + 1;
   }
+  const bySlug = new Map(posts.map((p) => [p.slug, p]));
+  const featureSlides: FeatureSlide[] = FEATURED_STORY_BY_AREA.flatMap(({ area, slug }) => {
+    const post = bySlug.get(slug);
+    if (!post || !post.featuredImage) return [];
+    const theme = THEMATIC_PILLARS[area];
+    return [{ area, areaName: theme.name, areaHref: theme.href, title: post.title, excerpt: post.excerpt, image: post.featuredImage, href: `/blog/${post.slug}`, linkLabel: "Read the story" }];
+  });
+  // The editor-managed feature (Admin → Settings) leads when it points somewhere the carousel doesn't already cover.
+  const feature = settings.homeFeature;
+  if (feature.enabled && feature.title && feature.image && !featureSlides.some((s) => s.href === feature.linkHref)) {
+    featureSlides.unshift({
+      area: "feature",
+      areaName: feature.eyebrow.replace(/^Feature story\s*·\s*/i, "") || "Feature",
+      areaHref: feature.linkHref || "/blog",
+      title: feature.title,
+      excerpt: feature.excerpt,
+      image: feature.image,
+      href: feature.linkHref || "/blog",
+      linkLabel: feature.linkLabel || "Read more",
+    });
+  }
   return (
     <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
       <HeroSlider />
       <StatsSection />
       <WhoWeAreBand />
-      <FeatureStory feature={settings.homeFeature} />
       <WhatWeDoTiles projectCounts={projectCounts} />
+      <FeatureStory slides={featureSlides} />
       <BeforeAfterSection />
       <OperationalMapSection />
       <UpcomingEvents events={events.slice(0, 5)} today={todayInLagos()} />

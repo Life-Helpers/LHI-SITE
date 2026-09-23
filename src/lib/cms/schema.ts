@@ -385,7 +385,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     name: "episodes",
     label: "Radio Episodes",
     singular: "Episode",
-    description: "Radio programme recordings played by the home-page radio and the Radio page. Upload MP3/M4A audio up to 80 MB.",
+    description: "Radio programme recordings played by the home-page radio and the Radio page. Upload MP3/M4A audio up to 100 MB.",
     permission: "episodes",
     titleField: "title",
     columns: ["title", "programme", "language", "status", "date"],
@@ -394,7 +394,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     fields: [
       { name: "title", label: "Episode title", type: "text", required: true },
       { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
-      { name: "audio", label: "Audio recording", type: "audio", required: true, help: "MP3, M4A, AAC, WAV or OGG, up to 80 MB." },
+      { name: "audio", label: "Audio recording", type: "audio", required: true, help: "MP3, M4A, AAC, WAV or OGG, up to 100 MB." },
       { name: "summary", label: "Summary", type: "textarea", required: true, help: "What the episode covers, shown under the player." },
       { name: "topics", label: "Topics", type: "list", help: "One per line, e.g. Malaria prevention." },
       { name: "guests", label: "Guests / speakers", type: "list", help: "One per line." },

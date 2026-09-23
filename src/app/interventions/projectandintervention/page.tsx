@@ -129,7 +129,7 @@ export default async function ProjectsAndInterventionsPage() {
                 <Layers size={20} />
               </div>
               <div>
-                <div className="text-xl font-bold text-foreground">6 Pillars</div>
+                <div className="text-xl font-bold text-foreground">6 Thematic Areas</div>
                 <div className="text-[11px] text-muted-foreground">Integrated Thematic Focus</div>
               </div>
             </div>

@@ -204,7 +204,7 @@ export const africanFulfillmentImages = {
   programsHero: {
     src: LHI_PHOTOS.learningCentre.src,
     alt: LHI_PHOTOS.learningCentre.alt,
-    caption: "Six thematic pillars delivering lasting smiles and community resilience.",
+    caption: "Six thematic areas delivering lasting smiles and community resilience.",
     tag: "Field Interventions",
   },
 

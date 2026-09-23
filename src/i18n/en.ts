@@ -148,8 +148,8 @@ export const en: Dictionary = {
     },
     philosophy: {
       heading: "Our Philosophy",
-      quote:
-        "“Putting a smile on a face — touching lives, transforming households, impacting communities.”",
+      quote: "Touching Lives, Transforming Households, Impacting Communities;",
+      highlight: "Putting a Smile on a Face!",
       attribution: "LHI's founding motto, since 2004",
     },
     newsletter: {

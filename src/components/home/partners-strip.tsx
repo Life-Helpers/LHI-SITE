@@ -15,9 +15,12 @@ import {
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { useLocale } from "@/i18n/locale-context";
 import { PARTNERS_DATA } from "@/data/partners-data";
+import { PARTNER_LOGOS } from "@/data/partner-logos";
 import type { CmsPartner } from "@/lib/cms/types";
 
 type PartnerItem = CmsPartner & { logo: React.ReactNode; categoryBadgeColor: string };
+/** A logo on the strip; `dossier` is set when the CMS holds a profile for that partner. */
+type StripItem = { id: string; name: string; logo: React.ReactNode; dossier?: PartnerItem };
 
 const BUILT_IN = new Map(PARTNERS_DATA.map((p) => [p.id, p]));
 
@@ -28,15 +31,18 @@ const CATEGORY_BADGES: Record<CmsPartner["category"], string> = {
   "Government & Clusters": "bg-foreground/5 text-foreground border-foreground/15",
 };
 
+const logoImage = (src: string, name: string) => (
+  // eslint-disable-next-line @next/next/no-img-element
+  <img src={src} alt={name} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain" />
+);
+
 /** Uploaded logo from the CMS first, then the built-in mark, then the acronym. */
-function toDisplay(partner: CmsPartner): PartnerItem {
+function toDisplay(partner: CmsPartner, fallbackLogo?: string): PartnerItem {
   const builtIn = BUILT_IN.get(partner.id);
-  const logo = partner.logoUrl ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={partner.logoUrl} alt="" className="max-h-full max-w-full object-contain" />
-  ) : (
-    builtIn?.logo ?? <span className="text-sm font-bold tracking-wide text-foreground">{partner.acronym}</span>
-  );
+  const logoSrc = partner.logoUrl || fallbackLogo;
+  const logo = logoSrc
+    ? logoImage(logoSrc, partner.name)
+    : builtIn?.logo ?? <span className="text-sm font-bold tracking-wide text-foreground">{partner.acronym}</span>;
   return {
     ...partner,
     logo,
@@ -44,10 +50,28 @@ function toDisplay(partner: CmsPartner): PartnerItem {
   };
 }
 
+/**
+ * The strip shows LHI's official partner logo set. Logos with a CMS profile open its dossier;
+ * partners added in the CMS (not part of the original seed) are appended so admins can extend it.
+ */
+function buildStrip(cmsPartners: CmsPartner[]): StripItem[] {
+  const byId = new Map(cmsPartners.map((p) => [p.id, p]));
+  const items: StripItem[] = PARTNER_LOGOS.map((logo) => {
+    const cms = logo.cmsId ? byId.get(logo.cmsId) : undefined;
+    return { id: logo.id, name: logo.name, logo: logoImage(logo.logo, logo.name), dossier: cms ? toDisplay(cms, logo.logo) : undefined };
+  });
+  for (const partner of cmsPartners) {
+    if (BUILT_IN.has(partner.id)) continue;
+    const dossier = toDisplay(partner);
+    items.push({ id: partner.id, name: partner.name, logo: dossier.logo, dossier });
+  }
+  return items;
+}
+
 export function PartnersStrip({ partners: rawPartners }: { partners: CmsPartner[] }) {
   const { t } = useLocale();
   const [selectedPartner, setSelectedPartner] = useState<PartnerItem | null>(null);
-  const partners = React.useMemo(() => rawPartners.map(toDisplay), [rawPartners]);
+  const partners = React.useMemo(() => buildStrip(rawPartners), [rawPartners]);
 
   // Split all partners into two balanced tracks for the continuous dual-row marquee
   const halfLength = Math.ceil(partners.length / 2);
@@ -152,37 +176,30 @@ export function PartnersStrip({ partners: rawPartners }: { partners: CmsPartner[
  * Clean Logo-Only Brand Card matching Brands Carousel 4 template aesthetic
  */
 interface PartnerCardProps {
-  partner: PartnerItem;
+  partner: StripItem;
   onSelect: (partner: PartnerItem) => void;
-  isGrid?: boolean;
 }
 
-function PartnerCard({ partner, onSelect, isGrid = false }: PartnerCardProps) {
-  return (
-    <div
-      id={`partner-card-${partner.id}`}
-      role="button"
-      tabIndex={0}
-      onClick={() => onSelect(partner)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onSelect(partner);
-        }
-      }}
-      aria-label={partner.name}
-      title={partner.name}
-      className={`group relative flex items-center justify-center cursor-pointer rounded-2xl border border-border/80 bg-card/90 dark:bg-slate-900/80 backdrop-blur-md px-5 py-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-lg ${
-        isGrid
-          ? "w-full h-24 sm:h-28"
-          : "w-[200px] sm:w-[240px] h-24 sm:h-28 shrink-0"
-      }`}
-    >
-      {/* Pristine centered brand logo mark */}
-      <div className="w-full h-full flex items-center justify-center max-w-[170px] max-h-[56px] transition-transform duration-300 group-hover:scale-105">
-        {partner.logo}
+function PartnerCard({ partner, onSelect }: PartnerCardProps) {
+  const className =
+    "group relative flex h-24 w-[200px] shrink-0 items-center justify-center rounded-2xl border border-border/80 bg-white px-5 py-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg sm:h-28 sm:w-[240px]";
+  const mark = (
+    <span className="flex h-full max-h-[64px] w-full max-w-[180px] items-center justify-center transition-transform duration-300 group-hover:scale-105">
+      {partner.logo}
+    </span>
+  );
+  const { dossier } = partner;
+  if (!dossier) {
+    return (
+      <div className={className} title={partner.name}>
+        {mark}
       </div>
-    </div>
+    );
+  }
+  return (
+    <button type="button" onClick={() => onSelect(dossier)} aria-label={`${partner.name}: view partnership details`} title={partner.name} className={`${className} cursor-pointer`}>
+      {mark}
+    </button>
   );
 }
 

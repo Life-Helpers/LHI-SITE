@@ -17,6 +17,20 @@ test.describe("homepage", () => {
     ).toBeVisible();
   });
 
+  test("feature stories rotate by thematic area and partner logos are shown", async ({ page }) => {
+    await page.goto("/");
+    const tabs = page.getByRole("tablist", { name: "Choose a thematic area" }).getByRole("tab");
+    await expect(tabs).toHaveCount(6);
+    await page.getByRole("button", { name: "Pause the stories" }).click();
+    await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
+    await page.getByRole("button", { name: "Next story" }).click();
+    await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
+
+    await expect(page.locator("#implementing-partners-section img[src^='/images/partners/']").first()).toBeAttached();
+    await expect(page.getByText(/Pillars? 0\d/)).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Our Philosophy" })).toBeVisible();
+  });
+
   test("no crisis banner renders when there are no active alerts", async ({
     page,
   }) => {

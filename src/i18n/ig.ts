@@ -149,8 +149,8 @@ export const ig: Dictionary = {
     },
     philosophy: {
       heading: "Nkà Ihe Ọmụma Anyị",
-      quote:
-        "“Ime ka ihu mụmụọ ọñụ - imetụta ndụ, ịgbanwe ezinụlọ, ime mmetụta n'obodo.”",
+      quote: "Imetụta ndụ, ịgbanwe ezinụlọ, ime mmetụta n'obodo;",
+      highlight: "Ime ka ihu mụmụọ ọñụ!",
       attribution: "Okwu ntọala LHI, kemgbe 2004",
     },
     newsletter: {

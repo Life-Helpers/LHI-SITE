@@ -2,7 +2,7 @@ import type { Program } from "@/types/content";
 import { africanFulfillmentImages } from "./african-fulfillment-images";
 
 /**
- * LHI's real thematic operational pillars, sourced from the organization's
+ * LHI's real thematic areas, sourced from the organization's
  * own content brief.
  */
 export const programs: Program[] = [

@@ -99,14 +99,14 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
           <div>
             <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
               <Layers size={14} />
-              <span>What We Do · 6 Thematic Pillars</span>
+              <span>What We Do · 6 Thematic Areas</span>
             </div>
             <h3 className="font-serif-display text-xl font-medium text-foreground sm:text-2xl">
               Projects Mapped to Our 6 Thematic Areas
             </h3>
           </div>
           <p className="max-w-md text-xs text-muted-foreground">
-            Every intervention is deeply integrated into one or more of LHI&apos;s core operational sectors. Click any pillar to filter projects or visit its dedicated program page.
+            Every intervention is deeply integrated into one or more of LHI&apos;s core operational sectors. Click any thematic area to filter projects or visit its dedicated program page.
           </p>
         </div>
 

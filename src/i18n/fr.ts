@@ -152,8 +152,8 @@ export const fr: Dictionary = {
     },
     philosophy: {
       heading: "Notre philosophie",
-      quote:
-        "« Mettre le sourire sur un visage — toucher des vies, transformer des foyers, impacter des communautés. »",
+      quote: "Toucher des vies, transformer des foyers, impacter des communautés ;",
+      highlight: "Mettre le sourire sur un visage !",
       attribution: "Devise fondatrice de LHI, depuis 2004",
     },
     newsletter: {

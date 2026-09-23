@@ -3,6 +3,8 @@ import { ArrowRight } from "lucide-react";
 
 import { AddToCalendar } from "@/components/events/add-to-calendar";
 import { countdownLabel, EventDateTile } from "@/components/events/event-date-tile";
+import { ParallaxBackground } from "@/components/effects/parallax-background";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { daysUntil, formatEventDate, OBSERVANCE_AREAS, type CalendarEvent } from "@/data/observances";
 
 /** Home page: the next event or observance day, with the few after it. */
@@ -12,7 +14,8 @@ export function UpcomingEvents({ events, today }: { events: CalendarEvent[]; tod
   const lhi = next.area === "lhi";
 
   return (
-    <section aria-labelledby="upcoming-heading" className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
+    <ParallaxBackground src={LHI_PHOTOS.activismMarch.src}>
+    <section aria-labelledby="upcoming-heading" className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— Upcoming</p>
@@ -28,7 +31,7 @@ export function UpcomingEvents({ events, today }: { events: CalendarEvent[]; tod
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <article
           className={`relative overflow-hidden rounded-3xl p-7 sm:p-9 lg:col-span-3 ${
-            lhi ? "bg-primary text-primary-foreground" : "border border-border bg-card text-foreground"
+            lhi ? "bg-primary text-primary-foreground shadow-xl" : "border border-border bg-card/95 text-foreground shadow-xl backdrop-blur"
           }`}
         >
           <div className="flex items-start gap-5">
@@ -50,7 +53,7 @@ export function UpcomingEvents({ events, today }: { events: CalendarEvent[]; tod
           </div>
         </article>
 
-        <ul className="flex flex-col divide-y divide-border rounded-3xl border border-border bg-card lg:col-span-2">
+        <ul className="flex flex-col divide-y divide-border rounded-3xl border border-border bg-card/95 shadow-lg backdrop-blur lg:col-span-2">
           {rest.slice(0, 4).map((e) => (
             <li key={`${e.id}-${e.start}`} className="flex items-center gap-4 p-4">
               <EventDateTile event={e} />
@@ -67,5 +70,6 @@ export function UpcomingEvents({ events, today }: { events: CalendarEvent[]; tod
         </ul>
       </div>
     </section>
+    </ParallaxBackground>
   );
 }

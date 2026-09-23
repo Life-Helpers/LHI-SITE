@@ -9,7 +9,7 @@ import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 export const metadata: Metadata = {
   title: "Programs",
   description:
-    "Explore Life Helpers Initiative's six core thematic operational pillars bringing smiles and fulfillment to vulnerable communities across Nigeria.",
+    "Explore Life Helpers Initiative's six thematic areas bringing smiles and fulfillment to vulnerable communities across Nigeria.",
 };
 
 export default function ProgramsPage() {
@@ -17,7 +17,7 @@ export default function ProgramsPage() {
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}
       <PageHeroBanner
-        eyebrow="— Our Thematic Pillars"
+        eyebrow="— Our Thematic Areas"
         title={
           <>
             Interventions Delivering <em className="font-light italic text-primary">Fulfilled Lives.</em>
@@ -31,7 +31,7 @@ export default function ProgramsPage() {
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mb-10 flex flex-col gap-2">
           <h2 className="font-serif-display text-2xl font-light text-foreground sm:text-3xl">
-            Explore All 6 Pillars
+            Explore All 6 Thematic Areas
           </h2>
           <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
             Active and ongoing field programs. Each program links to its

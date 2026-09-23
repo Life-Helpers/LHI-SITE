@@ -148,8 +148,8 @@ export const ha: Dictionary = {
     },
     philosophy: {
       heading: "Falsafarmu",
-      quote:
-        "“Sanya murmushi a fuska — taɓa rayuka, canza gidaje, yin tasiri a al'ummomi.”",
+      quote: "Taɓa rayuka, canza gidaje, yin tasiri a al'ummomi;",
+      highlight: "Sanya murmushi a fuska!",
       attribution: "Taken kafuwar LHI, tun 2004",
     },
     newsletter: {

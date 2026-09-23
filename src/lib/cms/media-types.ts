@@ -19,7 +19,7 @@ export const ALLOWED_MEDIA: Record<string, string> = {
 
 export const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 /** Radio episodes can be long, so audio gets a larger limit. */
-export const MAX_AUDIO_BYTES = 80 * 1024 * 1024;
+export const MAX_AUDIO_BYTES = 100 * 1024 * 1024;
 
 export const AUDIO_ACCEPT = ".mp3,.m4a,.aac,.wav,.ogg,.oga,.opus,audio/*";
 

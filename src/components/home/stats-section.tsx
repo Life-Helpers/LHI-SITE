@@ -3,6 +3,7 @@
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { useLocale } from "@/i18n/locale-context";
 import { MapPin, Users, Home, Calendar } from "lucide-react";
+import { CountUp } from "@/components/home/count-up";
 
 export function StatsSection() {
   const { t } = useLocale();
@@ -48,9 +49,10 @@ export function StatsSection() {
                 <div className="mb-3 inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform">
                   <Icon className="h-6 w-6" />
                 </div>
-                <span className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-serif-display text-foreground tracking-tight">
-                  {stat.value}
-                </span>
+                <CountUp
+                  value={stat.value}
+                  className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-serif-display text-foreground tracking-tight"
+                />
                 <span className="mt-1 text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider">
                   {stat.label}
                 </span>

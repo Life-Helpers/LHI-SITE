@@ -33,7 +33,7 @@ export default async function NidakePage() {
         image={africanFulfillmentImages.nidakeHero}
       />
 
-      {/* 4 Pillars */}
+      {/* 4 thematic areas */}
       <section className="py-16 md:py-24 border-b border-border">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -41,7 +41,7 @@ export default async function NidakePage() {
               Core Design Philosophy
             </p>
             <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
-              The Four Pillars of NIDAKE
+              The Four Thematic Areas of NIDAKE
             </h2>
           </div>
 

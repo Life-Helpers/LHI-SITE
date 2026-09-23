@@ -58,7 +58,7 @@ export async function ProgramDetail({ program }: { program: Program }) {
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
                 <span className="font-medium drop-shadow-sm flex items-center gap-1">
                   <Heart className="h-3.5 w-3.5 text-primary fill-primary" />
-                  Life Helpers Initiative — {program.name} Pillar
+                  Life Helpers Initiative — {program.name} Thematic Area
                 </span>
                 <span className="rounded-full bg-black/40 px-2.5 py-0.5 backdrop-blur-md border border-white/20">
                   {program.region}

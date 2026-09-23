@@ -120,10 +120,6 @@ export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record
   const shouldReduceMotion = useReducedMotion();
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
 
-  // Split into 3 UP and 3 DOWN (Two Roll layout)
-  const topThree = strategicPillars.slice(0, 3);
-  const bottomThree = strategicPillars.slice(3, 6);
-
   return (
     <section
       id="what-we-do"
@@ -142,7 +138,7 @@ export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>{t.home.whatWeDo.heading || "Our Strategic Pillars"}</span>
+              <span>Our Thematic Areas</span>
             </div>
             <h2
               id="what-we-do-heading"
@@ -167,75 +163,20 @@ export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record
           </div>
         </div>
 
-        {/* 3 UP, 3 DOWN (TWO ROLL) INTERACTIVE JELLY CARD GRID */}
-        <div className="mt-12 space-y-6 sm:space-y-8">
-          {/* Row 1: 3 UP */}
-          <div>
-            <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              <span>Pillars 01 – 03 • Humanitarian Relief & Development</span>
-              <span className="hidden sm:inline">Row 1 (3 Up)</span>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {topThree.map((pillar, index) => (
-                <JellyCard
-                  count={projectCounts[pillar.id] ?? 0}
-                  key={pillar.id}
-                  pillar={pillar}
-                  index={index}
-                  isHovered={hoveredCardId === pillar.id}
-                  onHover={() => setHoveredCardId(pillar.id)}
-                  onLeave={() => setHoveredCardId(null)}
-                  reducedMotion={!!shouldReduceMotion}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Row 2: 3 DOWN */}
-          <div>
-            <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              <span>Pillars 04 – 06 • Sustainability & Empowerment</span>
-              <span className="hidden sm:inline">Row 2 (3 Down)</span>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {bottomThree.map((pillar, index) => (
-                <JellyCard
-                  count={projectCounts[pillar.id] ?? 0}
-                  key={pillar.id}
-                  pillar={pillar}
-                  index={index + 3}
-                  isHovered={hoveredCardId === pillar.id}
-                  onHover={() => setHoveredCardId(pillar.id)}
-                  onLeave={() => setHoveredCardId(null)}
-                  reducedMotion={!!shouldReduceMotion}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Banner with Radio & Emergency Links */}
-        <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-foreground">
-                WeSpeak (Muyi Magana) on Radio Nigeria Royal FM 101.5
-              </h4>
-              <p className="text-xs text-muted-foreground">
-                LHI&apos;s weekly radio programme in Sokoto State, every Tuesday 11 AM – 12 PM.
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/radio"
-            className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-primary hover:underline shrink-0"
-          >
-            <span>About the programme</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+        {/* Thematic area cards */}
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {strategicPillars.map((pillar, index) => (
+            <JellyCard
+              count={projectCounts[pillar.id] ?? 0}
+              key={pillar.id}
+              pillar={pillar}
+              index={index}
+              isHovered={hoveredCardId === pillar.id}
+              onHover={() => setHoveredCardId(pillar.id)}
+              onLeave={() => setHoveredCardId(null)}
+              reducedMotion={!!shouldReduceMotion}
+            />
+          ))}
         </div>
       </div>
     </section>
@@ -326,10 +267,10 @@ function JellyCard({
       />
 
       <div>
-        {/* Card Header: Pillar Number & Tag */}
+        {/* Card Header: thematic area number & tag */}
         <div className="relative z-10 flex items-center justify-between">
           <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-primary uppercase">
-            Pillar {pillar.pillarNumber}
+            Thematic Area {pillar.pillarNumber}
           </span>
           <span className="text-[11px] font-medium text-muted-foreground">
             {pillar.tag}
@@ -395,7 +336,7 @@ function JellyCard({
           href={pillar.href}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary group-hover:underline"
         >
-          <span>Explore Pillar</span>
+          <span>Explore Thematic Area</span>
           <motion.span
             animate={isHovered ? { x: 4 } : { x: 0 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
