@@ -1,53 +1,52 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Radio } from "lucide-react";
+import { ArrowRight, CalendarClock, Radio } from "lucide-react";
 
 import { Eyebrow } from "@/components/eyebrow";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
+import { RetroRadio } from "@/components/radio/retro-radio";
+import { useRadio, type RadioEpisode } from "@/components/radio/use-radio";
 import { useLocale } from "@/i18n/locale-context";
 
-export function RadioBanner() {
+export function RadioBanner({ episodes }: { episodes: RadioEpisode[] }) {
   const { t } = useLocale();
+  const radio = useRadio(episodes);
 
   return (
-    <section
-      aria-labelledby="radio-heading"
-      className="border-t border-border/60 bg-gradient-to-br from-primary to-accent"
-    >
+    <section aria-labelledby="radio-heading" className="relative overflow-hidden border-t border-border/60 bg-gradient-to-br from-primary to-accent">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1.5px)", backgroundSize: "18px 18px" }}
+        aria-hidden="true"
+      />
       <ScrollReveal>
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-4 px-4 py-14 sm:px-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-start gap-4">
-            <Radio
-              className="mt-1 h-8 w-8 shrink-0 text-primary-foreground"
-              aria-hidden="true"
-            />
-            <div>
-              <Eyebrow className="text-primary-foreground">
-                {t.home.radio.eyebrow}
-              </Eyebrow>
-              <h2
-                id="radio-heading"
-                className="mt-1 text-2xl font-bold tracking-tight text-primary-foreground sm:text-3xl"
+        <div className="relative mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2">
+          <div className="text-primary-foreground">
+            <div className="flex items-center gap-3">
+              <Radio className="h-7 w-7" aria-hidden="true" />
+              <Eyebrow className="text-primary-foreground">{t.home.radio.eyebrow}</Eyebrow>
+            </div>
+            <h2 id="radio-heading" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              {t.home.radio.heading}
+            </h2>
+            <p className="mt-3 max-w-xl text-primary-foreground/90">{t.home.radio.body}</p>
+            <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-black/20 px-4 py-2 text-sm font-medium">
+              <CalendarClock className="h-4 w-4" /> Every Tuesday, 11:00 AM – 12:00 PM · Royal FM 101.5
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="/radio"
+                className="group inline-flex items-center gap-1.5 rounded-full bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:scale-105"
               >
-                {t.home.radio.heading}
-              </h2>
-              <p className="mt-2 max-w-xl text-primary-foreground">
-                {t.home.radio.body}
-              </p>
+                {episodes.length > 0 ? "All episodes" : t.home.radio.cta}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </Link>
             </div>
           </div>
-
-          <Link
-            href="/blog/wespeak-muyi-magana-radio"
-            className="group inline-flex shrink-0 items-center gap-1.5 rounded-full bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition-all duration-300 hover:scale-105 hover:bg-background/90 hover:shadow-[0_0_30px_rgba(0,0,0,0.3)] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            {t.home.radio.cta}
-            <ArrowRight
-              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5"
-              aria-hidden="true"
-            />
-          </Link>
+          <div className="pt-12 lg:pt-0">
+            <RetroRadio radio={radio} total={episodes.length} />
+          </div>
         </div>
       </ScrollReveal>
     </section>

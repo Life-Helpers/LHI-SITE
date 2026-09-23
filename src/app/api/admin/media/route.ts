@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { logActivity } from "@/lib/cms/activity";
 import { AuthError, requireUser } from "@/lib/cms/auth";
-import { ALLOWED_MEDIA, MAX_UPLOAD_BYTES } from "@/lib/cms/media-types";
+import { ALLOWED_MEDIA, maxBytesFor } from "@/lib/cms/media-types";
 import type { MediaItem } from "@/lib/cms/schema";
 import { readStore, UPLOADS_DIR, updateStore } from "@/lib/cms/store";
 
@@ -40,8 +40,9 @@ export async function POST(req: NextRequest) {
     if (!mimeType) {
       return NextResponse.json({ error: `${file.name}: file type not allowed.` }, { status: 400 });
     }
-    if (file.size > MAX_UPLOAD_BYTES) {
-      return NextResponse.json({ error: `${file.name}: larger than 15 MB.` }, { status: 400 });
+    const limit = maxBytesFor(mimeType);
+    if (file.size > limit) {
+      return NextResponse.json({ error: `${file.name}: larger than ${limit / 1024 / 1024} MB.` }, { status: 400 });
     }
     const base = path
       .basename(file.name, path.extname(file.name))

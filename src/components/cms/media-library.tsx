@@ -14,6 +14,7 @@ const FILTERS = [
   { id: "image", label: "Images" },
   { id: "application/pdf", label: "Documents" },
   { id: "video", label: "Video" },
+  { id: "audio", label: "Audio" },
 ];
 
 export function MediaLibrary({ items, canDelete }: { items: MediaItem[]; canDelete: boolean }) {

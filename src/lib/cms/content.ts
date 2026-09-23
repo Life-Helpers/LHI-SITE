@@ -84,3 +84,11 @@ export async function getTender(id: string) {
   if (!tender) return undefined;
   return { tender, open: tender.status === "open" && tender.deadline >= todayInLagos() };
 }
+
+/** Published radio episodes, featured first, then newest. */
+export async function getEpisodes() {
+  const today = todayInLagos();
+  return (await readStore("episodes"))
+    .filter((e) => e.status === "published" && e.audio && e.date <= today)
+    .sort((a, b) => Number(b.featured) - Number(a.featured) || b.date.localeCompare(a.date));
+}

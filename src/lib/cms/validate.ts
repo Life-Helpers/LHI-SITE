@@ -43,7 +43,7 @@ function coerceField(field: FieldDef, raw: unknown): { value: unknown; error?: s
       }
       if (field.type === "date" && !/^\d{4}-\d{2}-\d{2}$/.test(v)) return { value: v, error: `${field.label} must be a date.` };
       if (field.type === "url" && !/^https?:\/\//.test(v)) return { value: v, error: `${field.label} must start with https://` };
-      if ((field.type === "image" || field.type === "file") && !isSafeAssetUrl(v)) {
+      if ((field.type === "image" || field.type === "file" || field.type === "audio") && !isSafeAssetUrl(v)) {
         return { value: v, error: `${field.label} must be an uploaded file or an https:// link.` };
       }
       if (field.type === "text" && v.length > 300) return { value: v, error: `${field.label} is too long.` };

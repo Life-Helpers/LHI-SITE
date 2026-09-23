@@ -108,7 +108,7 @@ export default async function NewsUpdatesPage() {
                   <p className="mt-1 text-sm text-muted-foreground">
                     Radio Nigeria, Royal FM 101.5, Sokoto. Every Tuesday, 11:00 AM – 12:00 PM.
                   </p>
-                  <Link href="/blog/wespeak-muyi-magana-radio" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
+                  <Link href="/radio" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
                     About the programme →
                   </Link>
                 </div>

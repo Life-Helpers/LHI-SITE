@@ -30,7 +30,7 @@ export function SiteFooter() {
     { label: t.whatWeDoMenu.foodSecurity, href: "/food-security" },
     { label: t.whatWeDoMenu.socialInclusion, href: "/social-inclusion" },
     { label: t.whatWeDoMenu.protection, href: "/protection" },
-    { label: t.whatWeDoMenu.radioAdvocacy, href: "/blog/wespeak-muyi-magana-radio" },
+    { label: t.whatWeDoMenu.radioAdvocacy, href: "/radio" },
   ];
 
   const impactLinks = [

@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FileText, Loader2, Upload, X } from "lucide-react";
+import { FileText, Loader2, Music, Upload, X } from "lucide-react";
 
 import { buttonClass } from "@/components/cms/ui";
+import { AUDIO_ACCEPT } from "@/lib/cms/media-types";
 import type { MediaItem } from "@/lib/cms/schema";
 
 export async function uploadFiles(files: FileList | File[]): Promise<MediaItem[]> {
@@ -20,9 +21,10 @@ export function MediaThumb({ item, className = "" }: { item: Pick<MediaItem, "ur
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={item.url} alt="" className={`object-cover ${className}`} />;
   }
+  const Icon = item.mimeType.startsWith("audio/") ? Music : FileText;
   return (
     <div className={`flex flex-col items-center justify-center gap-1 bg-admin-bg p-2 text-center ${className}`}>
-      <FileText className="h-6 w-6 text-admin-muted" />
+      <Icon className="h-6 w-6 text-admin-muted" />
       <span className="line-clamp-2 break-all text-[10px] text-admin-muted">{item.filename}</span>
     </div>
   );
@@ -33,7 +35,7 @@ export function MediaPicker({
   onSelect,
   onClose,
 }: {
-  kind: "image" | "file";
+  kind: "image" | "file" | "audio";
   onSelect: (item: MediaItem) => void;
   onClose: () => void;
 }) {
@@ -60,7 +62,7 @@ export function MediaPicker({
     return () => window.removeEventListener("keydown", onKey);
   }, [load, onClose]);
 
-  const visible = (items ?? []).filter((m) => (kind === "image" ? m.mimeType.startsWith("image/") : true));
+  const visible = (items ?? []).filter((m) => (kind === "image" ? m.mimeType.startsWith("image/") : kind === "audio" ? m.mimeType.startsWith("audio/") : true));
 
   const handleUpload = async (files: FileList | null) => {
     if (!files?.length) return;
@@ -91,7 +93,13 @@ export function MediaPicker({
               ref={inputRef}
               type="file"
               multiple
-              accept={kind === "image" ? "image/jpeg,image/png,image/webp,image/gif,image/avif" : ".pdf,.jpg,.jpeg,.png,.webp,.gif,.avif,.mp4"}
+              accept={
+                kind === "image"
+                  ? "image/jpeg,image/png,image/webp,image/gif,image/avif"
+                  : kind === "audio"
+                    ? AUDIO_ACCEPT
+                    : `.pdf,.jpg,.jpeg,.png,.webp,.gif,.avif,.mp4,${AUDIO_ACCEPT}`
+              }
               className="hidden"
               onChange={(e) => handleUpload(e.target.files)}
             />

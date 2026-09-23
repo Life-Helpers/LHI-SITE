@@ -137,6 +137,9 @@ All of these store their data in `CMS_DATA_DIR` and are managed from the admin:
 - **Project magazines** (`/project-magazines`, in the Impact menu): flipbook reader with page-turn animation,
   synthesised flip sound, thumbnails, full screen and keyboard control. Page images are pre-rendered WebP files in
   `public/magazines/<slug>/`; add a magazine by rendering its pages there and adding it to `src/data/magazines.ts`.
+- **Radio** (`/radio` and the home-page mini radio): episodes are managed in **Admin → Radio Episodes**. Upload the
+  recording (MP3, M4A, AAC, WAV or OGG, up to 80 MB) straight from the episode editor; audio is served with byte-range
+  support so listeners can seek. Mark an episode "Play first on the home page" to put it at the top.
 - **Download gate:** the first document a visitor downloads (any `.pdf`/`.doc(x)`/`.xls(x)`/`.ppt(x)`/`.zip` link on
   the site, including job ads and vendor request packs) asks them to subscribe; subscribers are remembered in the
   browser. Use `data-gate="off"` on a link to skip it or `data-gate="on"` to force it.

@@ -23,6 +23,7 @@ import {
   LogOut,
   Map,
   Menu,
+  Radio,
   MessageSquare,
   Moon,
   Search,
@@ -58,6 +59,7 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
         { label: "Posts", href: "/admin/content/posts", icon: FileText, minRole: "author" },
         { label: "Media Library", href: "/admin/media", icon: ImageIcon, minRole: "author" },
         { label: "Comments", href: "/admin/comments", icon: MessageSquare, minRole: "editor", badge: pendingComments },
+        { label: "Radio Episodes", href: "/admin/content/episodes", icon: Radio, minRole: "editor" },
       ],
     },
     {

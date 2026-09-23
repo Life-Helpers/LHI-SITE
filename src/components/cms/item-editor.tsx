@@ -272,6 +272,7 @@ function Field({
       break;
     case "image":
     case "file":
+    case "audio":
       control = <AssetField kind={field.type} value={str} onChange={onChange} common={common} />;
       break;
     case "images":
@@ -357,7 +358,7 @@ function AssetField({
   onChange,
   common,
 }: {
-  kind: "image" | "file";
+  kind: "image" | "file" | "audio";
   value: string;
   onChange: (v: string) => void;
   common: Record<string, unknown>;
@@ -383,6 +384,14 @@ function AssetField({
           </button>
         </div>
       )}
+      {value && kind === "audio" && (
+        <div className="space-y-1 rounded-lg border border-admin-border bg-admin-bg p-2">
+          <audio src={value} controls preload="none" className="w-full" />
+          <button type="button" onClick={() => onChange("")} className="text-xs text-admin-muted hover:text-admin-danger">
+            Remove audio
+          </button>
+        </div>
+      )}
       {value && kind === "file" && (
         <div className="flex items-center gap-2 rounded-lg border border-admin-border bg-admin-bg px-3 py-2 text-xs">
           <Paperclip className="h-3.5 w-3.5 text-admin-muted" />
@@ -395,7 +404,7 @@ function AssetField({
         </div>
       )}
       <button type="button" onClick={() => setOpen(true)} className={`${buttonClass.secondary} w-full`}>
-        <ImagePlus className="h-4 w-4" /> {value ? "Replace" : kind === "image" ? "Choose image" : "Choose file"}
+        <ImagePlus className="h-4 w-4" /> {value ? "Replace" : kind === "image" ? "Choose image" : kind === "audio" ? "Choose or upload audio" : "Choose file"}
       </button>
       <input
         {...common}

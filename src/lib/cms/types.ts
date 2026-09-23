@@ -78,6 +78,23 @@ export interface CmsTender {
   document: string;
 }
 
+export interface CmsEpisode {
+  id: string;
+  title: string;
+  audio: string;
+  summary: string;
+  topics: string[];
+  guests: string[];
+  status: "published" | "draft";
+  programme: string;
+  date: string;
+  language: string;
+  duration: string;
+  station: string;
+  cover: string;
+  featured: boolean;
+}
+
 export interface CollectionRecords {
   posts: CmsPost;
   interventions: CmsIntervention;
@@ -86,4 +103,5 @@ export interface CollectionRecords {
   documents: CmsDocument;
   jobs: CmsJob;
   tenders: CmsTender;
+  episodes: CmsEpisode;
 }

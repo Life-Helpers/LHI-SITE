@@ -230,7 +230,7 @@ export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record
             </div>
           </div>
           <Link
-            href="/blog/wespeak-muyi-magana-radio"
+            href="/radio"
             className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-primary hover:underline shrink-0"
           >
             <span>About the programme</span>

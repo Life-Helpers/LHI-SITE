@@ -32,6 +32,7 @@ export type FieldType =
   | "image"
   | "images"
   | "file"
+  | "audio"
   | "url";
 
 export interface FieldOption {
@@ -70,7 +71,7 @@ export interface CollectionDef {
   fields: FieldDef[];
 }
 
-export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents" | "jobs" | "tenders";
+export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents" | "jobs" | "tenders" | "episodes";
 
 export const PILLAR_OPTIONS: FieldOption[] = [
   { value: "health", label: "Health & WASH" },
@@ -282,6 +283,33 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "postedDate", label: "Date published", type: "date", sidebar: true, required: true },
       { name: "deadline", label: "Submission deadline", type: "date", sidebar: true, required: true },
       { name: "document", label: "Solicitation pack (PDF)", type: "file", sidebar: true },
+    ],
+  },
+  episodes: {
+    name: "episodes",
+    label: "Radio Episodes",
+    singular: "Episode",
+    description: "Radio programme recordings played by the home-page radio and the Radio page. Upload MP3/M4A audio up to 80 MB.",
+    minRole: "editor",
+    titleField: "title",
+    columns: ["title", "programme", "language", "status", "date"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "published" ? `/radio#${item.id}` : null),
+    fields: [
+      { name: "title", label: "Episode title", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
+      { name: "audio", label: "Audio recording", type: "audio", required: true, help: "MP3, M4A, AAC, WAV or OGG, up to 80 MB." },
+      { name: "summary", label: "Summary", type: "textarea", required: true, help: "What the episode covers, shown under the player." },
+      { name: "topics", label: "Topics", type: "list", help: "One per line, e.g. Malaria prevention." },
+      { name: "guests", label: "Guests / speakers", type: "list", help: "One per line." },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "published", label: "Published" }, { value: "draft", label: "Draft" }] },
+      { name: "programme", label: "Programme", type: "select", sidebar: true, required: true, options: opts("WeSpeak (Muyi Magana)", "The Women Situation Room", "Special broadcast", "Jingle / PSA") },
+      { name: "date", label: "Broadcast date", type: "date", sidebar: true, required: true },
+      { name: "language", label: "Language", type: "select", sidebar: true, required: true, options: opts("Hausa", "English", "Hausa & English", "Fulfulde", "Kanuri", "Other") },
+      { name: "duration", label: "Duration", type: "text", sidebar: true, help: "e.g. 58:30 (shown until the audio loads)." },
+      { name: "station", label: "Station", type: "text", sidebar: true, help: "e.g. Radio Nigeria Royal FM 101.5, Sokoto" },
+      { name: "cover", label: "Cover image", type: "image", sidebar: true },
+      { name: "featured", label: "Play first on the home page", type: "boolean", sidebar: true },
     ],
   },
 };

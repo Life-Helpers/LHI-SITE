@@ -178,7 +178,7 @@ export const whatWeDoCards: NavCard[] = [
 
 export const whatWeDoExtra: NavLink = {
   label: "WeSpeak Radio",
-  href: "/blog/wespeak-muyi-magana-radio",
+  href: "/radio",
   description: "Weekly on Royal FM 101.5 Sokoto, Tuesdays 11 AM",
   icon: Radio,
 };
@@ -186,7 +186,7 @@ export const whatWeDoExtra: NavLink = {
 export const whatWeDoFeatured: FeaturedNavStory = {
   title: "WeSpeak (Muyi Magana)",
   subtitle: "LHI's weekly radio programme on health, education, livelihood, agriculture and gender equity.",
-  href: "/blog/wespeak-muyi-magana-radio",
+  href: "/radio",
   image: LHI_PHOTOS.solarRadioFarmer.src,
   tag: "Radio Advocacy",
 };
@@ -372,7 +372,7 @@ export function useLocalizedNav() {
 
   const whatWeDoExtraLocalized: NavLink = {
     label: t.whatWeDoMenu.radioAdvocacy,
-    href: "/blog/wespeak-muyi-magana-radio",
+    href: "/radio",
     description: "Weekly on Royal FM 101.5 Sokoto, Tuesdays 11 AM",
     icon: Radio,
   };
