@@ -120,6 +120,27 @@ export const heroChildSlides: HeroSlideItem[] = [
     },
   },
   {
+    id: "slide-livelihood",
+    src: LHI_PHOTOS.gidanArzikiTailoring.src,
+    alt: LHI_PHOTOS.gidanArzikiTailoring.alt,
+    eyebrow: "Livelihoods & Savings",
+    prefix: "Skills, savings and enterprise that build ",
+    highlight: "self-reliance",
+    suffix: ".",
+    body: "Farmers service hubs, vocational training and group savings help women and youths turn skills into income, from Batagarawa in Katsina to Gusau in Zamfara.",
+    caption: "Trainee at the Gidan Arziki vocational centre, Batagarawa, Katsina State.",
+    tag: "Livelihoods",
+    mottoBadge: "Touching Lives; Transforming Households",
+    primaryCta: {
+      label: "Livelihood Programmes",
+      href: "/livelihood",
+    },
+    secondaryCta: {
+      label: "Read the Magazine",
+      href: "/blog/gidan-arziki-magazine-vol-2",
+    },
+  },
+  {
     id: "slide-community",
     src: LHI_PHOTOS.farmerWomanHarvest.src,
     alt: LHI_PHOTOS.farmerWomanHarvest.alt,

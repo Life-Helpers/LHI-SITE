@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, FileText } from "lucide-react";
+import { ArrowRight, Download, FileText } from "lucide-react";
 
 import {
   Card,
@@ -14,11 +14,13 @@ import {
 import { impactReports } from "@/data/impact-reports";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
+import { ANNUAL_REPORT_2024_PDF } from "@/data/publication-stories";
 
 export const metadata: Metadata = {
   title: "Impact Reports | Life Helpers Initiative",
   description:
-    "Audited impact and verified accountability metrics published by Life Helpers Initiative across 11 states in Nigeria.",
+    "Annual reports and organisation-wide results from Life Helpers Initiative across 11 states in Nigeria.",
 };
 
 export default function ImpactPage() {
@@ -32,10 +34,33 @@ export default function ImpactPage() {
             Measuring Smiles, <em className="font-light italic text-primary">Impacting Lives.</em>
           </>
         }
-        subtitle="Transparent results, verified metrics, and over 1.5 million fulfilled lives."
-        description="Life Helpers Initiative accounts openly for every resource entrusted to us. We evaluate our programs against measurable improvements in child survival, maternal health, female literacy, and household resilience."
+        subtitle="Annual reports and results: over 1.5 million people reached since 2004."
+        description="Life Helpers Initiative accounts openly for every resource entrusted to us. Download our annual report and see our cumulative results since 2004."
         image={africanFulfillmentImages.impactHero}
       />
+
+      <section className="border-b border-border bg-muted/20">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 py-14 sm:px-6 md:grid-cols-5">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-border md:col-span-2">
+            <Image src={LHI_PHOTOS.lhiFamily.src} alt={LHI_PHOTOS.lhiFamily.alt} fill sizes="(min-width: 768px) 400px, 100vw" className="object-cover" />
+          </div>
+          <div className="md:col-span-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">Annual Report</p>
+            <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground">Life Helpers Initiative 2024 Annual Report</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Our aim, vision, mission and values, and our work in health, education, livelihood, gender and governance, and agriculture.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href={ANNUAL_REPORT_2024_PDF} download className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
+                <Download className="h-4 w-4" /> Download the 2024 report (PDF)
+              </a>
+              <Link href="/news-updates#publications" className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-card">
+                All publications
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mb-10 flex flex-col gap-2">

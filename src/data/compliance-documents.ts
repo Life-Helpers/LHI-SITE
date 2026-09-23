@@ -36,6 +36,27 @@ export const COMPLIANCE_DOCUMENTS: ComplianceDocument[] = [
     file: "/documents/lhi-strategic-plan-2026-2030.pdf",
   },
   {
+    id: "annual-report-2024",
+    title: "Annual Report 2024",
+    category: "Organisational documents",
+    description: "LHI's 2024 annual report: aim, vision, mission, values and thematic results.",
+    file: "/documents/lhi-annual-report-2024.pdf",
+  },
+  {
+    id: "project-magazine-vol-2",
+    title: "Project Magazine: Gidan Arziki, Vol. 2",
+    category: "Organisational documents",
+    description: "The Gidan Arziki Farmers Service Hub in Batagarawa, Katsina State (FCDO/WFP), April 2026.",
+    file: "/documents/gidan-arziki-magazine-vol-2.pdf",
+  },
+  {
+    id: "abep-project-magazine",
+    title: "ABEP Project Magazine",
+    category: "Organisational documents",
+    description: "The EU/UNICEF Accelerated Basic Education Programme in Sokoto State, February – May 2026.",
+    file: "/documents/abep-project-magazine.pdf",
+  },
+  {
     id: "project-magazine-vol-1",
     title: "Project Magazine: Cultivating Resilience, Vol. 1",
     category: "Organisational documents",

@@ -13,6 +13,9 @@ import type { CmsPost } from "@/lib/cms/types";
 export const GIDAN_ARZIKI_PDF = "/documents/gidan-arziki-magazine-vol-2.pdf";
 export const ABEP_PDF = "/documents/abep-project-magazine.pdf";
 export const NEWSLETTER_PDF = "/documents/lhi-newsletter-2025.pdf";
+export const ANNUAL_REPORT_2024_PDF = "/documents/lhi-annual-report-2024.pdf";
+export const GSLA_REPORT_PDF = "/documents/gsla-data-report-2024.pdf";
+export const AGRIC_ASSESSMENT_PDF = "/documents/agric-livelihood-needs-assessment-2026.pdf";
 
 const FEEDBACK = `For feedback, suggestions, appreciation or complaints, WhatsApp or SMS **0201 330 9033** or email feedback@lhinigeria.org.`;
 
@@ -391,6 +394,206 @@ Older out-of-school children are now seeking enrolment, and parents are requesti
 *From the [ABEP Project Magazine](/blog/abep-magazine-learning-for-a-brighter-future).*`,
   },
 
+
+  /* ------------------------------------------- Healing Homes (MIRP, Zamfara) */
+  {
+    ...base,
+    id: "mag-healing-homes",
+    slug: "healing-homes-zamfara-resilience",
+    title: "Healing Homes: Rebuilding Family Life in Six Zamfara Communities",
+    category: "Magazine",
+    date: "2026-06-20",
+    featuredImage: LHI_PHOTOS.dignityKitHandover.src,
+    featured: true,
+    tags: ["UNICEF", "FCDO", "Zamfara", "Child protection", "Positive parenting"],
+    excerpt:
+      "How the UNICEF and UK aid-funded Multi-Sectoral Integrated Resilience Programme is helping parents and caregivers in six LGAs of Zamfara State talk, listen and rebuild family life.",
+    updatedAt: "2026-06-20",
+    content: `**Healing Homes** tells the story of the Multi-Sectoral Integrated Resilience Programme in Zamfara State, implemented by Life Helpers Initiative with funding from **UNICEF and the UK Foreign, Commonwealth & Development Office (FCDO / UK aid)**.
+
+> "Every story here happened on a mat, under a tree, in a borrowed room. None of it required a generator, a new building, or a budget line for bricks."
+
+## Why a family-resilience programme
+
+Zamfara State has experienced sustained insecurity and displacement; several activities took place inside IDP camps, including **Gidan Gona IDP Camp in Shinkafi LGA** and a camp in Zurmi LGA. Caregivers under stress are more likely to rely on harsh discipline, adolescents lack safe spaces, and children without birth certificates remain invisible to protective systems.
+
+The programme covers **Bakura, Birnin Magaji, Bungudu, Shinkafi, Tsafe and Zurmi** LGAs.
+
+## By the numbers
+
+| Activity | Result |
+|---|---|
+| Positive Parenting Session 1 (19–25 April 2026) | 597 caregivers (151 M / 446 F) |
+| Positive Parenting Sessions 3–6 (6–31 May 2026) | 608 caregivers (136 M / 472 F) |
+| Community facilitators and caseworkers trained | 25 |
+| Baseline pre-assessment respondents | 554 (71.3% the child's biological mother) |
+| Reflective Dialogues on GBV and child protection | 4, around 40 leaders each |
+| Dignity kit distributions (March 2026) | Zurmi, Shinkafi, Bakura, Birnin Magaji |
+
+Session 1 attendance was remarkably even across the six LGAs (97–101 caregivers each), and sessions continued even after a security scare in Birnin Magaji.
+
+## Six ways the programme showed up
+
+1. **Adolescent life skills:** gender and sex roles, protection from sexual exploitation and abuse, STI awareness and the risks of psychoactive substances (35–41 adolescents per sitting).
+2. **Child-Friendly Spaces:** storytelling on honesty, hygiene and peaceful conflict resolution (16–22 children per sitting).
+3. **Reflective Dialogue:** traditional and religious leaders on GBV and shared responsibility for child protection, including a session at the **Emir's Palace, Tsafe**.
+4. **Positive Parenting:** caring family bonds, feelings, problem-solving and managing conflict without violence.
+5. **Birth registration and CB-CPCs:** a registration officers' review at the Women & Children Welfare Clinic, Tsafe, and CB-CPC orientation and review meetings in five LGAs.
+6. **Dignity and inclusion:** dignity kits with deliberate outreach to persons with disabilities; the **Zurmi LGA Chairman** personally took part in the handover, and a Chief Imam joined LHI staff in Birnin Magaji.
+
+## What the field taught us
+
+Participatory methods (discussion, storytelling, role-play) drove strong attendance, and training local facilitators kept sessions running through insecurity. Father participation remains low (22–26% of attendees), so the next phase will design outreach specifically for fathers, add modules on stress management and communication, and measure behaviour change at home, not only attendance.
+
+[See the project dossier](/interventions/fcdo-unicef-mirp)`,
+  },
+
+  /* ---------------------------------------------------- GSLA (SIF / ZOA) */
+  {
+    ...base,
+    id: "story-gsla-small-steps",
+    slug: "gsla-small-steps-big-impact",
+    title: "Small Steps, Big Impact: Group Savings Groups in Zamfara, Borno and Yobe",
+    category: "Success Stories",
+    date: "2024-04-30",
+    featuredImage: LHI_PHOTOS.gslaShareOut.src,
+    tags: ["GSLA", "SIF", "ZOA", "Zamfara", "Yobe", "Borno"],
+    excerpt:
+      "From a three-lock savings box to start-up capital: how Group Savings and Loan Associations supported by Secours Islamique France and ZOA are turning savings into businesses.",
+    updatedAt: "2024-04-30",
+    content: `> "The most difficult thing is your decision to act, the rest is merely tenacity."
+
+That is why LHI acted through a sustainable project, **Group Savings and Loan Associations (GSLA)**, so that women and men can build themselves up financially. With support from **Secours Islamique France (SIF)** and **ZOA**, groups in **Zamfara, Biu (Borno) and Yobe** are turning money, "a terrible master", into an excellent servant.
+
+[Download the GSLA data report (PDF)](${GSLA_REPORT_PDF})
+
+## How a group works
+
+- **Five days of training and orientation** on budgeting, saving and prudent investment before a group starts.
+- **Weekly meetings** where members buy shares, contribute to a social fund and review their savings.
+- **A savings box with three locks**, each key held by a different member, so no one person controls the money.
+- **Share-out** at the end of the cycle, when each member receives their savings and earnings.
+
+## Members in Zamfara
+
+| LGA | Members |
+|---|---|
+| Gusau | 100 |
+| Talata Mafara | 90 |
+| Tsafe | 87 |
+| Anka | 79 |
+
+In Biu, groups were formed in 11 communities, including Bayan Tasha, Dashu, Pompomari, Shememwada and **Kasalabata IDP camp**. In Yobe, members enrolled in Damaturu and Potiskum.
+
+## What share-out made possible
+
+- **Malama Halima** took her share-out to the market.
+- **Aliyu**, a farmer, invested his in his farm.
+- **Baba Amina** started a business after receiving his savings.
+- **Malama Amina**, a businesswoman, used her share-out as start-up capital.
+
+Savings knows no age: older members saved alongside young people, and in Buriya community men and women met together for their end-of-year meeting.
+
+[See the project dossier](/interventions/sif-zoa-gsla-financial-empowerment)`,
+  },
+
+  /* ------------------------------------------------------ IHP (Ebonyi) */
+  {
+    ...base,
+    id: "news-ihp-mentoring",
+    slug: "ihp-mentoring-frontline-health-workers",
+    title: "Mentoring Frontline Health Workers Under the Integrated Health Program",
+    category: "News",
+    date: "2024-06-15",
+    featuredImage: LHI_PHOTOS.ihpWeighing.src,
+    tags: ["Health", "IHP", "Ebonyi", "Child health", "Nutrition"],
+    excerpt:
+      "Onsite training and mentoring in child health, immunisation, malaria testing and nutrition counselling for health workers in primary health centres.",
+    updatedAt: "2024-06-15",
+    content: `Under the **Integrated Health Program (IHP)**, LHI's trainers used the low-dose, high-frequency approach: short training followed by onsite mentoring in the health facilities where providers work every day.
+
+Scenes from the mentoring visits include:
+
+- Participants reviewing the **IMCI chart** at Chidera Clinic Maternity, Amechi Okposi.
+- A mentee **weighing a nine-month-old baby** at Okaria MDGs PHC and counselling the mother on why her baby was classified as underweight.
+- Trainees checking **vaccine expiry dates and vaccine vial monitors** and documenting vaccines at PHC Onicha.
+- Trainees performing **malaria rapid diagnostic tests** while completing the sick child recording form.
+- Counselling an HIV-positive mother with pictures showing how ARVs prevent mother-to-child transmission.
+- **Role play on exclusive breastfeeding** and counselling on complementary feeding at UG Clinic Maternity.
+- Community-based health volunteers on **house-to-house visits**, and women tasting food at a nutrition demonstration.
+- Pre- and post-tests on nutrition at Chidera Clinic, Onicha and Ndiunuhu health centres, and an MNP orientation for trainers in Ohaozara LGA.
+
+Across the programme, more than 3,200 health providers were trained across 712 PHCs and communities in Bauchi, Ebonyi, Kebbi and Sokoto States.
+
+[See the project dossier](/interventions/palladium-ihp-child-health)`,
+  },
+
+  /* ------------------------------------------- Agric-led livelihood (2026) */
+  {
+    ...base,
+    id: "news-agric-needs-assessment",
+    slug: "agric-livelihood-needs-assessment-kware-wamakko",
+    title: "Needs Assessment: Agric-Led Livelihoods in Kware and Wamakko",
+    category: "News",
+    date: "2026-03-31",
+    featuredImage: LHI_PHOTOS.cabbageFieldGroup.src,
+    tags: ["Agriculture", "Livelihoods", "Sokoto", "Research"],
+    excerpt:
+      "A March 2026 assessment of 120 households in Kware and Wamakko LGAs found agriculture provides 70–80% of household income but is held back by limited inputs, irrigation, markets and finance.",
+    updatedAt: "2026-03-31",
+    content: `LHI's project team carried out a needs assessment in **Kware and Wamakko LGAs, Sokoto State**, in March 2026, to shape an agric-led livelihood project.
+
+[Download the report (PDF)](${AGRIC_ASSESSMENT_PDF})
+
+## How it was done
+
+Household surveys, focus group discussions and key informant interviews with **120 households (60 per LGA)**, community leaders, extension agents and market actors.
+
+## What we found
+
+| Indicator | Kware | Wamakko |
+|---|---|---|
+| Average household size | 8 | 9 |
+| Households engaged in farming | 82% | 85% |
+
+- Agriculture provides **70–80% of household income**; farms are mostly 1–3 hectares and rain-fed.
+- Staples are millet, sorghum, maize, cowpea and groundnut, with goats, sheep and poultry.
+- Middlemen dominate pricing, and poor roads and storage reduce profits. Women process and sell products but struggle to scale.
+- Farmers asked for training in pest and disease management, soil fertility, post-harvest handling and financial literacy.
+- Risks include erratic rainfall and dry spells, striga weed and locusts, costly credit, seasonal youth migration, and women's limited access to land and finance.
+
+## Recommendations
+
+Improved irrigation for year-round farming; farmer cooperatives for collective bargaining; climate-smart agriculture; stronger extension services; value-chain development (processing and branding); microfinance for smallholders and women; rural roads and storage; and youth-focused agribusiness programmes.`,
+  },
+
+  /* --------------------------------------------------- Annual Report 2024 */
+  {
+    ...base,
+    id: "press-annual-report-2024",
+    slug: "lhi-2024-annual-report",
+    title: "Life Helpers Initiative 2024 Annual Report",
+    category: "Press Release",
+    date: "2025-06-30",
+    featuredImage: LHI_PHOTOS.lhiFamily.src,
+    tags: ["Annual report", "Accountability", "2024"],
+    excerpt: "LHI's 2024 Annual Report covers our aim, vision, mission and values and our work in health, education, livelihood, gender and governance, and agriculture.",
+    updatedAt: "2025-06-30",
+    content: `The **Life Helpers Initiative 2024 Annual Report** is now available to download.
+
+[Download the 2024 Annual Report (PDF)](${ANNUAL_REPORT_2024_PDF})
+
+**Our aim:** to inspire every individual to reach for their goals and aspirations in life through wholesome living.
+
+**Our vision:** a more fulfilled life for everyone.
+
+**Our mission:** to be a leading non-governmental organisation working to maximise all opportunities to empower marginalised people.
+
+**Our values (L.H.I.):** Love (a friendly atmosphere, kind gestures, togetherness), Honesty (openness, forthrightness, matching our words with our actions) and Inclusion (access to all, acceptance, opportunity for staff and clients).
+
+The report is organised around our thematic areas (health, education, livelihood, gender and governance, and agriculture) with challenges, recommendations, lessons learnt and success stories.`,
+  },
+
   /* --------------------------------------------------------- Newsletter */
   {
     ...base,
@@ -548,6 +751,15 @@ Today Azima is no longer defined as a child bride. She is a skilled apprentice, 
 /** LHI publications, newest first, for the News & Updates and Success Stories pages. */
 export const PUBLICATIONS = [
   {
+    title: "Life Helpers Initiative 2024 Annual Report",
+    kind: "Annual Report",
+    period: "2024",
+    description: "Our aim, vision, mission and values, and our work across LHI's thematic areas.",
+    pdf: ANNUAL_REPORT_2024_PDF,
+    post: "/blog/lhi-2024-annual-report",
+    image: LHI_PHOTOS.lhiFamily,
+  },
+  {
     title: "Learning for a Brighter Future",
     kind: "ABEP Project Magazine",
     period: "February – May 2026",
@@ -573,6 +785,24 @@ export const PUBLICATIONS = [
     pdf: "/documents/cultivating-resilience-magazine-vol-1.pdf",
     post: "/blog/cultivating-resilience-magazine-vol-1",
     image: LHI_PHOTOS.farmerWomanHarvest,
+  },
+  {
+    title: "Small Steps, Big Impact: GSLA's Journey to Financial Empowerment",
+    kind: "Data report",
+    period: "June 2023 – 2024",
+    description: "Group Savings and Loan Associations in Zamfara, Biu and Yobe (SIF / ZOA).",
+    pdf: GSLA_REPORT_PDF,
+    post: "/blog/gsla-small-steps-big-impact",
+    image: LHI_PHOTOS.gslaShareOut,
+  },
+  {
+    title: "Agric-Led Livelihood Needs Assessment",
+    kind: "Assessment report",
+    period: "March 2026",
+    description: "Farming, income, markets and risks in Kware and Wamakko LGAs, Sokoto State.",
+    pdf: AGRIC_ASSESSMENT_PDF,
+    post: "/blog/agric-livelihood-needs-assessment-kware-wamakko",
+    image: LHI_PHOTOS.cabbageFieldGroup,
   },
   {
     title: "Strengthening Resilience, Restoring Dignity, Transforming Lives",

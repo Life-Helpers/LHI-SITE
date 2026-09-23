@@ -18,6 +18,7 @@ export const PROJECT_STORIES: Record<string, string[]> = {
     "mustafa-saving-a-family-business",
     "bankanu-vsla-a-group-that-grows-together",
     "atika-from-silence-to-strength",
+    "agric-livelihood-needs-assessment-kware-wamakko",
   ],
   "echo-unicef-education-in-emergencies": [
     "abep-magazine-learning-for-a-brighter-future",
@@ -29,5 +30,8 @@ export const PROJECT_STORIES: Record<string, string[]> = {
     "goronyo-learning-centres-2025",
   ],
   "project-hope-ace3-hiv": ["hope-restored-through-care-shagari"],
+  "fcdo-unicef-mirp": ["healing-homes-zamfara-resilience"],
+  "sif-zoa-gsla-financial-empowerment": ["gsla-small-steps-big-impact"],
+  "palladium-ihp-child-health": ["ihp-mentoring-frontline-health-workers"],
   "unicef-end-child-marriage-zamfara": ["azima-future-stitched-with-hope"],
 };
