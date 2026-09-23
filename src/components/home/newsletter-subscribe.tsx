@@ -6,20 +6,17 @@ import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
-import { siteConfig } from "@/config/site";
+import { useNewsletterSignup } from "@/components/news/use-newsletter";
 import { useLocale } from "@/i18n/locale-context";
 
 export function NewsletterSubscribe() {
   const { t } = useLocale();
   const [email, setEmail] = useState("");
+  const { status, error, subscribe } = useNewsletterSignup("home");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const subject = encodeURIComponent("Newsletter signup");
-    const body = encodeURIComponent(
-      `Please add this address to the LHI newsletter list: ${email}`,
-    );
-    window.location.href = `mailto:${siteConfig.contact.email}?subject=${subject}&body=${body}`;
+    if (await subscribe(email)) setEmail("");
   }
 
   return (
@@ -57,10 +54,14 @@ export function NewsletterSubscribe() {
                 onChange={(event) => setEmail(event.target.value)}
                 className="bg-background/60"
               />
-              <Button type="submit" className="shrink-0">
+              <Button type="submit" className="shrink-0" disabled={status === "loading"}>
                 {t.home.newsletter.subscribeCta}
               </Button>
             </form>
+            <p role="status" aria-live="polite" className="text-sm">
+              {status === "done" && <span className="text-primary">Thank you, you are subscribed to LHI news updates.</span>}
+              {status === "error" && <span className="text-destructive">{error}</span>}
+            </p>
           </div>
         </div>
       </ScrollReveal>

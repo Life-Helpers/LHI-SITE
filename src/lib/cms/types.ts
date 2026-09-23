@@ -45,10 +45,45 @@ export interface CmsPost {
   updatedAt: string;
 }
 
+export interface CmsJob {
+  id: string;
+  title: string;
+  summary: string;
+  description: string;
+  requirements: string[];
+  location: string;
+  status: "open" | "closed" | "draft";
+  department: string;
+  employmentType: string;
+  reference: string;
+  positions: number;
+  postedDate: string;
+  deadline: string;
+  attachment: string;
+}
+
+export interface CmsTender {
+  id: string;
+  title: string;
+  summary: string;
+  description: string;
+  requirements: string[];
+  location: string;
+  status: "open" | "closed" | "awarded" | "draft";
+  reference: string;
+  category: string;
+  procurementType: string;
+  postedDate: string;
+  deadline: string;
+  document: string;
+}
+
 export interface CollectionRecords {
   posts: CmsPost;
   interventions: CmsIntervention;
   states: CmsState;
   partners: CmsPartner;
   documents: CmsDocument;
+  jobs: CmsJob;
+  tenders: CmsTender;
 }

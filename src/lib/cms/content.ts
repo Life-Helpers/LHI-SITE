@@ -49,3 +49,38 @@ export async function getPostBySlug(slug: string) {
 export function getSettings() {
   return readSettings();
 }
+
+const byDeadline = <T extends { deadline: string; postedDate: string }>(a: T, b: T) =>
+  b.postedDate.localeCompare(a.postedDate) || a.deadline.localeCompare(b.deadline);
+
+/** Today in Nigeria (WAT), so a deadline stays open until the end of that local day. */
+export function todayInLagos() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(new Date());
+}
+
+/** Public vacancies: open ones first, then recently closed (for reference). */
+export async function getPublicJobs() {
+  const today = todayInLagos();
+  const jobs = (await readStore("jobs")).filter((j) => j.status !== "draft").sort(byDeadline);
+  const isOpen = (j: (typeof jobs)[number]) => j.status === "open" && j.deadline >= today;
+  return { open: jobs.filter(isOpen), closed: jobs.filter((j) => !isOpen(j)).slice(0, 10), isOpen };
+}
+
+export async function getJob(id: string) {
+  const job = (await readStore("jobs")).find((j) => j.id === id && j.status !== "draft");
+  if (!job) return undefined;
+  return { job, open: job.status === "open" && job.deadline >= todayInLagos() };
+}
+
+export async function getPublicTenders() {
+  const today = todayInLagos();
+  const tenders = (await readStore("tenders")).filter((t) => t.status !== "draft").sort(byDeadline);
+  const isOpen = (t: (typeof tenders)[number]) => t.status === "open" && t.deadline >= today;
+  return { open: tenders.filter(isOpen), past: tenders.filter((t) => !isOpen(t)).slice(0, 20) };
+}
+
+export async function getTender(id: string) {
+  const tender = (await readStore("tenders")).find((t) => t.id === id && t.status !== "draft");
+  if (!tender) return undefined;
+  return { tender, open: tender.status === "open" && tender.deadline >= todayInLagos() };
+}

@@ -44,6 +44,21 @@ export default async function SubmissionDetailPage({ params }: { params: Promise
             {s.organization && <div><dt className="text-xs text-admin-muted">Organization</dt><dd>{s.organization}</dd></div>}
             {s.fields.phone && <div><dt className="text-xs text-admin-muted">Phone</dt><dd>{s.fields.phone}</dd></div>}
           </dl>
+          {s.attachments && s.attachments.length > 0 && (
+            <div className="mt-5 border-t border-admin-border pt-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-admin-muted">Attachments</p>
+              <ul className="mt-2 space-y-2 text-sm">
+                {s.attachments.map((a, i) => (
+                  <li key={a.stored}>
+                    <a className="font-medium text-admin-primary hover:underline" href={`/api/admin/submissions/${s.id}/files/${i}`}>
+                      {a.filename}
+                    </a>{" "}
+                    <span className="text-xs text-admin-muted">({Math.max(1, Math.round(a.size / 1024))} KB)</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </Card>
       </div>
     </>

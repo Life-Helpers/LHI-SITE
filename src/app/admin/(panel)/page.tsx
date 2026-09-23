@@ -5,10 +5,9 @@ import { QuickDraft } from "@/components/cms/quick-draft";
 import { Badge, buttonClass, Card, formatDate, PageHeader, statusTone } from "@/components/cms/ui";
 import { WeeklyBarChart, type WeeklyPoint } from "@/components/cms/weekly-bar-chart";
 import { requirePageUser } from "@/lib/cms/auth";
-import { hasRole } from "@/lib/cms/schema";
+import { hasRole, SUBMISSION_TYPE_LABELS } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
-const SUBMISSION_LABELS = { contact: "Contact", volunteer: "Volunteer", "consortium-eoi": "Consortium / RFP" } as const;
 
 function weeklyCounts(dates: string[], weeks = 12): WeeklyPoint[] {
   const now = new Date();
@@ -160,7 +159,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">{s.subject || s.name}</p>
                     <p className="truncate text-xs text-admin-muted">
-                      {SUBMISSION_LABELS[s.type]} · {s.name} · {formatDate(s.createdAt, true)}
+                      {SUBMISSION_TYPE_LABELS[s.type]} · {s.name} · {formatDate(s.createdAt, true)}
                     </p>
                   </div>
                   <Badge tone={statusTone(s.status)}>{s.status}</Badge>

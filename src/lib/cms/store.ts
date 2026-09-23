@@ -46,6 +46,8 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   states: seedStates,
   partners: seedPartners,
   documents: seedDocuments,
+  jobs: () => [],
+  tenders: () => [],
   users: () => [],
   media: () => [],
   submissions: () => [],

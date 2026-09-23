@@ -70,7 +70,7 @@ export interface CollectionDef {
   fields: FieldDef[];
 }
 
-export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents";
+export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents" | "jobs" | "tenders";
 
 export const PILLAR_OPTIONS: FieldOption[] = [
   { value: "health", label: "Health & WASH" },
@@ -230,6 +230,59 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "href", label: "Or link to page", type: "text", sidebar: true, help: "Internal path, e.g. /impact" },
     ],
   },
+  jobs: {
+    name: "jobs",
+    label: "Jobs & Vacancies",
+    singular: "Vacancy",
+    description: "Vacancies shown on the Careers page. Applications (with CVs) arrive in Submissions.",
+    minRole: "editor",
+    titleField: "title",
+    columns: ["title", "department", "location", "status", "deadline"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "open" || item.status === "closed" ? `/careers/${item.id}` : null),
+    fields: [
+      { name: "title", label: "Job title", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
+      { name: "summary", label: "Summary", type: "textarea", required: true, help: "Two or three sentences shown on the vacancy card." },
+      { name: "description", label: "Full job description", type: "markdown", required: true, help: "Background, responsibilities, reporting line. Markdown supported." },
+      { name: "requirements", label: "Qualifications & requirements", type: "list", help: "One per line." },
+      { name: "location", label: "Duty station", type: "text", required: true, help: "e.g. Sokoto (with travel to project LGAs)" },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "open", label: "Open" }, { value: "closed", label: "Closed" }, { value: "draft", label: "Draft" }] },
+      { name: "department", label: "Department / unit", type: "select", sidebar: true, required: true, options: opts("Programmes", "Health & Nutrition", "Education", "Livelihood & Agriculture", "Protection & Gender", "MEAL", "Finance & Grants", "Human Resources & Administration", "Logistics & Procurement", "Safeguarding & Accountability", "Communications") },
+      { name: "employmentType", label: "Contract type", type: "select", sidebar: true, required: true, options: opts("Full-time", "Fixed-term contract", "Consultancy", "Internship", "Volunteer") },
+      { name: "reference", label: "Reference number", type: "text", sidebar: true },
+      { name: "positions", label: "Number of positions", type: "number", sidebar: true },
+      { name: "postedDate", label: "Date posted", type: "date", sidebar: true, required: true },
+      { name: "deadline", label: "Application deadline", type: "date", sidebar: true, required: true, help: "Applications close at the end of this day." },
+      { name: "attachment", label: "Job description / ToR (PDF)", type: "file", sidebar: true },
+    ],
+  },
+  tenders: {
+    name: "tenders",
+    label: "Vendor Requests",
+    singular: "Vendor request",
+    description: "Requests for quotation, tenders and expressions of interest on the Procurement page. Vendor responses arrive in Submissions.",
+    minRole: "editor",
+    titleField: "title",
+    columns: ["title", "reference", "category", "status", "deadline"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "draft" ? null : `/procurement/${item.id}`),
+    fields: [
+      { name: "title", label: "Title", type: "text", required: true, help: "e.g. Supply of dignity kits to Sokoto field office" },
+      { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
+      { name: "summary", label: "Summary", type: "textarea", required: true },
+      { name: "description", label: "Scope, specifications & instructions", type: "markdown", required: true, help: "Items/quantities, delivery location and schedule, how to submit, evaluation criteria." },
+      { name: "requirements", label: "Eligibility & documents required", type: "list", help: "One per line, e.g. CAC certificate, tax clearance." },
+      { name: "location", label: "Delivery / service location", type: "text", required: true },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "open", label: "Open" }, { value: "closed", label: "Closed" }, { value: "awarded", label: "Awarded" }, { value: "draft", label: "Draft" }] },
+      { name: "reference", label: "Reference number", type: "text", sidebar: true, required: true, help: "e.g. LHI/SOK/RFQ/2026/014" },
+      { name: "category", label: "Request type", type: "select", sidebar: true, required: true, options: opts("Request for Quotation (RFQ)", "Invitation to Tender (ITB)", "Request for Proposal (RFP)", "Expression of Interest (EOI)", "Prequalification") },
+      { name: "procurementType", label: "Category", type: "select", sidebar: true, required: true, options: opts("Goods", "Services", "Works", "Consultancy") },
+      { name: "postedDate", label: "Date published", type: "date", sidebar: true, required: true },
+      { name: "deadline", label: "Submission deadline", type: "date", sidebar: true, required: true },
+      { name: "document", label: "Solicitation pack (PDF)", type: "file", sidebar: true },
+    ],
+  },
 };
 
 export const COLLECTION_NAMES = Object.keys(COLLECTIONS) as CollectionName[];
@@ -270,7 +323,24 @@ export interface CmsSettings {
   };
 }
 
-export type SubmissionType = "contact" | "volunteer" | "consortium-eoi";
+export type SubmissionType =
+  | "contact"
+  | "volunteer"
+  | "consortium-eoi"
+  | "job-application"
+  | "vendor-registration"
+  | "tender-response"
+  | "newsletter";
+export const SUBMISSION_TYPE_LABELS: Record<SubmissionType, string> = {
+  "job-application": "Job applications",
+  "tender-response": "Vendor bids",
+  "vendor-registration": "Vendor registration",
+  "consortium-eoi": "Consortium / RFP",
+  contact: "Contact",
+  volunteer: "Volunteer",
+  newsletter: "Newsletter",
+};
+
 export type SubmissionStatus = "new" | "read" | "archived";
 
 export interface Submission {
@@ -282,6 +352,8 @@ export interface Submission {
   subject: string;
   organization?: string;
   fields: Record<string, string>;
+  /** Private uploads (CVs, quotations) served only to signed-in editors. */
+  attachments?: { filename: string; stored: string; size: number }[];
   createdAt: string;
 }
 

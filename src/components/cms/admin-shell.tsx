@@ -13,6 +13,9 @@ import {
   FileCheck2,
   FileText,
   FolderKanban,
+  GraduationCap,
+  BriefcaseBusiness,
+  Gavel,
   Handshake,
   ImageIcon,
   Inbox,
@@ -68,6 +71,19 @@ function buildNav(newSubmissions: number): NavGroup[] {
         { label: "Partners & Logos", href: "/admin/content/partners", icon: Handshake, minRole: "editor" },
         { label: "Compliance Docs", href: "/admin/content/documents", icon: FileCheck2, minRole: "editor" },
         { label: "Submissions", href: "/admin/submissions", icon: Inbox, minRole: "editor", badge: newSubmissions },
+      ],
+    },
+    {
+      label: "Recruitment & Procurement",
+      items: [
+        { label: "Jobs & Vacancies", href: "/admin/content/jobs", icon: BriefcaseBusiness, minRole: "editor" },
+        { label: "Vendor Requests", href: "/admin/content/tenders", icon: Gavel, minRole: "editor" },
+      ],
+    },
+    {
+      label: "Training",
+      items: [
+        { label: "Certificates", href: "/admin/certificates", icon: GraduationCap, minRole: "editor" },
       ],
     },
     {

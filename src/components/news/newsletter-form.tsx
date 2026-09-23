@@ -3,21 +3,19 @@
 import { useState } from "react";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 
+import { useNewsletterSignup } from "@/components/news/use-newsletter";
+
 export function NewsletterForm() {
   const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { status, error, subscribe } = useNewsletterSignup("news-updates");
+  const loading = status === "loading";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setLoading(false);
-    setSubscribed(true);
+    if (email) await subscribe(email);
   };
 
-  if (subscribed) {
+  if (status === "done") {
     return (
       <div className="rounded-xl border border-primary/20 bg-primary/10 p-4 text-center">
         <CheckCircle2 className="mx-auto h-6 w-6 text-primary" />
@@ -25,7 +23,7 @@ export function NewsletterForm() {
           Subscribed Successfully!
         </p>
         <p className="mt-1 text-[11px] text-muted-foreground">
-          You will receive the next quarterly LHI field bulletin at <strong>{email}</strong>.
+          We will send LHI news and newsletters to <strong>{email}</strong>.
         </p>
       </div>
     );
@@ -43,6 +41,7 @@ export function NewsletterForm() {
           className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
+      {error && <p role="alert" className="text-[11px] text-destructive">{error}</p>}
       <button
         type="submit"
         disabled={loading}

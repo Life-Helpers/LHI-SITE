@@ -2,16 +2,14 @@ import Link from "next/link";
 
 import { Badge, Card, formatDate, PageHeader, statusTone } from "@/components/cms/ui";
 import { requirePageUser } from "@/lib/cms/auth";
-import type { SubmissionType } from "@/lib/cms/schema";
+import { SUBMISSION_TYPE_LABELS, type SubmissionType } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
 export const metadata = { title: "Submissions" };
 
 const TYPES: { id: SubmissionType | "all"; label: string }[] = [
   { id: "all", label: "All" },
-  { id: "consortium-eoi", label: "Consortium / RFP" },
-  { id: "contact", label: "Contact" },
-  { id: "volunteer", label: "Volunteer" },
+  ...(Object.entries(SUBMISSION_TYPE_LABELS) as [SubmissionType, string][]).map(([id, label]) => ({ id, label })),
 ];
 
 export default async function SubmissionsPage({
@@ -32,7 +30,7 @@ export default async function SubmissionsPage({
     <>
       <PageHeader
         title="Submissions"
-        description="Messages from the contact form, volunteer applications and consortium / RFP expressions of interest."
+        description="Job applications, vendor bids and registrations, contact messages, volunteer sign-ups, consortium expressions of interest and newsletter subscribers."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Submissions" }]}
       />
       <Card bodyClassName="p-0">

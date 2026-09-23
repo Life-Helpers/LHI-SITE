@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { logActivity } from "@/lib/cms/activity";
+import { deletePrivateUpload } from "@/lib/cms/private-uploads";
 import {
   AuthError,
   checkSetupToken,
@@ -257,7 +258,11 @@ export async function setSubmissionStatusAction(id: string, status: SubmissionSt
 export async function deleteSubmissionAction(id: string): Promise<ActionResult> {
   return guard(async () => {
     const user = await requireUser("administrator");
-    await updateStore("submissions", (items) => ({ items: items.filter((s) => s.id !== id) }));
+    const removed = await updateStore("submissions", (items) => ({
+      items: items.filter((s) => s.id !== id),
+      result: items.find((s) => s.id === id),
+    }));
+    await Promise.all((removed?.attachments ?? []).map((a) => deletePrivateUpload(a.stored).catch(() => undefined)));
     await logActivity(user, "deleted submission", id);
     revalidatePath("/admin", "layout");
     return { ok: true };
