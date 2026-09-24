@@ -44,10 +44,21 @@ const THEMATIC_ICONS: Record<ThematicPillarId, React.ElementType> = {
   protection: ShieldCheck,
 };
 
+const PAGE_SIZE = 12;
+
 export function InterventionsList({ projects, initialFilter = "all" }: InterventionsListProps) {
   const [selectedPillar, setSelectedPillar] = useState<ThematicPillarId | "all">(initialFilter);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<"all" | "Active" | "Completed" | "Multi-Year">("all");
+  // Render the first batch of cards; the rest load on request so phones don't build 38 cards at once.
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const filterKey = `${selectedPillar}|${selectedStatus}|${searchQuery}`;
+  const [shownFor, setShownFor] = useState(filterKey);
+  if (shownFor !== filterKey) {
+    // A new filter or search starts again from the first batch.
+    setShownFor(filterKey);
+    setVisibleCount(PAGE_SIZE);
+  }
 
   const filterCounts = useMemo(() => {
     const counts: Record<string, number> = { all: projects.length };
@@ -302,8 +313,8 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
       {/* Results Header */}
       <div className="flex items-center justify-between border-b border-border pb-3 text-xs text-muted-foreground">
         <div>
-          Showing <span className="font-semibold text-foreground">{filteredProjects.length}</span> of{" "}
-          <span className="font-semibold text-foreground">{projects.length}</span> projects &amp; interventions
+          <span className="font-semibold text-foreground">{filteredProjects.length}</span> of{" "}
+          <span className="font-semibold text-foreground">{projects.length}</span> projects &amp; interventions match
           {selectedPillar !== "all" && (
             <> in thematic area <strong className="text-primary">{THEMATIC_PILLARS[selectedPillar].name}</strong></>
           )}
@@ -341,7 +352,7 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {filteredProjects.map((project, idx) => {
+          {filteredProjects.slice(0, visibleCount).map((project, idx) => {
             return (
               <article
                 key={project.id}
@@ -483,6 +494,20 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
               </article>
             );
           })}
+        </div>
+      )}
+      {filteredProjects.length > visibleCount && (
+        <div className="mt-10 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
+            className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-background px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-primary hover:text-primary-foreground"
+          >
+            Show more projects
+          </button>
+          <p className="text-xs text-muted-foreground">
+            Showing {visibleCount} of {filteredProjects.length}
+          </p>
         </div>
       )}
     </div>

@@ -147,10 +147,16 @@ export const OPERATIONAL_STATES: OperationalState[] = [
   },
 ];
 
-export function getInterventionsForState(interventions: InterventionProject[], id: OperationalStateId) {
+export function getInterventionsForState<T extends Pick<InterventionProject, "states">>(interventions: T[], id: OperationalStateId) {
   return interventions.filter((project) => project.states.includes(id));
 }
 
-export function getDonorsForState(interventions: InterventionProject[], id: OperationalStateId) {
+export function getDonorsForState<T extends Pick<InterventionProject, "states" | "donor">>(interventions: T[], id: OperationalStateId) {
   return Array.from(new Set(getInterventionsForState(interventions, id).map((project) => project.donor)));
 }
+
+/** The few project fields the operational map needs; passing only these keeps the page payload small. */
+export type MapProject = Pick<InterventionProject, "id" | "shortTitle" | "states" | "donor">;
+
+export const toMapProjects = (projects: InterventionProject[]): MapProject[] =>
+  projects.map(({ id, shortTitle, states, donor }) => ({ id, shortTitle, states, donor }));

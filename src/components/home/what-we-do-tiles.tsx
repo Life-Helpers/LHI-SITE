@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   Sparkles,
@@ -117,8 +115,6 @@ const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
 
 export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record<string, number>> }) {
   const { t } = useLocale();
-  const shouldReduceMotion = useReducedMotion();
-  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
 
   return (
     <section
@@ -166,16 +162,7 @@ export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record
         {/* Thematic area cards */}
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {strategicPillars.map((pillar, index) => (
-            <JellyCard
-              count={projectCounts[pillar.id] ?? 0}
-              key={pillar.id}
-              pillar={pillar}
-              index={index}
-              isHovered={hoveredCardId === pillar.id}
-              onHover={() => setHoveredCardId(pillar.id)}
-              onLeave={() => setHoveredCardId(null)}
-              reducedMotion={!!shouldReduceMotion}
-            />
+            <JellyCard count={projectCounts[pillar.id] ?? 0} key={pillar.id} pillar={pillar} index={index} />
           ))}
         </div>
       </div>
@@ -183,76 +170,12 @@ export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record
   );
 }
 
-function JellyCard({
-  pillar,
-  index,
-  isHovered,
-  onHover,
-  onLeave,
-  reducedMotion,
-  count,
-}: {
-  pillar: StrategicPillar;
-  count: number;
-  index: number;
-  isHovered: boolean;
-  onHover: () => void;
-  onLeave: () => void;
-  reducedMotion: boolean;
-}) {
+function JellyCard({ pillar, index, count }: { pillar: StrategicPillar; count: number; index: number }) {
   const Icon = pillar.icon;
 
-  // Spring physics jelly animation configuration
-  const springTransition = {
-    type: "spring" as const,
-    stiffness: 380,
-    damping: 12,
-    mass: 0.8,
-  };
-
-  const jellyVariants = {
-    rest: {
-      scale: 1,
-      y: 0,
-      rotate: 0,
-      borderRadius: "24px",
-      transition: springTransition,
-    },
-    hover: reducedMotion
-      ? { y: -4 }
-      : {
-          scale: 1.035,
-          y: -8,
-          rotate: index % 2 === 0 ? [-0.8, 1.2, -0.6, 0] : [0.8, -1.2, 0.6, 0],
-          borderRadius: [
-            "24px",
-            "30px 18px 28px 20px",
-            "20px 28px 18px 30px",
-            "24px",
-          ],
-          transition: {
-            ...springTransition,
-            rotate: { duration: 0.5, ease: "easeInOut" },
-            borderRadius: { duration: 0.7, ease: "easeInOut" },
-          },
-        },
-    tap: {
-      scale: 0.95,
-      y: 2,
-      rotate: 0,
-      transition: { type: "spring" as const, stiffness: 500, damping: 18 },
-    },
-  };
-
   return (
-    <motion.div
-      variants={jellyVariants}
-      initial="rest"
-      animate={isHovered ? "hover" : "rest"}
-      whileTap="tap"
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-      className="group relative flex flex-col justify-between overflow-hidden border border-border/80 bg-card p-6 shadow-xs cursor-pointer transition-colors duration-300 hover:border-primary/60 hover:shadow-xl dark:bg-[#070e1c]"
+    <div
+      className={`jelly-card ${index % 2 === 0 ? "" : "jelly-card--alt"} group relative flex flex-col justify-between overflow-hidden border border-border/80 bg-card p-6 shadow-xs cursor-pointer transition-colors duration-300 hover:border-primary/60 hover:shadow-xl dark:bg-[#070e1c]`}
     >
       {/* Dynamic Specular Jelly Sheen Overlay */}
       <div
@@ -279,20 +202,11 @@ function JellyCard({
 
         {/* Icon & Title */}
         <div className="relative z-10 mt-6 flex items-start gap-4">
-          <motion.div
-            animate={
-              isHovered && !reducedMotion
-                ? {
-                    scale: [1, 1.15, 0.95, 1.08, 1],
-                    rotate: [0, -6, 6, -2, 0],
-                  }
-                : { scale: 1, rotate: 0 }
-            }
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm shadow-primary/30"
+          <div
+            className="jelly-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm shadow-primary/30"
           >
             <Icon className="h-6 w-6" aria-hidden="true" />
-          </motion.div>
+          </div>
 
           <div className="min-w-0">
             <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
@@ -337,15 +251,12 @@ function JellyCard({
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary group-hover:underline"
         >
           <span>Explore Thematic Area</span>
-          <motion.span
-            animate={isHovered ? { x: 4 } : { x: 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-          >
+          <span className="transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:translate-x-1">
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </motion.span>
+          </span>
         </Link>
         <span className="text-[10px] text-muted-foreground">Learn more</span>
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -109,7 +109,14 @@ async function readJson<T>(name: string, fallback: () => T): Promise<T> {
     cache.set(file, { mtimeMs, data });
     return structuredClone(data);
   } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === "ENOENT") return fallback();
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      // No file yet: build the seed content once and reuse it until the first save.
+      const hit = cache.get(file);
+      if (hit && hit.mtimeMs === -1) return structuredClone(hit.data as T);
+      const data = fallback();
+      cache.set(file, { mtimeMs: -1, data });
+      return structuredClone(data);
+    }
     throw err;
   }
 }

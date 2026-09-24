@@ -63,13 +63,25 @@ export default async function Home() {
       <WhatWeDoTiles projectCounts={projectCounts} />
       <FeatureStory slides={featureSlides} />
       <BeforeAfterSection />
-      <OperationalMapSection />
+      <div className="defer-render">
+        <OperationalMapSection />
+      </div>
       <UpcomingEvents events={events.slice(0, 5)} today={todayInLagos()} />
-      <LatestFromLHI />
-      <RadioBanner episodes={episodes.slice(0, 12).map(toRadioEpisode)} />
-      <TestimonialsSection />
-      <SocialFeedsSection posts={posts.slice(0, 4)} />
-      <PartnersStrip partners={partners} />
+      <div className="defer-render">
+        <LatestFromLHI />
+      </div>
+      <div className="defer-render">
+        <RadioBanner episodes={episodes.slice(0, 12).map(toRadioEpisode)} />
+      </div>
+      <div className="defer-render">
+        <TestimonialsSection />
+      </div>
+      <div className="defer-render">
+        <SocialFeedsSection posts={posts.slice(0, 4)} />
+      </div>
+      <div className="defer-render">
+        <PartnersStrip partners={partners} />
+      </div>
       <PhilosophyQuote />
       <NewsletterSubscribe />
     </main>

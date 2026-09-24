@@ -6,10 +6,10 @@ import nigeriaMap from "@svg-maps/nigeria";
 import { ArrowRight, Building2, Handshake, Layers, MapPin, Users, X } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
-import type { InterventionProject } from "@/data/interventions-data";
 import {
   getDonorsForState,
   getInterventionsForState,
+  type MapProject,
   type OperationalState,
   type OperationalStateId,
 } from "@/data/operational-states";
@@ -31,7 +31,7 @@ export function OperationalMap({
   className = "",
 }: {
   states: OperationalState[];
-  interventions: InterventionProject[];
+  interventions: MapProject[];
   className?: string;
 }) {
   const STATE_BY_ID = useMemo(() => new Map(states.map((s) => [s.id as string, s])), [states]);

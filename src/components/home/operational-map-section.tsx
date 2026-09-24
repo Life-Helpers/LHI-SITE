@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { OperationalMap } from "@/components/operational-map";
+import { toMapProjects } from "@/data/operational-states";
 import { getInterventions, getStates } from "@/lib/cms/content";
 
 export async function OperationalMapSection() {
@@ -33,7 +34,7 @@ export async function OperationalMapSection() {
             All interventions <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
-        <OperationalMap states={states} interventions={interventions} />
+        <OperationalMap states={states} interventions={toMapProjects(interventions)} />
       </div>
     </section>
   );

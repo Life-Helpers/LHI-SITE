@@ -1,4 +1,6 @@
-import { open, stat } from "node:fs/promises";
+import { createReadStream } from "node:fs";
+import { stat } from "node:fs/promises";
+import { Readable } from "node:stream";
 import path from "node:path";
 
 import { ALLOWED_MEDIA } from "@/lib/cms/media-types";
@@ -14,18 +16,23 @@ export async function GET(req: Request, { params }: { params: Promise<{ file: st
   if (!mimeType || name !== file) return new Response("Not found", { status: 404 });
   const full = path.join(UPLOADS_DIR, name);
   let size: number;
+  let mtime: Date;
   try {
-    size = (await stat(full)).size;
+    ({ size, mtime } = await stat(full));
   } catch {
     return new Response("Not found", { status: 404 });
   }
+  const etag = `W/"${size.toString(16)}-${mtime.getTime().toString(16)}"`;
 
   const headers: Record<string, string> = {
     "Content-Type": mimeType,
     "Accept-Ranges": "bytes",
     "Cache-Control": "public, max-age=31536000, immutable",
     "X-Content-Type-Options": "nosniff",
+    ETag: etag,
+    "Last-Modified": mtime.toUTCString(),
   };
+  if (req.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers });
 
   let start = 0;
   let end = size - 1;
@@ -47,12 +54,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ file: st
   const length = end - start + 1;
   headers["Content-Length"] = String(length);
 
-  const handle = await open(full, "r");
-  try {
-    const buffer = Buffer.alloc(length);
-    await handle.read(buffer, 0, length, start);
-    return new Response(new Uint8Array(buffer), { status, headers });
-  } finally {
-    await handle.close();
-  }
+  // Stream from disk so large audio and video files never sit whole in memory.
+  const stream = Readable.toWeb(createReadStream(full, { start, end })) as ReadableStream<Uint8Array>;
+  return new Response(stream, { status, headers });
 }

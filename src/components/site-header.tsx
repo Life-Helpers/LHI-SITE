@@ -686,6 +686,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
             alt="Life Helpers Initiative"
             width={1533}
             height={440}
+            sizes="160px"
             priority
             referrerPolicy="no-referrer"
             className="h-9 sm:h-10 w-auto transition-all duration-300 hover:scale-[1.02]"

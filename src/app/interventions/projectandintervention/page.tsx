@@ -17,6 +17,7 @@ import {
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { InterventionsList } from "@/components/interventions-list";
 import { OperationalMap } from "@/components/operational-map";
+import { toMapProjects } from "@/data/operational-states";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { getInterventions, getStates } from "@/lib/cms/content";
 
@@ -153,7 +154,7 @@ export default async function ProjectsAndInterventionsPage() {
           <h2 id="map-heading" className="mb-8 font-serif-display text-3xl font-light text-foreground">
             Interventions by <em className="italic text-primary">state.</em>
           </h2>
-          <OperationalMap states={states} interventions={projects} />
+          <OperationalMap states={states} interventions={toMapProjects(projects)} />
         </div>
       </section>
 

@@ -70,6 +70,7 @@ export function SiteFooter() {
                 alt={siteConfig.name}
                 width={1533}
                 height={440}
+                sizes="160px"
                 referrerPolicy="no-referrer"
                 className="h-9 w-auto sm:h-10"
               />
