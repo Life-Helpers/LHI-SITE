@@ -10,13 +10,15 @@ import { LHI_PHOTOS, type LhiPhotoKey } from "@/data/lhi-photos";
 /**
  * "Before & After" stories. Every before/after statement is taken from LHI's project
  * magazines and newsletter; the photo is the person or place in the story. The
- * "before" side shows the same photo faded, because we only publish real LHI photos.
+ * "before" side uses a real earlier photo when we have one, otherwise the same photo faded.
  */
 const STORIES: {
   id: string;
   name: string;
   place: string;
   photo: LhiPhotoKey;
+  /** A real photo from before the support; when missing, the "before" side shows the main photo faded. */
+  beforePhoto?: LhiPhotoKey;
   before: { title: string; text: string };
   after: { title: string; text: string };
   href: string;
@@ -26,6 +28,7 @@ const STORIES: {
     name: "Jafaro Baro",
     place: "Katsina LGA, Katsina State",
     photo: "jafaroCabbage",
+    beforePhoto: "jafaroFieldBefore",
     before: { title: "One harvest, low prices", text: "Poor seeds took 80 days to mature; his cabbages sold for ₦175–₦200 each." },
     after: {
       title: "Two harvests, three times the price",
@@ -88,6 +91,7 @@ export function BeforeAfterSection() {
   const [position, setPosition] = useState(50);
   const story = STORIES[active];
   const photo = LHI_PHOTOS[story.photo];
+  const beforePhoto = story.beforePhoto ? LHI_PHOTOS[story.beforePhoto] : null;
 
   return (
     <section aria-labelledby="before-after-heading" className="border-t border-border/70 py-20 sm:py-24">
@@ -99,7 +103,7 @@ export function BeforeAfterSection() {
               The difference, <em className="italic text-primary">in their words.</em>
             </h2>
             <p className="mt-3 text-base text-muted-foreground">
-              Drag the slider to see life before and after LHI&apos;s support. Every statement comes from our project magazines and newsletter.
+              Drag the slider to see life before LHI&apos;s support and now. Every statement comes from our project magazines and newsletter.
             </p>
           </div>
           <div role="tablist" aria-label="Choose a story" className="flex flex-wrap gap-2">
@@ -128,12 +132,16 @@ export function BeforeAfterSection() {
             {/* After (full colour) */}
             <Image key={`after-${story.id}`} src={photo.src} alt={photo.alt} fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover" />
             <span className="absolute bottom-5 right-5 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground shadow sm:bottom-7 sm:right-7">
-              After
+              Now
             </span>
 
-            {/* Before (same photo, faded), clipped to the slider position */}
+            {/* Before (an earlier photo, or the same photo faded), clipped to the slider position */}
             <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }} aria-hidden="true">
-              <Image src={photo.src} alt="" fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover grayscale sepia-[.35] brightness-[.55] contrast-[.9]" />
+              {beforePhoto ? (
+                <Image key={`before-${story.id}`} src={beforePhoto.src} alt="" fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover" />
+              ) : (
+                <Image src={photo.src} alt="" fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover grayscale sepia-[.35] brightness-[.55] contrast-[.9]" />
+              )}
               <span className="absolute bottom-5 left-5 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-foreground shadow sm:bottom-7 sm:left-7">
                 Before
               </span>
@@ -146,7 +154,7 @@ export function BeforeAfterSection() {
               </span>
             </div>
             <label className="sr-only" htmlFor="before-after-range">
-              Compare before and after for {story.name}
+              Compare before and now for {story.name}
             </label>
             <input
               id="before-after-range"
@@ -155,7 +163,7 @@ export function BeforeAfterSection() {
               max={100}
               value={position}
               onChange={(e) => setPosition(Number(e.target.value))}
-              aria-valuetext={position > 50 ? "Showing mostly before" : "Showing mostly after"}
+              aria-valuetext={position > 50 ? "Showing mostly before" : "Showing mostly now"}
               className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
             />
           </div>
@@ -170,7 +178,7 @@ export function BeforeAfterSection() {
                 <p className="mt-1 text-sm text-muted-foreground">{story.before.text}</p>
               </div>
               <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-primary">After</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Now</p>
                 <p className="mt-1 font-semibold text-foreground">{story.after.title}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{story.after.text}</p>
               </div>

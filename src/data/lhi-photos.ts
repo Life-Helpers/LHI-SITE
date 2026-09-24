@@ -16,6 +16,7 @@ export const LHI_PHOTOS = {
   farmerWomanHarvest: p("farmer-woman-harvest", "Smiling woman farmer holding fresh produce on her farm in Sokoto State"),
   maizeFarmerWoman: p("maize-farmer-woman", "Woman farmer tending her irrigated maize and onion plot"),
   jafaroCabbage: p("jafaro-cabbage-harvest", "Farmer beaming as he holds a large cabbage from his dry-season harvest"),
+  jafaroFieldBefore: p("jafaro-cabbage-field-before", "LHI and WFP field officers walking between rows of young cabbages during a farm visit"),
   cabbageFarmerWaving: p("cabbage-farmer-waving", "Smallholder farmer waving from his thriving cabbage field"),
   cabbageFarm: p("cabbage-farm", "Farmer inspecting healthy cabbages grown with improved seeds"),
   riceField: p("rice-field", "Farmer walking through a lush green rice field"),
