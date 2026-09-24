@@ -6,10 +6,10 @@ import { getCurrentLearner, updateLearnerProgress } from "@/lib/training/learner
 
 export const dynamic = "force-dynamic";
 
-/** GET ?course=id → the signed-in learner's progress in that course. */
+/** GET ?course=id → the signed-in learner's progress in that course (null for visitors who are not signed in). */
 export async function GET(req: NextRequest) {
   const learner = await getCurrentLearner();
-  if (!learner) return NextResponse.json({ error: "Sign in to continue." }, { status: 401 });
+  if (!learner) return NextResponse.json({ progress: null, signedIn: false }, { headers: { "Cache-Control": "no-store" } });
   const courseId = req.nextUrl.searchParams.get("course") ?? "";
   return NextResponse.json({ progress: learner.progress[courseId] ?? { completed: [] } }, { headers: { "Cache-Control": "no-store" } });
 }

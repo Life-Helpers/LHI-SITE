@@ -54,13 +54,13 @@ export default async function MagazineReaderPage({ params }: { params: Promise<{
 
         <section className="px-4 py-14 sm:px-0" aria-labelledby="more-editions">
           <h2 id="more-editions" className="font-serif-display text-2xl font-light text-foreground">More editions</h2>
-          <ul className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3">
+          <ul className="mt-6 grid grid-cols-1 gap-6 min-[480px]:grid-cols-2 sm:grid-cols-3">
             {others.map((m) => (
               <li key={m.slug}>
                 <Link href={`/project-magazines/${m.slug}`} className="group flex gap-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={pageImage(m, 1)} alt="" loading="lazy" className="h-28 w-20 shrink-0 rounded object-cover shadow-md" />
-                  <span>
+                  <span className="min-w-0 break-words">
                     <span className="block text-[11px] font-semibold uppercase tracking-wider text-accent">{m.kind}</span>
                     <span className="mt-1 block text-sm font-semibold text-foreground group-hover:text-primary">{m.title}</span>
                   </span>
