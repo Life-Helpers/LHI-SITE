@@ -42,7 +42,7 @@ function NavUnderlineLink({
   return (
     <Link
       href={href}
-      className={`group relative px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+      className={`group relative whitespace-nowrap px-2 2xl:px-3 py-2 text-[11px] 2xl:text-[12px] uppercase tracking-[0.1em] 2xl:tracking-[0.14em] font-semibold ${
         insideHero ? "text-white/90 hover:text-white" : "text-foreground/80 hover:text-primary"
       } transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring ${className}`}
     >
@@ -641,15 +641,15 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
           />
         </Link>
 
-        <NavigationMenu className="hidden md:flex" aria-label="Primary">
-          <NavigationMenuList className="gap-2 lg:gap-4">
+        <NavigationMenu className="hidden xl:flex" aria-label="Primary">
+          <NavigationMenuList className="gap-0.5 2xl:gap-3">
             <NavigationMenuItem>
               <NavUnderlineLink href="/" insideHero={isHeroGlass}>{t.nav.home}</NavUnderlineLink>
             </NavigationMenuItem>
 
             {/* WHO WE ARE MEGA MENU */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className={`px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+              <NavigationMenuTrigger className={`whitespace-nowrap px-2 2xl:px-3 py-2 text-[11px] 2xl:text-[12px] uppercase tracking-[0.1em] 2xl:tracking-[0.14em] font-semibold ${
                 isHeroGlass ? "text-white/90 hover:text-white data-[state=open]:text-white" : "text-foreground/80 hover:text-primary data-[state=open]:text-primary"
               } transition-colors`}>
                 {t.nav.whoWeAre}
@@ -661,7 +661,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
 
             {/* WHAT WE DO MEGA MENU */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className={`px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+              <NavigationMenuTrigger className={`whitespace-nowrap px-2 2xl:px-3 py-2 text-[11px] 2xl:text-[12px] uppercase tracking-[0.1em] 2xl:tracking-[0.14em] font-semibold ${
                 isHeroGlass ? "text-white/90 hover:text-white data-[state=open]:text-white" : "text-foreground/80 hover:text-primary data-[state=open]:text-primary"
               } transition-colors`}>
                 {t.nav.whatWeDo}
@@ -673,7 +673,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
 
             {/* IMPACT MEGA MENU */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className={`px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+              <NavigationMenuTrigger className={`whitespace-nowrap px-2 2xl:px-3 py-2 text-[11px] 2xl:text-[12px] uppercase tracking-[0.1em] 2xl:tracking-[0.14em] font-semibold ${
                 isHeroGlass ? "text-white/90 hover:text-white data-[state=open]:text-white" : "text-foreground/80 hover:text-primary data-[state=open]:text-primary"
               } transition-colors`}>
                 {t.nav.impact}
@@ -685,7 +685,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
 
             {/* GET INVOLVED MEGA MENU */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className={`px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+              <NavigationMenuTrigger className={`whitespace-nowrap px-2 2xl:px-3 py-2 text-[11px] 2xl:text-[12px] uppercase tracking-[0.1em] 2xl:tracking-[0.14em] font-semibold ${
                 isHeroGlass ? "text-white/90 hover:text-white data-[state=open]:text-white" : "text-foreground/80 hover:text-primary data-[state=open]:text-primary"
               } transition-colors`}>
                 {t.nav.getInvolved}
@@ -733,7 +733,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
               isHeroGlass
                 ? "border-white/30 text-white hover:bg-white/10"
                 : "border-primary/30 dark:border-white/20 text-primary dark:text-accent hover:bg-primary/5"
-            } md:hidden transition-colors`}
+            } xl:hidden transition-colors`}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
             onClick={() => setMenuOpen((open) => !open)}
@@ -758,7 +758,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
             isHeroGlass
               ? "border-white/20 bg-slate-950/95 text-white rounded-b-2xl"
               : "border-border/80 bg-background/95 dark:bg-[#050b18]/95 text-foreground"
-          } backdrop-blur-2xl px-6 py-4 md:hidden max-h-[80vh] overflow-y-auto shadow-2xl`}
+          } backdrop-blur-2xl px-6 py-4 xl:hidden max-h-[80vh] overflow-y-auto shadow-2xl`}
         >
           <Link
             href="/"

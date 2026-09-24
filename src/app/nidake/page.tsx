@@ -5,6 +5,7 @@ import { CheckCircle2, Heart, Leaf, ShieldCheck, Sparkles, Users } from "lucide-
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { NidakeImpactCalculator } from "@/components/nidake/impact-calculator";
+import { NidakeVideo } from "@/components/nidake/nidake-video";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { donateHrefForKits } from "@/data/nidake";
 import { getSettings } from "@/lib/cms/content";
@@ -90,6 +91,8 @@ export default async function NidakePage() {
           </div>
         </div>
       </section>
+
+      <NidakeVideo />
 
       <NidakeImpactCalculator kit={nidake} />
 
