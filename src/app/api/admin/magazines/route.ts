@@ -7,6 +7,7 @@ import { AuthError, requireUser } from "@/lib/cms/auth";
 import { slugify } from "@/lib/cms/schema";
 import { readStore, UPLOADS_DIR, updateStore } from "@/lib/cms/store";
 import { revalidatePath } from "next/cache";
+import { optimizeUpload } from "@/lib/media/optimize";
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     }
     const bytes = Buffer.from(await file.arrayBuffer());
     if (bytes.subarray(0, 5).toString() !== "%PDF-") return NextResponse.json({ error: "That file is not a PDF." }, { status: 400 });
-    await writeFile(path.join(UPLOADS_DIR, `mag-${slug}.pdf`), bytes);
+    await writeFile(path.join(UPLOADS_DIR, `mag-${slug}.pdf`), (await optimizeUpload(bytes, "application/pdf")).buffer);
     return NextResponse.json({ ok: true, url: `/media/mag-${slug}.pdf` });
   }
 

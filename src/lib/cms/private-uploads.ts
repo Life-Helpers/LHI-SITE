@@ -5,6 +5,7 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { DATA_DIR } from "@/lib/cms/store";
+import { optimizeUpload } from "@/lib/media/optimize";
 
 /**
  * Private uploads (CVs, vendor quotations). Stored outside the public uploads
@@ -36,9 +37,10 @@ export async function savePrivateUpload(file: File, folder: string): Promise<Pri
   const safeFolder = folder.replace(/[^a-z0-9-]/gi, "");
   const stored = `${safeFolder}/${randomUUID()}.${kind.ext}`;
   await mkdir(path.join(PRIVATE_DIR, safeFolder), { recursive: true });
-  await writeFile(path.join(PRIVATE_DIR, stored), buffer);
+  const { buffer: optimized } = await optimizeUpload(buffer, kind.mime);
+  await writeFile(path.join(PRIVATE_DIR, stored), optimized);
   const filename = file.name.replace(/[^\w.\- ()]/g, "_").slice(0, 120) || `attachment.${kind.ext}`;
-  return { filename, stored, size: file.size };
+  return { filename, stored, size: optimized.length };
 }
 
 function resolveStored(stored: string) {

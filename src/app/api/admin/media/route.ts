@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { logActivity } from "@/lib/cms/activity";
 import { AuthError, requireUser } from "@/lib/cms/auth";
 import { ALLOWED_MEDIA, maxBytesFor } from "@/lib/cms/media-types";
+import { optimizeUpload } from "@/lib/media/optimize";
 import type { MediaItem } from "@/lib/cms/schema";
 import { readStore, UPLOADS_DIR, updateStore } from "@/lib/cms/store";
 
@@ -51,13 +52,14 @@ export async function POST(req: NextRequest) {
       .replace(/^-+|-+$/g, "")
       .slice(0, 60) || "file";
     const filename = `${base}-${randomUUID().slice(0, 8)}.${ext}`;
-    await writeFile(path.join(UPLOADS_DIR, filename), Buffer.from(await file.arrayBuffer()));
+    const { buffer } = await optimizeUpload(Buffer.from(await file.arrayBuffer()), mimeType);
+    await writeFile(path.join(UPLOADS_DIR, filename), buffer);
     saved.push({
       id: randomUUID(),
       filename,
       url: `/media/${filename}`,
       mimeType,
-      size: file.size,
+      size: buffer.length,
       alt: String(form?.get("alt") ?? ""),
       uploadedBy: user.name,
       uploadedAt: new Date().toISOString(),
