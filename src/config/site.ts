@@ -1,3 +1,26 @@
+/**
+ * The site's public address. A blank or malformed NEXT_PUBLIC_SITE_URL falls back to the
+ * Vercel deployment address (on Vercel) or lhinigeria.org, so builds never fail on it.
+ */
+function resolveSiteUrl() {
+  const candidates = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`,
+    process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
+  ];
+  for (const raw of candidates) {
+    const value = raw?.trim();
+    if (!value) continue;
+    try {
+      const url = new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`);
+      return url.origin;
+    } catch {
+      /* ignore malformed values */
+    }
+  }
+  return "https://lhinigeria.org";
+}
+
 export const siteConfig = {
   name: "Life Helpers Initiative",
   shortName: "LHI",
@@ -21,7 +44,7 @@ export const siteConfig = {
   ],
   description:
     "Life Helpers Initiative (LHI) is a Nigerian non-governmental organisation, founded in 2004, working in the development and humanitarian sectors to reach and support marginalized children, youth, women, men and people living with disabilities through community structures across 11 states.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://lhinigeria.org",
+  url: resolveSiteUrl(),
   foundingDate: "2004-10-01",
   cacRegistration: "CAC/IT/25232 (September 2007)",
   postalAddress: "P. O. Box 1908, Sokoto 840001, Sokoto State, Nigeria",
