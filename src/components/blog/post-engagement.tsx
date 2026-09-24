@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, Heart, Link2, Loader2, Mail, MessageCircle, Share2 } from "lucide-react";
-import { siFacebook, siPinterest, siReddit, siTelegram, siWhatsapp, siX } from "simple-icons";
+import { siFacebook, siPinterest, siReddit, siTelegram, siWhatsapp, siX } from "@/data/brand-icons";
 
 import { LINKEDIN_PATH, SocialIcon } from "@/components/social-links";
 import { Turnstile, turnstileHeaders } from "@/components/forms/turnstile";

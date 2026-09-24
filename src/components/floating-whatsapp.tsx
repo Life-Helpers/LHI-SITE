@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { siWhatsapp } from "simple-icons";
+import { siWhatsapp } from "@/data/brand-icons";
 import { MessageCircle, ShieldAlert, X, Phone, Mail, CheckCircle2, ChevronRight, ExternalLink } from "lucide-react";
 import { siteConfig } from "@/config/site";
 

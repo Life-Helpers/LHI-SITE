@@ -1,4 +1,4 @@
-import { siFacebook, siInstagram, siLinktree, siX, siYoutube } from "simple-icons";
+import { siFacebook, siInstagram, siLinktree, siX, siYoutube } from "@/data/brand-icons";
 
 import { siteConfig } from "@/config/site";
 
