@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { BookMarked, Download, FileSpreadsheet, HeartPulse, PiggyBank, Sprout, Tractor } from "lucide-react";
 
+import { Infographics } from "@/components/fact-sheet/infographics";
 import { ProportionBars, StatTile } from "@/components/fact-sheet/proportion-bars";
 import { SlideViewer } from "@/components/fact-sheet/slide-viewer";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
@@ -12,7 +13,7 @@ import { LHI_PHOTOS } from "@/data/lhi-photos";
 export const metadata: Metadata = {
   title: "Fact Sheet",
   description:
-    "Key results of LHI's FCDO/WFP Resilience Building and Smallholder Farmers Support Project in Sokoto and Katsina, and the Integrated Health Program presentation.",
+    "LHI at a glance in two infographics, key results of LHI's FCDO/WFP Resilience Building and Smallholder Farmers Support Project in Sokoto and Katsina, and the Integrated Health Program presentation.",
 };
 
 const n = (v: number) => v.toLocaleString("en-GB");
@@ -40,6 +41,9 @@ export default function FactSheetPage() {
 
       <nav aria-label="On this page" className="border-b border-border bg-background">
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 sm:px-6 lg:px-8">
+          <a href="#at-a-glance" className="shrink-0 rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-foreground hover:border-primary hover:text-primary">
+            LHI at a glance
+          </a>
           <a href="#resilience" className="shrink-0 rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-foreground hover:border-primary hover:text-primary">
             Resilience project (FCDO/WFP)
           </a>
@@ -58,7 +62,13 @@ export default function FactSheetPage() {
         </div>
       </nav>
 
-      <section id="resilience" aria-labelledby="resilience-heading" className="scroll-mt-32 py-16 md:py-20">
+      <section id="at-a-glance" aria-labelledby="infographics-heading" className="scroll-mt-32 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <Infographics />
+        </div>
+      </section>
+
+      <section id="resilience" aria-labelledby="resilience-heading" className="scroll-mt-32 border-t border-border py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">

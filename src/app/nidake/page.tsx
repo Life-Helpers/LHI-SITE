@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { CheckCircle2, Heart, Leaf, ShieldCheck, Sparkles, Users } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { NidakeImpactCalculator } from "@/components/nidake/impact-calculator";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { donateHrefForKits } from "@/data/nidake";
 import { getSettings } from "@/lib/cms/content";
 
@@ -117,6 +119,19 @@ export default async function NidakePage() {
                   <CheckCircle2 size={14} className="text-primary shrink-0" />
                   <span>Dismantling cultural stigmas and taboos through community dialogues.</span>
                 </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 pt-4">
+                {[
+                  { ...LHI_PHOTOS.nidakePadEducation, caption: "NIDAKE pad education: breaking taboos and opening conversations." },
+                  { ...LHI_PHOTOS.nidakePadsGirls, caption: "Restoring confidence and hygiene, one pad at a time." },
+                ].map((p) => (
+                  <figure key={p.src} className="overflow-hidden rounded-xl border border-border bg-card">
+                    <div className="relative aspect-[4/3]">
+                      <Image src={p.src} alt={p.alt} fill sizes="(min-width: 1024px) 230px, 50vw" className="object-cover" />
+                    </div>
+                    <figcaption className="px-2.5 py-2 text-[11px] leading-snug text-muted-foreground">{p.caption}</figcaption>
+                  </figure>
+                ))}
               </div>
             </div>
 

@@ -8,7 +8,8 @@ import type { CmsPost } from "@/lib/cms/types";
  * so under LHI's Child Safeguarding Policy it is not republished and no identifying
  * details are used. Also: Helpers Digest December 2023 (IPT-G champions of change),
  * the IHP success stories compendium, "Reaching for the Stars" (September 2021) and
- * "CBHVs, Agents of Change" (4th bulletin, September 2019).
+ * "CBHVs, Agents of Change" (4th bulletin, September 2019) and Vol. 3 "G4G: Achieving
+ * Beyond School Attendance & Retention" (November 2018).
  * Seeded as CMS posts; editable in Admin → Posts.
  */
 
@@ -388,6 +389,44 @@ She found the courage to tell her parents she wanted to go back to school, promi
 G4G activities this quarter included quarterly review meetings with G4G reading facilitators, monthly review meetings with G4G mentors, a spelling bee and reading festival, supportive supervision for G4G and He4She, and the biannual G4G radio programme.
 
 [Read the flipbook](/project-magazines/helpers-digest-reaching-for-the-stars) · [Download the PDF](/documents/helpers-digest-reaching-for-the-stars.pdf)`,
+  },
+
+  /* ------------------------------------------------ Vol. 3: G4G, Achieving Beyond School, November 2018 */
+  {
+    ...base,
+    id: "digest-g4g-achieving-beyond-school",
+    slug: "g4g-achieving-beyond-school-zamfara",
+    title: "G4G: Achieving Beyond School Attendance and Retention in Zamfara",
+    category: "Success Stories",
+    date: "2018-11-12",
+    featuredImage: LHI_PHOTOS.g4gZamfaraSkills.src,
+    tags: ["Education", "Girls' education", "G4G", "UNICEF", "UK aid", "Zamfara", "Vocational skills", "Helpers Digest"],
+    excerpt:
+      "In Shinkafi LGA, Zamfara State, Girls for Girls members learned leadership, life skills and crafts. Three girls now make beads and slippers, and one teaches others.",
+    updatedAt: "2018-11-12",
+    content: `Education is said to be the only meal ticket we have in life. That is not yet convincing to some communities in Northern Nigeria, where a child's gender can decide whether she goes to school. Every child deserves to be treated well irrespective of gender.
+
+To tackle low enrolment and retention of girls in school in **Zamfara State**, **UNICEF**, with support from **UK aid**, works with **Life Helpers Initiative** on the **Girls' Education Programme**. One of its strategies is **Girls for Girls (G4G)**: in-school groups that help girls take part in their education, build support for them, foster common bonds and improve their learning. G4G is linked to the **Mothers' Association**, the group of mothers in each community.
+
+## Beyond attendance
+
+After girls enrolled in G4G groups, their group leaders attended a **five-day leadership training** covering health topics, basic leadership skills and other life skills. A key part was **vocational skills training**, to help the girls become self-sufficient.
+
+## Three girls from Jangeru, Shinkafi LGA
+
+**Nasara Shittu**, 13, from Ummu Hattu Mumini, Jangeru, picked up bead making quickly and now hand-makes necklaces and earrings from the materials she received at the training.
+
+**Zara'u Basiru**, 15, from the same community, mastered slipper making. She is determined that, with what she has learned, she will not walk to school barefoot again.
+
+> "I thank Allah for the G4G Project."
+
+**Hauwa'u Abdullahi**, 12, attends Badamo Model Primary School, Jangeru. She has taken up teaching other girls and plans to sell her beadwork during the festive period.
+
+> "I bought stones for the bead work myself through the support I got from my parents, but kept the strings from the training to make these colourful beads which I enjoy making. I'm happy I know something else aside assisting with house chores and learning ABC."
+
+With the right conditions, girls can overcome educational deprivation and grow ready to meet the challenges of their future.
+
+*From Helpers Digest, Vol. 3.* [Read the flipbook](/project-magazines/helpers-digest-g4g-achieving-beyond-school) · [Download the PDF](/documents/helpers-digest-g4g-achieving-beyond-school.pdf)`,
   },
 
   /* ------------------------------------------------ 4th bulletin: CBHVs, September 2019 */

@@ -56,7 +56,11 @@ test.describe("homepage", () => {
 
     await page.getByRole("button", { name: "Open menu" }).click();
     await expect(mobileNav).toBeVisible();
-    await expect(mobileNav.getByRole("link", { name: "Get Involved" })).toBeVisible();
+    await expect(mobileNav.getByRole("link", { name: "Contact" })).toBeVisible();
+
+    // "Get Involved" is a disclosure too, grouping volunteering, training, careers and procurement.
+    await mobileNav.getByText("Get Involved", { exact: true }).click();
+    await expect(mobileNav.getByRole("link", { name: /Humanitarian Training/ })).toBeVisible();
 
     // "What We Do" is a disclosure (<details>/<summary>) in the mega menu,
     // not a flat link — confirm it expands to reveal a program link.

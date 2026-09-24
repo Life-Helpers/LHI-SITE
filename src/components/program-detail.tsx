@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import type { Program } from "@/types/content";
 import type { ThematicPillarId } from "@/data/interventions-data";
+import { programGallery } from "@/data/program-galleries";
 import { getInterventions } from "@/lib/cms/content";
 
 export async function ProgramDetail({ program }: { program: Program }) {
@@ -23,6 +24,7 @@ export async function ProgramDetail({ program }: { program: Program }) {
   const linkedProjects = allProjects.filter((proj) =>
     proj.thematicAreas.some((t) => t.id === pillarId)
   );
+  const gallery = programGallery(program.id);
 
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
@@ -194,6 +196,31 @@ export async function ProgramDetail({ program }: { program: Program }) {
               ))}
             </div>
           </div>
+        )}
+
+        {gallery.length > 0 && (
+          <section aria-labelledby="gallery-heading" className="mt-12 border-t border-border pt-10">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— In pictures</p>
+            <h2 id="gallery-heading" className="mt-1 font-serif-display text-xl font-light text-foreground sm:text-2xl">
+              {program.name} in the field
+            </h2>
+            <div className={`mt-6 grid grid-cols-1 gap-4 ${gallery.length > 1 ? "sm:grid-cols-2" : ""} ${gallery.length > 2 ? "lg:grid-cols-3" : ""}`}>
+              {gallery.map((g) => (
+                <figure key={g.src} className="group overflow-hidden rounded-2xl border border-border bg-card">
+                  <a href={g.src} target="_blank" rel="noopener noreferrer" className="relative block aspect-[4/3] overflow-hidden bg-muted" aria-label={`Open photo: ${g.alt}`}>
+                    <Image
+                      src={g.src}
+                      alt={g.alt}
+                      fill
+                      sizes="(min-width: 1024px) 290px, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </a>
+                  <figcaption className="px-4 py-3 text-xs leading-relaxed text-muted-foreground">{g.caption}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
         )}
 
         <div className="mt-10 border-t border-border pt-8 flex flex-wrap items-center justify-between gap-4">

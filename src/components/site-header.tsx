@@ -20,6 +20,8 @@ import {
   whoWeAreFeatured,
   whatWeDoFeatured,
   impactFeatured,
+  getInvolvedFeatured,
+  type FeaturedNavStory,
 } from "@/components/nav-data";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AccessibilityToolbar } from "@/components/accessibility/accessibility-toolbar";
@@ -127,10 +129,10 @@ function WhoWeAreMegaMenu({ links }: { links: NavLink[] }) {
           </ul>
         </div>
 
-        {/* Column 2: Governance & Enterprise */}
+        {/* Column 2: Governance & Safeguarding */}
         <div className="md:col-span-4">
           <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Governance & Enterprise
+            Governance & Safeguarding
           </p>
           <ul className="mt-3 space-y-1.5">
             {govLinks.map((link) => {
@@ -212,7 +214,7 @@ function WhoWeAreMegaMenu({ links }: { links: NavLink[] }) {
                   {whoWeAreFeatured.heritage.subtitle}
                 </p>
                 <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-primary group-hover:underline">
-                  Our 20-Year Journey <ArrowRight className="h-3 w-3" />
+                  Our 22-Year Journey <ArrowRight className="h-3 w-3" />
                 </span>
               </div>
             </Link>
@@ -375,174 +377,120 @@ function WhatWeDoMegaMenu({
   );
 }
 
+/** Icon + label + description rows, shared by the Impact and Get Involved menus. */
+function MenuLinkList({ links }: { links: NavLink[] }) {
+  return (
+    <ul className="mt-3 space-y-1.5">
+      {links.map((link) => {
+        const Icon = link.icon;
+        return (
+          <li key={link.href}>
+            <NavigationMenuLink asChild>
+              <Link
+                href={link.href}
+                className="group flex items-start gap-2.5 rounded-xl p-2 transition-colors hover:bg-muted/70 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                {Icon && (
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs font-semibold text-foreground group-hover:text-primary">{link.label}</p>
+                  {link.description && <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">{link.description}</p>}
+                </div>
+              </Link>
+            </NavigationMenuLink>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/** Image card for a featured story inside a mega menu. */
+function MenuFeatureCard({ story }: { story: FeaturedNavStory }) {
+  return (
+    <NavigationMenuLink asChild>
+      <Link
+        href={story.href}
+        className="group flex gap-3 rounded-2xl border border-border/80 bg-card p-2.5 transition-colors hover:border-primary/50 hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      >
+        <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
+          <Image src={story.image} alt="" fill sizes="96px" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+        </div>
+        <div className="flex flex-col justify-center">
+          <span className="text-[10px] font-semibold uppercase text-primary">{story.tag}</span>
+          <h4 className="text-xs font-bold text-foreground group-hover:text-primary">{story.title}</h4>
+          <p className="mt-0.5 line-clamp-2 text-[11px] leading-tight text-muted-foreground">{story.subtitle}</p>
+        </div>
+      </Link>
+    </NavigationMenuLink>
+  );
+}
+
 /** 3. IMPACT MEGA MENU */
 function ImpactMegaMenu({ links }: { links: NavLink[] }) {
-  const reportLinks = links.filter((l) => l.group === "accountability");
-  const mediaLinks = links.filter((l) => l.group !== "accountability");
+  const resultLinks = links.filter((l) => l.group === "results");
+  const storyLinks = links.filter((l) => l.group === "stories");
 
   return (
     <div className="w-full p-6">
-      {/* Mega Menu Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-4">
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
-            Evidence & Governance
-          </span>
-          <p className="text-xs text-muted-foreground">
-            Audited financial stewardship, donor compliance, and verified community impact.
-          </p>
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">Evidence &amp; Stories</span>
+          <p className="text-xs text-muted-foreground">What we achieve, how we account for it, and the people behind the numbers.</p>
         </div>
-        <Link
-          href="/impact"
-          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-        >
+        <Link href="/impact" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
           View Annual Reports <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
 
-      {/* Grid: 2 navigation columns + 2 visual impact stories */}
       <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-12">
-        {/* Column 1: Reports & Accountability */}
-        <div className="md:col-span-3">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Accountability
-          </p>
-          <ul className="mt-3 space-y-1.5">
-            {reportLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <li key={link.href}>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href={link.href}
-                      className="group flex items-start gap-2.5 rounded-xl p-2 transition-colors hover:bg-muted/70 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                    >
-                      {Icon && (
-                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-xs font-semibold text-foreground group-hover:text-primary">
-                          {link.label}
-                        </p>
-                        {link.description && (
-                          <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
-                            {link.description}
-                          </p>
-                        )}
-                      </div>
-                    </Link>
-                  </NavigationMenuLink>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        {/* Column 2: Media & Field Dispatches */}
         <div className="md:col-span-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Media & Field Dispatches
-          </p>
-          <ul className="mt-3 space-y-1.5">
-            {mediaLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <li key={link.href}>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href={link.href}
-                      className="group flex items-start gap-2.5 rounded-xl p-2 transition-colors hover:bg-muted/70 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                    >
-                      {Icon && (
-                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-xs font-semibold text-foreground group-hover:text-primary">
-                          {link.label}
-                        </p>
-                        {link.description && (
-                          <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
-                            {link.description}
-                          </p>
-                        )}
-                      </div>
-                    </Link>
-                  </NavigationMenuLink>
-                </li>
-              );
-            })}
-          </ul>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Results &amp; Accountability</p>
+          <MenuLinkList links={resultLinks} />
         </div>
+        <div className="md:col-span-4">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Stories &amp; Media</p>
+          <MenuLinkList links={storyLinks} />
+        </div>
+        <div className="flex flex-col gap-3 md:col-span-4">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Featured</p>
+          <MenuFeatureCard story={impactFeatured.glance} />
+          <MenuFeatureCard story={impactFeatured.story} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
-        {/* Column 3: Two Visual Impact Stories with Images */}
-        <div className="md:col-span-5 flex flex-col gap-3">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Verified Field Impact
-          </p>
+/** 4. GET INVOLVED MEGA MENU */
+function GetInvolvedMegaMenu({ links }: { links: NavLink[] }) {
+  return (
+    <div className="w-full p-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-4">
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">Join Us</span>
+          <p className="text-xs text-muted-foreground">Volunteer, learn, work or partner with Life Helpers Initiative.</p>
+        </div>
+        <Link href="/contact" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+          Contact us <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
 
-          {/* Story 1: Tom Brown Malnutrition */}
-          <NavigationMenuLink asChild>
-            <Link
-              href={impactFeatured.nutrition.href}
-              className="group flex gap-3 rounded-2xl border border-border/80 bg-card p-2.5 transition-colors hover:border-primary/50 hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
-                <Image
-                  src={impactFeatured.nutrition.image}
-                  alt="Malnutrition recovery initiative"
-                  fill
-                  sizes="96px"
-                  referrerPolicy="no-referrer"
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex flex-col justify-center">
-                <span className="text-[10px] font-semibold text-primary uppercase">
-                  {impactFeatured.nutrition.tag}
-                </span>
-                <h4 className="text-xs font-bold text-foreground group-hover:text-primary">
-                  {impactFeatured.nutrition.title}
-                </h4>
-                <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground line-clamp-2">
-                  {impactFeatured.nutrition.subtitle}
-                </p>
-              </div>
-            </Link>
-          </NavigationMenuLink>
-
-          {/* Story 2: Gujba Clean Water */}
-          <NavigationMenuLink asChild>
-            <Link
-              href={impactFeatured.water.href}
-              className="group flex gap-3 rounded-2xl border border-border/80 bg-card p-2.5 transition-colors hover:border-primary/50 hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
-                <Image
-                  src={impactFeatured.water.image}
-                  alt="Solar clean water borehole"
-                  fill
-                  sizes="96px"
-                  referrerPolicy="no-referrer"
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex flex-col justify-center">
-                <span className="text-[10px] font-semibold text-primary uppercase">
-                  {impactFeatured.water.tag}
-                </span>
-                <h4 className="text-xs font-bold text-foreground group-hover:text-primary">
-                  {impactFeatured.water.title}
-                </h4>
-                <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground line-clamp-2">
-                  {impactFeatured.water.subtitle}
-                </p>
-              </div>
-            </Link>
-          </NavigationMenuLink>
+      <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-12">
+        <div className="md:col-span-4">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Take Part</p>
+          <MenuLinkList links={links.slice(0, 3)} />
+        </div>
+        <div className="md:col-span-4">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Work With Us</p>
+          <MenuLinkList links={links.slice(3)} />
+        </div>
+        <div className="flex flex-col gap-3 md:col-span-4">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Support Our Work</p>
+          <MenuFeatureCard story={getInvolvedFeatured} />
         </div>
       </div>
     </div>
@@ -636,6 +584,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
     whatWeDoCards,
     whatWeDoExtra,
     impactLinks,
+    getInvolvedLinks,
   } = useLocalizedNav();
 
   useEffect(() => {
@@ -658,7 +607,6 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
   const isHeroGlass = insideHero && !isScrolled;
 
   const simpleLinks: NavLink[] = [
-    { label: t.nav.getInvolved, href: "/get-involved" },
     { label: t.nav.contact, href: "/contact" },
   ];
 
@@ -732,6 +680,18 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ImpactMegaMenu links={impactLinks} />
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            {/* GET INVOLVED MEGA MENU */}
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className={`px-3 py-2 text-[11px] lg:text-[12px] uppercase tracking-[0.14em] font-semibold ${
+                isHeroGlass ? "text-white/90 hover:text-white data-[state=open]:text-white" : "text-foreground/80 hover:text-primary data-[state=open]:text-primary"
+              } transition-colors`}>
+                {t.nav.getInvolved}
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <GetInvolvedMegaMenu links={getInvolvedLinks} />
               </NavigationMenuContent>
             </NavigationMenuItem>
 
@@ -821,6 +781,11 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
           <MobileDisclosure
             label={t.nav.impact}
             links={impactLinks}
+            onNavigate={() => setMenuOpen(false)}
+          />
+          <MobileDisclosure
+            label={t.nav.getInvolved}
+            links={getInvolvedLinks}
             onNavigate={() => setMenuOpen(false)}
           />
 

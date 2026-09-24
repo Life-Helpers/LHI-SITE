@@ -15,11 +15,11 @@ export function SiteFooter() {
   const whoWeAreLinks = [
     { label: t.whoWeAreMenu.aboutUs, href: "/about" },
     { label: t.whoWeAreMenu.ourHistory, href: "/our-history" },
-    { label: t.whoWeAreMenu.ourCommitment, href: "/our-commitment" },
     { label: t.whoWeAreMenu.ourStrategies, href: "/our-strategies" },
+    { label: t.whoWeAreMenu.nidake, href: "/nidake" },
     { label: t.whoWeAreMenu.boardOfTrustees, href: "/board-of-trustees" },
     { label: t.whoWeAreMenu.managementTeam, href: "/management-team" },
-    { label: t.whoWeAreMenu.nidake, href: "/nidake" },
+    { label: t.whoWeAreMenu.ourCommitment, href: "/our-commitment" },
   ];
 
   const programLinks = [
@@ -34,15 +34,16 @@ export function SiteFooter() {
   ];
 
   const impactLinks = [
-    { label: t.footer.emergencies, href: "/emergencies" },
     { label: t.footer.impactReports, href: "/impact" },
+    { label: "Fact Sheet & Infographics", href: "/fact-sheet" },
     { label: t.impactMenu.projectsInterventions, href: "/interventions/projectandintervention" },
-    { label: t.impactMenu.successStories, href: "/success-stories" },
-    { label: "LHI Blog & Newsletter", href: "/blog" },
-    { label: "Events & Observance Days", href: "/events" },
-    { label: "Fact Sheet", href: "/fact-sheet" },
     { label: "Brochure", href: "/brochure" },
     { label: "Feedback", href: "/feedback" },
+    { label: t.impactMenu.successStories, href: "/success-stories" },
+    { label: "Project Magazines", href: "/project-magazines" },
+    { label: "LHI Blog & Newsletter", href: "/blog" },
+    { label: "Events & Observance Days", href: "/events" },
+    { label: t.footer.emergencies, href: "/emergencies" },
   ];
 
   const getInvolvedLinks = [
@@ -52,6 +53,7 @@ export function SiteFooter() {
     { label: "Careers & Vacancies", href: "/careers" },
     { label: "Humanitarian Training", href: "/get-involved/training" },
     { label: "Vendor Requests", href: "/procurement" },
+    { label: "Partner & Bidder Portal", href: "/partner-portal" },
     { label: t.footer.contact, href: "/contact" },
     { label: t.footer.privacy, href: "/privacy" },
     { label: t.footer.terms, href: "/terms" },

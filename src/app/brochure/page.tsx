@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BarChart3, Download, Maximize2, Sun, Users, Warehouse } from "lucide-react";
 
+import { Infographics } from "@/components/fact-sheet/infographics";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 
@@ -99,6 +100,12 @@ export default function BrochurePage() {
               </figure>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="at-a-glance" aria-labelledby="brochure-infographics-heading" className="scroll-mt-32 border-t border-border py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <Infographics headingId="brochure-infographics-heading" />
         </div>
       </section>
 

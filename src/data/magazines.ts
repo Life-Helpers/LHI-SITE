@@ -143,6 +143,18 @@ export const MAGAZINES: Magazine[] = [
     partners: "UNICEF · KfW",
   },
   {
+    slug: "helpers-digest-g4g-achieving-beyond-school",
+    title: "G4G: Achieving Beyond School Attendance & Retention",
+    kind: "Helpers Digest, Vol. 3",
+    period: "November 2018",
+    description:
+      "Girls for Girls (G4G) in Shinkafi LGA, Zamfara State: leadership, life-skills and vocational training that has girls making beads and slippers.",
+    pages: 4,
+    pdf: "/documents/helpers-digest-g4g-achieving-beyond-school.pdf",
+    story: "/blog/g4g-achieving-beyond-school-zamfara",
+    partners: "UNICEF · UK aid",
+  },
+  {
     slug: "helpers-digest-cbhvs-agents-of-change",
     title: "CBHVs, Agents of Change",
     kind: "Helpers Digest, 4th bulletin",

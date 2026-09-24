@@ -44,6 +44,7 @@ const nextConfig: NextConfig = {
       { source: "/magazines/:path*", headers: longCache },
       { source: "/fact-sheet/:path*", headers: longCache },
       { source: "/brochure/:path*", headers: longCache },
+      { source: "/infographics/:path*", headers: longCache },
     ];
   },
   webpack: (config, { dev, isServer }) => {

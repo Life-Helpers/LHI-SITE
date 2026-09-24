@@ -46,7 +46,7 @@ export type NavLink = {
   tag?: string;
   image?: string;
   /** Column in the Impact mega menu. */
-  group?: "accountability" | "media";
+  group?: "results" | "stories";
 };
 
 export type FeaturedNavStory = {
@@ -56,58 +56,6 @@ export type FeaturedNavStory = {
   image: string;
   tag: string;
 };
-
-export const whoWeAreLinks: NavLink[] = [
-  {
-    label: "About Us",
-    href: "/about",
-    description: "Our vision, mission, and values of Love, Honesty & Inclusion",
-    icon: HeartHandshake,
-    tag: "Core Identity",
-  },
-  {
-    label: "Our History",
-    href: "/our-history",
-    description: "22 years, from Sokoto in 2004 to 11 states",
-    icon: Compass,
-    tag: "Heritage",
-  },
-  {
-    label: "Our Commitment",
-    href: "/our-commitment",
-    description: "Safeguarding, PSEA and feedback & complaints channels",
-    icon: ShieldAlert,
-    tag: "Safeguarding",
-  },
-  {
-    label: "Our Strategies",
-    href: "/our-strategies",
-    description: "Our 4 strategies and the Strategic Plan 2026–2030",
-    icon: Target,
-    tag: "Approach",
-  },
-  {
-    label: "NIDAKE",
-    href: "/nidake",
-    description: "Locally made reusable sanitary pads for girls and women",
-    icon: Sparkles,
-    tag: "Enterprise",
-  },
-  {
-    label: "Board of Trustees",
-    href: "/board-of-trustees",
-    description: "Institutional governance & fiduciary stewardship",
-    icon: Scale,
-    tag: "Governance",
-  },
-  {
-    label: "Management Team",
-    href: "/management-team",
-    description: "Executive directorates and field operations leadership",
-    icon: Users,
-    tag: "Leadership",
-  },
-];
 
 export const whoWeAreFeatured: {
   heritage: FeaturedNavStory;
@@ -197,38 +145,32 @@ export const whatWeDoFeatured: FeaturedNavStory = {
   tag: "Radio Program",
 };
 
-export const impactLinks: NavLink[] = [
-  { label: "Annual Reports", href: "/impact", description: "Organisation-wide results since 2004", icon: FileText, tag: "Accountability", group: "accountability" },
-  { label: "Fact Sheet", href: "/fact-sheet", description: "Project results in numbers, reports and presentations", icon: BarChart3, tag: "Results", group: "accountability" },
-  { label: "Brochure", href: "/brochure", description: "The Noma Tushen Arziki Farmer Service Center resilience hub", icon: BookMarked, tag: "Read", group: "accountability" },
-  { label: "Feedback", href: "/feedback", description: "Compliments, suggestions and complaints, answered by our team", icon: MessageSquareHeart, tag: "Your voice", group: "accountability" },
-  { label: "Projects & Interventions", href: "/interventions/projectandintervention", description: "38 profiled projects with dossiers & PDF factsheets", icon: FolderGit2, tag: "Active Grants", group: "accountability" },
-  { label: "Partner & Bidder Portal", href: "/partner-portal", description: "Compliance documents & consortium / RFP expression of interest", icon: Handshake, tag: "For Donors", group: "accountability" },
-  { label: "Project Magazines", href: "/project-magazines", description: "Flip through our magazines and Helpers Digest bulletins", icon: BookOpen, tag: "Read", group: "media" },
-  { label: "Success Stories", href: "/success-stories", description: "Stories from our magazines and newsletters", icon: Award, tag: "Human Stories", group: "media" },
-  { label: "LHI Blog & Newsletter", href: "/blog", description: "News, field stories, newsletters and publications", icon: Newspaper, tag: "Dispatches", group: "media" },
-  { label: "Events & Observance Days", href: "/events", description: "Upcoming events and international days, add to calendar", icon: CalendarDays, tag: "Calendar", group: "media" },
-  { label: "Radio Program", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "media" },
-];
-
 export const impactFeatured: {
-  nutrition: FeaturedNavStory;
-  water: FeaturedNavStory;
+  glance: FeaturedNavStory;
+  story: FeaturedNavStory;
 } = {
-  nutrition: {
-    title: "A Bag, A Dream",
-    subtitle: "Saudatu, 14, is back in class through the EU/UNICEF Accelerated Basic Education Programme.",
-    href: "/blog/saudatu-a-bag-a-dream",
-    image: LHI_PHOTOS.saudatu.src,
-    tag: "Education",
+  glance: {
+    title: "LHI at a Glance",
+    subtitle: "Our offices, thematic areas, mission and values in one infographic, plus the nutrition project journey.",
+    href: "/fact-sheet#at-a-glance",
+    image: "/infographics/lhi-at-a-glance.webp",
+    tag: "Infographic",
   },
-  water: {
-    title: "Gidan Arziki Hub",
-    subtitle: "A solar-powered farmers service hub in Batagarawa, commissioned in April 2026.",
-    href: "/blog/gidan-arziki-hub-commissioned-batagarawa",
-    image: LHI_PHOTOS.gidanArzikiAerial.src,
-    tag: "Livelihoods",
+  story: {
+    title: "G4G: Achieving Beyond School",
+    subtitle: "Girls in Shinkafi, Zamfara State, learn leadership, life skills, bead making and slipper making.",
+    href: "/blog/g4g-achieving-beyond-school-zamfara",
+    image: LHI_PHOTOS.g4gZamfaraSkills.src,
+    tag: "Success Story",
   },
+};
+
+export const getInvolvedFeatured: FeaturedNavStory = {
+  title: "Donate",
+  subtitle: "Your gift puts a smile on a face: it reaches families across our 11 states.",
+  href: "/donate",
+  image: LHI_PHOTOS.farmerWomanHarvest.src,
+  tag: "Give",
 };
 
 /** Localized overlay: keeps hrefs/icons/images fixed, swaps labels via the active dictionary. */
@@ -249,13 +191,6 @@ export function useLocalizedNav() {
       description: "22 years, from Sokoto in 2004 to 11 states",
       icon: Compass,
       tag: "Heritage",
-    },
-    {
-      label: t.whoWeAreMenu.ourCommitment,
-      href: "/our-commitment",
-      description: "Safeguarding, PSEA and feedback & complaints channels",
-      icon: ShieldAlert,
-      tag: "Safeguarding",
     },
     {
       label: t.whoWeAreMenu.ourStrategies,
@@ -284,6 +219,13 @@ export function useLocalizedNav() {
       description: "Executive directorates and field operations leadership",
       icon: Users,
       tag: "Leadership",
+    },
+    {
+      label: t.whoWeAreMenu.ourCommitment,
+      href: "/our-commitment",
+      description: "Safeguarding, PSEA and feedback & complaints channels",
+      icon: ShieldAlert,
+      tag: "Safeguarding",
     },
   ];
 
@@ -346,19 +288,25 @@ export function useLocalizedNav() {
   };
 
   const impact: NavLink[] = [
-    { label: t.impactMenu.annualReport, href: "/impact", description: "Organisation-wide results since 2004", icon: FileText, tag: "Accountability", group: "accountability" },
-    { label: "Fact Sheet", href: "/fact-sheet", description: "Project results in numbers, reports and presentations", icon: BarChart3, tag: "Results", group: "accountability" },
-    { label: "Brochure", href: "/brochure", description: "The Noma Tushen Arziki Farmer Service Center resilience hub", icon: BookMarked, tag: "Read", group: "accountability" },
-    { label: "Feedback", href: "/feedback", description: "Compliments, suggestions and complaints, answered by our team", icon: MessageSquareHeart, tag: "Your voice", group: "accountability" },
-    { label: t.impactMenu.projectsInterventions, href: "/interventions/projectandintervention", description: "38 profiled projects with dossiers & PDF factsheets", icon: FolderGit2, tag: "Active Grants", group: "accountability" },
-    { label: "Partner & Bidder Portal", href: "/partner-portal", description: "Compliance documents & consortium / RFP expression of interest", icon: Handshake, tag: "For Donors", group: "accountability" },
-    { label: "Project Magazines", href: "/project-magazines", description: "Flip through our magazines and Helpers Digest bulletins", icon: BookOpen, tag: "Read", group: "media" },
-    { label: t.impactMenu.successStories, href: "/success-stories", description: "Stories from our magazines and newsletters", icon: Award, tag: "Human Stories", group: "media" },
-    { label: "LHI Blog & Newsletter", href: "/blog", description: "News, field stories, newsletters and publications", icon: Newspaper, tag: "Dispatches", group: "media" },
-    { label: "Events & Observance Days", href: "/events", description: "Upcoming events and international days, add to calendar", icon: CalendarDays, tag: "Calendar", group: "media" },
-    { label: "Radio Program", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "media" },
-    { label: "Humanitarian Training", href: "/get-involved/training", description: "Free safeguarding courses with certificates", icon: GraduationCap, tag: "Learn", group: "media" },
-    { label: "Careers & Procurement", href: "/careers", description: "Vacancies, vendor requests and registration", icon: Users, tag: "Work with us", group: "media" },
+    { label: t.impactMenu.annualReport, href: "/impact", description: "Organisation-wide results since 2004", icon: FileText, tag: "Accountability", group: "results" },
+    { label: "Fact Sheet & Infographics", href: "/fact-sheet", description: "LHI at a glance and project results in numbers", icon: BarChart3, tag: "Results", group: "results" },
+    { label: t.impactMenu.projectsInterventions, href: "/interventions/projectandintervention", description: "38 profiled projects with dossiers & PDF factsheets", icon: FolderGit2, tag: "Portfolio", group: "results" },
+    { label: "Brochure", href: "/brochure", description: "The Noma Tushen Arziki resilience hub and LHI infographics", icon: BookMarked, tag: "Read", group: "results" },
+    { label: "Feedback", href: "/feedback", description: "Compliments, suggestions and complaints, answered by our team", icon: MessageSquareHeart, tag: "Your voice", group: "results" },
+    { label: t.impactMenu.successStories, href: "/success-stories", description: "Lives changed, in their own words", icon: Award, tag: "Human Stories", group: "stories" },
+    { label: "Project Magazines", href: "/project-magazines", description: "Flip through our magazines and Helpers Digest bulletins", icon: BookOpen, tag: "Read", group: "stories" },
+    { label: "LHI Blog & Newsletter", href: "/blog", description: "News, field stories, newsletters and publications", icon: Newspaper, tag: "Dispatches", group: "stories" },
+    { label: "Radio Program", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "stories" },
+    { label: "Events & Observance Days", href: "/events", description: "Upcoming events and international days, add to calendar", icon: CalendarDays, tag: "Calendar", group: "stories" },
+  ];
+
+  const getInvolved: NavLink[] = [
+    { label: "Volunteer & Get Involved", href: "/get-involved", description: "Volunteer openings and ways to support our work", icon: HeartHandshake, tag: "Join us" },
+    { label: "Donate", href: "/donate", description: "Support families in the communities we serve", icon: Sparkles, tag: "Give" },
+    { label: "Humanitarian Training", href: "/get-involved/training", description: "Free safeguarding courses with certificates", icon: GraduationCap, tag: "Learn" },
+    { label: "Careers", href: "/careers", description: "Current vacancies and how to apply", icon: Users, tag: "Work with us" },
+    { label: "Procurement", href: "/procurement", description: "Vendor requests, bids and supplier registration", icon: FileText, tag: "Suppliers" },
+    { label: "Partner & Bidder Portal", href: "/partner-portal", description: "Compliance documents & consortium / RFP expression of interest", icon: Handshake, tag: "For donors" },
   ];
 
   return {
@@ -369,5 +317,7 @@ export function useLocalizedNav() {
     whatWeDoFeatured,
     impactLinks: impact,
     impactFeatured,
+    getInvolvedLinks: getInvolved,
+    getInvolvedFeatured,
   };
 }
