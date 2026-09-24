@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Eye, HeartHandshake, Target } from "lucide-react";
 
 import { Eyebrow } from "@/components/eyebrow";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { useLocale } from "@/i18n/locale-context";
 
 interface Panel {
@@ -14,6 +16,8 @@ interface Panel {
   word: string;
   icon: React.ElementType;
   className: string;
+  /** Matching photo shown at 50% opacity behind the panel colour. */
+  image: string;
   body: React.ReactNode;
 }
 
@@ -63,6 +67,7 @@ export function WhoWeAreBand() {
       word: "Vision",
       icon: Eye,
       className: "bg-primary text-primary-foreground",
+      image: LHI_PHOTOS.cabbageFarmerWaving.src,
       body: <p className="font-serif-display text-2xl font-light leading-snug sm:text-4xl">{w.visionBody}</p>,
     },
     {
@@ -71,6 +76,7 @@ export function WhoWeAreBand() {
       word: "Mission",
       icon: Target,
       className: "bg-accent text-white",
+      image: LHI_PHOTOS.girlSewing.src,
       body: <p className="font-serif-display text-xl font-light leading-snug sm:text-3xl">{w.missionBody}</p>,
     },
     {
@@ -79,6 +85,7 @@ export function WhoWeAreBand() {
       word: "Values",
       icon: HeartHandshake,
       className: "bg-[#7d0c10] text-white dark:bg-[#5c090c]",
+      image: LHI_PHOTOS.teamOutdoors.src,
       body: (
         <ul className="grid gap-3 sm:grid-cols-3">
           {w.values.map((value) => {
@@ -143,6 +150,16 @@ export function WhoWeAreBand() {
                 isActive ? "grow-[6]" : "grow"
               } basis-0 min-h-16 md:min-w-20`}
             >
+              {/* Matching photo, faded to 50% so the panel colour shows through */}
+              <Image
+                src={panel.image}
+                alt=""
+                fill
+                sizes="(min-width: 768px) 70vw, 100vw"
+                className={`pointer-events-none object-cover opacity-50 transition-transform duration-700 ${isActive ? "scale-100" : "scale-110"}`}
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" aria-hidden="true" />
+
               {/* Decorative oversized icon */}
               <Icon
                 aria-hidden="true"

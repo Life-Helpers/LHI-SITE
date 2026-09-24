@@ -346,7 +346,7 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
       const n = Number(v);
       return Number.isFinite(n) && n >= min ? n : null;
     };
-    const cost = num(settings.nidake.costUsd, 1);
+    const cost = num(settings.nidake.costNgn, 1);
     const years = num(settings.nidake.yearsOfDignity, 1);
     const days = num(settings.nidake.schoolDaysSaved, 1);
     if (cost === null || years === null || days === null) {
@@ -371,7 +371,7 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
         linkLabel: str(settings.homeFeature.linkLabel, 60),
         linkHref: href,
       },
-      nidake: { costUsd: cost, yearsOfDignity: years, schoolDaysSaved: days },
+      nidake: { costNgn: cost, yearsOfDignity: years, schoolDaysSaved: days },
       contact: { email: str(settings.contact.email, 200), phone: str(settings.contact.phone, 60) },
       donations: { bankDetails: str(settings.donations?.bankDetails, 2000) },
       engagement: {

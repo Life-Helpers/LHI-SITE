@@ -1,22 +1,12 @@
-import { africanFulfillmentImages, type FulfillmentImage } from "@/data/african-fulfillment-images";
-import type { InterventionProject, ThematicPillarId } from "@/data/interventions-data";
+import type { FulfillmentImage } from "@/data/african-fulfillment-images";
+import type { InterventionProject } from "@/data/interventions-data";
 
-const PILLAR_IMAGES: Record<ThematicPillarId, FulfillmentImage> = {
-  health: africanFulfillmentImages.healthHero,
-  education: africanFulfillmentImages.educationHero,
-  livelihood: africanFulfillmentImages.livelihoodHero,
-  "food-security": africanFulfillmentImages.foodSecurityHero,
-  "social-inclusion": africanFulfillmentImages.socialInclusionHero,
-  protection: africanFulfillmentImages.protectionHero,
-};
-
-/** Project photo first, then its own gallery, then one image per thematic pillar (deduplicated). */
+/**
+ * Project photo first, then its own gallery (deduplicated). Thematic-area hero photos are
+ * no longer appended: they made the same picture repeat across every project in an area.
+ */
 export function getInterventionGallery(project: InterventionProject): FulfillmentImage[] {
-  const candidates: FulfillmentImage[] = [
-    project.image,
-    ...(project.gallery ?? []),
-    ...project.thematicAreas.map((t) => PILLAR_IMAGES[t.id]),
-  ];
+  const candidates: FulfillmentImage[] = [project.image, ...(project.gallery ?? [])];
   const seen = new Set<string>();
   return candidates.filter((img) => {
     if (seen.has(img.src)) return false;

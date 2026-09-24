@@ -4,9 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 import { Play } from "lucide-react";
 
-import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 const VIDEO_ID = "45HZKC19AxY";
+const POSTER = { src: "/images/lhi/nidake-mhday-2023.jpg" };
 
 /** Click-to-play YouTube video: the player (and YouTube's scripts) only load when a visitor presses play. */
 export function NidakeVideo() {
@@ -34,15 +34,16 @@ export function NidakeVideo() {
             />
           ) : (
             <button type="button" onClick={() => setPlaying(true)} className="group absolute inset-0 h-full w-full" aria-label="Play the NIDAKE video">
-              {/* A local LHI photo as the poster, so nothing is requested from YouTube until play is pressed. */}
+              {/* The #MHDay2023 NIDAKE poster: shown in full, with a blurred copy filling the rest of the frame. */}
+              <Image src={POSTER.src} alt="" fill sizes="(min-width: 1024px) 960px, 100vw" className="scale-110 object-cover opacity-70 blur-2xl" aria-hidden="true" />
               <Image
-                src={LHI_PHOTOS.nidakePadEducation.src}
+                src={POSTER.src}
                 alt=""
                 fill
                 sizes="(min-width: 1024px) 960px, 100vw"
-                className="object-cover opacity-85 transition-transform duration-500 group-hover:scale-105"
+                className="object-contain transition-transform duration-500 group-hover:scale-[1.03]"
               />
-              <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/10" aria-hidden="true" />
+              <span className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" aria-hidden="true" />
               <span className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl ring-8 ring-white/20 transition-transform group-hover:scale-110">
                 <Play className="ml-1 h-8 w-8 fill-current" aria-hidden="true" />
               </span>

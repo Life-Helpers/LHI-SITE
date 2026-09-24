@@ -202,6 +202,15 @@ export const LHI_PHOTOS = {
   womenSavingsGroup: p("women-savings-group-yobe", "Women's savings group meeting under an EU early recovery project banner in Yobe State"),
   gbvAwarenessMarch: p("gbv-awareness-march", "Community members marching with banners and placards against gender-based violence"),
   nutritionFoodDemo: p("nutrition-food-demonstration", "Mothers with their babies at a food demonstration with vegetables, grains and fruit"),
+  // Archive field photos (history Drive folder)
+  healthFacilityConsultation: p("health-facility-consultation", "Health worker consulting with women and children at a health facility, with medicines on the table"),
+  healthFacilityMotherChild: p("health-facility-mother-child", "Health worker attending to a mother and her child at a health facility"),
+  integratedClinicTeam: p("integrated-health-clinic-team", "LHI staff member and a health worker at an integrated health clinic"),
+  gulaniTomBrownPreparation: p("gulani-tom-brown-preparation", "Women preparing Tom Brown, a local weaning food, in Bara Ward, Gulani LGA, Yobe State"),
+  gulaniTomBrownCooking: p("gulani-tom-brown-cooking", "A woman roasting grains for Tom Brown in Bara Ward, Gulani LGA, Yobe State"),
+  dayOfGirlChildBanner: p("day-of-the-girl-child-banner", "Girls and women holding a “Ranar Yarinya Ta Duniya” International Day of the Girl Child banner"),
+  dayOfGirlChildWomen: p("day-of-the-girl-child-women", "Women holding a “Ranar Yarinya Ta Duniya” International Day of the Girl Child banner"),
+  womenCommunitySession: p("women-community-session", "A facilitator speaking to a women's community session under an LHI banner"),
 } satisfies Record<string, LhiPhoto>;
 
 export type LhiPhotoKey = keyof typeof LHI_PHOTOS;

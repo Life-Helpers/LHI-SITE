@@ -85,7 +85,7 @@ export function seedSettings(): CmsSettings {
       linkHref: "/blog/murja-eight-years-of-struggle-to-renewed-hope",
     },
     nidake: {
-      costUsd: NIDAKE_KIT.costUsd,
+      costNgn: NIDAKE_KIT.costNgn,
       yearsOfDignity: NIDAKE_KIT.yearsOfDignity,
       schoolDaysSaved: NIDAKE_KIT.schoolDaysSaved,
     },

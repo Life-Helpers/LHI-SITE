@@ -191,7 +191,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     tags: ["eu", "echo", "unicef", "oosc", "almajiri", "abep"],
     featured: true,
     gallery: gallery(
-      "abepGirls",
+      "abepGirlBag",
       "abepLearningCentre",
       "nasiru",
       "saudatu",
@@ -295,7 +295,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Sokoto State: 1 tertiary hospital, 23 general hospitals and 244 PHCs (one per ward)",
     states: ["sokoto"],
     pillars: ["health"],
-    photo: "healthScreening",
+    photo: "cbhvTraining",
     summary:
       "Strengthens maternal, newborn and child health services by building health worker skills (Specialized Newborn Care, Kangaroo Mother Care, Helping Babies Breathe) and improving service quality through training, mentoring and supportive supervision.",
     keyInterventions: [
@@ -317,7 +317,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Wurno and Kware LGAs, Sokoto State",
     states: ["sokoto"],
     pillars: ["food-security"],
-    photo: "maizeFarmerWoman",
+    photo: "onionFarmer",
     summary: "Stabilised food security for households affected by the humanitarian crisis in Wurno and Kware Local Government Areas of Sokoto State.",
     keyInterventions: ["Food security support for crisis-affected households.", "Implemented in partnership with ZOA."],
     impactMetric: "Crisis-affected households in two Sokoto LGAs supported.",
@@ -333,7 +333,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Jere LGA (Borno) and Bade LGA (Yobe)",
     states: ["borno", "yobe"],
     pillars: ["health"],
-    photo: "muacScreening",
+    photo: "gulaniTomBrownCooking",
     summary:
       "As implementing partner to ALIMA, LHI reduced morbidity and mortality among host and displaced populations through emergency medico-nutritional services.",
     keyInterventions: ["Emergency medical and nutrition services for displaced and host communities.", "Community screening and referral."],
@@ -350,7 +350,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Selected locations in Borno, Adamawa and Yobe States",
     states: ["borno", "adamawa", "yobe"],
     pillars: ["social-inclusion", "livelihood", "protection"],
-    photo: "communityDialogue",
+    photo: "annualReviewMeeting",
     summary:
       "A consortium-led project deploying location-specific interventions across peacebuilding, livelihood development, protection, agriculture-based support and institution building for marginalized populations.",
     keyInterventions: [
@@ -386,7 +386,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     impactMetric: "1,205 caregiver attendances at Positive Parenting Sessions across all six LGAs (April–May 2026).",
     tags: ["fcdo", "unicef", "mirp", "child-protection", "positive-parenting"],
     featured: true,
-    gallery: gallery("dignityKitHandover", "mirpDistribution", "caseManagement", "communityDialogue"),
+    gallery: gallery("dignityKitHandover", "mirpDistribution"),
   }),
   project({
     id: "sci-durable-solutions-yobe",
@@ -419,7 +419,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Community health systems in project LGAs",
     states: [],
     pillars: ["health", "livelihood"],
-    photo: "healthOutreach",
+    photo: "ihpRecords",
     summary:
       "Trains, mentors and supports frontline health workers to improve healthcare quality and outcomes, while strengthening community health systems through participation, access to essential services, referral and linkages.",
     keyInterventions: [
@@ -503,7 +503,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "327 primary healthcare centres in Plateau State",
     states: ["plateau"],
     pillars: ["health"],
-    photo: "healthScreening",
+    photo: "healthFacilityMotherChild",
     summary:
       "A President's Malaria Initiative for States project providing technical support to frontline providers to improve malaria treatment for children and pregnant women, and strengthening state agencies to use data for a responsive malaria programme.",
     keyInterventions: [
@@ -544,7 +544,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Displacement camps and PHCs in Sokoto State",
     states: ["sokoto"],
     pillars: ["health"],
-    photo: "muacScreening",
+    photo: "integratedClinicTeam",
     summary:
       "In an IRC-led consortium with COOPI and ALIMA, LHI delivers critical health and nutrition services to displaced persons through clinical treatment and community approaches, using existing PHCs and mobile clinics at the camp.",
     keyInterventions: [
@@ -565,7 +565,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "65 communities in Damaturu, Gujba, Tarmuwa, Geidam and Gulani LGAs, Yobe State",
     states: ["yobe"],
     pillars: ["health", "protection"],
-    photo: "childrenWater",
+    photo: "gulaniTomBrownPreparation",
     summary:
       "In a Save the Children-led consortium, LHI delivers nutrition, WASH and protection services and strengthens state, LGA and community structures to provide adequate services.",
     keyInterventions: [
@@ -586,7 +586,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Security-challenged LGAs",
     states: [],
     pillars: ["health"],
-    photo: "healthOutreach",
+    photo: "healthFacilityConsultation",
     summary:
       "Enhanced primary-level health workforce capacity to provide comprehensive malaria services and strengthened overall malaria programming in the state.",
     keyInterventions: ["Capacity building of primary health workers on malaria.", "Strengthening state malaria programming."],
@@ -603,7 +603,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Selected communities",
     states: [],
     pillars: ["health"],
-    photo: "motherChildNutrition",
+    photo: "immunisationRegister",
     summary:
       "A CARE-led consortium combining health system strengthening and community-based services to address infectious disease outbreaks and malnutrition, increasing acceptance of immunisation and health services.",
     keyInterventions: [
@@ -624,7 +624,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Conflict-affected communities",
     states: [],
     pillars: ["livelihood"],
-    photo: "womanShop",
+    photo: "cucumberTrader",
     summary:
       "Platforms supporting people affected by conflict to develop their livelihoods, grow their assets and build resilience to future shocks.",
     keyInterventions: [
@@ -707,7 +707,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Selected LGAs",
     states: [],
     pillars: ["protection"],
-    photo: "activismWomen",
+    photo: "gbvAwarenessMarch",
     summary:
       "Provided an immediate supportive platform for survivors and strengthened community structures to identify and support survivors of violence, including those living with disabilities.",
     keyInterventions: [
@@ -960,7 +960,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Local government areas",
     states: [],
     pillars: ["social-inclusion"],
-    photo: "womenGathering",
+    photo: "womenCommunitySession",
     summary:
       "Increased women's participation in local government processes through advocacy, working with women's groups and groups of people living with disabilities to enhance their penetration into the civic space.",
     keyInterventions: ["Advocacy for women's participation in local governance.", "Engagement of women's groups and people living with disabilities."],

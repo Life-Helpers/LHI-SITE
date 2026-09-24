@@ -82,10 +82,12 @@ export function DonateView({ bankDetails = "" }: { bankDetails?: string }) {
     }
     if (searchParams.get("designation") === "nidake") {
       const kits = Number(searchParams.get("kits"));
+      const ngn = Number(searchParams.get("ngn"));
+      const naira = Number.isFinite(ngn) && ngn > 0 ? ` (₦${new Intl.NumberFormat("en-NG").format(ngn)})` : "";
       setDesignation("nidake");
       setNoticeMessage(
         Number.isFinite(kits) && kits > 0
-          ? `Your gift will sponsor ${kits} NIDAKE dignity ${kits === 1 ? "kit" : "kits"} for displaced and rural schoolgirls.`
+          ? `Your gift${naira} will sponsor ${kits} NIDAKE dignity ${kits === 1 ? "kit" : "kits"} for displaced and rural schoolgirls. Pay in Naira by bank transfer, or by card.`
           : "Your gift will sponsor NIDAKE dignity kits for displaced and rural schoolgirls.",
       );
     }

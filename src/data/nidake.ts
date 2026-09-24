@@ -1,9 +1,10 @@
 /**
  * NIDAKE dignity kit economics used by the impact calculator and Sponsor-A-Girl packs.
- * KIT_COST_USD is a provisional figure: confirm with the NIDAKE enterprise team before launch.
+ * Prices are in Naira. costNgn is a provisional figure (editable in Admin → Settings):
+ * confirm it with the NIDAKE enterprise team.
  */
 export const NIDAKE_KIT = {
-  costUsd: 15,
+  costNgn: 22500,
   yearsOfDignity: 3,
   schoolDaysSaved: 180,
 } as const;
@@ -22,7 +23,9 @@ export const SPONSOR_PACKS: SponsorPack[] = [
   { id: "school", name: "Whole-School Pack", kits: 100, audience: "Every girl in a rural secondary school" },
 ];
 
-export function donateHrefForKits(kits: number, costUsd: number = NIDAKE_KIT.costUsd) {
-  const amount = kits * costUsd;
-  return `/donate?amount=${amount}&designation=nidake&kits=${kits}`;
+export const formatNaira = (amount: number) => `₦${new Intl.NumberFormat("en-NG").format(Math.round(amount))}`;
+
+/** Links to the donate page with the kits and their Naira value; the donor chooses how to pay there. */
+export function donateHrefForKits(kits: number, costNgn: number = NIDAKE_KIT.costNgn) {
+  return `/donate?designation=nidake&kits=${kits}&ngn=${Math.round(kits * costNgn)}`;
 }

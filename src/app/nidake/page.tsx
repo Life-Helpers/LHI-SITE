@@ -167,7 +167,7 @@ export default async function NidakePage() {
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">
               <Link
-                href={donateHrefForKits(1, nidake.costUsd)}
+                href={donateHrefForKits(1, nidake.costNgn)}
                 className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
               >
                 Donate a Dignity Kit →

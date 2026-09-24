@@ -462,7 +462,8 @@ export interface CmsSettings {
     linkHref: string;
   };
   nidake: {
-    costUsd: number;
+    /** Price of one dignity kit in Naira. */
+    costNgn: number;
     yearsOfDignity: number;
     schoolDaysSaved: number;
   };

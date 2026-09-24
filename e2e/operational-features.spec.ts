@@ -19,9 +19,11 @@ test("NIDAKE calculator converts kits into school days saved", async ({ page }) 
   await page.goto("/nidake");
   await page.getByLabel("Number of dignity kits to sponsor").fill("4");
   await expect(page.getByText("720", { exact: true })).toBeVisible();
+  // Prices are shown in Naira.
+  await expect(page.getByText("₦90,000", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Sponsor 4 kits" })).toHaveAttribute(
     "href",
-    "/donate?amount=60&designation=nidake&kits=4",
+    "/donate?designation=nidake&kits=4&ngn=90000",
   );
 });
 

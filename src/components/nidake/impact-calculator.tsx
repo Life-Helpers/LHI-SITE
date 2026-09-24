@@ -4,10 +4,10 @@ import { useId, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CalendarCheck, GraduationCap, Heart, Package } from "lucide-react";
 
-import { SPONSOR_PACKS, donateHrefForKits } from "@/data/nidake";
+import { SPONSOR_PACKS, donateHrefForKits, formatNaira } from "@/data/nidake";
 
 interface KitEconomics {
-  costUsd: number;
+  costNgn: number;
   yearsOfDignity: number;
   schoolDaysSaved: number;
 }
@@ -21,7 +21,7 @@ export function NidakeImpactCalculator({ kit: NIDAKE_KIT }: { kit: KitEconomics 
   const safeKits = Math.min(Math.max(Math.round(kits) || 1, 1), 5000);
   const schoolDays = safeKits * NIDAKE_KIT.schoolDaysSaved;
   const dignityYears = safeKits * NIDAKE_KIT.yearsOfDignity;
-  const cost = safeKits * NIDAKE_KIT.costUsd;
+  const cost = safeKits * NIDAKE_KIT.costNgn;
 
   return (
     <section aria-labelledby="calculator-heading" className="border-b border-border py-16 md:py-24">
@@ -66,12 +66,12 @@ export function NidakeImpactCalculator({ kit: NIDAKE_KIT }: { kit: KitEconomics 
             <Result icon={Package} label="Dignity kits" value={fmt.format(safeKits)} />
             <Result icon={CalendarCheck} label="School days saved" value={fmt.format(schoolDays)} />
             <Result icon={Heart} label="Years of dignity" value={fmt.format(dignityYears)} />
-            <Result icon={GraduationCap} label="Your gift (USD)" value={`$${fmt.format(cost)}`} />
+            <Result icon={GraduationCap} label="Your gift (Naira)" value={formatNaira(cost)} />
           </dl>
 
           <div className="mt-8 flex justify-center">
             <Link
-              href={donateHrefForKits(safeKits, NIDAKE_KIT.costUsd)}
+              href={donateHrefForKits(safeKits, NIDAKE_KIT.costNgn)}
               className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
             >
               Sponsor {fmt.format(safeKits)} {safeKits === 1 ? "kit" : "kits"} <ArrowRight className="h-4 w-4" />
@@ -90,7 +90,7 @@ export function NidakeImpactCalculator({ kit: NIDAKE_KIT }: { kit: KitEconomics 
             <div key={pack.id} className="flex flex-col rounded-2xl border border-border bg-card p-6">
               <p className="text-xs font-semibold uppercase tracking-wider text-accent">{pack.name}</p>
               <p className="mt-2 font-serif-display text-3xl text-foreground">
-                ${fmt.format(pack.kits * NIDAKE_KIT.costUsd)}
+                {formatNaira(pack.kits * NIDAKE_KIT.costNgn)}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">{pack.audience}</p>
               <ul className="mt-4 space-y-1 text-xs text-foreground">
@@ -99,7 +99,7 @@ export function NidakeImpactCalculator({ kit: NIDAKE_KIT }: { kit: KitEconomics 
               </ul>
               <div className="mt-auto pt-5">
                 <Link
-                  href={donateHrefForKits(pack.kits, NIDAKE_KIT.costUsd)}
+                  href={donateHrefForKits(pack.kits, NIDAKE_KIT.costNgn)}
                   className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-primary py-2 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground"
                 >
                   Give this pack <ArrowRight className="h-3.5 w-3.5" />

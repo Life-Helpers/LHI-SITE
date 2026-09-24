@@ -92,8 +92,8 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
       </Card>
 
       <Card title="NIDAKE impact calculator" bodyClassName="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3">
-        <Row label="Kit cost (USD)">
-          <input type="number" min={1} value={s.nidake.costUsd} onChange={(e) => set("nidake", "costUsd", e.target.value)} className={inputClass} />
+        <Row label="Kit cost (₦ Naira)">
+          <input type="number" min={1} value={s.nidake.costNgn} onChange={(e) => set("nidake", "costNgn", e.target.value)} className={inputClass} />
         </Row>
         <Row label="Years of dignity / kit">
           <input type="number" min={1} value={s.nidake.yearsOfDignity} onChange={(e) => set("nidake", "yearsOfDignity", e.target.value)} className={inputClass} />
