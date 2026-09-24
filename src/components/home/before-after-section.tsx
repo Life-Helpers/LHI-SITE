@@ -10,14 +10,15 @@ import { LHI_PHOTOS, type LhiPhotoKey } from "@/data/lhi-photos";
 /**
  * "Before & After" stories. Every before/after statement is taken from LHI's project
  * magazines and newsletter; the photo is the person or place in the story. The
- * "before" side uses a real earlier photo when we have one, otherwise the same photo faded.
+ * "before" side is shown in black and white: a real earlier photo when we have one,
+ * otherwise the same photo.
  */
 const STORIES: {
   id: string;
   name: string;
   place: string;
   photo: LhiPhotoKey;
-  /** A real photo from before the support; when missing, the "before" side shows the main photo faded. */
+  /** A real photo from before the support; when missing, the "before" side shows the main photo in black and white. */
   beforePhoto?: LhiPhotoKey;
   before: { title: string; text: string };
   after: { title: string; text: string };
@@ -135,12 +136,12 @@ export function BeforeAfterSection() {
               Now
             </span>
 
-            {/* Before (an earlier photo, or the same photo faded), clipped to the slider position */}
+            {/* Before (black and white), clipped to the slider position */}
             <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }} aria-hidden="true">
               {beforePhoto ? (
-                <Image key={`before-${story.id}`} src={beforePhoto.src} alt="" fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover" />
+                <Image key={`before-${story.id}`} src={beforePhoto.src} alt="" fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover grayscale" />
               ) : (
-                <Image src={photo.src} alt="" fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover grayscale sepia-[.35] brightness-[.55] contrast-[.9]" />
+                <Image src={photo.src} alt="" fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover grayscale" />
               )}
               <span className="absolute bottom-5 left-5 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-foreground shadow sm:bottom-7 sm:left-7">
                 Before
