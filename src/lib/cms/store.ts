@@ -1,6 +1,7 @@
 import "server-only";
 
 import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 
 import type {
@@ -41,9 +42,15 @@ import type { CollectionRecords } from "@/lib/cms/types";
  * everything else talks to the store only through these functions.
  */
 
-export const DATA_DIR = process.env.CMS_DATA_DIR
-  ? path.resolve(process.env.CMS_DATA_DIR)
-  : path.join(process.cwd(), "cms-data");
+/**
+ * CMS_DATA_DIR when set; on Vercel (read-only project folder) the writable temp folder, which
+ * is fine for previews but is wiped regularly; otherwise ./cms-data next to the app.
+ */
+export const DATA_DIR = process.env.CMS_DATA_DIR?.trim()
+  ? path.resolve(process.env.CMS_DATA_DIR.trim())
+  : process.env.VERCEL
+    ? path.join(tmpdir(), "lhi-cms-data")
+    : path.join(process.cwd(), "cms-data");
 
 export const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 
