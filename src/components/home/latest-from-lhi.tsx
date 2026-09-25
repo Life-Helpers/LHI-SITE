@@ -49,10 +49,9 @@ export function LatestFromLHI({ posts, today }: { posts: LatestPost[]; today: st
         <header className="border-b-4 border-double border-current pb-4">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-current/30 pb-2 text-[10px] font-semibold uppercase tracking-[0.3em] opacity-70 sm:text-[11px]">
             <span>{dateLabel(today, "long")}</span>
-            <span className="hidden sm:inline">Sokoto · Abuja · the field</span>
             <span>Since 2004</span>
           </div>
-          <h2 id="latest-heading" className="mt-4 text-center font-serif-display text-5xl font-light leading-none tracking-tight sm:text-7xl lg:text-8xl">
+          <h2 id="latest-heading" className="mt-4 text-center font-serif-display text-5xl font-light leading-none tracking-tight text-primary sm:text-7xl lg:text-8xl">
             {l.heading}
           </h2>
           <p className="mt-3 text-center font-serif-display text-lg italic opacity-75 sm:text-xl">{l.subtitle}</p>

@@ -5,6 +5,7 @@ import { ArrowRight, CalendarClock, Radio } from "lucide-react";
 
 import { Eyebrow } from "@/components/eyebrow";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
+import { TiltCard } from "@/components/effects/tilt-card";
 import { RetroRadio } from "@/components/radio/retro-radio";
 import { useRadio, type RadioEpisode } from "@/components/radio/use-radio";
 import { useLocale } from "@/i18n/locale-context";
@@ -45,7 +46,9 @@ export function RadioBanner({ episodes }: { episodes: RadioEpisode[] }) {
             </div>
           </div>
           <div className="pt-12 lg:pt-0">
-            <RetroRadio radio={radio} total={episodes.length} />
+            <TiltCard>
+              <RetroRadio radio={radio} total={episodes.length} />
+            </TiltCard>
           </div>
         </div>
       </ScrollReveal>

@@ -21,11 +21,17 @@ export function OperationalMap({
   states,
   interventions: allInterventions,
   className = "",
+  glass = false,
 }: {
   states: OperationalState[];
   interventions: MapProject[];
   className?: string;
+  /** Frosted-glass cards, for use over a photo background. */
+  glass?: boolean;
 }) {
+  const surface = glass
+    ? "border-white/40 bg-white/55 shadow-xl backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-black/45"
+    : "border-border bg-card";
   const locations = useNigeriaLocations();
   const STATE_BY_ID = useMemo(() => new Map(states.map((s) => [s.id as string, s])), [states]);
   const [selectedId, setSelectedId] = useState<OperationalStateId | null>("sokoto");
@@ -48,7 +54,7 @@ export function OperationalMap({
   return (
     <div className={`grid grid-cols-1 gap-6 lg:grid-cols-12 ${className}`}>
       {/* Map */}
-      <div className="relative rounded-3xl border border-border bg-card p-4 sm:p-6 lg:col-span-7">
+      <div className={`relative rounded-3xl border p-4 sm:p-6 lg:col-span-7 ${surface}`}>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-primary">
             {states.length} office states
@@ -151,7 +157,7 @@ export function OperationalMap({
       {/* State detail popover panel */}
       <div className="lg:col-span-5" aria-live="polite">
         {selected ? (
-          <div className="flex h-full flex-col rounded-3xl border border-border bg-card p-6 shadow-sm">
+          <div className={`flex h-full flex-col rounded-3xl border p-6 shadow-sm ${surface}`}>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-accent">
@@ -230,7 +236,7 @@ export function OperationalMap({
             </p>
           </div>
         ) : (
-          <div className="flex h-full min-h-64 items-center justify-center rounded-3xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+          <div className={`flex h-full min-h-64 items-center justify-center rounded-3xl border border-dashed p-8 text-center text-sm text-muted-foreground ${glass ? surface : "border-border"}`}>
             Select a highlighted state on the map to see LHI&apos;s interventions, donor partners and reach there.
           </div>
         )}

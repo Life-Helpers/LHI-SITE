@@ -42,6 +42,7 @@ const STORIES: {
     name: "Murja Yari",
     place: "Katsina State",
     photo: "murja",
+    beforePhoto: "murjaPassbook",
     before: { title: "Eight years of struggle", text: "Widowed with 11 children and no income: “There were times when we spent up to five days without anything to eat.”" },
     after: {
       title: "A food business that runs all day",
@@ -77,7 +78,8 @@ const STORIES: {
     id: "azima",
     name: "Azima Bello",
     place: "Zamfara State",
-    photo: "azima",
+    photo: "azimaAtHome",
+    beforePhoto: "azima",
     before: { title: "A child bride at fifteen", text: "Forced into marriage at fifteen, she returned home broken and without hope." },
     after: {
       title: "A skilled apprentice and saver",
