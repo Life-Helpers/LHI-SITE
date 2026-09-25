@@ -76,7 +76,7 @@ export function WhoWeAreBand() {
       word: "Mission",
       icon: Target,
       className: "bg-accent text-white",
-      image: LHI_PHOTOS.girlSewing.src,
+      image: LHI_PHOTOS.childrensDayDance.src,
       body: <p className="font-serif-display text-xl font-light leading-snug sm:text-3xl">{w.missionBody}</p>,
     },
     {
@@ -150,15 +150,15 @@ export function WhoWeAreBand() {
                 isActive ? "grow-[6]" : "grow"
               } basis-0 min-h-16 md:min-w-20`}
             >
-              {/* Matching photo, faded to 50% so the panel colour shows through */}
+              {/* Matching photo, at 80% with a dark wash so the panel colour still tints it and the text stays readable */}
               <Image
                 src={panel.image}
                 alt=""
                 fill
                 sizes="(min-width: 768px) 70vw, 100vw"
-                className={`pointer-events-none object-cover opacity-50 transition-transform duration-700 ${isActive ? "scale-100" : "scale-110"}`}
+                className={`pointer-events-none object-cover opacity-80 brightness-90 transition-transform duration-700 ${isActive ? "scale-100" : "scale-110"}`}
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" aria-hidden="true" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/35 to-black/20" aria-hidden="true" />
 
               {/* Decorative oversized icon */}
               <Icon

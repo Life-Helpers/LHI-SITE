@@ -4,7 +4,9 @@ import Image from "next/image";
 import { ArrowRight, Flag, MapPin, Navigation } from "lucide-react";
 import { MotionConfig, motion } from "motion/react";
 
-import { OLD_LOGO, type HistoryMedia, type HistoryMilestone } from "@/data/history-timeline";
+import { HISTORY_START, OLD_LOGO, type HistoryMilestone, type HistoryPhoto } from "@/data/history-timeline";
+
+import { StatePinMap } from "./state-pin-map";
 
 /**
  * "Our History" as a road-map journey: a winding road runs down the middle, each
@@ -12,13 +14,21 @@ import { OLD_LOGO, type HistoryMedia, type HistoryMilestone } from "@/data/histo
  * title and story on the right. On small screens the road runs down the left edge.
  */
 export function RoadmapTimeline({ milestones }: { milestones: HistoryMilestone[] }) {
+  // States reached before each stop, so its map can shade the journey so far.
+  const reached: string[] = [];
+  const earlierStates = milestones.map((m) => {
+    const before = [...reached];
+    reached.push(...(m.states ?? []));
+    return before;
+  });
+
   return (
     <MotionConfig reducedMotion="user">
       <div className="relative">
         <RoadEnd kind="start" />
         <ol className="relative">
           {milestones.map((m, i) => (
-            <Stop key={`${m.year}-${m.title}`} milestone={m} index={i} />
+            <Stop key={`${m.year}-${m.title}`} milestone={m} index={i} earlier={earlierStates[i]} />
           ))}
         </ol>
         <RoadEnd kind="end" />
@@ -70,7 +80,7 @@ function YearMarker({ year }: { year: string }) {
   );
 }
 
-function Stop({ milestone: m, index }: { milestone: HistoryMilestone; index: number }) {
+function Stop({ milestone: m, index, earlier }: { milestone: HistoryMilestone; index: number; earlier: string[] }) {
   const bend = index % 2 === 0 ? "right" : "left";
   return (
     <li className="relative">
@@ -82,7 +92,7 @@ function Stop({ milestone: m, index }: { milestone: HistoryMilestone; index: num
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <Media media={m.media} milestone={m} />
+          <Media milestone={m} earlier={earlier} />
         </motion.div>
         <div className="relative flex h-full items-center justify-center self-stretch">
           <div className="absolute -inset-y-6 inset-x-0">
@@ -117,7 +127,7 @@ function Stop({ milestone: m, index }: { milestone: HistoryMilestone; index: num
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="space-y-4"
         >
-          {m.media && <Media media={m.media} milestone={m} />}
+          {(m.media || m.states) && <Media milestone={m} earlier={earlier} />}
           <Story milestone={m} />
         </motion.div>
       </div>
@@ -140,8 +150,21 @@ function Story({ milestone: m }: { milestone: HistoryMilestone }) {
   );
 }
 
-function Media({ media, milestone: m }: { media?: HistoryMedia; milestone: HistoryMilestone }) {
+function Media({ milestone: m, earlier }: { milestone: HistoryMilestone; earlier: string[] }) {
+  const media = m.media;
   if (!media) {
+    if (m.states) {
+      // A state expansion without photos: the map, with a pin on the new state(s).
+      return (
+        <figure className="mx-auto w-full max-w-md rounded-3xl border border-border bg-card p-4 sm:p-5">
+          <StatePinMap states={m.states} earlier={earlier} />
+          <figcaption className="mt-2 flex items-center justify-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+            {m.location}
+          </figcaption>
+        </figure>
+      );
+    }
     // A road sign for milestones without photos.
     return (
       <div className="relative mx-auto flex aspect-[16/9] w-full max-w-md flex-col items-center justify-center overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary/10 via-card to-accent/10 p-6 text-center">
@@ -177,33 +200,55 @@ function Media({ media, milestone: m }: { media?: HistoryMedia; milestone: Histo
     );
   }
 
-  const { photos, caption } = media;
   return (
     <figure>
-      <div className={`grid gap-2 ${photos.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
-        {photos.map((p, i) => (
+      <div className="relative">
+        <PhotoGrid photos={media.photos} />
+        {m.states && (
+          // Map inset: where this milestone happened.
+          <div className="pointer-events-none absolute right-2 top-2 w-[30%] min-w-[96px] max-w-[150px] rounded-xl bg-background/90 p-1.5 shadow-lg ring-1 ring-border backdrop-blur-sm">
+            <StatePinMap states={m.states} earlier={earlier} compact />
+          </div>
+        )}
+      </div>
+      {media.caption && <figcaption className="mt-2 text-xs italic text-muted-foreground">{media.caption}</figcaption>}
+    </figure>
+  );
+}
+
+function PhotoGrid({ photos }: { photos: HistoryPhoto[] }) {
+  const n = photos.length;
+  return (
+    <div className={`grid gap-2 ${n > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
+      {photos.map((p, i) => {
+        const wide = n === 1 || (n === 3 && i === 0);
+        return (
           <a
             key={p.src}
             href={p.src}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Open photo: ${p.alt}`}
+            aria-label={`Open photo: ${p.label ?? p.alt}`}
             className={`group relative block overflow-hidden rounded-2xl bg-muted shadow-sm ${
-              photos.length === 3 && i === 0 ? "col-span-2 aspect-[16/9]" : photos.length === 1 ? "aspect-[16/10]" : "aspect-[4/3]"
+              n === 3 && i === 0 ? "col-span-2 aspect-[16/9]" : n === 1 ? "aspect-[16/10]" : "aspect-[4/3]"
             }`}
           >
             <Image
               src={p.src}
               alt={p.alt}
               fill
-              sizes={photos.length === 1 || (photos.length === 3 && i === 0) ? "(min-width: 1024px) 480px, 90vw" : "(min-width: 1024px) 240px, 45vw"}
+              sizes={wide ? "(min-width: 1024px) 480px, 90vw" : "(min-width: 1024px) 240px, 45vw"}
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
+            {p.label && (
+              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent px-2.5 pb-2 pt-6 text-[11px] font-medium leading-snug text-white sm:text-xs">
+                {p.label}
+              </span>
+            )}
           </a>
-        ))}
-      </div>
-      {caption && <figcaption className="mt-2 text-xs italic text-muted-foreground">{caption}</figcaption>}
-    </figure>
+        );
+      })}
+    </div>
   );
 }
 
@@ -211,22 +256,43 @@ function RoadEnd({ kind }: { kind: "start" | "end" }) {
   const start = kind === "start";
   return (
     <div className="grid grid-cols-[64px_minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_150px_minmax(0,1fr)] lg:gap-6">
-      <div className="hidden lg:block" />
-      <div className="flex flex-col items-center">
+      {start ? (
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="col-span-2 self-center lg:col-span-1"
+        >
+          <PhotoGrid photos={HISTORY_START.photos} />
+        </motion.div>
+      ) : (
+        <div className="hidden lg:block" />
+      )}
+      <div className="flex flex-col items-center justify-end">
         {!start && <div className="h-8 w-7 rounded-b-full bg-slate-700 dark:bg-slate-600" aria-hidden="true" />}
         <span
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] shadow-md ${
+          className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-bold lg:px-4 uppercase tracking-[0.2em] shadow-md ${
             start ? "bg-foreground text-background" : "bg-accent text-accent-foreground"
           }`}
         >
           {start ? <Flag className="h-3.5 w-3.5" aria-hidden="true" /> : <Navigation className="h-3.5 w-3.5" aria-hidden="true" />}
-          {start ? "Start" : "The road ahead"}
+          <span className="sr-only lg:not-sr-only">{start ? "Start" : "The road ahead"}</span>
         </span>
         {start && <div className="h-8 w-7 rounded-t-full bg-slate-700 dark:bg-slate-600" aria-hidden="true" />}
       </div>
-      <p className={`self-center text-sm text-muted-foreground ${start ? "" : "lg:col-start-3"}`}>
-        {start ? "1 October 2004 · Sokoto: where the journey began." : "More lives to touch, more smiles to put on faces."}
-      </p>
+      {start ? (
+        <div className="self-center">
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
+            <MapPin size={12} aria-hidden="true" />
+            {HISTORY_START.date}
+          </span>
+          <h3 className="mt-2 font-serif-display text-2xl font-light leading-snug text-foreground sm:text-[1.7rem]">{HISTORY_START.title}</h3>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">{HISTORY_START.summary}</p>
+        </div>
+      ) : (
+        <p className="self-center text-sm text-muted-foreground lg:col-start-3">More lives to touch, more smiles to put on faces.</p>
+      )}
     </div>
   );
 }

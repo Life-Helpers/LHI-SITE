@@ -6,7 +6,7 @@ import { Play } from "lucide-react";
 
 
 const VIDEO_ID = "45HZKC19AxY";
-const POSTER = { src: "/images/lhi/nidake-mhday-2023.jpg" };
+const POSTER = { src: "/images/lhi/nidake-poster.jpg" };
 
 /** Click-to-play YouTube video: the player (and YouTube's scripts) only load when a visitor presses play. */
 export function NidakeVideo() {
@@ -34,17 +34,16 @@ export function NidakeVideo() {
             />
           ) : (
             <button type="button" onClick={() => setPlaying(true)} className="group absolute inset-0 h-full w-full" aria-label="Play the NIDAKE video">
-              {/* The #MHDay2023 NIDAKE poster: shown in full, with a blurred copy filling the rest of the frame. */}
-              <Image src={POSTER.src} alt="" fill sizes="(min-width: 1024px) 960px, 100vw" className="scale-110 object-cover opacity-70 blur-2xl" aria-hidden="true" />
+              {/* The NIDAKE poster fills the 16:9 frame. */}
               <Image
                 src={POSTER.src}
                 alt=""
                 fill
                 sizes="(min-width: 1024px) 960px, 100vw"
-                className="object-contain transition-transform duration-500 group-hover:scale-[1.03]"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               />
-              <span className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" aria-hidden="true" />
-              <span className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl ring-8 ring-white/20 transition-transform group-hover:scale-110">
+              <span className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" aria-hidden="true" />
+              <span className="absolute bottom-5 left-5 flex h-16 w-16 sm:bottom-8 sm:left-8 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl ring-8 ring-white/20 transition-transform group-hover:scale-110">
                 <Play className="ml-1 h-8 w-8 fill-current" aria-hidden="true" />
               </span>
             </button>

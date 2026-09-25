@@ -8,6 +8,8 @@ import { LHI_PHOTOS } from "@/data/lhi-photos";
 export interface HistoryPhoto {
   src: string;
   alt: string;
+  /** Shown on the photo: the picture's own title from LHI's archive. */
+  label?: string;
 }
 
 export type HistoryMedia =
@@ -20,9 +22,23 @@ export interface HistoryMilestone {
   location?: string;
   summary: string;
   media?: HistoryMedia;
+  /** @svg-maps/nigeria ids of states LHI expanded into at this milestone; shown as pins on a map. */
+  states?: string[];
 }
 
-const h = (file: string, alt: string): HistoryPhoto => ({ src: `/images/lhi/history/${file}`, alt });
+const h = (file: string, alt: string, label?: string): HistoryPhoto => ({ src: `/images/lhi/history/${file}`, alt, label });
+
+/** The start of the road: where the foundation was laid. */
+export const HISTORY_START = {
+  date: "1 October 2004 · Sokoto",
+  title: "Where the journey began",
+  summary: "Foundation was laid here at the Goshen Development Centre.",
+  photos: [
+    h("goshen-foundation-blocks.jpg", "Sandcrete blocks stacked on the cleared site of the Goshen Development Centre", "Blocks on site"),
+    h("goshen-foundation-walls.jpg", "Block walls rising on the Goshen Development Centre site", "The walls go up"),
+    h("goshen-centre-building.jpg", "The completed building at the Goshen Development Centre", "Goshen Development Centre"),
+  ],
+};
 
 export const OLD_LOGO = h("lhi-old-logo.png", "Life Helpers Initiative's first logo: helping hands over a globe, with the words Putting A Smile On A Face");
 
@@ -31,6 +47,7 @@ export const HISTORY_MILESTONES: HistoryMilestone[] = [
     year: "2004",
     title: "Inception as the Beulah Project",
     location: "Sokoto State",
+    states: ["sokoto"],
     summary:
       "Established on October 1, 2004 as the Beulah Project, supporting children at the orphanage. In the words of Executive Director Tayo Fatinikun, “It was simply just a passion – a passion to touch lives, a passion to make children feel wanted, an attempt to restore their dignity.”",
     media: {
@@ -92,6 +109,16 @@ export const HISTORY_MILESTONES: HistoryMilestone[] = [
     },
   },
   {
+    year: "2009",
+    title: "Staff Retreat",
+    location: "Goshen Development Centre, Sokoto",
+    summary: "The Life Helpers team gathered for its 2009 staff retreat.",
+    media: {
+      kind: "photos",
+      photos: [h("goshen-staff-retreat-2009.jpg", "Life Helpers staff in LH polo shirts at the 2009 staff retreat", "Staff Retreat 2009")],
+    },
+  },
+  {
     year: "2011",
     title: "NEI Children's Day Celebration",
     location: "Sokoto State",
@@ -121,13 +148,30 @@ export const HISTORY_MILESTONES: HistoryMilestone[] = [
     year: "2013",
     title: "Expansion to Kebbi State",
     location: "Kebbi State",
+    states: ["kebbi"],
     summary:
       "Scaled programming beyond Sokoto into neighboring Kebbi State, rolling out community-based maternal and child healthcare, routine immunization campaigns, and rural Water, Sanitation, and Hygiene (WASH) infrastructure.",
+  },
+  {
+    year: "2014",
+    title: "Celebrating 10 Years at Goshen",
+    location: "Goshen Development Centre, Sokoto",
+    summary:
+      "Ten years on from 2004, the team marked the milestone with a staff retreat at the Goshen Development Centre, where Life Helpers sang the Life Helpers anthem.",
+    media: {
+      kind: "photos",
+      photos: [
+        h("goshen-10-years-centre.jpg", "Life Helpers staff posing together at the 10-year staff retreat", "Staff Retreat celebrating 10 years at Goshen Development Centre"),
+        h("goshen-10-years-group.jpg", "Five Life Helpers staff in LH shirts at the 10-year staff retreat", "Staff Retreat celebrating 10 years in Goshen"),
+        h("goshen-10-years-anthem.jpg", "Life Helpers staff singing together at the 10-year staff retreat", "Life Helpers singing the Life Helpers anthem"),
+      ],
+    },
   },
   {
     year: "2015",
     title: "Expansion to Zamfara State",
     location: "Zamfara State",
+    states: ["zamfara"],
     summary:
       "Launched large-scale interventions in Zamfara State focusing on girls' education, community nutrition stabilization for children under five, and gender-based violence prevention through Mothers' Associations and community leaders.",
     media: {
@@ -143,6 +187,7 @@ export const HISTORY_MILESTONES: HistoryMilestone[] = [
     year: "2017",
     title: "North-East Humanitarian Crisis Response",
     location: "Borno, Yobe, & Adamawa States",
+    states: ["borno", "yobe", "adamawa"],
     summary:
       "In response to the severe humanitarian emergency in North-East Nigeria, LHI deployed frontline teams to Maiduguri (Borno), Damaturu (Yobe), and Yola (Adamawa). Implemented emergency Child Protection in Emergencies (CPiE), malnutrition stabilization, and emergency psychosocial support funded by the Nigeria Humanitarian Fund (NHF) and international partners.",
     media: { kind: "photos", caption: "Emergency response supplies", photos: [LHI_PHOTOS.sifKit] },
@@ -156,6 +201,21 @@ export const HISTORY_MILESTONES: HistoryMilestone[] = [
       photos: [
         h("2017-world-aids-day.jpg", "LHI team in World AIDS Day 2017 T-shirts in front of a Save the Children banner"),
         h("2017-world-aids-day-team.jpg", "LHI team and partners beside an ambulance on World AIDS Day 2017"),
+      ],
+    },
+  },
+  {
+    year: "2018",
+    title: "Staff Retreat at Goshen",
+    location: "Goshen Development Centre, Tamaje bypass, Sokoto",
+    summary: "The growing Life Helpers team came together again at the Goshen Development Centre for the 2018 staff retreat.",
+    media: {
+      kind: "photos",
+      photos: [
+        h("goshen-retreat-2018-team.jpg", "The full Life Helpers team in LHI shirts at the 2018 staff retreat", "Staff Retreat 2018 at Goshen"),
+        h("goshen-retreat-2018-group.jpg", "Six Life Helpers staff at the 2018 staff retreat", "Staff Retreat 2018 at Goshen"),
+        h("goshen-retreat-2018-hall.jpg", "Staff outside a hall at the Goshen Development Centre during the 2018 retreat", "Staff Retreat 2018 at Goshen Development Centre"),
+        h("goshen-retreat-2018-tamaje.jpg", "Life Helpers staff on the lawn at Goshen, Tamaje bypass, during the 2018 retreat", "Staff Retreat 2018 at Goshen, Tamaje bypass"),
       ],
     },
   },
@@ -184,6 +244,7 @@ export const HISTORY_MILESTONES: HistoryMilestone[] = [
     year: "2020",
     title: "Expansion to Bauchi State",
     location: "Bauchi State",
+    states: ["bauchi"],
     summary:
       "Commenced comprehensive adolescent reproductive health, girl-child empowerment, and community resilience programs in Bauchi, including the multi-year ASPIRED project funded by Global Affairs Canada in partnership with Plan International.",
   },
@@ -191,6 +252,7 @@ export const HISTORY_MILESTONES: HistoryMilestone[] = [
     year: "2021",
     title: "Abuja Liaison Office & Ebonyi State Expansion",
     location: "FCT Abuja & Ebonyi State",
+    states: ["fct", "ebonyi"],
     summary:
       "Established the Liaison Office in Gwarimpa, Abuja, for partner and federal coordination. Extended operations into Ebonyi State, where LHI supported health workers and community-based workers across 65 PHCs to reduce malnutrition in children under 5.",
   },
@@ -198,6 +260,7 @@ export const HISTORY_MILESTONES: HistoryMilestone[] = [
     year: "2022",
     title: "Expansion to Plateau State",
     location: "Plateau State",
+    states: ["plateau"],
     summary:
       "Under the President's Malaria Initiative for States with Management Sciences for Health, LHI began mentoring frontline providers on malaria case management, data management and malaria in pregnancy across 327 primary healthcare centres.",
   },
@@ -205,6 +268,7 @@ export const HISTORY_MILESTONES: HistoryMilestone[] = [
     year: "2023",
     title: "Katsina Office",
     location: "Katsina State",
+    states: ["katsina"],
     summary:
       "Opened the Katsina office, later home to the FCDO/WFP Resilience Building and Smallholder Farmers Support Project and the Gidan Arziki Farmer Service Centre in Batagarawa.",
   },
