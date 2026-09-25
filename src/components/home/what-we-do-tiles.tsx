@@ -257,10 +257,7 @@ function JellyCard({
 
       <div>
         {/* Card Header: thematic area number & tag */}
-        <div className="relative z-10 flex items-center justify-between">
-          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-primary uppercase">
-            Thematic Area {pillar.pillarNumber}
-          </span>
+        <div className="relative z-10 flex items-center">
           <span className="text-[11px] font-medium text-muted-foreground">
             {pillar.tag}
           </span>

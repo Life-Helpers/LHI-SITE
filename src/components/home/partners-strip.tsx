@@ -135,7 +135,7 @@ export function PartnersStrip({ partners: rawPartners, projects = {} }: { partne
 
         {/* Track 1: Moving Forward (Reduced speed for relaxed, readable gliding) */}
         <div className="relative w-full overflow-hidden mb-4 sm:mb-6">
-          <div className="flex w-max gap-4 sm:gap-6 animate-[marquee_85s_linear_infinite] hover:[animation-play-state:paused]">
+          <div className="flex w-max gap-4 sm:gap-6 animate-[marquee_130s_linear_infinite] hover:[animation-play-state:paused]">
             {/* Duplicate track for seamless infinite loop */}
             {[...rowOnePartners, ...rowOnePartners, ...rowOnePartners].map((partner, idx) => (
               <PartnerCard
@@ -151,7 +151,7 @@ export function PartnersStrip({ partners: rawPartners, projects = {} }: { partne
         {/* Track 2: Moving Reverse / Offset (Reduced speed for relaxed, readable gliding) */}
         {rowTwoPartners.length > 0 && (
           <div className="relative w-full overflow-hidden">
-            <div className="flex w-max gap-4 sm:gap-6 animate-[marquee-reverse_85s_linear_infinite] hover:[animation-play-state:paused]">
+            <div className="flex w-max gap-4 sm:gap-6 animate-[marquee-reverse_130s_linear_infinite] hover:[animation-play-state:paused]">
               {/* Duplicate track for seamless infinite loop */}
               {[...rowTwoPartners, ...rowTwoPartners, ...rowTwoPartners].map((partner, idx) => (
                 <PartnerCard

@@ -67,6 +67,12 @@ export default async function Home() {
       linkLabel: feature.linkLabel || "Read more",
     });
   }
+  // Latest from LHI: newest posts not already in the feature carousel above.
+  const featured = new Set(featureSlides.map((s) => s.href));
+  const latest = posts
+    .filter((p) => !featured.has(`/blog/${p.slug}`))
+    .slice(0, 24)
+    .map((p) => ({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, date: p.date, image: p.featuredImage || undefined }));
   return (
     <HomeTextOverrides text={settings.homeText}>
       <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
@@ -81,7 +87,7 @@ export default async function Home() {
         </div>
         <UpcomingEvents events={events.slice(0, 5)} today={todayInLagos()} />
         <div className="defer-render">
-          <LatestFromLHI />
+          <LatestFromLHI posts={latest} today={todayInLagos()} />
         </div>
         <div className="defer-render">
           <RadioBanner episodes={episodes.slice(0, 12).map(toRadioEpisode)} />
@@ -90,7 +96,7 @@ export default async function Home() {
           <TestimonialsSection />
         </div>
         <div className="defer-render">
-          <SocialFeedsSection posts={posts.slice(0, 4)} />
+          <SocialFeedsSection />
         </div>
         <div className="defer-render">
           <PartnersStrip partners={partners} projects={partnerProjects} />

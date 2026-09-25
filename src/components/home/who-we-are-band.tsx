@@ -68,7 +68,11 @@ export function WhoWeAreBand() {
       icon: Eye,
       className: "bg-primary text-primary-foreground",
       image: LHI_PHOTOS.cabbageFarmerWaving.src,
-      body: <p className="font-serif-display text-2xl font-light leading-snug sm:text-4xl">{w.visionBody}</p>,
+      body: (
+        <div className="rounded-2xl bg-white/10 p-5 backdrop-blur-sm sm:p-6">
+          <p className="font-serif-display text-2xl font-light leading-snug sm:text-4xl">{w.visionBody}</p>
+        </div>
+      ),
     },
     {
       id: "mission",
@@ -77,7 +81,11 @@ export function WhoWeAreBand() {
       icon: Target,
       className: "bg-accent text-white",
       image: LHI_PHOTOS.childrensDayDance.src,
-      body: <p className="font-serif-display text-xl font-light leading-snug sm:text-3xl">{w.missionBody}</p>,
+      body: (
+        <div className="rounded-2xl bg-white/10 p-5 backdrop-blur-sm sm:p-6">
+          <p className="font-serif-display text-xl font-light leading-snug sm:text-3xl">{w.missionBody}</p>
+        </div>
+      ),
     },
     {
       id: "values",
@@ -208,7 +216,6 @@ export function WhoWeAreBand() {
         {panels.map((panel, i) => (
           <span key={panel.id} className={`h-1.5 rounded-full transition-all duration-500 ${i === active ? "w-10 bg-primary" : "w-4 bg-border"}`} />
         ))}
-        <span className="ml-2 text-[11px] uppercase tracking-widest text-muted-foreground">Scroll or hover to explore</span>
       </div>
       </div>
     </section>

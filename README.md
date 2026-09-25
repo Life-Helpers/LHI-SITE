@@ -249,6 +249,22 @@ All of these store their data in `CMS_DATA_DIR` and are managed from the admin:
 Seed content (posts, projects) is only used until a collection is first saved; on a site whose `posts.json`
 already exists, new seed stories must be added through the admin.
 
+## Live social feed (home page)
+
+The "Follow our work" section streams the Facebook Page timeline with no setup. To also show
+the newest posts from each account on the social wall, add these in Vercel → Settings →
+Environment Variables (all optional; see `.env.example` and `src/lib/social-feed.ts`):
+
+| Account | Variables | Notes |
+|---|---|---|
+| YouTube | `YOUTUBE_CHANNEL_ID` (optional) | No key needed; the ID is looked up from the channel handle if unset. |
+| Facebook | `FACEBOOK_PAGE_ID`, `FACEBOOK_PAGE_ACCESS_TOKEN` | Long-lived Page token with `pages_read_engagement`. |
+| Instagram | `INSTAGRAM_ACCESS_TOKEN` | Professional account, "Instagram API with Instagram Login"; refresh the token every 60 days. |
+| X | `X_BEARER_TOKEN`, optional `X_USER_ID` | Needs an X API plan that can read posts. |
+
+Posts refresh every 15 minutes. An account that isn't connected or doesn't respond is skipped.
+LinkedIn does not offer a public feed API, so it appears as a follow link only.
+
 ## Brand system
 
 - **Typefaces:** Cormorant Garamond (`font-serif-display`, light weight) for page and section headings;

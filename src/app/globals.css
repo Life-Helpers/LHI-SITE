@@ -198,6 +198,7 @@
   --animate-drift-2: drift-2 38s ease-in-out infinite;
   --animate-drift-3: drift-3 44s ease-in-out infinite;
   --animate-fade-blur-in: fade-blur-in 0.8s ease-out both;
+  --animate-header-drop: header-drop 0.35s ease-out;
   --animate-marquee: marquee 85s linear infinite;
   --animate-marquee-fast: marquee 45s linear infinite;
   --animate-marquee-reverse: marquee-reverse 85s linear infinite;
@@ -207,6 +208,11 @@
 @keyframes story-progress {
   from { width: 0%; }
   to { width: 100%; }
+}
+
+@keyframes header-drop {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
 }
 
 @keyframes marquee {

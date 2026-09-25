@@ -587,17 +587,25 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
     getInvolvedLinks,
   } = useLocalizedNav();
 
+  // Inside the hero only the glass menu shows. The white menu appears (sliding down from the
+  // top) once the hero has scrolled out from under the menu bar, and goes away again on the
+  // way back up.
   useEffect(() => {
     if (!insideHero) return;
+    const hero = document.getElementById("hero-slider-container");
 
     const handleScroll = () => {
-      const scrolled = window.scrollY > 30;
+      const scrolled = hero ? hero.getBoundingClientRect().bottom <= 80 : window.scrollY > window.innerHeight;
       setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev));
     };
 
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, [insideHero]);
 
   // Close the mobile menu on navigation.
@@ -635,8 +643,8 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
       className={
         insideHero
           ? isScrolled
-            ? "fixed top-0 left-0 right-0 w-full z-50 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 shadow-md transition-all duration-300"
-            : "w-full bg-black/40 backdrop-blur-md border border-white/20 rounded-2xl px-4 sm:px-6 py-3 shadow-2xl transition-all duration-300"
+            ? "fixed top-0 left-0 right-0 w-full z-50 bg-white dark:bg-slate-950 border-b border-slate-200/80 dark:border-slate-800/80 shadow-md animate-header-drop motion-reduce:animate-none"
+            : "w-full bg-white/10 backdrop-blur-xl backdrop-saturate-150 border border-white/25 rounded-2xl px-4 sm:px-6 py-3 shadow-2xl transition-all duration-300"
           : "sticky top-0 z-50 w-full transition-colors duration-300 bg-background/85 dark:bg-background/85 backdrop-blur-xl border-b border-primary/10 dark:border-white/10 shadow-xs"
       }
     >
