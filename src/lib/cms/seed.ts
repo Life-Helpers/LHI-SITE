@@ -108,12 +108,12 @@ export function seedSettings(): CmsSettings {
     homeFeature: {
       enabled: true,
       eyebrow: "Feature story · Cultivating Resilience",
-      title: "From eight years of struggle to renewed hope",
+      title: "Saving a family business",
       excerpt:
-        "Widowed and raising 11 children in Katsina, Murja Yari invested her ₦75,000 WFP cash transfer, delivered with LHI, into a food business that now runs from morning until evening. Hers is one of the stories from our new project magazine on the FCDO/WFP resilience project reaching 5,700 households in Sokoto and Katsina.",
-      image: LHI_PHOTOS.murja.src,
-      linkLabel: "Read Murja's story",
-      linkHref: "/blog/murja-eight-years-of-struggle-to-renewed-hope",
+        "With ₦75,000 in livelihood support from the FCDO/WFP resilience project, delivered with LHI, cap-washer Mustafa Almajiri in Batagarawa diversified into selling caps and turned a failing shop into a growing enterprise.",
+      image: LHI_PHOTOS.mustafa.src,
+      linkLabel: "Read Mustafa's story",
+      linkHref: "/blog/mustafa-saving-a-family-business",
     },
     nidake: {
       costNgn: NIDAKE_KIT.costNgn,
