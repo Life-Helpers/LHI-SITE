@@ -7,11 +7,14 @@ import type { CmsPost } from "@/lib/cms/types";
  *   Project Magazine Vol. 2 (Gidan Arziki, FCDO/WFP project, April 2026)
  * - "Learning for a Brighter Future", ABEP Project Magazine (EU/UNICEF, Feb–May 2026)
  * - The LHI Newsletter ("Strengthening Resilience, Restoring Dignity, Transforming Lives")
+ * - "Restoring Hope, North West Lives", Project Magazine Vol. 4 (USG OHA / IRC Integrated
+ *   Emergency Response, Sokoto State, May 2023 – June 2026)
  * Seeded as CMS posts; editable in Admin → Posts.
  */
 
 export const GIDAN_ARZIKI_PDF = "/documents/gidan-arziki-magazine-vol-2.pdf";
 export const ABEP_PDF = "/documents/abep-project-magazine.pdf";
+export const OHA_PDF = "/documents/oha-restoring-hope-magazine.pdf";
 export const NEWSLETTER_PDF = "/documents/lhi-newsletter-2025.pdf";
 export const ANNUAL_REPORT_2024_PDF = "/documents/lhi-annual-report-2024.pdf";
 export const GSLA_REPORT_PDF = "/documents/gsla-data-report-2024.pdf";
@@ -27,6 +30,134 @@ const base = {
 };
 
 export const PUBLICATION_POSTS: CmsPost[] = [
+  /* ------------------------------------- OHA / IRC emergency response, Vol. 4 */
+  {
+    ...base,
+    id: "mag-oha-restoring-hope",
+    slug: "oha-magazine-restoring-hope-northwest-lives",
+    title: "Restoring Hope, North West Lives: OHA Project Magazine",
+    category: "Magazine",
+    date: "2026-09-20",
+    featuredImage: LHI_PHOTOS.ohaJointSupervision.src,
+    featured: true,
+    tags: ["USG", "OHA", "IRC", "Health", "Nutrition", "Sokoto"],
+    excerpt:
+      "The project closure edition of the USG OHA-funded Integrated Emergency Response in Sokoto State: 109,225 outpatient consultations, 76,257 children screened for malnutrition, 9,614 children treated for SAM and 5,635 skilled deliveries.",
+    updatedAt: "2026-09-20",
+    content: `The OHA-funded project (formerly BHA) **"Integrated Emergency Response to the Displaced Population in Zamfara, Sokoto and Katsina States, NW Nigeria"** ran from **22 May 2023 to 30 June 2026** under a consortium led by the **International Rescue Committee (IRC)** with **ALIMA, COOPI, Life Helpers Initiative (LHI) and GISCOR**. Across 11 LGAs the consortium delivered health, nutrition, WASH, protection and multipurpose cash assistance to conflict-affected, displaced and host-community populations.
+
+Within the consortium, **LHI was the health and nutrition lead for Sokoto State**, delivering services in **Goronyo, Rabah, Isa and Sabon Birni LGAs** for the full implementation period.
+
+[Download the full magazine (PDF)](${OHA_PDF}) · [Read it online](/project-magazines/oha-restoring-hope-northwest) · [See the fact sheet](/fact-sheet#oha)
+
+## The numbers that define this response
+
+| Result (May 2023 – June 2026) | Achieved |
+|---|---|
+| Outpatient consultations | 109,225 (86.5% new cases) |
+| Non-communicable disease consultations | 38,250 |
+| Pregnant women with 2+ antenatal visits | 9,550 |
+| Skilled deliveries | 5,635 |
+| Newborns with postnatal care within 3 days | 6,520 (3,591 girls · 2,929 boys) |
+| Mental health and psychosocial support consultations | 1,222 |
+| Referral admissions / emergency referrals | 1,253 / 613 |
+| Children screened for acute malnutrition | 76,257 |
+| Children treated for SAM (Lajinge & Makuwana OTPs) | 9,614, of whom 7,698 recovered |
+| Caregivers trained in Family MUAC | 47,565 |
+| Children in the Tom Brown programme (MAM) | 500 |
+| Mother Support Groups | 112, with 1,680 women |
+| Facilities supported | 10 (7 PHCs + 3 mobile/IDP clinics) |
+
+Consortium-wide, across all partners and sectors, the project reached **1,850,049 people**: 1,202,532 internally displaced people and 647,517 host-community members.
+
+## Health: primary care as a lifeline
+
+In communities where the nearest referral hospital can be hours away, the quality of primary care is the difference between life and death. Communicable diseases made up 85.3% of the caseload, including 54,671 confirmed malaria cases, 17,492 diarrhoeal disease cases and 10,443 acute respiratory infections.
+
+Referrals ran through four secondary hospitals (Isa, Rabah, Goronyo and Sabon Birni) and two tertiary institutions (the Federal Neuropsychiatric Hospital, Kware, and UDUTH Sokoto), with financial support for approved emergency referrals. Seven PHCs were renovated in Goronyo, Rabah and Isa, and three mobile clinics served the Maitandu, 120 Rahama Estate and 400 Housing Estate IDP camps.
+
+> "Word-of-mouth referrals following successful treatment of complex cases such as uterine prolapse and septic wounds encouraged more community members to seek timely medical care."
+>
+> IRC/LHI Final Report, Lessons Learned
+
+## Nutrition: fighting malnutrition at the root
+
+LHI's nutrition programme grew from three sites in Goronyo and Rabah to ten sites across all four LGAs. Caregivers were trained to measure their own children's mid-upper arm circumference (**Family MUAC**), putting early detection in the hands of families. With no partner or government programme managing moderate acute malnutrition at the start, LHI piloted the **Tom Brown programme**: 500 children enrolled, and their MUAC improved by 0.3–0.6 cm on average.
+
+63.4% of infants aged 0–5 months at supported facilities were exclusively breastfed, and 33,790 pregnant women received individual counselling on maternal, infant and young child nutrition.
+
+## Operating under pressure
+
+The team worked through insecurity and repeated displacement, long distances to facilities, periodic stock-outs and two facilities without a reliable water supply. Mobile clinics, ambulance services, a pharmaceutical warehouse upgrade with IRC, and water trucking kept services running.
+
+## Built to outlast the project
+
+Health workers were trained in IMCI, IMAM, BEmONC and CEmONC; government took formal ownership of supported facilities, including the mobile clinic, with staff posted before handover; and monthly nutrition coordination meetings embedded LHI's data and learning in the State's own coordination system.
+
+## Stories from the field
+
+- [A Child Saved, A Mother's Hope Restored](/blog/basiru-a-child-saved-a-mothers-hope-restored)
+- [How Nutrition Support Saved Ahmad's Life](/blog/ahmad-how-nutrition-support-saved-his-life)
+
+*Funded by the Office of Humanitarian Assistance (OHA), United States Government, through the International Rescue Committee. Source: IRC Nigeria BHA/OHA Final Report (720BHA23GR00216).*
+
+${FEEDBACK}`,
+  },
+  {
+    ...base,
+    id: "story-basiru-goronyo",
+    slug: "basiru-a-child-saved-a-mothers-hope-restored",
+    title: "A Child Saved, A Mother's Hope Restored",
+    category: "Success Stories",
+    date: "2026-09-19",
+    featuredImage: LHI_PHOTOS.ohaClinicBloodPressure.src,
+    tags: ["Health", "Sokoto", "Goronyo", "USG", "OHA", "IRC"],
+    excerpt:
+      "Seven-year-old Basiru could not walk, and traditional treatment had failed. One visit to the LHI Goronyo IDP health clinic changed everything for his family.",
+    updatedAt: "2026-09-19",
+    content: `In Goronyo, Sokoto State, seven-year-old **Basiru** faced a life-threatening condition that left him unable to walk. After developing severe swelling in his leg, his family sought traditional treatment, but his condition worsened, spreading and causing intense pain.
+
+His mother, **Fatima**, believed the illness was spiritual and had nearly lost hope.
+
+> "Na riga na yanke ƙauna, na yi tunanin ba zai sake tafiya ba." (I had already lost hope. I thought he would never walk again.)
+>
+> Fatima, Basiru's mother
+
+Through community engagement supported by LHI, in a project funded by the US Government, she was encouraged to seek medical care. At the **LHI Goronyo IDP health clinic**, Basiru received comprehensive treatment, including wound care, antibiotics, nutrition support and rehabilitation.
+
+Within weeks his condition improved significantly. The swelling reduced, his strength returned, and he gradually began walking again, and soon running like other children.
+
+Today Basiru is healthy and active, fully returned to childhood. This intervention not only saved a child's life but restored a mother's hope and trust in healthcare, showing the power of timely, life-saving support.
+
+*Funded by the Office of Humanitarian Assistance (OHA), United States Government, through the International Rescue Committee. From [Restoring Hope, North West Lives](/blog/oha-magazine-restoring-hope-northwest-lives).*`,
+  },
+  {
+    ...base,
+    id: "story-ahmad-goronyo",
+    slug: "ahmad-how-nutrition-support-saved-his-life",
+    title: "How Nutrition Support Saved Ahmad's Life",
+    category: "Success Stories",
+    date: "2026-09-18",
+    featuredImage: LHI_PHOTOS.ohaOutreachRegistration.src,
+    tags: ["Nutrition", "Sokoto", "Goronyo", "USG", "OHA", "IRC"],
+    excerpt:
+      "Displaced from Kunawa, two-year-old Ahmad was screened in the yellow zone for moderate acute malnutrition. Twelve weeks later his MUAC was green, and his mother had new confidence in feeding him.",
+    updatedAt: "2026-09-18",
+    content: `Two-year-old **Ahmad** was the third child in a family displaced from Kunawa to an IDP camp in Goronyo, Sokoto State. A routine MUAC screening placed him in the **yellow zone: moderate acute malnutrition**. His mother, struggling with limited resources and gaps in her knowledge of complementary feeding, could not give him what he needed on her own.
+
+Through the US Government-funded programme, Ahmad and his mother were enrolled in a **12-week nutrition programme** within a caregivers' support group. She learned hands-on how to prepare **Tom Brown**, a nutritious, locally made complementary food, alongside hygiene practices and age-appropriate child feeding.
+
+Week by week she applied what she had learned. Week by week, Ahmad changed.
+
+> "Yanzu na koyi yadda zan hada abinci mai gina jiki ga ɗana." (Now I have learned how to prepare nutritious food for my child.)
+>
+> Ahmad's mother
+
+Ahmad's MUAC moved from the yellow zone to **green: normal nutritional status**. He is one of 500 children enrolled in the Tom Brown programme that LHI piloted across Goronyo, Rabah, Isa and Sabon Birni, where no other programme was managing moderate acute malnutrition.
+
+*Funded by the Office of Humanitarian Assistance (OHA), United States Government, through the International Rescue Committee. From [Restoring Hope, North West Lives](/blog/oha-magazine-restoring-hope-northwest-lives).*`,
+  },
+
   /* ------------------------------------------------ Gidan Arziki, Vol. 2 */
   {
     ...base,
@@ -752,6 +883,15 @@ Today Azima is no longer defined as a child bride. She is a skilled apprentice, 
 
 /** LHI publications, newest first, for the News & Updates and Success Stories pages. */
 export const PUBLICATIONS = [
+  {
+    title: "Restoring Hope, North West Lives",
+    kind: "Project Magazine Vol. 4",
+    period: "May 2023 – June 2026",
+    description: "The USG OHA/IRC Integrated Emergency Response: health and nutrition for displaced and host communities in Sokoto State.",
+    pdf: OHA_PDF,
+    post: "/blog/oha-magazine-restoring-hope-northwest-lives",
+    image: LHI_PHOTOS.ohaJointSupervision,
+  },
   {
     title: "Life Helpers Initiative 2024 Annual Report",
     kind: "Annual Report",

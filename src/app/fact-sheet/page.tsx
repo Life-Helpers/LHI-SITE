@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { BookMarked, Download, FileSpreadsheet, HeartPulse, PiggyBank, Sprout, Tractor } from "lucide-react";
+import { BookMarked, BookOpen, Download, FileSpreadsheet, HeartPulse, PiggyBank, Sprout, Stethoscope, Tractor } from "lucide-react";
 
 import { Infographics } from "@/components/fact-sheet/infographics";
 import { ProportionBars, StatTile } from "@/components/fact-sheet/proportion-bars";
 import { SlideViewer } from "@/components/fact-sheet/slide-viewer";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
-import { AGRIC_ASSESSMENT as A, GSLA_PRESENTATION as G, IHP_PRESENTATION, WFP_FACT_SHEET as F } from "@/data/fact-sheets";
+import { AGRIC_ASSESSMENT as A, GSLA_PRESENTATION as G, IHP_PRESENTATION, OHA_FACT_SHEET as O, WFP_FACT_SHEET as F } from "@/data/fact-sheets";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/fact-sheet" },
   title: "Fact Sheet",
   description:
-    "LHI at a glance in two infographics, key results of LHI's FCDO/WFP Resilience Building and Smallholder Farmers Support Project in Sokoto and Katsina, and the Integrated Health Program presentation.",
+    "LHI at a glance in two infographics, life-of-award results of the USG OHA/IRC emergency health and nutrition response in Sokoto, key results of LHI's FCDO/WFP Resilience Building and Smallholder Farmers Support Project in Sokoto and Katsina, and the Integrated Health Program presentation.",
 };
 
-const n = (v: number) => v.toLocaleString("en-GB");
+const n = (v: number | string) => (typeof v === "number" ? v.toLocaleString("en-GB") : v);
 const btn =
   "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest transition-colors";
 
@@ -36,7 +36,7 @@ export default function FactSheetPage() {
           </>
         }
         subtitle="Our results in numbers, from the field to your screen."
-        description="Key figures from the FCDO/WFP resilience project in Sokoto and Katsina, and highlights from the Integrated Health Program. View them here or download them."
+        description="Key figures from the USG OHA emergency health and nutrition response in Sokoto, the FCDO/WFP resilience project in Sokoto and Katsina, and highlights from the Integrated Health Program. View them here or download them."
         image={{ ...LHI_PHOTOS.farmerWomanHarvest, tag: "Smallholder farmer, Sokoto State" }}
       />
 
@@ -44,6 +44,9 @@ export default function FactSheetPage() {
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 sm:px-6 lg:px-8">
           <a href="#at-a-glance" className="shrink-0 rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-foreground hover:border-primary hover:text-primary">
             LHI at a glance
+          </a>
+          <a href="#oha" className="shrink-0 rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-foreground hover:border-primary hover:text-primary">
+            Emergency health &amp; nutrition (OHA)
           </a>
           <a href="#resilience" className="shrink-0 rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-foreground hover:border-primary hover:text-primary">
             Resilience project (FCDO/WFP)
@@ -66,6 +69,81 @@ export default function FactSheetPage() {
       <section id="at-a-glance" aria-labelledby="infographics-heading" className="scroll-mt-32 py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <Infographics />
+        </div>
+      </section>
+
+      <section id="oha" aria-labelledby="oha-heading" className="scroll-mt-32 border-t border-border bg-muted/20 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
+                <Stethoscope className="h-4 w-4" aria-hidden="true" /> Health &amp; nutrition
+              </p>
+              <h2 id="oha-heading" className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
+                {O.shortTitle} <span className="text-primary">(Sokoto State)</span>
+              </h2>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Funded by the {O.fundedBy}, in a consortium of {O.consortium}. LHI led health and nutrition in Sokoto State across{" "}
+                {O.lgas.join(", ")} LGAs, {O.period}. Life-of-award results.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <a href={O.pdf} download className={`${btn} bg-primary text-primary-foreground hover:bg-primary/90`}>
+                <Download className="h-3.5 w-3.5" aria-hidden="true" /> Magazine (PDF)
+              </a>
+              <Link href={O.magazine} className={`${btn} border border-border text-foreground hover:border-primary hover:text-primary`}>
+                <BookOpen className="h-3.5 w-3.5" aria-hidden="true" /> Read online
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-10 space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {O.headline.map((t) => (
+                <StatTile key={t.label} value={n(t.value)} label={t.label} detail={t.detail} />
+              ))}
+            </div>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <section aria-labelledby="oha-health-heading" className="space-y-4 rounded-3xl border border-border bg-card/60 p-5 sm:p-6 lg:col-span-2">
+                <h3 id="oha-health-heading" className="font-serif-display text-2xl font-light text-foreground">
+                  Health services &amp; referrals
+                </h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {O.health.map((t) => (
+                    <StatTile key={t.label} value={n(t.value)} label={t.label} detail={t.detail} />
+                  ))}
+                </div>
+              </section>
+              <ProportionBars
+                title="Communicable disease cases (top three)"
+                unit="count"
+                rows={O.communicable}
+                note="Part of 93,159 communicable disease consultations (85.3% of the caseload)."
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <ProportionBars title="SAM admissions by OTP site" unit="count" rows={O.samBySite} note="9,614 children: 4,455 boys · 5,159 girls." />
+              <ProportionBars title="SAM treatment outcomes" rows={O.samOutcomes} note="Share of the 9,614 children admitted." />
+              <ProportionBars
+                title="Consortium-wide reach (all partners, all sectors)"
+                unit="count"
+                rows={O.consortiumReach}
+                note="1,850,049 people reached across Zamfara, Sokoto and Katsina."
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[...O.nutrition, ...O.systems].map((t) => (
+                <StatTile key={t.label} value={n(t.value)} label={t.label} detail={t.detail} />
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Source: Project Magazine Vol. 4, &ldquo;Restoring Hope, North West Lives&rdquo; (LHI, 2026), citing the IRC Nigeria BHA/OHA final report (
+              {O.agreement}).{" "}
+              <Link href={O.story} className="font-semibold text-primary hover:underline">
+                Read the stories →
+              </Link>
+            </p>
+          </div>
         </div>
       </section>
 

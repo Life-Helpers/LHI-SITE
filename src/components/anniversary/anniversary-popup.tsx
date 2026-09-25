@@ -9,6 +9,7 @@ import { firePoppers } from "@/components/anniversary/confetti";
 import { useNewsletterSignup } from "@/components/news/use-newsletter";
 import { ANNIVERSARY } from "@/config/anniversary";
 import { siteConfig } from "@/config/site";
+import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 const STORAGE_KEY = `lhi_anniversary_${ANNIVERSARY.years}`;
 const SNOOZE_MS = 3 * 24 * 3600_000;
@@ -129,19 +130,15 @@ export function AnniversaryPopup() {
           <X className="h-4 w-4" />
         </button>
         <div className="grid grid-cols-1 md:grid-cols-5">
-          <div className="relative flex min-h-[220px] flex-col justify-end overflow-hidden bg-[#7d0c10] p-6 text-white md:col-span-2 md:min-h-[460px]">
-            <Image src="/images/lhi/lhi-team-strategic-plan.jpg" alt="" fill sizes="(min-width: 768px) 300px, 100vw" className="object-cover opacity-35" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#7d0c10] via-[#7d0c10]/60 to-transparent" />
-            <div className="relative">
-              <p className="flex items-start font-serif-display font-light leading-none tracking-tight">
-                <span className="text-[92px] sm:text-[112px]">{ANNIVERSARY.years}</span>
-                <span className="mt-3 text-3xl">nd</span>
-              </p>
-              <p className="mt-1 text-sm font-semibold uppercase tracking-[0.2em]">Anniversary</p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/85">
-                {ANNIVERSARY.foundedYear} – {ANNIVERSARY.foundedYear + ANNIVERSARY.years}
-              </p>
-            </div>
+          <div className="relative aspect-[16/9] overflow-hidden bg-[#6b4a1f] md:col-span-2 md:aspect-auto md:min-h-[460px]">
+            <Image
+              src={LHI_PHOTOS.anniversaryBadge.src}
+              alt={`${LHI_PHOTOS.anniversaryBadge.alt}, ${ANNIVERSARY.foundedYear}–${ANNIVERSARY.foundedYear + ANNIVERSARY.years}`}
+              fill
+              priority
+              sizes="(min-width: 768px) 310px, 100vw"
+              className="object-cover"
+            />
           </div>
           <div className="p-6 sm:p-8 md:col-span-3">
             <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary">

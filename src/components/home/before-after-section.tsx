@@ -85,6 +85,19 @@ const STORIES: {
     },
     href: "/blog/azima-future-stitched-with-hope",
   },
+  {
+    id: "noma",
+    name: "Noma Tushen Arziki Hub",
+    place: "Wamakko LGA, Sokoto State",
+    photo: "hubAerial",
+    beforePhoto: "hubConstruction",
+    before: { title: "A construction site", text: "In October 2025 the hub in Wamakko was still a construction site, with buildings going up and the demonstration farm being laid out." },
+    after: {
+      title: "A working farming wealth hub",
+      text: "Commissioned on 27 November 2025 with WFP and FCDO: rice milling, cold storage, a fish farm, hire services and training, run by a community Facility Management Committee.",
+    },
+    href: "/blog/noma-tushen-arziki-farming-wealth-hub",
+  },
 ];
 
 export function BeforeAfterSection() {
@@ -185,7 +198,7 @@ export function BeforeAfterSection() {
               </div>
             </div>
             <Link href={story.href} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-              Read {story.name.split(",")[0]}&apos;s story <ArrowRight className="h-4 w-4" />
+              {story.id === "noma" ? "Read the hub's story" : <>Read {story.name.split(",")[0]}&apos;s story</>} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

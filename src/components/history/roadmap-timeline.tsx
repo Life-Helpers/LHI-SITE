@@ -26,7 +26,7 @@ export function RoadmapTimeline({ milestones }: { milestones: HistoryMilestone[]
   return (
     <LazyMotion features={domAnimation} strict>
       <MotionConfig reducedMotion="user">
-        <div className="relative">
+        <div className="relative overflow-x-clip">
           <RoadEnd kind="start" />
           <ol className="relative">
             {milestones.map((m, i) => (
@@ -184,16 +184,16 @@ function Media({ milestone: m, earlier }: { milestone: HistoryMilestone; earlier
   if (media.kind === "logos") {
     return (
       <figure className="rounded-3xl border border-border bg-card p-5">
-        <div className="flex items-center justify-center gap-4 sm:gap-6">
+        <div className="flex items-center justify-center gap-2 sm:gap-6">
           <div className="text-center">
-            <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-2xl bg-muted sm:h-32 sm:w-32">
+            <div className="relative mx-auto h-20 w-20 overflow-hidden rounded-2xl bg-muted min-[400px]:h-28 min-[400px]:w-28 sm:h-32 sm:w-32">
               <Image src={OLD_LOGO.src} alt={OLD_LOGO.alt} fill sizes="128px" className="object-contain" />
             </div>
             <p className="mt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Until 2019</p>
           </div>
-          <ArrowRight className="h-7 w-7 shrink-0 text-primary" aria-hidden="true" />
+          <ArrowRight className="h-5 w-5 shrink-0 text-primary sm:h-7 sm:w-7" aria-hidden="true" />
           <div className="text-center">
-            <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-full bg-muted sm:h-32 sm:w-32">
+            <div className="relative mx-auto h-20 w-20 overflow-hidden rounded-full bg-muted min-[400px]:h-28 min-[400px]:w-28 sm:h-32 sm:w-32">
               <Image src="/icon.png" alt="Life Helpers Initiative's current logo: Life Helpers in orange and red, with a smiling i" fill sizes="128px" className="object-cover" />
             </div>
             <p className="mt-2 text-[11px] font-semibold uppercase tracking-wider text-primary">2019 – today</p>

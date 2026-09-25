@@ -4,7 +4,9 @@
  * 1. Resilience Building and Smallholder Farmers Support Project in Northwest Nigeria (Katsina and
  *    Sokoto), funded by FCDO (UK aid) through the World Food Programme and implemented by LHI.
  *    Figures come from the project's progress dashboard (WFP_Progress.pptx, final slide).
- * 2. The Integrated Health Program (IHP) presentation "Work done, achievement, success stories"
+ * 2. USG OHA/IRC Integrated Emergency Response in Sokoto State (Project Magazine Vol. 4,
+ *    "Restoring Hope, North West Lives", 2026). Life-of-award results, May 2023 – June 2026.
+ * 3. The Integrated Health Program (IHP) presentation "Work done, achievement, success stories"
  *    from the IHP Partners Summit. One slide showing counselling of an HIV-positive mother is
  *    left out to protect her privacy.
  */
@@ -75,6 +77,63 @@ export const WFP_FACT_SHEET = {
       { label: "Pepper", value: 87 },
     ],
   },
+};
+
+export const OHA_FACT_SHEET = {
+  title: "Integrated Emergency Response to the Displaced Population in Northwest Nigeria",
+  shortTitle: "Integrated Emergency Health & Nutrition Response",
+  fundedBy: "Office of Humanitarian Assistance (OHA), United States Government",
+  consortium: "IRC (lead) with ALIMA, COOPI, LHI and GISCOR",
+  agreement: "720BHA23GR00216",
+  period: "May 2023 – June 2026",
+  lgas: ["Goronyo", "Rabah", "Isa", "Sabon Birni"],
+  pdf: "/documents/oha-restoring-hope-magazine.pdf",
+  magazine: "/project-magazines/oha-restoring-hope-northwest",
+  story: "/blog/oha-magazine-restoring-hope-northwest-lives",
+  headline: [
+    { value: 109225, label: "Outpatient consultations", detail: "86.5% new cases" },
+    { value: 76257, label: "Children screened", detail: "For acute malnutrition, aged 6–59 months" },
+    { value: 9614, label: "Children treated for SAM", detail: "At Lajinge and Makuwana OTPs" },
+    { value: 5635, label: "Skilled deliveries", detail: "By trained birth attendants" },
+  ],
+  health: [
+    { value: 9550, label: "ANC attendees (2+ visits)", detail: "Pregnant women" },
+    { value: 6520, label: "Newborns with postnatal care", detail: "3,591 girls · 2,929 boys, within 3 days" },
+    { value: 38250, label: "NCD consultations", detail: "23,376 female · 14,874 male" },
+    { value: 1222, label: "MHPSS consultations", detail: "1,073 female · 149 male" },
+    { value: 1253, label: "Referral admissions", detail: "To secondary and tertiary care" },
+    { value: 613, label: "Emergency referrals", detail: "398 female · 215 male" },
+  ],
+  communicable: [
+    { label: "Malaria (confirmed)", value: 54671, pct: 0 },
+    { label: "Diarrhoeal disease", value: 17492, pct: 0 },
+    { label: "Acute respiratory infections", value: 10443, pct: 0 },
+  ],
+  samOutcomes: [
+    { label: "Recovered / discharged cured", value: 7698, pct: 80.1 },
+    { label: "Defaulted", value: 298, pct: 3.1 },
+    { label: "Transferred to a stabilisation centre", value: 46, pct: 0.5 },
+  ],
+  samBySite: [
+    { label: "Lajinge OTP", value: 5112, pct: 0 },
+    { label: "Makuwana OTP", value: 4502, pct: 0 },
+  ],
+  nutrition: [
+    { value: 47565, label: "Caregivers trained in Family MUAC", detail: "39,532 women · 8,033 men" },
+    { value: 500, label: "Children in the Tom Brown programme", detail: "For moderate acute malnutrition" },
+    { value: 112, label: "Mother Support Groups", detail: "1,680 women members" },
+    { value: "63.4%", label: "Exclusive breastfeeding", detail: "Infants 0–5 months at supported facilities" },
+  ],
+  systems: [
+    { value: 10, label: "Facilities supported", detail: "7 PHCs + 3 mobile/IDP clinics" },
+    { value: "58 + 57", label: "Health workers trained / mentored", detail: "Nurses, midwives, CHEWs, technicians" },
+    { value: 56, label: "Community nutrition mobilisers", detail: "54 women · 2 men" },
+    { value: 54, label: "Adolescent mentors", detail: "27 female · 27 male" },
+  ],
+  consortiumReach: [
+    { label: "Internally displaced people", value: 1202532, pct: 0 },
+    { label: "Host communities", value: 647517, pct: 0 },
+  ],
 };
 
 export const IHP_PRESENTATION = {

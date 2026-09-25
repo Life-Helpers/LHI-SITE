@@ -18,6 +18,18 @@ export interface Magazine {
 
 export const MAGAZINES: Magazine[] = [
   {
+    slug: "oha-restoring-hope-northwest",
+    title: "Restoring Hope, North West Lives",
+    kind: "Project Magazine Vol. 4 · Project Closure Edition",
+    period: "May 2023 – June 2026",
+    description:
+      "The USG OHA-funded Integrated Emergency Response in Sokoto State: 109,225 outpatient consultations, 76,257 children screened, 9,614 children treated for SAM and 5,635 skilled deliveries across Goronyo, Rabah, Isa and Sabon Birni.",
+    pages: 20,
+    pdf: "/documents/oha-restoring-hope-magazine.pdf",
+    story: "/blog/oha-magazine-restoring-hope-northwest-lives",
+    partners: "USG OHA · International Rescue Committee",
+  },
+  {
     slug: "abep-learning-for-a-brighter-future",
     title: "Learning for a Brighter Future",
     kind: "ABEP Project Magazine",

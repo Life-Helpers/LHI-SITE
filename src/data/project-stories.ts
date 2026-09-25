@@ -29,6 +29,11 @@ export const PROJECT_STORIES: Record<string, string[]> = {
     "abep-impact-beyond-the-classroom",
     "goronyo-learning-centres-2025",
   ],
+  "irc-integrated-emergency-response-sokoto": [
+    "oha-magazine-restoring-hope-northwest-lives",
+    "basiru-a-child-saved-a-mothers-hope-restored",
+    "ahmad-how-nutrition-support-saved-his-life",
+  ],
   "project-hope-ace3-hiv": ["hope-restored-through-care-shagari"],
   "fcdo-unicef-mirp": ["healing-homes-zamfara-resilience"],
   "sif-zoa-gsla-financial-empowerment": ["gsla-small-steps-big-impact"],

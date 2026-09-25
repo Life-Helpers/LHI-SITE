@@ -38,6 +38,7 @@ export const LHI_PHOTOS = {
 
   // Farmer Service Centres (Noma Tushen Arziki, Wamakko; Gidan Arziki, Batagarawa)
   hubAerial: p("noma-tushen-arziki-aerial", "Aerial view of the Noma Tushen Arziki farmer service hub in Wamakko LGA"),
+  hubConstruction: p("noma-tushen-arziki-construction", "Drone view of the Noma Tushen Arziki hub in Wamakko LGA under construction, with red-roofed buildings going up and the demonstration farm being laid out"),
   hubAerialBuilding: p("hub-aerial-building", "Aerial view of a farmer service centre and its surroundings"),
   hubCourtyard: p("hub-courtyard", "Courtyard of the farmer service centre with red-roofed buildings"),
   hubTreePlanting: p("hub-tree-planting", "Tree planting at the farmer service centre commissioning"),
@@ -195,6 +196,13 @@ export const LHI_PHOTOS = {
   womenSavingsGroup: p("women-savings-group-yobe", "Women's savings group meeting under an EU early recovery project banner in Yobe State"),
   gbvAwarenessMarch: p("gbv-awareness-march", "Community members marching with banners and placards against gender-based violence"),
   nutritionFoodDemo: p("nutrition-food-demonstration", "Mothers with their babies at a food demonstration with vegetables, grains and fruit"),
+  // USG OHA / IRC Integrated Emergency Response, Sokoto (Project Magazine Vol. 4, 2026)
+  ohaJointSupervision: p("oha-joint-supportive-supervision", "Joint supportive supervision team of government and LHI officers conducting a health facility review in Sokoto State, 2026"),
+  ohaOutreachRegistration: p("oha-community-outreach-registration", "LHI staff registering community members at an outreach session in Sokoto State"),
+  ohaClinicBloodPressure: p("oha-clinic-blood-pressure-check", "Nurse checking a man's blood pressure at an LHI-supported health facility in Sokoto State"),
+  // Partners and celebrations
+  partnersLogoWall: p("partners-logo-wall-group", "LHI staff and partners standing together in front of the LHI partners' logo wall"),
+  anniversaryBadge: p("anniversary-22-badge", "Life Helpers 22nd Anniversary gold badge"),
   // Archive field photos (history Drive folder)
   healthFacilityConsultation: p("health-facility-consultation", "Health worker consulting with women and children at a health facility, with medicines on the table"),
   healthFacilityMotherChild: p("health-facility-mother-child", "Health worker attending to a mother and her child at a health facility"),
