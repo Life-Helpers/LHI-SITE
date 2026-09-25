@@ -350,7 +350,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Selected locations in Borno, Adamawa and Yobe States",
     states: ["borno", "adamawa", "yobe"],
     pillars: ["social-inclusion", "livelihood", "protection"],
-    photo: "annualReviewMeeting",
+    photo: "dumsaiMeeting",
     summary:
       "A consortium-led project deploying location-specific interventions across peacebuilding, livelihood development, protection, agriculture-based support and institution building for marginalized populations.",
     keyInterventions: [
@@ -880,7 +880,7 @@ export const INTERVENTIONS_DATA: InterventionProject[] = [
     locations: "Gwoza LGA, Borno State",
     states: ["borno"],
     pillars: ["livelihood"],
-    photo: "womanTailoring",
+    photo: "sewingTrainee",
     summary:
       "Supported women and youths to develop income-generating channels through vocational and technical skills and business and financial education using the ILO Start and Improve Your Business and Enterprise Your Business curricula.",
     keyInterventions: ["Vocational and technical skills development.", "ILO SIYB and EYB business and financial education."],

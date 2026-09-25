@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     title: "Volunteer & Get Involved | Life Helpers Initiative",
     description:
       "This mission takes all of us. Choose your path to support life-saving humanitarian work and grassroots community development.",
-    images: [LHI_PHOTOS.staffGroup.src],
+    images: [LHI_PHOTOS.annualExhibition.src],
   },
 };
 

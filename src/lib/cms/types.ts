@@ -13,7 +13,7 @@ export type CmsIntervention = Omit<InterventionProject, "image" | "thematicAreas
 
 export type CmsState = OperationalState;
 
-export type CmsPartner = Omit<PartnerItem, "logo" | "categoryBadgeColor"> & {
+export type CmsPartner = Omit<PartnerItem, "logo"> & {
   logoUrl: string;
   visible: boolean;
   order: number;

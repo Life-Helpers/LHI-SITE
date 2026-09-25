@@ -13,8 +13,11 @@ const SECTIONS: { id: string; heading: string }[] = [
   { id: "protection", heading: "Protection" },
 ];
 
+const COVER = LHI_PHOTOS.healthAmbassadorsTraining;
+
+// The cover photo already heads the post, so it is not repeated in the body.
 const body = SECTIONS.map(({ id, heading }) => {
-  const photos = (PROGRAM_GALLERIES[id] ?? []).map(({ photo, caption }) => {
+  const photos = (PROGRAM_GALLERIES[id] ?? []).filter(({ photo }) => LHI_PHOTOS[photo].src !== COVER.src).map(({ photo, caption }) => {
     const p = LHI_PHOTOS[photo];
     return `![${p.alt}](${p.src})\n\n*${caption}*`;
   });
@@ -32,7 +35,7 @@ export const PHOTO_STORY_POSTS: CmsPost[] = [
     authorId: "",
     status: "published",
     featured: false,
-    featuredImage: LHI_PHOTOS.healthAmbassadorsTraining.src,
+    featuredImage: COVER.src,
     tags: ["Photo story", "Health", "Nutrition", "Immunisation", "NIDAKE", "Education", "GBV"],
     excerpt:
       "Training health educators, immunising children, teaching nutrition from seed to plate, and standing against gender-based violence: our work in pictures.",

@@ -74,7 +74,7 @@ export const whoWeAreFeatured: {
     subtitle:
       "Reusable sanitary pads made at the Goshen Development Centre, Sokoto.",
     href: "/nidake",
-    image: LHI_PHOTOS.nidakePad.src,
+    image: LHI_PHOTOS.nidakeKit.src,
     tag: "Social Enterprise",
   },
 };
@@ -153,7 +153,7 @@ export const impactFeatured: {
     title: "LHI at a Glance",
     subtitle: "Our offices, thematic areas, mission and values in one infographic, plus the nutrition project journey.",
     href: "/fact-sheet#at-a-glance",
-    image: "/infographics/lhi-at-a-glance.webp",
+    image: "/infographics/lhi-at-a-glance.jpg",
     tag: "Infographic",
   },
   story: {

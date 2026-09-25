@@ -1,17 +1,8 @@
 "use client";
 
-import nigeriaMap from "@svg-maps/nigeria";
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 
-interface MapLocation {
-  id: string;
-  name: string;
-  path: string;
-}
-
-const LOCATIONS = (nigeriaMap as { locations: MapLocation[] }).locations;
-const VIEWBOX = (nigeriaMap as { viewBox: string }).viewBox;
-const [, , VB_W, VB_H] = VIEWBOX.split(" ").map(Number);
+import { NIGERIA_VB_H as VB_H, NIGERIA_VB_W as VB_W, NIGERIA_VIEWBOX as VIEWBOX, useNigeriaLocations } from "@/lib/nigeria-map";
 
 /** Where to drop the pin for each state LHI has expanded into, in the map's viewBox units (checked against the outlines). */
 const STATE_PINS: Record<string, { x: number; y: number }> = {
@@ -28,7 +19,19 @@ const STATE_PINS: Record<string, { x: number; y: number }> = {
   plateau: { x: 425, y: 290 },
 };
 
-const NAMES: Record<string, string> = { ...Object.fromEntries(LOCATIONS.map((l) => [l.id, l.name])), fct: "Abuja (FCT)" };
+const NAMES: Record<string, string> = {
+  sokoto: "Sokoto",
+  kebbi: "Kebbi",
+  zamfara: "Zamfara",
+  katsina: "Katsina",
+  bauchi: "Bauchi",
+  borno: "Borno",
+  yobe: "Yobe",
+  adamawa: "Adamawa",
+  fct: "Abuja (FCT)",
+  ebonyi: "Ebonyi",
+  plateau: "Plateau",
+};
 
 /**
  * A map of Nigeria for a road-map stop: the states opened at this milestone are
@@ -43,6 +46,7 @@ export function StatePinMap({
   earlier?: string[];
   compact?: boolean;
 }) {
+  const locations = useNigeriaLocations();
   const now = new Set(states);
   const before = new Set(earlier);
   const names = states.map((s) => NAMES[s] ?? s).join(", ");
@@ -50,7 +54,7 @@ export function StatePinMap({
   return (
     <div className="relative w-full">
       <svg viewBox={VIEWBOX} className="h-auto w-full" role="img" aria-label={`Map of Nigeria with a pin on ${names}`}>
-        {LOCATIONS.map((loc) => (
+        {locations.map((loc) => (
           <path
             key={loc.id}
             d={loc.path}
@@ -68,7 +72,7 @@ export function StatePinMap({
         if (!pin) return null;
         const { x, y } = pin;
         return (
-          <motion.span
+          <m.span
             key={id}
             initial={{ y: -18, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -87,7 +91,7 @@ export function StatePinMap({
                 {NAMES[id] ?? id}
               </span>
             )}
-          </motion.span>
+          </m.span>
         );
       })}
     </div>

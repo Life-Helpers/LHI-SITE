@@ -1,5 +1,5 @@
 import type { ImpactReport } from "@/types/content";
-import { africanFulfillmentImages } from "./african-fulfillment-images";
+import { LHI_PHOTOS } from "./lhi-photos";
 
 /**
  * Real, cumulative organization-wide figures from LHI's own content brief.
@@ -32,7 +32,7 @@ export const impactReports: ImpactReport[] = [
       "social-inclusion",
       "protection",
     ],
-    image: africanFulfillmentImages.impactHero.src,
-    imageAlt: africanFulfillmentImages.impactHero.alt,
+    image: LHI_PHOTOS.beneficiaryRegistration.src,
+    imageAlt: LHI_PHOTOS.beneficiaryRegistration.alt,
   },
 ];

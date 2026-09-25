@@ -131,7 +131,7 @@ Beyond the numbers, the family's mindset changed: their commitment even led them
     title: "Transforming Lives Through Nutrition: Rejoice's Journey",
     category: "Success Stories",
     date: "2023-09-30",
-    featuredImage: LHI_PHOTOS.ihpMuacScreening.src,
+    featuredImage: LHI_PHOTOS.nutritionMotherChild.src,
     tags: ["Health", "Nutrition", "IHP", "Ebonyi", "Onicha", "Newsletter"],
     excerpt:
       "A 16-month-old in Onicha LGA moved from severe to moderate acute malnutrition through counselling, food demonstrations, an IMAM referral and the food bank.",

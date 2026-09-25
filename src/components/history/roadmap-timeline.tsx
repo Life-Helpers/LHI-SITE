@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { ArrowRight, Flag, MapPin, Navigation } from "lucide-react";
-import { MotionConfig, motion } from "motion/react";
+import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
+import * as M from "motion/react-m";
 
 import { HISTORY_START, OLD_LOGO, type HistoryMilestone, type HistoryPhoto } from "@/data/history-timeline";
 
@@ -23,17 +24,19 @@ export function RoadmapTimeline({ milestones }: { milestones: HistoryMilestone[]
   });
 
   return (
-    <MotionConfig reducedMotion="user">
-      <div className="relative">
-        <RoadEnd kind="start" />
-        <ol className="relative">
-          {milestones.map((m, i) => (
-            <Stop key={`${m.year}-${m.title}`} milestone={m} index={i} earlier={earlierStates[i]} />
-          ))}
-        </ol>
-        <RoadEnd kind="end" />
-      </div>
-    </MotionConfig>
+    <LazyMotion features={domAnimation} strict>
+      <MotionConfig reducedMotion="user">
+        <div className="relative">
+          <RoadEnd kind="start" />
+          <ol className="relative">
+            {milestones.map((m, i) => (
+              <Stop key={`${m.year}-${m.title}`} milestone={m} index={i} earlier={earlierStates[i]} />
+            ))}
+          </ol>
+          <RoadEnd kind="end" />
+        </div>
+      </MotionConfig>
+    </LazyMotion>
   );
 }
 
@@ -61,7 +64,7 @@ function StraightRoad() {
 function YearMarker({ year }: { year: string }) {
   const long = year.length > 4;
   return (
-    <motion.div
+    <M.div
       initial={{ scale: 0.6, opacity: 0 }}
       whileInView={{ scale: 1, opacity: 1 }}
       viewport={{ once: true, margin: "-80px" }}
@@ -76,7 +79,7 @@ function YearMarker({ year }: { year: string }) {
         {year}
       </span>
       <span className="-mt-1 h-3 w-3 rotate-45 bg-primary" aria-hidden="true" />
-    </motion.div>
+    </M.div>
   );
 }
 
@@ -86,28 +89,28 @@ function Stop({ milestone: m, index, earlier }: { milestone: HistoryMilestone; i
     <li className="relative">
       {/* Desktop: photo | road + year | story */}
       <div className="hidden min-h-[300px] grid-cols-[minmax(0,1fr)_150px_minmax(0,1fr)] items-center gap-6 py-6 lg:grid">
-        <motion.div
+        <M.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
           <Media milestone={m} earlier={earlier} />
-        </motion.div>
+        </M.div>
         <div className="relative flex h-full items-center justify-center self-stretch">
           <div className="absolute -inset-y-6 inset-x-0">
             <RoadSegment bend={bend} />
           </div>
           <YearMarker year={m.year} />
         </div>
-        <motion.div
+        <M.div
           initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
         >
           <Story milestone={m} />
-        </motion.div>
+        </M.div>
       </div>
 
       {/* Mobile and tablet: road on the left, content on the right */}
@@ -120,7 +123,7 @@ function Stop({ milestone: m, index, earlier }: { milestone: HistoryMilestone; i
             <YearMarker year={m.year} />
           </div>
         </div>
-        <motion.div
+        <M.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
@@ -129,7 +132,7 @@ function Stop({ milestone: m, index, earlier }: { milestone: HistoryMilestone; i
         >
           {(m.media || m.states) && <Media milestone={m} earlier={earlier} />}
           <Story milestone={m} />
-        </motion.div>
+        </M.div>
       </div>
     </li>
   );
@@ -257,7 +260,7 @@ function RoadEnd({ kind }: { kind: "start" | "end" }) {
   return (
     <div className="grid grid-cols-[64px_minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_150px_minmax(0,1fr)] lg:gap-6">
       {start ? (
-        <motion.div
+        <M.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
@@ -265,7 +268,7 @@ function RoadEnd({ kind }: { kind: "start" | "end" }) {
           className="col-span-2 self-center lg:col-span-1"
         >
           <PhotoGrid photos={HISTORY_START.photos} />
-        </motion.div>
+        </M.div>
       ) : (
         <div className="hidden lg:block" />
       )}

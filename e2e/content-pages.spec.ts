@@ -83,7 +83,12 @@ test.describe("content hierarchy", () => {
     await expect(pins).toHaveCount(11);
     await page.getByRole("button", { name: /^Jos Office, / }).click();
     await expect(page.locator("#presence-map h3").first()).toHaveText("Jos Office");
-    await expect(page.locator("iframe[title^='Google Map of the']")).toHaveCount(12);
+    // Only the selected office's map loads up front; each office card loads its map on request.
+    const maps = page.locator("iframe[title^='Google Map of the']");
+    await expect(maps).toHaveCount(1);
+    await expect(page.getByRole("button", { name: /Show map of the / })).toHaveCount(11);
+    await page.getByRole("button", { name: /Show map of the Jos Office$/ }).click();
+    await expect(maps).toHaveCount(2);
   });
 
   test("robots.txt and sitemap.xml are served", async ({ request }) => {

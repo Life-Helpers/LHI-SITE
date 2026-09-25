@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import nigeriaMap from "@svg-maps/nigeria";
 import { ArrowRight, Building2, Handshake, Layers, MapPin, Users, X } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -13,15 +12,8 @@ import {
   type OperationalState,
   type OperationalStateId,
 } from "@/data/operational-states";
+import { NIGERIA_VIEWBOX, useNigeriaLocations } from "@/lib/nigeria-map";
 
-interface MapLocation {
-  id: string;
-  name: string;
-  path: string;
-}
-
-const LOCATIONS = (nigeriaMap as { viewBox: string; locations: MapLocation[] }).locations;
-const VIEWBOX = (nigeriaMap as { viewBox: string }).viewBox;
 
 const numberFormat = new Intl.NumberFormat("en-NG");
 
@@ -34,6 +26,7 @@ export function OperationalMap({
   interventions: MapProject[];
   className?: string;
 }) {
+  const locations = useNigeriaLocations();
   const STATE_BY_ID = useMemo(() => new Map(states.map((s) => [s.id as string, s])), [states]);
   const [selectedId, setSelectedId] = useState<OperationalStateId | null>("sokoto");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -71,12 +64,12 @@ export function OperationalMap({
         </div>
 
         <svg
-          viewBox={VIEWBOX}
+          viewBox={NIGERIA_VIEWBOX}
           role="group"
           aria-label="Map of Nigeria showing the states where Life Helpers Initiative has offices"
           className="h-auto w-full"
         >
-          {LOCATIONS.map((loc) => {
+          {locations.map((loc) => {
             const state = STATE_BY_ID.get(loc.id);
             const isActive = Boolean(state);
             const isSelected = loc.id === selectedId;

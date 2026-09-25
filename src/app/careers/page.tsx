@@ -29,7 +29,7 @@ export default async function CareersPage() {
         }
         subtitle={`${siteConfig.stats.staff} staff and ${siteConfig.stats.volunteers} volunteers across 11 states.`}
         description="Life Helpers Initiative recruits people who share our commitment to dignity, integrity and accountability to the communities we serve. All current vacancies are listed here and applications are made online."
-        image={{ ...LHI_PHOTOS.staffGroup, tag: "The LHI team" }}
+        image={{ ...LHI_PHOTOS.annualTeamEvent, tag: "The LHI team" }}
       />
 
       <section className="py-16 md:py-20" aria-labelledby="open-heading">

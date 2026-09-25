@@ -44,6 +44,8 @@ function CopyAddress({ office }: { office: Office }) {
 }
 
 function OfficeCard({ office, highlighted, onFocus }: { office: Office; highlighted: boolean; onFocus: () => void }) {
+  // Each Google Map embed is heavy, so a card only loads its map when asked.
+  const [showMap, setShowMap] = useState(false);
   return (
     <article
       id={office.id}
@@ -52,13 +54,27 @@ function OfficeCard({ office, highlighted, onFocus }: { office: Office; highligh
       }`}
     >
       <div className="relative aspect-[16/10] w-full bg-muted">
-        <iframe
-          title={`Google Map of the ${office.name}, ${office.city}`}
-          src={embedUrl(office)}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="absolute inset-0 h-full w-full border-0"
-        />
+        {showMap ? (
+          <iframe
+            title={`Google Map of the ${office.name}, ${office.city}`}
+            src={embedUrl(office)}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="absolute inset-0 h-full w-full border-0"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowMap(true)}
+            className="group absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-primary/10 via-muted to-accent/10 text-center"
+          >
+            <MapPin className="h-8 w-8 text-primary transition-transform group-hover:-translate-y-1" aria-hidden="true" />
+            <span className="px-4 text-sm font-medium text-foreground">{office.city}</span>
+            <span className="rounded-full bg-background px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary shadow-sm group-hover:bg-primary group-hover:text-primary-foreground">
+              Show map<span className="sr-only"> of the {office.name}</span>
+            </span>
+          </button>
+        )}
         <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-background/95 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-foreground shadow-sm">
           {office.state}
         </span>

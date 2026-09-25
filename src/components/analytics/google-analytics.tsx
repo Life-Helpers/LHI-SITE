@@ -1,21 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export function GoogleAnalytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [gaId, setGaId] = useState<string>("");
-
-  useEffect(() => {
-    // Check environment variable first, then custom admin setting
-    const envId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-    const storedId = typeof window !== "undefined" ? localStorage.getItem("lhi_ga_measurement_id") : null;
-    const activeId = envId || storedId || "G-LHI2026NG"; // Fallback identifier
-    setGaId(activeId);
-  }, []);
+  // Analytics only loads when a measurement ID is configured (NEXT_PUBLIC_GA_MEASUREMENT_ID).
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "";
 
   useEffect(() => {
     if (!gaId || typeof window === "undefined" || !(window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {

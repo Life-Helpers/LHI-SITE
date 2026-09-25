@@ -1,4 +1,5 @@
-import ProjectsAndInterventionsPage, { metadata } from "@/app/interventions/projectandintervention/page";
+import { permanentRedirect } from "next/navigation";
 
-export { metadata };
-export default ProjectsAndInterventionsPage;
+export default function Page() {
+  permanentRedirect("/interventions/projectandintervention");
+}

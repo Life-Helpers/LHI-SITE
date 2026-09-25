@@ -5,14 +5,12 @@ export const INFOGRAPHICS_PDF = "/documents/lhi-infographics.pdf";
 
 export const INFOGRAPHICS = [
   {
-    src: "/infographics/lhi-at-a-glance.webp",
-    full: "/infographics/lhi-at-a-glance.jpg",
+    src: "/infographics/lhi-at-a-glance.jpg",
     title: "Life Helpers Initiative at a glance",
     alt: "Infographic: LHI's staff and volunteers, beneficiaries, household reach, partnerships, state offices on a map of Nigeria, mission, vision, values and five thematic areas",
   },
   {
-    src: "/infographics/lhi-nutrition-project-journey.webp",
-    full: "/infographics/lhi-nutrition-project-journey.jpg",
+    src: "/infographics/lhi-nutrition-project-journey.jpg",
     title: "LHI Nutrition Project: a journey towards healthier communities",
     alt: "Infographic: the fourteen steps of LHI's nutrition project, from healthcare services and awareness creation to RUTF, counselling, food demonstrations, home gardens and healthy children",
   },
@@ -41,7 +39,7 @@ export function Infographics({ headingId = "infographics-heading", eyebrow = "â€
       <div className="mt-10 space-y-8">
         {INFOGRAPHICS.map((g) => (
           <figure key={g.src} className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-            <a href={g.full} target="_blank" rel="noopener noreferrer" className="group relative block" aria-label={`Open "${g.title}" full size`}>
+            <a href={g.src} target="_blank" rel="noopener noreferrer" className="group relative block" aria-label={`Open "${g.title}" full size`}>
               <Image src={g.src} alt={g.alt} width={2000} height={1415} sizes="(min-width: 1152px) 1152px, 100vw" className="h-auto w-full" />
               <span className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
                 <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" /> Full size

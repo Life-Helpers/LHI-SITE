@@ -63,6 +63,10 @@ export default async function InterventionDossierPage({
     .map((slug) => posts.find((p) => p.slug === slug))
     .filter((p): p is (typeof posts)[number] => Boolean(p))
     .slice(0, 6);
+  // Photos already shown as a story card further down the page are left out of the gallery.
+  const storyImages = new Set(stories.map((s) => s.featuredImage));
+  const withoutStoryImages = gallery.filter((img) => !storyImages.has(img.src));
+  const galleryImages = withoutStoryImages.length > 0 ? withoutStoryImages : gallery;
   const related = all.filter(
     (p) => p.id !== project.id && p.primaryThematic === project.primaryThematic,
   ).slice(0, 3);
@@ -125,7 +129,7 @@ export default async function InterventionDossierPage({
 
         <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-12">
           <div className="space-y-10 lg:col-span-8">
-            <FieldGallery images={gallery} youtubeId={project.youtubeId} title={project.shortTitle} />
+            <FieldGallery images={galleryImages} youtubeId={project.youtubeId} title={project.shortTitle} />
 
             <section aria-labelledby="summary-heading">
               <h2 id="summary-heading" className="font-serif-display text-2xl font-light text-foreground">

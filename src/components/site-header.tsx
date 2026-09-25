@@ -617,7 +617,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
           ? isScrolled
             ? "fixed top-0 left-0 right-0 w-full z-50 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 shadow-md transition-all duration-300"
             : "w-full bg-black/40 backdrop-blur-md border border-white/20 rounded-2xl px-4 sm:px-6 py-3 shadow-2xl transition-all duration-300"
-          : "sticky top-0 z-50 w-full transition-colors duration-300 bg-background/85 dark:bg-[#050b18]/85 backdrop-blur-xl border-b border-primary/10 dark:border-white/10 shadow-xs"
+          : "sticky top-0 z-50 w-full transition-colors duration-300 bg-background/85 dark:bg-background/85 backdrop-blur-xl border-b border-primary/10 dark:border-white/10 shadow-xs"
       }
     >
       <div
@@ -757,7 +757,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
           className={`flex flex-col gap-1 border-t ${
             isHeroGlass
               ? "border-white/20 bg-slate-950/95 text-white rounded-b-2xl"
-              : "border-border/80 bg-background/95 dark:bg-[#050b18]/95 text-foreground"
+              : "border-border/80 bg-background/95 dark:bg-background/95 text-foreground"
           } backdrop-blur-2xl px-6 py-4 xl:hidden max-h-[80vh] overflow-y-auto shadow-2xl`}
         >
           <Link

@@ -768,7 +768,7 @@ export const PUBLICATIONS = [
     description: "The EU/UNICEF Accelerated Basic Education Programme in six LGAs of Sokoto State.",
     pdf: ABEP_PDF,
     post: "/blog/abep-magazine-learning-for-a-brighter-future",
-    image: LHI_PHOTOS.abepLearnersCelebrate,
+    image: LHI_PHOTOS.abepLearnerClassroom,
   },
   {
     title: "Empowering Communities Through Innovation, Skills & Livelihood Support",
@@ -777,7 +777,7 @@ export const PUBLICATIONS = [
     description: "The Gidan Arziki Farmers Service Hub in Batagarawa, Katsina State (FCDO/WFP).",
     pdf: GIDAN_ARZIKI_PDF,
     post: "/blog/gidan-arziki-magazine-vol-2",
-    image: LHI_PHOTOS.gidanArzikiTailoring,
+    image: LHI_PHOTOS.gidanArzikiSewing,
   },
   {
     title: "Cultivating Resilience: A New Harvest in Northwest Nigeria",

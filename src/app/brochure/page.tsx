@@ -17,15 +17,13 @@ const PDF = "/documents/noma-tushen-arziki-farmer-service-center-brochure.pdf";
 
 const pages = [
   {
-    src: "/brochure/noma-tushen-arziki-resilience-hub.webp",
-    full: "/brochure/noma-tushen-arziki-resilience-hub.jpg",
+    src: "/brochure/noma-tushen-arziki-resilience-hub.jpg",
     alt: "Brochure page: Resilience Hub, Noma Tushen Arziki Farmer Service Center 2025, with background, approach, project map and metrics",
     w: 2000,
     h: 1424,
   },
   {
-    src: "/brochure/noma-tushen-arziki-core-message.webp",
-    full: "/brochure/noma-tushen-arziki-core-message.jpg",
+    src: "/brochure/noma-tushen-arziki-core-message.jpg",
     alt: "Brochure page: core message and core focus areas of the Noma Tushen Arziki Farmer Service Center 2025",
     w: 1317,
     h: 744,
@@ -88,7 +86,7 @@ export default function BrochurePage() {
           <div className="mt-10 space-y-8">
             {pages.map((p, i) => (
               <figure key={p.src} className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-                <a href={p.full} target="_blank" rel="noopener noreferrer" className="group relative block" aria-label={`Open page ${i + 1} full size`}>
+                <a href={p.src} target="_blank" rel="noopener noreferrer" className="group relative block" aria-label={`Open page ${i + 1} full size`}>
                   <Image src={p.src} alt={p.alt} width={p.w} height={p.h} sizes="(min-width: 1152px) 1152px, 100vw" className="h-auto w-full" priority={i === 0} />
                   <span className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
                     <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" /> Full size

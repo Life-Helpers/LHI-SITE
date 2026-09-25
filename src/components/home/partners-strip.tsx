@@ -46,7 +46,7 @@ function toDisplay(partner: CmsPartner, fallbackLogo?: string): PartnerItem {
   return {
     ...partner,
     logo,
-    categoryBadgeColor: builtIn?.categoryBadgeColor ?? CATEGORY_BADGES[partner.category] ?? CATEGORY_BADGES["International NGOs"],
+    categoryBadgeColor: CATEGORY_BADGES[partner.category] ?? CATEGORY_BADGES["International NGOs"],
   };
 }
 
@@ -139,6 +139,7 @@ export function PartnersStrip({ partners: rawPartners }: { partners: CmsPartner[
                 key={`track1-${partner.id}-${idx}`}
                 partner={partner}
                 onSelect={setSelectedPartner}
+                loopCopy={idx >= rowOnePartners.length}
               />
             ))}
           </div>
@@ -154,6 +155,7 @@ export function PartnersStrip({ partners: rawPartners }: { partners: CmsPartner[
                   key={`track2-${partner.id}-${idx}`}
                   partner={partner}
                   onSelect={setSelectedPartner}
+                  loopCopy={idx >= rowTwoPartners.length}
                 />
               ))}
             </div>
@@ -180,7 +182,7 @@ interface PartnerCardProps {
   onSelect: (partner: PartnerItem) => void;
 }
 
-function PartnerCard({ partner, onSelect }: PartnerCardProps) {
+function PartnerCard({ partner, onSelect, loopCopy = false }: PartnerCardProps & { loopCopy?: boolean }) {
   const className =
     "group relative flex h-24 w-[200px] shrink-0 items-center justify-center rounded-2xl border border-border/80 bg-white px-5 py-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg sm:h-28 sm:w-[240px]";
   const mark = (
@@ -191,13 +193,18 @@ function PartnerCard({ partner, onSelect }: PartnerCardProps) {
   const { dossier } = partner;
   if (!dossier) {
     return (
-      <div className={className} title={partner.name}>
+      <div className={className} title={partner.name} aria-hidden={loopCopy || undefined}>
         {mark}
       </div>
     );
   }
   return (
-    <button type="button" onClick={() => onSelect(dossier)} aria-label={`${partner.name}: view partnership details`} title={partner.name} className={`${className} cursor-pointer`}>
+    <button
+      type="button"
+      onClick={() => onSelect(dossier)}
+      aria-hidden={loopCopy || undefined}
+      tabIndex={loopCopy ? -1 : undefined}
+      aria-label={`${partner.name}: view partnership details`} title={partner.name} className={`${className} cursor-pointer`}>
       {mark}
     </button>
   );

@@ -58,7 +58,7 @@ function updateGoogleTranslate(target: Locale) {
         el.value = target;
         el.dispatchEvent(new Event("change"));
         clearInterval(interval);
-      } else if (attempts > 20) {
+      } else if (attempts > 60) {
         clearInterval(interval);
       }
     }, 150);

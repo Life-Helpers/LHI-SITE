@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
+import { LazyMotion, domAnimation, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import {
   ArrowRight,
   Sparkles,
@@ -121,65 +122,67 @@ export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
 
   return (
-    <section
-      id="what-we-do"
-      aria-labelledby="what-we-do-heading"
-      className="relative overflow-hidden border-t border-border/70 bg-muted/20 py-20 sm:py-28"
-    >
-      {/* Background ambient decorative glow */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-96 w-full max-w-7xl rounded-full bg-primary/5 blur-3xl"
-      />
+    <LazyMotion features={domAnimation} strict>
+      <section
+        id="what-we-do"
+        aria-labelledby="what-we-do-heading"
+        className="relative overflow-hidden border-t border-border/70 bg-muted/20 py-20 sm:py-28"
+      >
+        {/* Background ambient decorative glow */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-96 w-full max-w-7xl rounded-full bg-primary/5 blur-3xl"
+        />
 
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 border-b border-border/60">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
-              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Our Thematic Areas</span>
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 border-b border-border/60">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
+                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Our Thematic Areas</span>
+              </div>
+              <h2
+                id="what-we-do-heading"
+                className="mt-3 font-serif-display text-3xl sm:text-4xl lg:text-5xl font-light text-foreground"
+              >
+                What We Do — <span className="italic text-primary font-serif">Community Impact</span>
+              </h2>
+              <p className="mt-3 text-base text-muted-foreground leading-relaxed">
+                {t.home.whatWeDo.subtitle ||
+                  "Integrated humanitarian and development programmes across 11 states in Nigeria."}
+              </p>
             </div>
-            <h2
-              id="what-we-do-heading"
-              className="mt-3 font-serif-display text-3xl sm:text-4xl lg:text-5xl font-light text-foreground"
-            >
-              What We Do — <span className="italic text-primary font-serif">Community Impact</span>
-            </h2>
-            <p className="mt-3 text-base text-muted-foreground leading-relaxed">
-              {t.home.whatWeDo.subtitle ||
-                "Integrated humanitarian and development programmes across 11 states in Nigeria."}
-            </p>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <Link
+                href="/programs"
+                className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-primary hover:text-primary-foreground transition-all shadow-xs"
+              >
+                <span>{t.home.whatWeDo.viewAllPrograms || "All 9 Interventions"}</span>
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <Link
-              href="/programs"
-              className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-primary hover:text-primary-foreground transition-all shadow-xs"
-            >
-              <span>{t.home.whatWeDo.viewAllPrograms || "All 9 Interventions"}</span>
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </Link>
+          {/* Thematic area cards */}
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {strategicPillars.map((pillar, index) => (
+              <JellyCard
+                count={projectCounts[pillar.id] ?? 0}
+                key={pillar.id}
+                pillar={pillar}
+                index={index}
+                isHovered={hoveredCardId === pillar.id}
+                onHover={() => setHoveredCardId(pillar.id)}
+                onLeave={() => setHoveredCardId(null)}
+                reducedMotion={!!shouldReduceMotion}
+              />
+            ))}
           </div>
         </div>
-
-        {/* Thematic area cards */}
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {strategicPillars.map((pillar, index) => (
-            <JellyCard
-              count={projectCounts[pillar.id] ?? 0}
-              key={pillar.id}
-              pillar={pillar}
-              index={index}
-              isHovered={hoveredCardId === pillar.id}
-              onHover={() => setHoveredCardId(pillar.id)}
-              onLeave={() => setHoveredCardId(null)}
-              reducedMotion={!!shouldReduceMotion}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
+      </section>
+    </LazyMotion>
   );
 }
 
@@ -245,7 +248,7 @@ function JellyCard({
   };
 
   return (
-    <motion.div
+    <m.div
       variants={jellyVariants}
       initial="rest"
       animate={isHovered ? "hover" : "rest"}
@@ -279,7 +282,7 @@ function JellyCard({
 
         {/* Icon & Title */}
         <div className="relative z-10 mt-6 flex items-start gap-4">
-          <motion.div
+          <m.div
             animate={
               isHovered && !reducedMotion
                 ? {
@@ -292,7 +295,7 @@ function JellyCard({
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm shadow-primary/30"
           >
             <Icon className="h-6 w-6" aria-hidden="true" />
-          </motion.div>
+          </m.div>
 
           <div className="min-w-0">
             <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
@@ -337,15 +340,15 @@ function JellyCard({
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary group-hover:underline"
         >
           <span>Explore Thematic Area</span>
-          <motion.span
+          <m.span
             animate={isHovered ? { x: 4 } : { x: 0 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </motion.span>
+          </m.span>
         </Link>
         <span className="text-[10px] text-muted-foreground">Learn more</span>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

@@ -194,8 +194,8 @@ export const africanFulfillmentImages = {
 
   // 3. Our History
   historyHero: {
-    src: LHI_PHOTOS.staffGroup.src,
-    alt: LHI_PHOTOS.staffGroup.alt,
+    src: LHI_PHOTOS.partnersEvent.src,
+    alt: LHI_PHOTOS.partnersEvent.alt,
     caption: "Over 20 years of bringing smiles, dignity, and sustainable hope to Northern Nigeria.",
     tag: "Since Oct 1, 2004",
   },
@@ -210,16 +210,16 @@ export const africanFulfillmentImages = {
 
   // 5. Impact Reports
   impactHero: {
-    src: LHI_PHOTOS.jafaroCabbage.src,
-    alt: LHI_PHOTOS.jafaroCabbage.alt,
+    src: LHI_PHOTOS.cabbageFarm.src,
+    alt: LHI_PHOTOS.cabbageFarm.alt,
     caption: "Transparent results, verified metrics, and over 1.5 million fulfilled lives.",
     tag: "Evidence of Joy",
   },
 
   // 6. Success Stories
   successStoriesHero: {
-    src: LHI_PHOTOS.murja.src,
-    alt: LHI_PHOTOS.murja.alt,
+    src: LHI_PHOTOS.tomatoHarvest.src,
+    alt: LHI_PHOTOS.tomatoHarvest.alt,
     caption: "Real transformations: from severe vulnerability to radiant smiles and self-reliance.",
     tag: "Stories of Hope",
   },

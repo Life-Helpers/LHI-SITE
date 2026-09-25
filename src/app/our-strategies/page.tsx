@@ -246,7 +246,7 @@ export default function OurStrategiesPage() {
           </div>
 
           <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {[LHI_PHOTOS.strategyWorkshop1, LHI_PHOTOS.strategyWorkshop3, LHI_PHOTOS.teamStrategicPlan].map((ph) => (
+            {[LHI_PHOTOS.strategyWorkshop2, LHI_PHOTOS.strategyWorkshop3, LHI_PHOTOS.teamStrategicPlan].map((ph) => (
               <div key={ph.src} className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-muted">
                 <Image src={ph.src} alt={ph.alt} fill sizes="(min-width: 640px) 33vw, 100vw" className="object-cover" />
               </div>

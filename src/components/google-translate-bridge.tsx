@@ -34,9 +34,10 @@ export function GoogleTranslateBridge() {
     applyGoogleTranslatePatch();
   }, []);
 
-  // Initialize Google Translate Element
+  // Load Google Translate only once a visitor picks another language: English
+  // visitors never download it.
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || locale === "en") return;
 
     window.googleTranslateElementInit = () => {
       try {
@@ -58,13 +59,13 @@ export function GoogleTranslateBridge() {
     if (!scriptLoadedRef.current && !document.getElementById("google-translate-script")) {
       const script = document.createElement("script");
       script.id = "google-translate-script";
-      script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
       script.async = true;
       script.defer = true;
       document.body.appendChild(script);
       scriptLoadedRef.current = true;
     }
-  }, []);
+  }, [locale]);
 
   // Page by page: When pathname changes, re-trigger translation if non-English
   useEffect(() => {
