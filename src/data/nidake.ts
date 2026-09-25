@@ -1,7 +1,6 @@
 /**
  * NIDAKE dignity kit economics used by the impact calculator and Sponsor-A-Girl packs.
- * Prices are in Naira. costNgn is a provisional figure (editable in Admin → Settings):
- * confirm it with the NIDAKE enterprise team.
+ * Prices are in Naira; costNgn can be changed in Admin → Settings.
  */
 export const NIDAKE_KIT = {
   costNgn: 22500,
