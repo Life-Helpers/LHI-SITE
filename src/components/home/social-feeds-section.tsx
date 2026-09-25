@@ -1,17 +1,10 @@
 import { ExternalLink } from "lucide-react";
 
 import { SocialWall } from "@/components/home/social-wall";
-import { YoutubePair, type YoutubeVideo } from "@/components/home/youtube-pair";
 import { SOCIAL_ACCOUNTS, SocialIcon } from "@/components/social-links";
 import { siteConfig } from "@/config/site";
-import { getSocialFeed, youtubeItems } from "@/lib/social-feed";
+import { getSocialFeed } from "@/lib/social-feed";
 
-/** The "Recommended" video beside the newest upload. */
-const RECOMMENDED_VIDEO: YoutubeVideo = {
-  id: "45HZKC19AxY",
-  title: "NIDAKE reusable sanitary pads: the women and girls they serve",
-  poster: "/images/lhi/nidake-poster.jpg",
-};
 
 /**
  * "Follow our work": a live social media newsroom. The phone on the left streams the
@@ -20,11 +13,7 @@ const RECOMMENDED_VIDEO: YoutubeVideo = {
  * back to follow cards for each channel until an account is connected.
  */
 export async function SocialFeedsSection() {
-  const [feed, videos] = await Promise.all([getSocialFeed(11), youtubeItems()]);
-  const newest = videos.find((v) => v.id !== `yt-${RECOMMENDED_VIDEO.id}`);
-  const latest: YoutubeVideo | null = newest ? { id: newest.id.slice(3), title: newest.text } : null;
-  // The newest upload has its own player below, so the wall skips it.
-  const items = feed.items.filter((i) => i.id !== newest?.id).slice(0, 10);
+  const { items } = await getSocialFeed(10);
   const fbPlugin = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(
     siteConfig.social.facebook,
   )}&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
@@ -145,8 +134,6 @@ export async function SocialFeedsSection() {
             )}
           </div>
         </div>
-
-        <YoutubePair latest={latest} recommended={RECOMMENDED_VIDEO} />
       </div>
     </section>
   );

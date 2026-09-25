@@ -12,9 +12,7 @@ import {
   MapPin,
   Calendar,
 } from "lucide-react";
-import { ParallaxBackground } from "@/components/effects/parallax-background";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
-import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { useLocale } from "@/i18n/locale-context";
 import { PARTNERS_DATA } from "@/data/partners-data";
 import { PARTNER_LOGOS } from "@/data/partner-logos";
@@ -95,17 +93,20 @@ export function PartnersStrip({ partners: rawPartners, projects = {} }: { partne
   }, [selectedPartner]);
 
   return (
-    <>
-    <ParallaxBackground src={LHI_PHOTOS.partnersOfficeWall.src} opacity={0.9} strength={0.3} className="border-t border-b border-border/60 bg-background">
     <section
       id="implementing-partners-section"
       aria-labelledby="partners-heading"
-      className="relative py-16 sm:py-24"
+      className="relative py-16 sm:py-24 overflow-hidden border-t border-b border-border/60 bg-gradient-to-b from-background via-muted/20 to-background"
     >
+      {/* Decorative ambient background glows */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-primary/5 rounded-full blur-3xl -z-10"
+      />
 
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <ScrollReveal className="text-center flex flex-col items-center max-w-3xl mx-auto rounded-3xl border border-white/40 bg-white/60 px-6 py-7 shadow-xl backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-black/50">
+        <ScrollReveal className="text-center flex flex-col items-center max-w-3xl mx-auto">
           <h2
             id="partners-heading"
             className="font-serif-display text-3xl sm:text-4xl md:text-5xl font-light text-foreground"
@@ -113,7 +114,7 @@ export function PartnersStrip({ partners: rawPartners, projects = {} }: { partne
             {t.home.partners.heading || "Implementing Partners"}
           </h2>
 
-          <p className="mt-3.5 text-sm sm:text-base text-foreground/80 leading-relaxed max-w-2xl">
+          <p className="mt-3.5 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
             {t.home.partners.subtitle ||
               "Delivering life-saving emergency relief, child protection, and community resilience in direct operational partnership with leading multilateral donors, UN agencies, and global organizations."}
           </p>
@@ -121,7 +122,16 @@ export function PartnersStrip({ partners: rawPartners, projects = {} }: { partne
       </div>
 
       {/* Continuous Smooth Dual-Track Logo Marquee with Edge Fade Masks */}
-      <div className="mt-8 relative w-full overflow-hidden py-3 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+      <div className="mt-8 relative w-full overflow-hidden py-3">
+        {/* Edge Blur & Vignette Gradients */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-0 w-12 sm:w-28 md:w-40 bg-gradient-to-r from-background via-background/90 to-transparent z-10"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 w-12 sm:w-28 md:w-40 bg-gradient-to-l from-background via-background/90 to-transparent z-10"
+        />
 
         {/* Track 1: Moving Forward (Reduced speed for relaxed, readable gliding) */}
         <div className="relative w-full overflow-hidden mb-4 sm:mb-6">
@@ -155,8 +165,6 @@ export function PartnersStrip({ partners: rawPartners, projects = {} }: { partne
           </div>
         )}
       </div>
-    </section>
-    </ParallaxBackground>
 
       {/* Partner Detail Modal / Dossier */}
       {selectedPartner && (
@@ -166,7 +174,7 @@ export function PartnersStrip({ partners: rawPartners, projects = {} }: { partne
           onClose={() => setSelectedPartner(null)}
         />
       )}
-    </>
+    </section>
   );
 }
 
@@ -180,7 +188,7 @@ interface PartnerCardProps {
 
 function PartnerCard({ partner, onSelect, loopCopy = false }: PartnerCardProps & { loopCopy?: boolean }) {
   const className =
-    "group relative flex h-24 w-[200px] shrink-0 items-center justify-center rounded-2xl border border-white/50 bg-white/55 px-5 py-4 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-white/75 hover:shadow-xl sm:h-28 sm:w-[240px]";
+    "group relative flex h-24 w-[200px] shrink-0 items-center justify-center rounded-2xl border border-white/60 bg-white/55 px-5 py-4 shadow-md backdrop-blur-md backdrop-saturate-150 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-white/80 hover:shadow-lg sm:h-28 sm:w-[240px] dark:border-white/15 dark:bg-white/85";
   const mark = (
     <span className="flex h-full max-h-[64px] w-full max-w-[180px] items-center justify-center transition-transform duration-300 group-hover:scale-105">
       {partner.logo}

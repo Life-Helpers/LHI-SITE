@@ -15,7 +15,7 @@ export async function OperationalMapSection() {
   return (
     <ParallaxBackground
       src={LHI_PHOTOS.partnersLogoWall.src}
-      opacity={0.85} mouse
+      opacity={0.35} mouse
       className="border-y border-border bg-background"
     >
       <section
@@ -24,7 +24,7 @@ export async function OperationalMapSection() {
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-2xl rounded-3xl border border-white/40 bg-white/55 p-6 shadow-xl backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-black/45">
+            <div className="max-w-2xl rounded-3xl border border-white/60 bg-white/85 p-6 shadow-xl backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-black/70">
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
                 — Where we work
               </p>

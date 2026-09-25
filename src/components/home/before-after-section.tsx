@@ -63,18 +63,6 @@ const STORIES: {
     href: "/blog/saudatu-a-bag-a-dream",
   },
   {
-    id: "arajana",
-    name: "Arajana Suleiman, 70",
-    place: "Batagarawa, Katsina State",
-    photo: "arajana",
-    before: { title: "Cut off from her farm", text: "Insecurity kept her from her farmland, and she struggled with stress and high blood pressure." },
-    after: {
-      title: "Purpose and better health",
-      text: "At the Gidan Arziki centre she works, earns and learns. “Before, the process was very tedious. Now with the machine, we finish in minutes.”",
-    },
-    href: "/blog/arajana-finding-purpose-at-70",
-  },
-  {
     id: "azima",
     name: "Azima Bello",
     place: "Zamfara State",

@@ -30,7 +30,7 @@ export function OperationalMap({
   glass?: boolean;
 }) {
   const surface = glass
-    ? "border-white/40 bg-white/55 shadow-xl backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-black/45"
+    ? "border-white/60 bg-white/85 shadow-xl backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-black/70"
     : "border-border bg-card";
   const locations = useNigeriaLocations();
   const STATE_BY_ID = useMemo(() => new Map(states.map((s) => [s.id as string, s])), [states]);

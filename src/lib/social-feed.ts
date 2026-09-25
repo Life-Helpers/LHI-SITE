@@ -8,7 +8,7 @@ import { siteConfig } from "@/config/site";
  * connected (no token) or doesn't answer is simply left out, so the page never waits long
  * or breaks.
  *
- * - YouTube: the channel's public RSS feed. No key needed; set YOUTUBE_CHANNEL_ID, or it is
+ * - YouTube: the two newest videos from the channel's public RSS feed. No key needed; set YOUTUBE_CHANNEL_ID, or it is
  *   looked up once a day from the channel handle in siteConfig.social.youtube.
  * - Facebook: FACEBOOK_PAGE_ID + FACEBOOK_PAGE_ACCESS_TOKEN (a long-lived Page token).
  * - Instagram: INSTAGRAM_ACCESS_TOKEN (Instagram API with Instagram Login, professional account).
@@ -33,6 +33,8 @@ export interface SocialItem {
 const REVALIDATE = 900;
 const TIMEOUT = 4000;
 const PER_NETWORK = 6;
+/** YouTube videos on the wall (the newest ones). */
+const YOUTUBE_ITEMS = 2;
 
 async function getJson<T>(url: string, init: RequestInit = {}, revalidate = REVALIDATE): Promise<T | null> {
   try {
@@ -81,7 +83,7 @@ export async function youtubeItems(): Promise<SocialItem[]> {
   if (!xml) return [];
   return xml
     .split("<entry>")
-    .slice(1, PER_NETWORK + 1)
+    .slice(1, YOUTUBE_ITEMS + 1)
     .map((entry) => {
       const id = tag(entry, "yt:videoId");
       return {

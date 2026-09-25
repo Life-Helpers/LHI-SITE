@@ -202,7 +202,6 @@ export const LHI_PHOTOS = {
   ohaClinicBloodPressure: p("oha-clinic-blood-pressure-check", "Nurse checking a man's blood pressure at an LHI-supported health facility in Sokoto State"),
   // Partners and celebrations
   partnersLogoWall: p("partners-logo-wall-group", "LHI staff and partners standing together in front of the LHI partners' logo wall"),
-  partnersOfficeWall: p("lhi-partners-wall-office", "The LHI office reception with the partners' logo wall and Life Helpers chairs"),
   azimaAtHome: p("azima-bello-at-home", "Azima Bello smiling and hugging a woman outside her home in Zamfara State"),
   murjaPassbook: p("murja-vsla-passbook", "Murja Yari holding her Village Savings and Loan Association passbook beside her food supplies"),
   anniversaryBadge: p("anniversary-22-badge", "Life Helpers 22nd Anniversary gold badge"),
