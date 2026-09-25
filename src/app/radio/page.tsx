@@ -12,6 +12,7 @@ import { toRadioEpisode } from "@/lib/radio";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/radio" },
   title: "Radio Program: WeSpeak (Muyi Magana)",
   description:
     "Life Helpers Initiative's Radio Program. WeSpeak (Muyi Magana) airs every Tuesday, 11 AM – 12 PM on Radio Nigeria Royal FM 101.5, Sokoto.",

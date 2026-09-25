@@ -491,7 +491,8 @@ export type SubmissionType =
   | "vendor-registration"
   | "tender-response"
   | "feedback"
-  | "newsletter";
+  | "newsletter"
+  | "donation";
 export const SUBMISSION_TYPE_LABELS: Record<SubmissionType, string> = {
   "job-application": "Job applications",
   "tender-response": "Vendor bids",
@@ -501,6 +502,7 @@ export const SUBMISSION_TYPE_LABELS: Record<SubmissionType, string> = {
   contact: "Contact",
   volunteer: "Volunteer",
   newsletter: "Newsletter",
+  donation: "Donations",
 };
 
 export type SubmissionStatus = "new" | "read" | "archived";

@@ -11,6 +11,7 @@ import { getCurrentLearner } from "@/lib/training/learners";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/get-involved/training/login" },
   title: "Sign in to Humanitarian Training",
   robots: { index: false },
 };

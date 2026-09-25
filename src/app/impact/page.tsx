@@ -18,6 +18,7 @@ import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { ANNUAL_REPORT_2024_PDF } from "@/data/publication-stories";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/impact" },
   title: "Impact Reports",
   description:
     "Annual reports and organisation-wide results from Life Helpers Initiative across 11 states in Nigeria.",

@@ -711,7 +711,7 @@ For communities on Sokoto's climate frontline, this collaboration is a promise o
     title: "Hope Restored Through Care in Shagari",
     category: "Success Stories",
     date: "2026-01-06",
-    featuredImage: LHI_PHOTOS.ace3Mother.src,
+    featuredImage: LHI_PHOTOS.integratedClinicTeam.src,
     tags: ["Health", "HIV", "ACE3", "Sokoto", "Newsletter"],
     excerpt:
       "A breastfeeding mother of twins learned her HIV status through community testing and was linked to care. Today the family is thriving.",

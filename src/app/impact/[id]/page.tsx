@@ -27,6 +27,7 @@ export async function generateMetadata({
   return {
     title: report.title,
     description: report.summary,
+    alternates: { canonical: `/impact/${id}` },
   };
 }
 

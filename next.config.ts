@@ -38,7 +38,18 @@ const nextConfig: NextConfig = {
   async headers() {
     // Photos, documents and magazine pages rarely change: let browsers and CDNs cache them.
     const longCache = [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=2592000" }];
+    // Baseline security headers on every response. The CSP only restricts framing, so the
+    // site (and /admin) can't be embedded by other sites for clickjacking.
+    const security = [
+      { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+      { key: "X-Frame-Options", value: "SAMEORIGIN" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(self)" },
+    ];
     return [
+      { source: "/:path*", headers: security },
       { source: "/images/:path*", headers: longCache },
       { source: "/documents/:path*", headers: longCache },
       { source: "/magazines/:path*", headers: longCache },

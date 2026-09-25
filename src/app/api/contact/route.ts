@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { addSubmission } from "@/lib/cms/submissions";
 import { checkSpam } from "@/lib/spam";
+import { formError } from "@/lib/validation";
 
 const contactSchema = z.object({
   fullName: z.string().trim().min(1, "Please enter your name.").max(120),
@@ -17,7 +18,7 @@ const contactSchema = z.object({
 export async function POST(req: NextRequest) {
   const parsed = contactSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid submission." }, { status: 400 });
+    return NextResponse.json({ error: formError(parsed.error, "Invalid submission.") }, { status: 400 });
   }
   const { website, ...d } = parsed.data;
   const spam = await checkSpam(req, { key: "contact", max: 10, honeypot: website });

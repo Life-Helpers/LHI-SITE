@@ -11,6 +11,7 @@ import { getPublicJobs } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/careers" },
   title: "Careers & Vacancies",
   description: "Current job vacancies at Life Helpers Initiative. Apply online for roles across LHI's offices in Nigeria.",
 };

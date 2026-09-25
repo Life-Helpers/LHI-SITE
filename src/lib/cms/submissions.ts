@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import type { Submission, SubmissionType } from "@/lib/cms/schema";
 import { updateStore } from "@/lib/cms/store";
 import { notifySubmission } from "@/lib/email/notifications";
+import { clientIp } from "@/lib/client-ip";
 
 const MAX_SUBMISSIONS = 5000;
 
@@ -44,7 +45,7 @@ export async function addSubmission(input: {
 const buckets = new Map<string, { count: number; until: number }>();
 
 export function rateLimited(req: Request, key: string, max: number) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  const ip = clientIp(req);
   const id = `${key}:${ip}`;
   const entry = buckets.get(id);
   const fresh = !entry || entry.until < Date.now();

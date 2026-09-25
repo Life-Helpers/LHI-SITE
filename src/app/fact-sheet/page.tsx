@@ -11,6 +11,7 @@ import { AGRIC_ASSESSMENT as A, GSLA_PRESENTATION as G, IHP_PRESENTATION, WFP_FA
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/fact-sheet" },
   title: "Fact Sheet",
   description:
     "LHI at a glance in two infographics, key results of LHI's FCDO/WFP Resilience Building and Smallholder Farmers Support Project in Sokoto and Katsina, and the Integrated Health Program presentation.",

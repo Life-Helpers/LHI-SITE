@@ -6,12 +6,11 @@ import Image from "next/image";
 import { ArrowRight, Calendar, Clock, Tag, User } from "lucide-react";
 
 import { isUnoptimized } from "@/lib/image";
-import type { CmsPost } from "@/lib/cms/types";
-import { formatPostDate, readingTime } from "@/lib/posts";
+import { formatPostDate, type PostCard } from "@/lib/posts";
 
 const PAGE_SIZE = 12;
 
-export function BlogFeed({ posts, paginate = false }: { posts: CmsPost[]; paginate?: boolean }) {
+export function BlogFeed({ posts, paginate = false }: { posts: PostCard[]; paginate?: boolean }) {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const categories = ["All", ...Array.from(new Set(posts.map((p) => p.category)))];
@@ -93,7 +92,7 @@ export function BlogFeed({ posts, paginate = false }: { posts: CmsPost[]; pagina
                 <span>·</span>
                 <span className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5 text-primary" />
-                  {readingTime(post.content)}
+                  {post.readingTime}
                 </span>
               </div>
 

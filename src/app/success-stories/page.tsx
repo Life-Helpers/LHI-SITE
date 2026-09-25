@@ -8,10 +8,12 @@ import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { getPublishedPosts } from "@/lib/cms/content";
+import { toPostCard } from "@/lib/posts";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/success-stories" },
   title: "Success Stories",
   description:
     "Real stories of change from LHI's projects: farmers, women entrepreneurs, learners and survivors across Sokoto, Katsina and Zamfara, from LHI's magazines and newsletter.",
@@ -60,7 +62,7 @@ export default async function SuccessStoriesPage() {
 
       <section className="py-16 md:py-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <BlogFeed posts={stories} />
+          <BlogFeed posts={stories.map(toPostCard)} />
 
           <div className="mt-16 rounded-2xl border border-border bg-muted/40 p-8 text-center sm:p-12">
             <Sparkles className="mx-auto h-8 w-8 fill-primary/20 text-primary" />

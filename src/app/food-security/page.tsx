@@ -7,7 +7,7 @@ import { programs } from "@/data/programs";
 const program = programs.find((p) => p.id === "food-security");
 
 export const metadata: Metadata = program
-  ? { title: program.name, description: program.summary }
+  ? { title: program.name, description: program.summary, alternates: { canonical: "/food-security" } }
   : {};
 
 export default function FoodSecurityPage() {

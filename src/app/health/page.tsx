@@ -7,7 +7,7 @@ import { programs } from "@/data/programs";
 const program = programs.find((p) => p.id === "health");
 
 export const metadata: Metadata = program
-  ? { title: program.name, description: program.summary }
+  ? { title: program.name, description: program.summary, alternates: { canonical: "/health" } }
   : {};
 
 export default function HealthPage() {

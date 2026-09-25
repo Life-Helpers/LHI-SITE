@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getPostBySlug } from "@/lib/cms/content";
 import { addComment } from "@/lib/cms/engagement";
 import { checkSpam } from "@/lib/spam";
+import { formError } from "@/lib/validation";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Enter your name.").max(80),
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
   if (!post) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid comment." }, { status: 400 });
+    return NextResponse.json({ error: formError(parsed.error, "Invalid comment.") }, { status: 400 });
   }
   const spam = await checkSpam(req, { key: "comment", max: 10, honeypot: parsed.data.website });
   if ("blocked" in spam) return spam.blocked;

@@ -290,7 +290,7 @@ export function useLocalizedNav() {
   const impact: NavLink[] = [
     { label: t.impactMenu.annualReport, href: "/impact", description: "Organisation-wide results since 2004", icon: FileText, tag: "Accountability", group: "results" },
     { label: "Fact Sheet & Infographics", href: "/fact-sheet", description: "LHI at a glance and project results in numbers", icon: BarChart3, tag: "Results", group: "results" },
-    { label: t.impactMenu.projectsInterventions, href: "/interventions/projectandintervention", description: "38 profiled projects with dossiers & PDF factsheets", icon: FolderGit2, tag: "Portfolio", group: "results" },
+    { label: t.impactMenu.projectsInterventions, href: "/interventions/projectandintervention", description: "Every profiled project, with dossiers & PDF factsheets", icon: FolderGit2, tag: "Portfolio", group: "results" },
     { label: "Brochure", href: "/brochure", description: "The Noma Tushen Arziki resilience hub and LHI infographics", icon: BookMarked, tag: "Read", group: "results" },
     { label: "Feedback", href: "/feedback", description: "Compliments, suggestions and complaints, answered by our team", icon: MessageSquareHeart, tag: "Your voice", group: "results" },
     { label: t.impactMenu.successStories, href: "/success-stories", description: "Lives changed, in their own words", icon: Award, tag: "Human Stories", group: "stories" },

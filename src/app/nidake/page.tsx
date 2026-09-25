@@ -14,6 +14,7 @@ export const revalidate = 300;
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/nidake" },
   title: "NIDAKE Enterprise",
   description:
     "NIDAKE ('Me & You') is LHI's social enterprise producing affordable, reusable, and eco-friendly sanitary pads to eradicate period poverty and empower women.",

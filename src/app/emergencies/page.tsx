@@ -6,6 +6,7 @@ import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/emergencies" },
   title: "Emergencies",
   description:
     "Active and past crisis responses coordinated by Life Helpers Initiative bringing relief, dignity, and smiles in challenging times.",

@@ -28,6 +28,7 @@ export async function generateMetadata({
   return {
     title: emergency.title,
     description: emergency.summary,
+    alternates: { canonical: `/emergencies/${id}` },
   };
 }
 

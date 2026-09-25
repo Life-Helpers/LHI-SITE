@@ -3,6 +3,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 
 import { rateLimited } from "@/lib/cms/submissions";
+import { clientIp } from "@/lib/client-ip";
 
 /**
  * Shared protection for public forms: a per-IP rate limit, a hidden "website" honeypot and,
@@ -43,7 +44,7 @@ export async function checkSpam(
   if (typeof honeypot === "string" && honeypot.trim()) return { drop: true };
   if (turnstileEnabled()) {
     const t = (typeof token === "string" && token) || req.headers.get("x-turnstile-token") || "";
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+    const ip = clientIp(req);
     if (!t || !(await verifyTurnstile(t, ip))) {
       return { blocked: NextResponse.json({ error: "Please complete the security check and try again." }, { status: 400 }) };
     }

@@ -8,6 +8,7 @@ import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/brochure" },
   title: "Brochure",
   description:
     "The Noma Tushen Arziki Farmer Service Center, a solar-powered resilience hub for smallholder farmers, women and youth under the FCDO/WFP resilience project, implemented by LHI.",

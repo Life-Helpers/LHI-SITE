@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }): Promise<Metadata> {
   const course = getCourse((await params).courseId);
-  return course ? { title: `${course.title} | Humanitarian Training`, description: course.description } : {};
+  return course ? { title: `${course.title} | Humanitarian Training`, description: course.description, alternates: { canonical: `/get-involved/training/${course.id}` } } : {};
 }
 
 export default async function CoursePage({ params }: { params: Promise<{ courseId: string }> }) {

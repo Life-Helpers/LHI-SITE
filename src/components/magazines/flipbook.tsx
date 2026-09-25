@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,6 +24,8 @@ type PageFlipInstance = import("page-flip/dist/js/page-flip.module.js").PageFlip
 const SOUND_KEY = "lhi_flip_sound";
 
 const PAGE_W = 550;
+/** Pages either side of the open spread whose images are loaded; the rest wait until the reader gets near. */
+const PRELOAD = 3;
 const PAGE_H = 778; // A4 portrait
 
 /** Heyzine-style flipbook: realistic page curl, flip sound, thumbnails, fullscreen and keyboard control. */
@@ -30,6 +33,7 @@ export function Flipbook({ magazine }: { magazine: Magazine }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const bookRef = useRef<HTMLDivElement>(null);
   const flipRef = useRef<PageFlipInstance | null>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
   const soundRef = useRef(true);
   const [ready, setReady] = useState(false);
   const [page, setPage] = useState(0);
@@ -58,19 +62,23 @@ export function Flipbook({ magazine }: { magazine: Magazine }) {
     // Pages are built outside React so the library can own and move these nodes.
     const book = document.createElement("div");
     host.appendChild(book);
+    const images: HTMLImageElement[] = [];
     for (let i = 1; i <= total; i++) {
       const el = document.createElement("div");
       el.className = "flipbook-page";
       if (i === 1 || i === total) el.dataset.density = "hard";
       const img = document.createElement("img");
-      img.src = pageImage(magazine, i);
+      // The page-flip library lays out every page, so native lazy loading would fetch them all:
+      // sources are assigned only around the open page (see the effect below).
+      img.dataset.src = pageImage(magazine, i);
       img.alt = `${magazine.title}, page ${i}`;
-      img.loading = i <= 4 ? "eager" : "lazy";
       img.decoding = "async";
       img.draggable = false;
       el.appendChild(img);
       book.appendChild(el);
+      images.push(img);
     }
+    imagesRef.current = images;
 
     import("page-flip/dist/js/page-flip.module.js").then(({ PageFlip }) => {
       if (cancelled) return;
@@ -127,6 +135,17 @@ export function Flipbook({ magazine }: { magazine: Magazine }) {
       host.innerHTML = "";
     };
   }, [magazine, total]);
+
+  // Load the open spread and a few pages either side of it.
+  useEffect(() => {
+    const images = imagesRef.current;
+    const from = Math.max(0, page - PRELOAD);
+    const to = Math.min(images.length - 1, page + PRELOAD + 1);
+    for (let i = from; i <= to; i++) {
+      const img = images[i];
+      if (img && !img.getAttribute("src") && img.dataset.src) img.src = img.dataset.src;
+    }
+  }, [page, ready]);
 
   const next = useCallback(() => flipRef.current?.flipNext(), []);
   const prev = useCallback(() => flipRef.current?.flipPrev(), []);
@@ -230,8 +249,7 @@ export function Flipbook({ magazine }: { magazine: Magazine }) {
                     i === page || (spread && i === page + 1) ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={pageImage(magazine, i + 1)} alt="" loading="lazy" className="h-24 w-[68px] object-cover" />
+                  <Image src={pageImage(magazine, i + 1)} alt="" width={68} height={96} sizes="68px" className="h-24 w-[68px] object-cover" />
                 </button>
                 <span className="mt-1 block text-center text-[10px] text-white/60">{i + 1}</span>
               </li>

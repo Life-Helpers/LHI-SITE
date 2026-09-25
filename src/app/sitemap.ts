@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
 import { emergencies } from "@/data/emergencies";
 import { impactReports } from "@/data/impact-reports";
-import { getInterventions, getPublishedPosts } from "@/lib/cms/content";
+import { getInterventions, getPublicJobs, getPublicTenders, getPublishedPosts } from "@/lib/cms/content";
 import { programs } from "@/data/programs";
 import { COURSES } from "@/data/training/courses";
 import { MAGAZINES } from "@/data/magazines";
@@ -32,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/success-stories",
     "/events",
     "/feedback",
+    "/faq",
     "/fact-sheet",
     "/brochure",
     "/interventions/projectandintervention",
@@ -74,5 +75,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "monthly" as const,
   }));
 
-  return [...staticRoutes, ...programRoutes, ...emergencyRoutes, ...impactRoutes, ...interventionRoutes, ...postRoutes];
+  const [jobs, tenders] = await Promise.all([getPublicJobs(), getPublicTenders()]);
+  const jobRoutes = jobs.open.map((job) => ({ url: `${siteConfig.url}/careers/${job.id}`, changeFrequency: "weekly" as const }));
+  const tenderRoutes = tenders.open.map((tender) => ({ url: `${siteConfig.url}/procurement/${tender.id}`, changeFrequency: "weekly" as const }));
+
+  return [...staticRoutes, ...programRoutes, ...emergencyRoutes, ...impactRoutes, ...interventionRoutes, ...postRoutes, ...jobRoutes, ...tenderRoutes];
 }

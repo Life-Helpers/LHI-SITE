@@ -18,6 +18,7 @@ import { getInterventionGallery } from "@/data/intervention-media";
 import { PROJECT_STORIES } from "@/data/project-stories";
 import { getIntervention, getInterventions, getPublishedPosts, getStates } from "@/lib/cms/content";
 import { formatPostDate } from "@/lib/posts";
+import { jsonLdScript } from "@/lib/validation";
 
 export const revalidate = 300;
 
@@ -36,6 +37,7 @@ export async function generateMetadata({
   return {
     title: `${project.shortTitle} | Project Dossier`,
     description: project.summary,
+    alternates: { canonical: `/interventions/${project.id}` },
     openGraph: {
       title: project.title,
       description: project.summary,
@@ -83,7 +85,7 @@ export default async function InterventionDossierPage({
 
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }} />
 
       <div className="mx-auto max-w-6xl px-4 pb-20 pt-28 sm:px-6 sm:pt-32 lg:px-8">
         <Link

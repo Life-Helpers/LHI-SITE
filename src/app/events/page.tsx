@@ -11,10 +11,12 @@ import { siteConfig } from "@/config/site";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { daysUntil, formatEventDate, OBSERVANCE_AREAS } from "@/data/observances";
 import { getCalendarEvents, getPublishedPosts, todayInLagos } from "@/lib/cms/content";
+import { toPostCard } from "@/lib/posts";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/events" },
   title: "Events & Observance Days",
   description:
     "Upcoming LHI events, the LHI anniversary (1 October) and the international days for health, education, livelihoods, food security, social inclusion, protection and humanitarian action. Add any of them to your calendar.",
@@ -126,7 +128,7 @@ export default async function EventsPage() {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— From past events</p>
             <h2 className="mt-2 mb-8 font-serif-display text-3xl font-light text-foreground sm:text-4xl">Event reports</h2>
-            <BlogFeed posts={reports} />
+            <BlogFeed posts={reports.map(toPostCard)} />
           </div>
         </section>
       )}

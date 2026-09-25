@@ -11,6 +11,7 @@ import { getPublicTenders } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/procurement" },
   title: "Procurement & Vendor Requests",
   description:
     "Open requests for quotation, tenders and expressions of interest from Life Helpers Initiative, and vendor registration for suppliers and service providers.",

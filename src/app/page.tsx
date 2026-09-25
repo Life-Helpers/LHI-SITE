@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { HeroSlider } from "@/components/home/hero-slider";
 import { StatsSection } from "@/components/home/stats-section";
 import { WhoWeAreBand } from "@/components/home/who-we-are-band";
@@ -17,6 +19,8 @@ import { THEMATIC_PILLARS } from "@/data/interventions-data";
 import { UpcomingEvents } from "@/components/home/upcoming-events";
 import { getCalendarEvents, getEpisodes, getInterventions, getPartners, getPublishedPosts, getSettings, todayInLagos } from "@/lib/cms/content";
 import { toRadioEpisode } from "@/lib/radio";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 /** Content comes from the admin CMS; saves refresh it instantly, this is a safety net. */
 export const revalidate = 300;

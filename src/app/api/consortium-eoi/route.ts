@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { addSubmission } from "@/lib/cms/submissions";
 import { checkSpam } from "@/lib/spam";
 import { consortiumEoiSchema } from "@/lib/validations/consortium-eoi";
+import { formError } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -10,7 +11,7 @@ export async function POST(req: NextRequest) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid submission." },
+      { error: formError(parsed.error, "Invalid submission.") },
       { status: 400 },
     );
   }

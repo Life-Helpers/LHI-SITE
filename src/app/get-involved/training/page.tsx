@@ -11,6 +11,7 @@ import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { COURSES, coursePhoto } from "@/data/training/courses";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/get-involved/training" },
   title: "Humanitarian Training & Certificates",
   description:
     "Free self-paced safeguarding training from Life Helpers Initiative. Complete the lessons, pass the final assessment and download a verifiable certificate.",

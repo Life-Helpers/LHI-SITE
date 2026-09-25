@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { siteConfig } from "@/config/site";
 import { getStripe } from "@/lib/stripe";
+import { rateLimited } from "@/lib/cms/submissions";
+
+const MIN_USD = 5;
+const MAX_USD = 50_000;
 
 export async function POST(req: NextRequest) {
+  if (rateLimited(req, "donate-checkout", 20)) {
+    return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429 });
+  }
   try {
     const body = await req.json().catch(() => ({}));
     const {
@@ -9,9 +17,10 @@ export async function POST(req: NextRequest) {
       donor_email,
       package_id,
       custom_amount,
-      frequency = "one_time",
+      frequency: rawFrequency,
       designation,
     } = body;
+    const frequency = rawFrequency === "monthly" ? "monthly" : "one_time";
     const isNidake = designation === "nidake";
 
     // Determine donation amount in USD
@@ -39,9 +48,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (amount < 5) {
+    if (amount < MIN_USD || amount > MAX_USD) {
       return NextResponse.json(
-        { error: "Donation amount must be at least $5.00." },
+        { error: `Online gifts must be between $${MIN_USD} and $${MAX_USD.toLocaleString("en-US")}. For larger gifts, please contact us.` },
         { status: 400 }
       );
     }
@@ -49,10 +58,8 @@ export async function POST(req: NextRequest) {
     const amountInCents = Math.round(amount * 100);
     const isMonthly = frequency === "monthly";
 
-    // Detect actual request origin safely
-    const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
-    const proto = req.headers.get("x-forwarded-proto") || "https";
-    const origin = `${proto}://${host}`;
+    // Return URLs come from configuration, never from request headers a client could set.
+    const origin = siteConfig.url.replace(/\/$/, "");
 
     // Attempt Stripe checkout session creation if Stripe secret key is present
     try {
@@ -61,14 +68,14 @@ export async function POST(req: NextRequest) {
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: isMonthly ? "subscription" : "payment",
-        customer_email: donor_email?.trim() || undefined,
+        customer_email: typeof donor_email === "string" && donor_email.includes("@") ? donor_email.trim().slice(0, 200) : undefined,
         line_items: [
           {
             price_data: {
               currency: "usd",
               product_data: {
                 name: isMonthly
-                  ? `Monthly Giving (${package_id || "Custom Tier"})`
+                  ? "Monthly giving"
                   : isNidake
                     ? "NIDAKE Dignity Kit Sponsorship"
                     : `Life Helpers Initiative Support`,
@@ -83,13 +90,13 @@ export async function POST(req: NextRequest) {
           },
         ],
         metadata: {
-          donor_name: donor_name?.trim() || "Anonymous",
-          donor_email: donor_email?.trim() || "",
+          donor_name: (typeof donor_name === "string" && donor_name.trim().slice(0, 200)) || "Anonymous",
+          donor_email: typeof donor_email === "string" ? donor_email.trim().slice(0, 200) : "",
           frequency,
-          package_id: package_id || "custom",
+          package_id: typeof package_id === "string" ? package_id.slice(0, 40) : "custom",
           designation: isNidake ? "nidake" : "general",
         },
-        success_url: `${origin}/donate/success?session_id={CHECKOUT_SESSION_ID}&amount=${amount}&kind=${frequency}`,
+        success_url: `${origin}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/donate?cancelled=true`,
       });
 

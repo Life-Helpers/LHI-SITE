@@ -29,7 +29,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             defaultValue={query}
             placeholder="Stories, projects, courses, vacancies…"
             autoFocus
-            className="flex-1 rounded-full border border-border bg-background px-5 py-3 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="min-w-0 flex-1 rounded-full border border-border bg-background px-5 py-3 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           />
           <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
             <Search className="h-4 w-4" aria-hidden="true" /> Search

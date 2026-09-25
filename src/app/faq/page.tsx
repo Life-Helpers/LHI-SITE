@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { FaqAccordion } from "@/components/faq-accordion";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
+import { jsonLdScript } from "@/lib/validation";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/faq" },
   title: "Frequently Asked Questions (FAQ)",
   description:
     "Find answers to frequently asked questions about Life Helpers Initiative (LHI), our health, education, and protection programs, governance, and donation processes.",
@@ -11,6 +13,7 @@ export const metadata: Metadata = {
     title: "Frequently Asked Questions (FAQ) | Life Helpers Initiative",
     description:
       "Explore transparent answers on Life Helpers Initiative's organization, humanitarian programs, and donation handling.",
+    images: [{ url: "/logo.png", width: 1533, height: 440, alt: "Life Helpers Initiative (LHI) Logo" }],
   },
 };
 
@@ -67,7 +70,7 @@ export default function FaqPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(faqSchema),
+          __html: jsonLdScript(faqSchema),
         }}
       />
 

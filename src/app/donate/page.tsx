@@ -7,6 +7,7 @@ import { getSettings } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/donate" },
   title: "Donate",
   description:
     "Your donation directly supports emergency food assistance, clinical care, malnutrition stabilization, and child protection hubs across 11 frontline states.",

@@ -7,6 +7,7 @@ import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/programs" },
   title: "Programs",
   description:
     "Explore Life Helpers Initiative's six thematic areas bringing smiles and fulfillment to vulnerable communities across Nigeria.",

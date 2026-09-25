@@ -6,6 +6,7 @@ import { getAllMagazines } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/project-magazines" },
   title: "Project Magazines",
   description: "Read Life Helpers Initiative's project magazines, Helpers Digest bulletins and newsletters online as flipbooks, or download them as PDF.",
 };

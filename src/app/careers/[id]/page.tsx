@@ -12,7 +12,7 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const found = await getJob((await params).id);
-  return found ? { title: `${found.job.title} | Careers`, description: found.job.summary } : {};
+  return found ? { title: `${found.job.title} | Careers`, description: found.job.summary, alternates: { canonical: `/careers/${found.job.id}` } } : {};
 }
 
 export default async function JobPage({ params }: { params: Promise<{ id: string }> }) {

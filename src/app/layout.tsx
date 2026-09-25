@@ -18,6 +18,7 @@ import { LocaleProvider } from "@/i18n/locale-context";
 import { GoogleTranslateBridge } from "@/components/google-translate-bridge";
 import { activeAlerts } from "@/config/alerts";
 import { siteConfig } from "@/config/site";
+import { jsonLdScript } from "@/lib/validation";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -67,7 +68,6 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_NG",
-    url: siteConfig.url,
     title: "Life Helpers Initiative | Humanitarian Relief & Sustainable Development",
     description: siteConfig.description,
     siteName: siteConfig.name,
@@ -86,9 +86,6 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: ["/logo.png"],
     creator: "@lhinigeria",
-  },
-  alternates: {
-    canonical: siteConfig.url,
   },
 };
 
@@ -130,7 +127,7 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationJsonLd),
+            __html: jsonLdScript(organizationJsonLd),
           }}
         />
         <ThemeProvider>

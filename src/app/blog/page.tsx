@@ -13,10 +13,12 @@ import { MAGAZINES } from "@/data/magazines";
 import { OBSERVANCE_AREAS } from "@/data/observances";
 import { PUBLICATIONS } from "@/data/publication-stories";
 import { getCalendarEvents, getPublishedPosts } from "@/lib/cms/content";
+import { toPostCard } from "@/lib/posts";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/blog" },
   title: "LHI Blog & Newsletter",
   description:
     "News, field stories, success stories, the LHI newsletter, Helpers Digest bulletins and project magazines from Life Helpers Initiative, with free PDF downloads.",
@@ -44,7 +46,7 @@ export default async function BlogPage() {
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:px-8">
           <div className="lg:col-span-8">
             <h2 className="mb-8 font-serif-display text-3xl font-light text-foreground">Latest stories</h2>
-            <BlogFeed posts={posts} paginate />
+            <BlogFeed posts={posts.map(toPostCard)} paginate />
           </div>
 
           <aside className="lg:col-span-4">

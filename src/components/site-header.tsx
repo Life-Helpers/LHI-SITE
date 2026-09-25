@@ -600,6 +600,26 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [insideHero]);
 
+  // Close the mobile menu on navigation.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // While the mobile menu is open: Escape closes it and the page behind it doesn't scroll.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
+
   if (pathname === "/" && !insideHero) {
     return null;
   }
@@ -754,11 +774,9 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
       {menuOpen && (
         <div
           id="mobile-nav"
-          className={`flex flex-col gap-1 border-t ${
-            isHeroGlass
-              ? "border-white/20 bg-slate-950/95 text-white rounded-b-2xl"
-              : "border-border/80 bg-background/95 dark:bg-background/95 text-foreground"
-          } backdrop-blur-2xl px-6 py-4 xl:hidden max-h-[80vh] overflow-y-auto shadow-2xl`}
+          className={`flex max-h-[80vh] flex-col gap-1 overflow-y-auto overscroll-contain border-t border-border/80 bg-background/95 px-6 py-4 text-foreground shadow-2xl backdrop-blur-2xl xl:hidden ${
+            isHeroGlass ? "rounded-b-2xl" : ""
+          }`}
         >
           <Link
             href="/"

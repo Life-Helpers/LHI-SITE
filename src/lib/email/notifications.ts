@@ -60,6 +60,14 @@ const ACKNOWLEDGEMENTS: Record<SubmissionType, (s: Submission) => { subject: str
       "LHI never charges fees for vendor registration or tenders.",
     ],
   }),
+  donation: (s) => ({
+    subject: "Thank you for your gift",
+    heading: "Thank you for your gift.",
+    paragraphs: [
+      `We have received your ${s.fields.frequency === "monthly" ? "monthly gift" : "gift"} of ${s.fields.amount}. Thank you for standing with communities across Northern Nigeria.`,
+      "Your card statement and payment receipt come from Stripe, our payment processor.",
+    ],
+  }),
   "tender-response": (s) => ({
     subject: `Bid received: ${s.subject.replace(/^Bid:\s*/, "")}`,
     heading: "Your bid has been received.",
@@ -90,7 +98,7 @@ const ACKNOWLEDGEMENTS: Record<SubmissionType, (s: Submission) => { subject: str
 export async function notifySubmission(submission: Submission) {
   try {
     const ack = ACKNOWLEDGEMENTS[submission.type](submission);
-    await sendEmail({
+    if (submission.email) await sendEmail({
       to: submission.email,
       subject: ack.subject,
       kind: "confirmation",

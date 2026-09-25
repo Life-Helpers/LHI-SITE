@@ -68,7 +68,7 @@ export function OfficePresenceMap({ selectedId, onSelect }: { selectedId: string
                   office.isPrimary ? "h-5 w-5 bg-accent" : "h-3.5 w-3.5 bg-primary"
                 } ${active ? "scale-125" : ""}`}
               >
-                {office.isPrimary && <span className="text-[8px] font-bold leading-none text-white">HQ</span>}
+                {office.isPrimary && <span className="text-[8px] font-bold leading-none text-accent-foreground">HQ</span>}
               </span>
             </span>
             <span

@@ -4,6 +4,8 @@ import { z } from "zod";
 import { sendCertificateEmail } from "@/lib/email/notifications";
 import { gradeExam, issueCertificate } from "@/lib/training/grading";
 import { getCurrentLearner, updateLearnerProgress } from "@/lib/training/learners";
+import { clientIp } from "@/lib/client-ip";
+import { formError } from "@/lib/validation";
 
 const schema = z.object({
   courseId: z.string().min(1).max(80),
@@ -16,7 +18,7 @@ const schema = z.object({
 const attempts = new Map<string, { count: number; until: number }>();
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  const ip = clientIp(req);
   const entry = attempts.get(ip);
   const fresh = !entry || entry.until < Date.now();
   const count = fresh ? 1 : entry.count + 1;
@@ -30,7 +32,7 @@ export async function POST(req: NextRequest) {
 
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid submission." }, { status: 400 });
+    return NextResponse.json({ error: formError(parsed.error, "Invalid submission.") }, { status: 400 });
   }
   const { courseId, name, organization, answers } = parsed.data;
   const graded = gradeExam(courseId, answers);

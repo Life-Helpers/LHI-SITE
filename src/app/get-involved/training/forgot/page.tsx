@@ -6,6 +6,7 @@ import { LearnerForgotForm } from "@/components/training/learner-reset-forms";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/get-involved/training/forgot" },
   title: "Forgot your password?",
   robots: { index: false },
 };

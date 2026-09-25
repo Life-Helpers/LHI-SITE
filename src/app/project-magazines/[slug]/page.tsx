@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,6 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${m.title} | Project Magazines`,
     description: m.description,
+    alternates: { canonical: `/project-magazines/${m.slug}` },
     openGraph: { title: m.title, description: m.description, images: [{ url: pageImage(m, 1) }] },
   };
 }
@@ -58,8 +60,9 @@ export default async function MagazineReaderPage({ params }: { params: Promise<{
             {others.map((m) => (
               <li key={m.slug}>
                 <Link href={`/project-magazines/${m.slug}`} className="group flex gap-4">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={pageImage(m, 1)} alt="" loading="lazy" className="h-28 w-20 shrink-0 rounded object-cover shadow-md" />
+                  <span className="relative h-28 w-20 shrink-0 overflow-hidden rounded shadow-md">
+                    <Image src={pageImage(m, 1)} alt="" fill sizes="80px" className="object-cover" />
+                  </span>
                   <span className="min-w-0 break-words">
                     <span className="block text-[11px] font-semibold uppercase tracking-wider text-accent">{m.kind}</span>
                     <span className="mt-1 block text-sm font-semibold text-foreground group-hover:text-primary">{m.title}</span>

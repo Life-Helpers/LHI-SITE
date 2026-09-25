@@ -4,6 +4,7 @@ import { z } from "zod";
 import { FEEDBACK_TYPES, RESPONSE_CHANNELS } from "@/data/feedback";
 import { addSubmission } from "@/lib/cms/submissions";
 import { checkSpam } from "@/lib/spam";
+import { formError } from "@/lib/validation";
 
 const schema = z
   .object({
@@ -30,7 +31,7 @@ const schema = z
 /** Community feedback and response mechanism: compliments, suggestions, complaints and questions. */
 export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json().catch(() => null));
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid feedback." }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ error: formError(parsed.error, "Invalid feedback.") }, { status: 400 });
   const d = parsed.data;
   const spam = await checkSpam(req, { key: "feedback", max: 10, honeypot: d.website });
   if ("blocked" in spam) return spam.blocked;

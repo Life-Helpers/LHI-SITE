@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { readStore, updateStore } from "@/lib/cms/store";
 import { addSubmission, rateLimited } from "@/lib/cms/submissions";
+import { formError } from "@/lib/validation";
 
 const schema = z.object({
   email: z.string().trim().toLowerCase().email("Enter a valid email address.").max(200),
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid request." }, { status: 400 });
+    return NextResponse.json({ error: formError(parsed.error, "Invalid request.") }, { status: 400 });
   }
   const { email, name, source, website } = parsed.data;
   if (website) return NextResponse.json({ ok: true });

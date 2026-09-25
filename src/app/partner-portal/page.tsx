@@ -8,6 +8,7 @@ import { getDocuments, getStates } from "@/lib/cms/content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/partner-portal" },
   title: "Partner & Bidder Portal",
   description:
     "Institutional donor and consortium bidding hub: CAC registration, tax clearance, audited financial statements, PSEA, child safeguarding and anti-fraud policies, plus an expedited RFP expression-of-interest intake.",

@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/terms" },
   title: "Terms of Service",
   description: `Terms governing use of the ${siteConfig.name} website, donations, training, careers and procurement.`,
 };

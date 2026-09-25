@@ -123,7 +123,6 @@ export const LHI_PHOTOS = {
   hubOfficeWall: p("hub-office-partners-wall", "LHI office at the farmers hub with a wall of partner logos"),
   nidakeKit: p("nidake-pad-kit", "NIDAKE reusable sanitary pad kit"),
   fctTeam: p("lhi-fct-team", "LHI staff in branded vests at an FCT community event"),
-  ace3Mother: p("ace3-mother-hope", "Two women embracing and smiling outside their home in Shagari LGA"),
   azima: p("azima-tailoring", "Azima Bello at her sewing machine after tailoring training"),
   vslaGroup: p("vsla-group-sokoto", "Village savings group members seated on mats during a meeting"),
 

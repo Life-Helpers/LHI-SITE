@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/privacy" },
   title: "Privacy Policy",
   description: `How ${siteConfig.name} collects, uses and protects personal data under the Nigeria Data Protection Act 2023.`,
 };

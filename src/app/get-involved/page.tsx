@@ -4,10 +4,12 @@ import { GetInvolvedView } from "@/components/get-involved/get-involved-view";
 import { siteConfig } from "@/config/site";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { getPublicJobs } from "@/lib/cms/content";
+import { jsonLdScript } from "@/lib/validation";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/get-involved" },
   title: "Volunteer & Get Involved",
   description:
     "Volunteer, donate, partner, or advocate with Life Helpers Initiative across 11 states in Nigeria. Community health outreach, education, emergency food security, and protection.",
@@ -49,7 +51,7 @@ export default async function GetInvolvedPage() {
     <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <GetInvolvedView openings={openings} />
     </main>

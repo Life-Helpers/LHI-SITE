@@ -4,6 +4,7 @@ import { z } from "zod";
 import { readStore } from "@/lib/cms/store";
 import { addSubmission, rateLimited } from "@/lib/cms/submissions";
 import { authenticateLearner, createLearnerSession, registerLearner } from "@/lib/training/learners";
+import { formError } from "@/lib/validation";
 
 const signup = z.object({
   mode: z.literal("signup"),
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
   }
   const body = await req.json().catch(() => null);
   const parsed = z.discriminatedUnion("mode", [signup, login]).safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid request." }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ error: formError(parsed.error, "Invalid request.") }, { status: 400 });
 
   if (parsed.data.mode === "login") {
     const learner = await authenticateLearner(parsed.data.email, parsed.data.password);

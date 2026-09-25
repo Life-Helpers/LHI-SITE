@@ -6,6 +6,7 @@ import { LearnerResetForm } from "@/components/training/learner-reset-forms";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/get-involved/training/reset" },
   title: "Choose a new password",
   robots: { index: false },
 };

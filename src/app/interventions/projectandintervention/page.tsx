@@ -20,10 +20,12 @@ import { OperationalMap } from "@/components/operational-map";
 import { toMapProjects } from "@/data/operational-states";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { getInterventions, getStates } from "@/lib/cms/content";
+import { jsonLdScript } from "@/lib/validation";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/interventions/projectandintervention" },
   title: "Projects & Interventions",
   description:
     "Explore active and past humanitarian, health, education, and livelihood interventions implemented by Life Helpers Initiative across 11 Nigerian states alongside MSH, Save the Children, UNICEF, Plan International, SIF, ZOA, and BMZ.",
@@ -44,6 +46,7 @@ export const metadata: Metadata = {
     description:
       "Comprehensive directory of LHI's evidence-based humanitarian and development projects mapped to our 6 thematic areas across 11 states in Nigeria.",
     type: "website",
+    images: [{ url: "/logo.png", width: 1533, height: 440, alt: "Life Helpers Initiative (LHI) Logo" }],
   },
 };
 
@@ -85,7 +88,7 @@ export default async function ProjectsAndInterventionsPage() {
       {/* Schema.org JSON-LD Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
 
       {/* Hero Banner */}

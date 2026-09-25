@@ -8,6 +8,7 @@ import { HISTORY_MILESTONES } from "@/data/history-timeline";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/our-history" },
   title: "Our History",
   description:
     "The journey of Life Helpers Initiative: from the Beulah Project in 2004 to a national humanitarian and development organization operating across 11 states in Nigeria.",

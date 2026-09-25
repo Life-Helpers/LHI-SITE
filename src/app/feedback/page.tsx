@@ -8,6 +8,7 @@ import { siteConfig } from "@/config/site";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/feedback" },
   title: "Feedback",
   description:
     "Share a compliment, suggestion, complaint or question with Life Helpers Initiative. Feedback is free, confidential and can be anonymous.",

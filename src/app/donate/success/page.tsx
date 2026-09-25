@@ -8,73 +8,47 @@ import { ArrowRight, CheckCircle2, Loader2, Sparkles, XCircle } from "lucide-rea
 function DonateSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const urlAmount = searchParams.get("amount");
-  const urlKind = searchParams.get("kind");
 
-  const [status, setStatus] = useState<"loading" | "paid" | "pending" | "error">("loading");
-  const [amount, setAmount] = useState<number | null>(urlAmount ? parseFloat(urlAmount) : null);
-  const [kind, setKind] = useState<string | null>(urlKind || null);
+  // Only Stripe's own answer decides what the donor sees: amounts are never taken from the URL.
+  const [status, setStatus] = useState<"loading" | "paid" | "pending" | "error">(sessionId ? "loading" : "error");
+  const [amount, setAmount] = useState<number | null>(null);
+  const [currency, setCurrency] = useState("usd");
+  const [kind, setKind] = useState<string | null>(null);
   const pollCountRef = useRef(0);
 
   useEffect(() => {
-    document.title = "Thank You — Life Helpers Initiative";
-
-    if (!sessionId) {
-      if (urlAmount) {
-        setStatus("paid");
-        return;
-      }
-      setStatus("error");
-      return;
-    }
-
-    if (sessionId.startsWith("lhi_sim_") || sessionId.startsWith("chf_sim_") || sessionId.startsWith("demo_")) {
-      setStatus("paid");
-      if (urlAmount) setAmount(parseFloat(urlAmount));
-      if (urlKind) setKind(urlKind);
-      return;
-    }
+    if (!sessionId) return;
 
     let isCancelled = false;
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
     const checkStatus = async () => {
       pollCountRef.current += 1;
       try {
-        const res = await fetch(`/api/donations/status/${sessionId}`);
+        const res = await fetch(`/api/donations/status/${encodeURIComponent(sessionId)}`);
         if (!res.ok) throw new Error("Status lookup failed");
         const data = await res.json();
-
         if (isCancelled) return;
 
-        if (data.amount) setAmount(data.amount);
+        if (typeof data.amount === "number") setAmount(data.amount);
+        if (typeof data.currency === "string") setCurrency(data.currency);
         if (data.kind) setKind(data.kind);
 
-        if (data.payment_status === "paid" || data.status === "complete") {
+        if (data.payment_status === "paid" || data.payment_status === "no_payment_required") {
           setStatus("paid");
           return;
         }
-
-        if (data.payment_status === "expired" || data.status === "failed") {
+        if (data.status === "expired") {
           setStatus("error");
           return;
         }
-
         if (pollCountRef.current >= 12) {
           setStatus("pending");
           return;
         }
-
         timer = setTimeout(checkStatus, 2000);
       } catch {
-        if (!isCancelled) {
-          // If in preview or test without live server hook, fall back to paid if params present
-          if (urlAmount) {
-            setStatus("paid");
-          } else {
-            setStatus("error");
-          }
-        }
+        if (!isCancelled) setStatus("error");
       }
     };
 
@@ -84,7 +58,10 @@ function DonateSuccessContent() {
       isCancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [sessionId, urlAmount, urlKind]);
+  }, [sessionId]);
+
+  const formattedAmount =
+    amount != null ? new Intl.NumberFormat("en-NG", { style: "currency", currency: currency.toUpperCase() }).format(amount) : null;
 
   return (
     <main
@@ -119,12 +96,10 @@ function DonateSuccessContent() {
               <em className="font-light italic text-primary">from all of us.</em>
             </h1>
 
-            {amount && (
+            {formattedAmount && (
               <p className="mt-8 text-lg text-muted-foreground">
                 Your {kind === "monthly" ? "monthly recurring gift" : "gift"} of{" "}
-                <span className="font-serif-display text-2xl font-medium text-primary">
-                  ${amount.toFixed(2)}
-                </span>
+                <span className="font-serif-display text-2xl font-medium text-primary">{formattedAmount}</span>
                 {kind === "monthly" && (
                   <span className="text-lg font-medium text-primary"> / month</span>
                 )}{" "}
@@ -177,7 +152,7 @@ function DonateSuccessContent() {
               Unable to verify donation
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-              We couldn&apos;t confirm this donation session. If your account was charged, a receipt will still arrive in your email.
+              We couldn&apos;t confirm this donation. If your card was charged, Stripe will email you a receipt, and you can contact us with any questions.
             </p>
             <div className="mt-8 flex justify-center gap-4">
               <Link

@@ -12,7 +12,7 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const found = await getTender((await params).id);
-  return found ? { title: `${found.tender.title} | Procurement`, description: found.tender.summary } : {};
+  return found ? { title: `${found.tender.title} | Procurement`, description: found.tender.summary, alternates: { canonical: `/procurement/${found.tender.id}` } } : {};
 }
 
 export default async function TenderPage({ params }: { params: Promise<{ id: string }> }) {
