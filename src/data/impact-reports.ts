@@ -2,7 +2,8 @@ import type { ImpactReport } from "@/types/content";
 import { LHI_PHOTOS } from "./lhi-photos";
 
 /**
- * Real, cumulative organization-wide figures from LHI's own content brief.
+ * First-run impact reports for Admin → Impact Reports: real, cumulative organisation-wide
+ * figures from LHI's own content brief.
  */
 export const impactReports: ImpactReport[] = [
   {

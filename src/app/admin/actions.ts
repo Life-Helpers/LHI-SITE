@@ -413,6 +413,12 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
     if (href && !(href.startsWith("/") || href.startsWith("https://"))) {
       return { ok: false, error: "Feature link must start with / or https://" };
     }
+    const social = {} as CmsSettings["social"];
+    for (const key of ["facebook", "instagram", "x", "linkedin", "youtube", "linktree"] as const) {
+      const link = str(settings.social?.[key], 300);
+      if (link && !/^https:\/\/[^\s]+$/.test(link)) return { ok: false, error: "Social media links must be full https:// links." };
+      social[key] = link;
+    }
     const current = await readSettings();
     await writeSettings({
       // Home page text is edited on its own screen; keep it as saved.
@@ -427,7 +433,23 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
         linkHref: href,
       },
       nidake: { costNgn: cost, yearsOfDignity: years, schoolDaysSaved: days },
-      contact: { email: str(settings.contact.email, 200), phone: str(settings.contact.phone, 60) },
+      contact: {
+        email: str(settings.contact.email, 200),
+        phone: str(settings.contact.phone, 60),
+        helpline: str(settings.contact.helpline, 60),
+        feedbackEmail: str(settings.contact.feedbackEmail, 200),
+        pseaEmail: str(settings.contact.pseaEmail, 200),
+        recruitmentEmail: str(settings.contact.recruitmentEmail, 200),
+      },
+      social,
+      stats: {
+        peopleReached: str(settings.stats?.peopleReached, 40),
+        households: str(settings.stats?.households, 40),
+        projects: str(settings.stats?.projects, 40),
+        staff: str(settings.stats?.staff, 40),
+        volunteers: str(settings.stats?.volunteers, 40),
+        grants: str(settings.stats?.grants, 60),
+      },
       donations: { bankDetails: str(settings.donations?.bankDetails, 2000) },
       engagement: {
         autoApproveComments: Boolean(settings.engagement?.autoApproveComments),

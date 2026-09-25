@@ -167,13 +167,13 @@ export function occurrence(o: Observance, year: number): CalendarEvent {
 }
 
 /** Observance occurrences that end on or after `today`, within the next `days` days, soonest first. */
-export function upcomingObservances(today: string, days = 366): CalendarEvent[] {
+export function upcomingObservances(today: string, days = 366, list: Observance[] = OBSERVANCES): CalendarEvent[] {
   const year = Number(today.slice(0, 4));
   const limit = new Date(`${today}T00:00:00Z`);
   limit.setUTCDate(limit.getUTCDate() + days);
   const until = limit.toISOString().slice(0, 10);
   return [year - 1, year, year + 1]
-    .flatMap((y) => OBSERVANCES.map((o) => occurrence(o, y)))
+    .flatMap((y) => list.map((o) => occurrence(o, y)))
     .filter((e) => e.end >= today && e.start <= until)
     .sort(compareEvents);
 }

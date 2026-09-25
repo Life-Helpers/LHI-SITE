@@ -5,15 +5,13 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, FileText, Heart, Sparkles } from "lucide-react";
 
 import { ProgramCard } from "@/components/program-card";
-import { impactReports } from "@/data/impact-reports";
-import { programs } from "@/data/programs";
+import { getImpactReport, getImpactReports, getPrograms } from "@/lib/cms/content";
 
-function getReport(id: string) {
-  return impactReports.find((report) => report.id === id);
-}
+/** Reports come from Admin → Impact Reports. */
+export const revalidate = 300;
 
-export function generateStaticParams() {
-  return impactReports.map((report) => ({ id: report.id }));
+export async function generateStaticParams() {
+  return (await getImpactReports()).map((report) => ({ id: report.id }));
 }
 
 export async function generateMetadata({
@@ -22,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const report = getReport(id);
+  const report = await getImpactReport(id);
   if (!report) return {};
   return {
     title: report.title,
@@ -37,10 +35,10 @@ export default async function ImpactReportDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const report = getReport(id);
+  const report = await getImpactReport(id);
   if (!report) notFound();
 
-  const relatedPrograms = programs.filter((program) =>
+  const relatedPrograms = (await getPrograms()).filter((program) =>
     report.relatedProgramIds.includes(program.id),
   );
 

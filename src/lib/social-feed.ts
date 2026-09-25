@@ -1,6 +1,9 @@
 import "server-only";
 
-import { siteConfig } from "@/config/site";
+import { getSiteData } from "@/lib/cms/content";
+
+/** Account links from Admin → Settings → Social media accounts. */
+const accounts = async () => (await getSiteData()).social;
 
 /**
  * Recent posts from LHI's official social media accounts, for the home page social wall.
@@ -9,7 +12,7 @@ import { siteConfig } from "@/config/site";
  * or breaks.
  *
  * - YouTube: the two newest videos from the channel's public RSS feed. No key needed; set YOUTUBE_CHANNEL_ID, or it is
- *   looked up once a day from the channel handle in siteConfig.social.youtube.
+ *   looked up once a day from the YouTube link in Admin → Settings.
  * - Facebook: FACEBOOK_PAGE_ID + FACEBOOK_PAGE_ACCESS_TOKEN (a long-lived Page token).
  * - Instagram: INSTAGRAM_ACCESS_TOKEN (Instagram API with Instagram Login, professional account).
  * - X: X_BEARER_TOKEN (+ optional X_USER_ID; otherwise looked up from the handle). Needs an X API
@@ -71,7 +74,9 @@ const tag = (xml: string, name: string) => {
 
 async function youtubeChannelId(): Promise<string | null> {
   if (process.env.YOUTUBE_CHANNEL_ID) return process.env.YOUTUBE_CHANNEL_ID;
-  const html = await getText(siteConfig.social.youtube, 86_400);
+  const youtube = (await accounts()).youtube;
+  if (!youtube) return null;
+  const html = await getText(youtube, 86_400);
   const m = html && (/"externalId":"(UC[\w-]{22})"/.exec(html) ?? /channel\/(UC[\w-]{22})/.exec(html));
   return m ? m[1] : null;
 }
@@ -106,12 +111,13 @@ async function facebookItems(): Promise<SocialItem[]> {
   const data = await getJson<{ data?: { id: string; message?: string; permalink_url?: string; full_picture?: string; created_time: string }[] }>(
     `https://graph.facebook.com/v21.0/${encodeURIComponent(page)}/posts?fields=message,permalink_url,full_picture,created_time&limit=${PER_NETWORK}&access_token=${encodeURIComponent(token)}`,
   );
+  const pageUrl = (await accounts()).facebook;
   return (data?.data ?? [])
     .filter((p) => p.message || p.full_picture)
     .map((p) => ({
       id: `fb-${p.id}`,
       network: "facebook" as const,
-      url: p.permalink_url ?? siteConfig.social.facebook,
+      url: p.permalink_url ?? pageUrl,
       text: p.message ?? "",
       image: p.full_picture,
       date: p.created_time,
@@ -141,9 +147,10 @@ async function xItems(): Promise<SocialItem[]> {
   const bearer = process.env.X_BEARER_TOKEN;
   if (!bearer) return [];
   const headers = { Authorization: `Bearer ${bearer}` };
+  const handle = (await accounts()).x.split("/").pop();
+  if (!handle) return [];
   let userId = process.env.X_USER_ID;
   if (!userId) {
-    const handle = siteConfig.social.x.split("/").pop();
     const user = await getJson<{ data?: { id: string } }>(`https://api.x.com/2/users/by/username/${handle}`, { headers }, 86_400);
     userId = user?.data?.id;
   }
@@ -156,7 +163,6 @@ async function xItems(): Promise<SocialItem[]> {
     { headers },
   );
   const media = new Map((data?.includes?.media ?? []).map((m) => [m.media_key, m]));
-  const handle = siteConfig.social.x.split("/").pop();
   return (data?.data ?? []).slice(0, PER_NETWORK).map((t) => {
     const m = t.attachments?.media_keys?.map((k) => media.get(k)).find(Boolean);
     return {

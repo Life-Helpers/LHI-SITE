@@ -1,10 +1,8 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/config/site";
-import { emergencies } from "@/data/emergencies";
-import { impactReports } from "@/data/impact-reports";
-import { getInterventions, getPublicJobs, getPublicTenders, getPublishedPosts } from "@/lib/cms/content";
-import { programs } from "@/data/programs";
+import { THEMATIC_AREA_IDS } from "@/data/thematic-areas";
+import { getEmergencies, getImpactReports, getInterventions, getPublicJobs, getPublicTenders, getPublishedPosts } from "@/lib/cms/content";
 import { COURSES } from "@/data/training/courses";
 import { MAGAZINES } from "@/data/magazines";
 
@@ -49,8 +47,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly" as const,
   }));
 
-  const programRoutes = programs.map((program) => ({
-    url: `${siteConfig.url}/${program.id}`,
+  const [emergencies, impactReports] = await Promise.all([getEmergencies(), getImpactReports()]);
+  const programRoutes = THEMATIC_AREA_IDS.map((id) => ({
+    url: `${siteConfig.url}/${id}`,
     changeFrequency: "monthly" as const,
   }));
 

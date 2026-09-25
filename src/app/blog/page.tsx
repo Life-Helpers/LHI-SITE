@@ -12,7 +12,7 @@ import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { MAGAZINES } from "@/data/magazines";
 import { OBSERVANCE_AREAS } from "@/data/observances";
 import { PUBLICATIONS } from "@/data/publication-stories";
-import { getCalendarEvents, getPublishedPosts } from "@/lib/cms/content";
+import { getCalendarEvents, getPublishedPosts, getSiteData } from "@/lib/cms/content";
 import { toPostCard } from "@/lib/posts";
 
 export const revalidate = 300;
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const [posts, events] = await Promise.all([getPublishedPosts(), getCalendarEvents(120)]);
+  const [posts, events, { social }] = await Promise.all([getPublishedPosts(), getCalendarEvents(120), getSiteData()]);
   const upcoming = events.slice(0, 4);
 
   return (
@@ -98,7 +98,7 @@ export default async function BlogPage() {
 
               <div className="rounded-2xl border border-border bg-card p-6">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Follow LHI</h3>
-                <SocialLinks className="mt-4" />
+                <SocialLinks social={social} className="mt-4" />
               </div>
             </div>
           </aside>

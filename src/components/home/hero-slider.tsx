@@ -14,6 +14,7 @@ import {
 
 import { heroChildSlides, type HeroSlideItem } from "@/data/african-fulfillment-images";
 import { SiteHeader } from "@/components/site-header";
+import { isUnoptimized } from "@/lib/image";
 
 interface HeroSliderProps {
   slides?: HeroSlideItem[];
@@ -117,6 +118,7 @@ export function HeroSlider({ slides = heroChildSlides }: HeroSliderProps) {
                 <Image
                   src={slide.src}
                   alt={slide.alt}
+                  unoptimized={isUnoptimized(slide.src)}
                   fill
                   priority={index === 0}
                   referrerPolicy="no-referrer"
@@ -247,17 +249,19 @@ export function HeroSlider({ slides = heroChildSlides }: HeroSliderProps) {
                 </span>
               </Link>
 
-              {/* Secondary "Learn How" / "See Programs" Pill with Brand Circular Arrow */}
-              <Link
-                href={currentSlide.secondaryCta.href}
-                id="hero-secondary-cta"
-                className="group inline-flex items-center gap-3 rounded-full bg-white pl-6 pr-2 py-2 text-slate-900 font-semibold text-sm shadow-xl hover:bg-white/95 hover:scale-105 transition-all duration-300"
-              >
-                <span>{currentSlide.secondaryCta.label}</span>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white transition-transform group-hover:translate-x-0.5">
-                  <ArrowRight className="h-4 w-4" />
-                </span>
-              </Link>
+              {/* Secondary pill, when the slide has a second button */}
+              {currentSlide.secondaryCta.label && currentSlide.secondaryCta.href && (
+                <Link
+                  href={currentSlide.secondaryCta.href}
+                  id="hero-secondary-cta"
+                  className="group inline-flex items-center gap-3 rounded-full bg-white pl-6 pr-2 py-2 text-slate-900 font-semibold text-sm shadow-xl hover:bg-white/95 hover:scale-105 transition-all duration-300"
+                >
+                  <span>{currentSlide.secondaryCta.label}</span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white transition-transform group-hover:translate-x-0.5">
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                </Link>
+              )}
             </div>
           </div>
 
@@ -278,6 +282,7 @@ export function HeroSlider({ slides = heroChildSlides }: HeroSliderProps) {
                     <Image
                       src={currentSlide.src}
                       alt={currentSlide.alt}
+                      unoptimized={isUnoptimized(currentSlide.src)}
                       fill
                       sizes="96px"
                       referrerPolicy="no-referrer"

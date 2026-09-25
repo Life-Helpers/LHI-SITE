@@ -6,6 +6,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
+  AlertTriangle,
+  BarChart3,
+  CalendarHeart,
+  CircleHelp,
+  Columns2,
+  GalleryHorizontal,
+  Layers,
+  Quote,
   Languages,
   Route,
   UsersRound,
@@ -73,6 +81,30 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
       ],
     },
     {
+      label: "Home Page",
+      items: [
+        { label: "Hero Slides", href: "/admin/content/heroSlides", icon: GalleryHorizontal, permission: "homepage" },
+        { label: "Testimonials", href: "/admin/content/testimonials", icon: Quote, permission: "homepage" },
+        { label: "Before & After", href: "/admin/content/beforeAfter", icon: Columns2, permission: "homepage" },
+        { label: "Home Page Text", href: "/admin/home-text", icon: Languages, permission: "settings" },
+      ],
+    },
+    {
+      label: "Pages",
+      items: [
+        { label: "Thematic Area Pages", href: "/admin/content/thematicAreas", icon: Layers, permission: "pages" },
+        { label: "FAQs", href: "/admin/content/faqs", icon: CircleHelp, permission: "pages" },
+        { label: "Observance Days", href: "/admin/content/observances", icon: CalendarHeart, permission: "pages" },
+      ],
+    },
+    {
+      label: "Impact & Emergencies",
+      items: [
+        { label: "Impact Reports", href: "/admin/content/impactReports", icon: BarChart3, permission: "impact" },
+        { label: "Emergencies & Alerts", href: "/admin/content/emergencies", icon: AlertTriangle, permission: "impact" },
+      ],
+    },
+    {
       label: "About LHI",
       items: [
         { label: "History Timeline", href: "/admin/content/milestones", icon: Route, permission: "about" },
@@ -120,7 +152,6 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
       items: [
         { label: "Users", href: "/admin/users", icon: Users, permission: "users" },
         { label: "Roles & Permissions", href: "/admin/users/roles", icon: ShieldCheck, permission: "users" },
-        { label: "Home Page Text", href: "/admin/home-text", icon: Languages, permission: "settings" },
         { label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings" },
         { label: "Activity Log", href: "/admin/activity", icon: Activity, permission: "activity" },
       ],

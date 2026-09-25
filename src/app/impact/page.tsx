@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { impactReports } from "@/data/impact-reports";
+import { getImpactReports } from "@/lib/cms/content";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
@@ -24,7 +24,11 @@ export const metadata: Metadata = {
     "Annual reports and organisation-wide results from Life Helpers Initiative across 11 states in Nigeria.",
 };
 
-export default function ImpactPage() {
+/** Reports come from Admin → Impact Reports. */
+export const revalidate = 300;
+
+export default async function ImpactPage() {
+  const impactReports = await getImpactReports();
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}

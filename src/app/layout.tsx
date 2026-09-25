@@ -16,7 +16,8 @@ import { DownloadGate } from "@/components/downloads/download-gate";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { LocaleProvider } from "@/i18n/locale-context";
 import { GoogleTranslateBridge } from "@/components/google-translate-bridge";
-import { activeAlerts } from "@/config/alerts";
+import { SiteDataProvider } from "@/components/site-data-provider";
+import { getActiveAlerts, getSiteData } from "@/lib/cms/content";
 import { siteConfig } from "@/config/site";
 import { jsonLdScript } from "@/lib/validation";
 
@@ -89,29 +90,32 @@ export const metadata: Metadata = {
   },
 };
 
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "NGO",
-  name: siteConfig.name,
-  alternateName: siteConfig.shortName,
-  description: siteConfig.description,
-  url: siteConfig.url,
-  logo: `${siteConfig.url}/logo.png`,
-  foundingDate: siteConfig.foundingDate,
-  areaServed: "NG",
-  email: siteConfig.contact.email,
-  telephone: siteConfig.contact.phone,
-  address: {
-    "@type": "PostalAddress",
-    ...siteConfig.address,
-  },
-};
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Contact details, social accounts, impact figures and emergency alerts are managed in the admin.
+  const [siteData, alerts] = await Promise.all([getSiteData(), getActiveAlerts()]);
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NGO",
+    name: siteConfig.name,
+    alternateName: siteConfig.shortName,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    logo: `${siteConfig.url}/logo.png`,
+    foundingDate: siteConfig.foundingDate,
+    areaServed: "NG",
+    email: siteData.contact.email,
+    telephone: siteData.contact.phone.replace(/[^\d+]/g, ""),
+    sameAs: Object.values(siteData.social).filter(Boolean),
+    address: {
+      "@type": "PostalAddress",
+      ...siteConfig.address,
+    },
+  };
   return (
     <html
       lang="en"
@@ -131,6 +135,7 @@ export default function RootLayout({
           }}
         />
         <ThemeProvider>
+          <SiteDataProvider value={siteData}>
           <AccessibilityProvider>
             <LocaleProvider>
               <GoogleTranslateBridge />
@@ -144,7 +149,7 @@ export default function RootLayout({
                 Skip to content
               </a>
               <PublicChrome>
-                <EmergencyAlertBanner alerts={activeAlerts} />
+                <EmergencyAlertBanner alerts={alerts} />
                 <SiteHeader />
               </PublicChrome>
               <Suspense fallback={null}>
@@ -159,6 +164,7 @@ export default function RootLayout({
               </PublicChrome>
             </LocaleProvider>
           </AccessibilityProvider>
+          </SiteDataProvider>
         </ThemeProvider>
       </body>
     </html>

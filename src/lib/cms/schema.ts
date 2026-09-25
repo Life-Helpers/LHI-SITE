@@ -27,6 +27,9 @@ export const PERMISSION_GROUPS = [
       { id: "events", label: "Events", help: "Add LHI events to the events calendar and home page." },
       { id: "magazines", label: "Project magazines", help: "Upload magazine PDFs as flipbooks." },
       { id: "about", label: "History & team", help: "Edit the history timeline and the board, management and coordinator profiles." },
+      { id: "homepage", label: "Home page content", help: "Edit the hero slides, testimonials and before & after stories." },
+      { id: "impact", label: "Impact & emergencies", help: "Edit impact reports and emergencies, and switch the site-wide emergency alert on or off." },
+      { id: "pages", label: "Thematic pages, FAQs & observances", help: "Edit the thematic area pages, the FAQ and the observance days calendar." },
     ],
   },
   {
@@ -129,7 +132,9 @@ export type FieldType =
   | "images"
   | "file"
   | "audio"
-  | "url";
+  | "url"
+  /** A page on this site (/…) or an https://, mailto: or tel: link. */
+  | "link";
 
 export interface FieldOption {
   value: string;
@@ -170,7 +175,26 @@ export interface CollectionDef {
   fields: FieldDef[];
 }
 
-export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents" | "jobs" | "tenders" | "episodes" | "events" | "milestones" | "team";
+export type CollectionName =
+  | "posts"
+  | "interventions"
+  | "states"
+  | "partners"
+  | "documents"
+  | "jobs"
+  | "tenders"
+  | "episodes"
+  | "events"
+  | "milestones"
+  | "team"
+  | "heroSlides"
+  | "testimonials"
+  | "beforeAfter"
+  | "impactReports"
+  | "emergencies"
+  | "thematicAreas"
+  | "faqs"
+  | "observances";
 
 export const PILLAR_OPTIONS: FieldOption[] = THEMATIC_AREA_LIST.map((a) => ({ value: a.id, label: a.label }));
 
@@ -193,6 +217,19 @@ export const POST_CATEGORIES: FieldOption[] = [
 ].map((c) => ({ value: c, label: c }));
 
 const opts = (...values: string[]): FieldOption[] => values.map((v) => ({ value: v, label: v }));
+
+export const PUBLISH_OPTIONS: FieldOption[] = [
+  { value: "published", label: "Published" },
+  { value: "draft", label: "Draft" },
+];
+
+/** Card colours for testimonials (brand gradients). */
+export const TESTIMONIAL_TONES: FieldOption[] = [
+  { value: "from-primary to-[#a80f14]", label: "LHI red" },
+  { value: "from-accent to-[#7a3605]", label: "LHI orange" },
+  { value: "from-[#7d0c10] to-[#4a0709]", label: "Deep maroon" },
+  { value: "from-[#b45309] to-[#7c2d12]", label: "Amber" },
+];
 
 export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
   posts: {
@@ -478,6 +515,215 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "order", label: "Order", type: "number", sidebar: true, required: true, help: "Lower numbers come first within the group." },
     ],
   },
+  heroSlides: {
+    name: "heroSlides",
+    label: "Hero Slides",
+    singular: "Hero slide",
+    description: "The rotating photo slides at the top of the home page. Use real LHI photos of people from the communities we serve.",
+    permission: "homepage",
+    titleField: "highlight",
+    columns: ["highlight", "tag", "order", "status"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "published" ? "/" : null),
+    fields: [
+      { name: "prefix", label: "Headline: start", type: "text", required: true, help: "e.g. Putting a radiant smile on every child's face across " },
+      { name: "highlight", label: "Headline: highlighted word(s)", type: "text", required: true, help: "Underlined in red, e.g. Nigeria" },
+      { name: "suffix", label: "Headline: end", type: "text", help: "e.g. a full stop." },
+      { name: "id", label: "URL slug", type: "slug", from: "highlight", required: true },
+      { name: "body", label: "Body text", type: "textarea", required: true },
+      { name: "image", label: "Photo", type: "image", required: true },
+      { name: "imageAlt", label: "Photo description (alt text)", type: "text", required: true },
+      { name: "eyebrow", label: "Eyebrow", type: "text", help: "Small line above the headline." },
+      { name: "tag", label: "Theme tag", type: "text", help: "Shown in the top badge and the caption card, e.g. Child Welfare & Hope." },
+      { name: "caption", label: "Caption card text", type: "text" },
+      { name: "mottoBadge", label: "Motto badge", type: "text" },
+      { name: "primaryLabel", label: "Main button text", type: "text", required: true },
+      { name: "primaryHref", label: "Main button link", type: "link", required: true, help: "A page on this site (e.g. /donate) or an https:// link." },
+      { name: "secondaryLabel", label: "Second button text", type: "text" },
+      { name: "secondaryHref", label: "Second button link", type: "link" },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: PUBLISH_OPTIONS },
+      { name: "order", label: "Order", type: "number", sidebar: true, required: true, help: "Lower numbers show first." },
+    ],
+  },
+  testimonials: {
+    name: "testimonials",
+    label: "Testimonials",
+    singular: "Testimonial",
+    description: "Quotes on the home page. Use only quotes published in LHI's magazines, newsletters or stories, and link to the full story.",
+    permission: "homepage",
+    titleField: "name",
+    columns: ["name", "role", "order", "status"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "published" ? "/" : null),
+    fields: [
+      { name: "name", label: "Name", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "name", required: true },
+      { name: "role", label: "Role or place", type: "text", required: true },
+      { name: "quote", label: "Quote", type: "textarea", required: true },
+      { name: "href", label: "Link to the full story", type: "link", required: true, help: "e.g. /blog/murja-eight-years-of-struggle-to-renewed-hope" },
+      { name: "tone", label: "Card colour", type: "select", sidebar: true, required: true, options: TESTIMONIAL_TONES },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: PUBLISH_OPTIONS },
+      { name: "order", label: "Order", type: "number", sidebar: true, required: true },
+    ],
+  },
+  beforeAfter: {
+    name: "beforeAfter",
+    label: "Before & After",
+    singular: "Before & after story",
+    description:
+      "The before/now slider on the home page. Every statement must come from a published LHI story. Never show an identifiable child survivor or link anyone to a health status.",
+    permission: "homepage",
+    titleField: "name",
+    columns: ["name", "place", "order", "status"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "published" ? "/" : null),
+    fields: [
+      { name: "name", label: "Name", type: "text", required: true, help: "Person or place, e.g. Murja Yari or Noma Tushen Arziki Hub." },
+      { name: "id", label: "URL slug", type: "slug", from: "name", required: true },
+      { name: "place", label: "Place", type: "text", required: true },
+      { name: "photo", label: "\"Now\" photo", type: "image", required: true },
+      { name: "photoAlt", label: "\"Now\" photo description (alt text)", type: "text", required: true },
+      { name: "beforePhoto", label: "\"Before\" photo", type: "image", help: "Optional. Shown in black and white; without it the \"now\" photo is used." },
+      { name: "beforeTitle", label: "Before: headline", type: "text", required: true },
+      { name: "beforeText", label: "Before: text", type: "textarea", required: true },
+      { name: "afterTitle", label: "Now: headline", type: "text", required: true },
+      { name: "afterText", label: "Now: text", type: "textarea", required: true },
+      { name: "href", label: "Link to the full story", type: "link", required: true },
+      { name: "linkLabel", label: "Link text", type: "text", help: "Defaults to \"Read <name>'s story\"." },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: PUBLISH_OPTIONS },
+      { name: "order", label: "Order", type: "number", sidebar: true, required: true },
+    ],
+  },
+  impactReports: {
+    name: "impactReports",
+    label: "Impact Reports",
+    singular: "Impact report",
+    description: "Reports on /impact. Use audited or officially published figures only.",
+    permission: "impact",
+    titleField: "title",
+    columns: ["title", "period", "order", "status"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "published" ? `/impact/${item.id}` : null),
+    fields: [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
+      { name: "period", label: "Period covered", type: "text", required: true, help: "e.g. January–December 2025" },
+      { name: "publishedAt", label: "Published / source", type: "text", help: "e.g. March 2026" },
+      { name: "summary", label: "Summary", type: "textarea", required: true },
+      { name: "description", label: "Report text", type: "textarea", required: true, help: "Separate paragraphs with a blank line." },
+      { name: "stats", label: "Figures", type: "list", help: "One per line as Label | Value, e.g. Individuals reached | 1.5M+" },
+      { name: "image", label: "Photo", type: "image" },
+      { name: "imageAlt", label: "Photo description (alt text)", type: "text" },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: PUBLISH_OPTIONS },
+      { name: "order", label: "Order", type: "number", sidebar: true, required: true },
+      { name: "relatedProgramIds", label: "Thematic areas covered", type: "multiselect", sidebar: true, options: PILLAR_OPTIONS },
+    ],
+  },
+  emergencies: {
+    name: "emergencies",
+    label: "Emergencies",
+    singular: "Emergency",
+    description:
+      "Declared emergencies on /emergencies. Tick \"Show the alert banner\" on an active emergency to put a banner on every page; set it to Resolved (or untick) to take the banner down.",
+    permission: "impact",
+    titleField: "title",
+    columns: ["title", "region", "severity", "status", "declaredAt"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "draft" ? null : `/emergencies/${item.id}`),
+    fields: [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
+      { name: "region", label: "Region", type: "text", required: true, help: "e.g. Goronyo LGA, Sokoto State" },
+      { name: "declaredAt", label: "Declared", type: "text", required: true, help: "e.g. January 2026" },
+      { name: "summary", label: "Summary", type: "textarea", required: true },
+      { name: "description", label: "Full text", type: "textarea", required: true, help: "Separate paragraphs with a blank line." },
+      { name: "stats", label: "Figures", type: "list", help: "One per line as Label | Value, e.g. Households reached | 1,200" },
+      { name: "alertMessage", label: "Alert banner message", type: "text", help: "e.g. Flood response in Sokoto: LHI teams are on the ground." },
+      { name: "alertCtaLabel", label: "Alert banner button", type: "text", help: "e.g. Read the update" },
+      {
+        name: "status",
+        label: "Status",
+        type: "select",
+        sidebar: true,
+        required: true,
+        options: [
+          { value: "draft", label: "Draft (hidden)" },
+          { value: "active", label: "Active" },
+          { value: "resolved", label: "Resolved" },
+        ],
+      },
+      { name: "severity", label: "Severity", type: "select", sidebar: true, required: true, options: [{ value: "critical", label: "Critical" }, { value: "warning", label: "Warning" }] },
+      { name: "showAlert", label: "Show the alert banner", type: "boolean", sidebar: true, help: "Only while the emergency is Active." },
+      { name: "relatedProgramIds", label: "Responding thematic areas", type: "multiselect", sidebar: true, options: PILLAR_OPTIONS },
+    ],
+  },
+  thematicAreas: {
+    name: "thematicAreas",
+    label: "Thematic Area Pages",
+    singular: "Thematic area",
+    description: "The text and photo on the six thematic area pages. The six areas themselves are fixed.",
+    permission: "pages",
+    titleField: "name",
+    columns: ["name", "region", "metricValue"],
+    fixed: true,
+    publicPath: (item) => `/${item.id}`,
+    fields: [
+      { name: "name", label: "Page title", type: "text", required: true },
+      { name: "region", label: "Region", type: "text", required: true },
+      { name: "summary", label: "Summary", type: "textarea", required: true },
+      { name: "description", label: "Page text", type: "textarea", required: true, help: "Separate paragraphs with a blank line." },
+      { name: "metricLabel", label: "Headline figure: label", type: "text" },
+      { name: "metricValue", label: "Headline figure: value", type: "text" },
+      { name: "stats", label: "Other figures", type: "list", help: "One per line as Label | Value." },
+      { name: "image", label: "Photo", type: "image", required: true },
+      { name: "imageAlt", label: "Photo description (alt text)", type: "text", required: true },
+    ],
+  },
+  faqs: {
+    name: "faqs",
+    label: "FAQs",
+    singular: "FAQ",
+    description: "Questions and answers on /faq and the About page.",
+    permission: "pages",
+    titleField: "question",
+    columns: ["question", "category", "order", "status"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "published" ? "/faq" : null),
+    fields: [
+      { name: "question", label: "Question", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "question", required: true },
+      { name: "answer", label: "Answer", type: "textarea", required: true },
+      { name: "tags", label: "Search words", type: "list", help: "One per line; helps visitors find the answer." },
+      { name: "category", label: "Category", type: "select", sidebar: true, required: true, options: [{ value: "organization", label: "Organisation" }, { value: "programs", label: "Programmes" }, { value: "donations", label: "Donations" }] },
+      { name: "featured", label: "Show as a popular question", type: "boolean", sidebar: true },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: PUBLISH_OPTIONS },
+      { name: "order", label: "Order", type: "number", sidebar: true, required: true },
+    ],
+  },
+  observances: {
+    name: "observances",
+    label: "Observance Days",
+    singular: "Observance day",
+    description:
+      "International and national days on the events calendar and the home page. List only fixed-date days proclaimed by the UN, WHO, UNESCO, the African Union or the Nigerian government.",
+    permission: "pages",
+    titleField: "title",
+    columns: ["title", "month", "day", "area", "status"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "published" ? `/events#${item.id}` : null),
+    fields: [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
+      { name: "by", label: "Proclaimed by", type: "text", required: true },
+      { name: "description", label: "Why it matters to LHI", type: "textarea", required: true },
+      { name: "month", label: "Month (1–12)", type: "number", sidebar: true, required: true },
+      { name: "day", label: "Day", type: "number", sidebar: true, required: true },
+      { name: "endMonth", label: "Last month (multi-day)", type: "number", sidebar: true, help: "Leave at 0 for a single day." },
+      { name: "endDay", label: "Last day (multi-day)", type: "number", sidebar: true },
+      { name: "area", label: "Area", type: "select", sidebar: true, required: true, options: EVENT_AREA_OPTIONS },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: PUBLISH_OPTIONS },
+    ],
+  },
 };
 
 export const COLLECTION_NAMES = Object.keys(COLLECTIONS) as CollectionName[];
@@ -518,6 +764,29 @@ export interface CmsSettings {
   contact: {
     email: string;
     phone: string;
+    /** WhatsApp / SMS feedback and safeguarding (PSEA) line. */
+    helpline: string;
+    feedbackEmail: string;
+    pseaEmail: string;
+    recruitmentEmail: string;
+  };
+  /** Official social media accounts (full https:// links). */
+  social: {
+    facebook: string;
+    instagram: string;
+    x: string;
+    linkedin: string;
+    youtube: string;
+    linktree: string;
+  };
+  /** Organisation-wide figures shown on the home page, About, Careers and elsewhere. States and years are counted automatically. */
+  stats: {
+    peopleReached: string;
+    households: string;
+    projects: string;
+    staff: string;
+    volunteers: string;
+    grants: string;
   };
   donations: {
     /** Bank transfer details shown on the donate page; hidden when empty. One account per paragraph. */

@@ -79,11 +79,6 @@ live site without touching code.
 | Section | What it manages | Where it appears |
 |---|---|---|
 | Posts | News, success stories, field blog, magazine, press releases (Markdown) | `/blog`, `/blog/[slug]`, `/success-stories`, `/news-updates` |
-
-**Sensitive stories.** Posts about health status (e.g. HIV), GBV or abuse, child protection or mental health
-are flagged (by the "Sensitive story" box, or automatically from the title, excerpt and tags). Only users with
-*Approve sensitive stories* (Administrators by default) can publish them, and only after ticking all four
-safeguarding checks; everyone else saves them as *Pending review*.
 | Media Library | Uploaded photos, logos, PDFs, video (served from `/media/...`) | Everywhere via the image/file pickers |
 | Interventions | The project directory, dossiers, gallery photos, YouTube video | `/interventions/*`, factsheet PDFs, programme pages, map |
 | Map States | Offices, LGAs covered and reach for the 11 states | Operational map (home + interventions) |
@@ -91,14 +86,35 @@ safeguarding checks; everyone else saves them as *Pending review*.
 | Compliance Docs | CAC, tax clearance, audits, PSEA/safeguarding/anti-fraud PDFs | `/partner-portal` |
 | Submissions | Contact, volunteer and consortium/RFP forms (inbox) | Admin only |
 | Users | Accounts with roles: Administrator, Editor, Author | Admin only |
+| Hero Slides | The home page photo slides: headline, text, photo, buttons, order | Home page hero |
+| Testimonials | Quotes from published stories, with the link to each story | Home page |
+| Before & After | The before/now slider stories (before photo shown in black and white) | Home page |
+| Thematic Area Pages | Text, figures and photo of the six thematic area pages (the six areas are fixed) | `/health`, `/education`, `/livelihood`, `/food-security`, `/social-inclusion`, `/protection`, `/programs` |
+| FAQs | Questions and answers, categories, popular questions | `/faq` (and its search-engine data), About page |
+| Observance Days | International and national days on the calendar | `/events`, home page "Days we mark together", calendar downloads |
+| Impact Reports | Organisation-wide reports and their figures | `/impact`, `/impact/[id]` |
+| Emergencies & Alerts | Declared emergencies; tick *Show the alert banner* on an active one to put a banner on every page | `/emergencies`, site-wide banner |
 | Home Page Text | Home page headings and text in English, French, Hausa, Yoruba and Igbo (empty = built-in text) | Home page |
 | History Timeline | Road-map milestones: year, story, photos with alt text/labels, state map pins | `/our-history` |
 | Team | Board of Trustees, management team, state office coordinators | `/board-of-trustees`, `/management-team` |
-| Settings | Home feature story, NIDAKE kit figures, factsheet contact details | Home page, `/nidake`, PDFs |
+| Settings | Home feature story, NIDAKE kit figures, contact details (email, phone, WhatsApp/PSEA helpline), social media links, impact figures (people and households reached, projects, staff, volunteers, grants), bank details | Header/footer, contact, feedback, donate, careers, About, home stats, map, anniversary pop-up, social feed, PDFs |
 | Activity Log | Sign-ins, edits, uploads, deletions | Admin only |
 
 Saving in the admin refreshes the public pages immediately (on-demand revalidation);
 pages also re-check every 5 minutes.
+
+**Sensitive stories.** Posts about health status (e.g. HIV), GBV or abuse, child protection or mental health
+are flagged (by the "Sensitive story" box, or automatically from the title, excerpt and tags). Only users with
+*Approve sensitive stories* (Administrators by default) can publish them, and only after ticking all four
+safeguarding checks; everyone else saves them as *Pending review*.
+
+**Permissions for the newer screens.** *Home page content* (hero slides, testimonials, before & after),
+*Impact & emergencies* and *Thematic pages, FAQs & observances*. Administrators always have them. If the
+Editor role or a custom role was saved before these were added, tick them under **Users → Roles**.
+
+**Still in the code (developer-controlled):** the legal pages (Privacy, Terms), training courses and their
+answer keys, the Fact Sheet and Brochure infographics, navigation menus, and the six thematic area and eleven
+state ids that the map and filters depend on.
 
 ### First-time setup
 

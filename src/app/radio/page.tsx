@@ -4,10 +4,11 @@ import Link from "next/link";
 import { CalendarClock, MessageSquareText, Phone, Radio as RadioIcon, Users } from "lucide-react";
 
 import { RadioStation } from "@/components/radio/radio-station";
-import { siteConfig } from "@/config/site";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
-import { getEpisodes } from "@/lib/cms/content";
+import { getEpisodes, getSiteData } from "@/lib/cms/content";
 import { toRadioEpisode } from "@/lib/radio";
+
+import { whatsappHref } from "@/lib/site-data";
 
 export const revalidate = 300;
 
@@ -42,6 +43,7 @@ const features = [
 ];
 
 export default async function RadioPage() {
+  const { contact } = await getSiteData();
   const episodes = (await getEpisodes()).map(toRadioEpisode);
 
   return (
@@ -84,7 +86,7 @@ export default async function RadioPage() {
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <a
-              href={`https://wa.me/${siteConfig.contact.feedbackLine.replace(/\D/g, "")}`}
+              href={whatsappHref(contact.helpline)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"

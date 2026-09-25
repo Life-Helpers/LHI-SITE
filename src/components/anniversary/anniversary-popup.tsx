@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSiteData } from "@/components/site-data-provider";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { CheckCircle2, Loader2, PartyPopper, X } from "lucide-react";
@@ -8,7 +9,6 @@ import { CheckCircle2, Loader2, PartyPopper, X } from "lucide-react";
 import { firePoppers } from "@/components/anniversary/confetti";
 import { useNewsletterSignup } from "@/components/news/use-newsletter";
 import { ANNIVERSARY } from "@/config/anniversary";
-import { siteConfig } from "@/config/site";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 const STORAGE_KEY = `lhi_anniversary_${ANNIVERSARY.years}`;
@@ -40,6 +40,7 @@ function writeState(state: { subscribed?: boolean; dismissedAt?: number }) {
 }
 
 export function AnniversaryPopup() {
+  const { stats } = useSiteData();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -149,7 +150,7 @@ export function AnniversaryPopup() {
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               Since 1 October {ANNIVERSARY.foundedYear}, Life Helpers Initiative has grown from a small initiative in Sokoto into an organisation working
-              across 11 states, with {siteConfig.stats.projects} projects and {siteConfig.stats.peopleReached} people reached. Thank you
+              across {stats.statesActive.replace(/\+$/, "")} states, with {stats.projects} projects and {stats.peopleReached} people reached. Thank you
               to every community, partner, volunteer and staff member who made it possible.
             </p>
 

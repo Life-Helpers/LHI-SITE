@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { siWhatsapp } from "@/data/brand-icons";
 import { MessageCircle, ShieldAlert, X, Phone, Mail, CheckCircle2, ChevronRight, ExternalLink } from "lucide-react";
-import { siteConfig } from "@/config/site";
+import { useSiteData } from "@/components/site-data-provider";
 
 export function FloatingWhatsApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +20,8 @@ export function FloatingWhatsApp() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
-  const cleanPhone = siteConfig.contact.feedbackLine.replace(/[^0-9]/g, "");
+  const { contact } = useSiteData();
+  const cleanPhone = contact.helpline.replace(/[^0-9]/g, "");
 
   const generalWhatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
     "Hello Life Helpers Initiative, I would like to make an enquiry regarding your programs, activities, or partnerships."
@@ -119,13 +120,13 @@ export function FloatingWhatsApp() {
                   <div className="flex items-center justify-between text-muted-foreground">
                     <span>Phone:</span>
                     <a href={`tel:${cleanPhone}`} className="font-semibold text-foreground hover:text-primary">
-                      {siteConfig.contact.feedbackLine}
+                      {contact.helpline}
                     </a>
                   </div>
                   <div className="flex items-center justify-between text-muted-foreground">
                     <span>Email:</span>
-                    <a href={`mailto:${siteConfig.contact.email}`} className="font-semibold text-foreground hover:text-primary">
-                      {siteConfig.contact.email}
+                    <a href={`mailto:${contact.email}`} className="font-semibold text-foreground hover:text-primary">
+                      {contact.email}
                     </a>
                   </div>
                 </div>
@@ -166,7 +167,7 @@ export function FloatingWhatsApp() {
                       Hotline:
                     </span>
                     <a href={`tel:${cleanPhone}`} className="font-bold text-foreground hover:underline">
-                      {siteConfig.contact.feedbackLine}
+                      {contact.helpline}
                     </a>
                   </div>
                   <div className="flex items-center justify-between">

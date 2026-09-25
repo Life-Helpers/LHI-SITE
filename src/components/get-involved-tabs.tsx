@@ -5,9 +5,10 @@ import { Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { siteConfig } from "@/config/site";
+import { useSiteData } from "@/components/site-data-provider";
+import type { SiteData } from "@/lib/site-data";
 
-const tabs = [
+const buildTabs = (contact: SiteData["contact"]) => [
   {
     value: "donate",
     label: "01 Donate",
@@ -21,8 +22,8 @@ const tabs = [
     heading: "Volunteer",
     body: "There's no online application form wired up yet — reach out directly and the team will follow up.",
     cta: {
-      label: siteConfig.contact.email,
-      href: `mailto:${siteConfig.contact.email}?subject=Volunteer%20Inquiry`,
+      label: contact.email,
+      href: `mailto:${contact.email}?subject=Volunteer%20Inquiry`,
       kind: "email" as const,
     },
   },
@@ -32,8 +33,8 @@ const tabs = [
     heading: "Partner with us",
     body: "LHI works alongside multilateral and international partners across health, education, livelihoods, agriculture, and protection. To discuss a partnership, get in touch directly.",
     cta: {
-      label: siteConfig.contact.email,
-      href: `mailto:${siteConfig.contact.email}?subject=Partnership%20Inquiry`,
+      label: contact.email,
+      href: `mailto:${contact.email}?subject=Partnership%20Inquiry`,
       kind: "email" as const,
     },
   },
@@ -43,8 +44,8 @@ const tabs = [
     heading: "Advocate",
     body: "Help raise awareness of LHI's work in your own network, or connect us with people and organizations who can amplify it.",
     cta: {
-      label: siteConfig.contact.email,
-      href: `mailto:${siteConfig.contact.email}?subject=Advocacy%20Inquiry`,
+      label: contact.email,
+      href: `mailto:${contact.email}?subject=Advocacy%20Inquiry`,
       kind: "email" as const,
     },
   },
@@ -54,8 +55,8 @@ const tabs = [
     heading: "Careers",
     body: "Open roles are posted as they become available. Send your CV and a note on the role you're interested in.",
     cta: {
-      label: siteConfig.contact.recruitmentEmail,
-      href: `mailto:${siteConfig.contact.recruitmentEmail}?subject=Job%20Application`,
+      label: contact.recruitmentEmail,
+      href: `mailto:${contact.recruitmentEmail}?subject=Job%20Application`,
       kind: "email" as const,
     },
   },
@@ -65,14 +66,15 @@ const tabs = [
     heading: "Do a course & get a certificate",
     body: "There's no online course platform live yet — this isn't a working enrollment form. Let us know what you're interested in and we'll follow up once one exists.",
     cta: {
-      label: siteConfig.contact.email,
-      href: `mailto:${siteConfig.contact.email}?subject=Course%20%26%20Certificate%20Inquiry`,
+      label: contact.email,
+      href: `mailto:${contact.email}?subject=Course%20%26%20Certificate%20Inquiry`,
       kind: "email" as const,
     },
   },
 ];
 
 export function GetInvolvedTabs() {
+  const tabs = buildTabs(useSiteData().contact);
   return (
     <Tabs defaultValue="donate">
       <TabsList aria-label="Ways to get involved">

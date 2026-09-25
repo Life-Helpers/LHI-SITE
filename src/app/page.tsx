@@ -18,7 +18,19 @@ import { FeatureStory, type FeatureSlide } from "@/components/home/feature-story
 import { FEATURED_STORY_BY_AREA } from "@/data/featured-stories";
 import { THEMATIC_PILLARS } from "@/data/interventions-data";
 import { UpcomingEvents } from "@/components/home/upcoming-events";
-import { getCalendarEvents, getEpisodes, getInterventions, getPartners, getPublishedPosts, getSettings, todayInLagos } from "@/lib/cms/content";
+import {
+  getBeforeAfterStories,
+  getCalendarEvents,
+  getEpisodes,
+  getHeroSlides,
+  getInterventions,
+  getPartners,
+  getPublishedPosts,
+  getSettings,
+  getTestimonials,
+  todayInLagos,
+} from "@/lib/cms/content";
+import { heroChildSlides } from "@/data/african-fulfillment-images";
 import { toRadioEpisode } from "@/lib/radio";
 import { HomeTextOverrides } from "@/i18n/locale-context";
 
@@ -28,13 +40,16 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 export const revalidate = 300;
 
 export default async function Home() {
-  const [partners, settings, posts, interventions, episodes, events] = await Promise.all([
+  const [partners, settings, posts, interventions, episodes, events, heroSlides, testimonials, beforeAfter] = await Promise.all([
     getPartners(),
     getSettings(),
     getPublishedPosts(),
     getInterventions(),
     getEpisodes(),
     getCalendarEvents(120),
+    getHeroSlides(),
+    getTestimonials(),
+    getBeforeAfterStories(),
   ]);
   const projectCounts: Record<string, number> = {};
   for (const project of interventions) {
@@ -76,12 +91,13 @@ export default async function Home() {
   return (
     <HomeTextOverrides text={settings.homeText}>
       <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
-        <HeroSlider />
+        {/* The built-in slides stand in if every CMS slide is unpublished, so the hero is never empty. */}
+        <HeroSlider slides={heroSlides.length > 0 ? heroSlides : heroChildSlides} />
         <StatsSection />
         <WhoWeAreBand />
         <WhatWeDoTiles projectCounts={projectCounts} />
         <FeatureStory slides={featureSlides} />
-        <BeforeAfterSection />
+        <BeforeAfterSection stories={beforeAfter} />
         <div className="defer-render">
           <OperationalMapSection />
         </div>
@@ -93,7 +109,7 @@ export default async function Home() {
           <RadioBanner episodes={episodes.slice(0, 12).map(toRadioEpisode)} />
         </div>
         <div className="defer-render">
-          <TestimonialsSection />
+          <TestimonialsSection testimonials={testimonials} />
         </div>
         <div className="defer-render">
           <SocialFeedsSection />

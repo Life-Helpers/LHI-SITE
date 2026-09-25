@@ -4,7 +4,8 @@ import { ClipboardCheck, Lock, Mail, MessageCircle, Radio, Reply, Search, Shield
 
 import { FeedbackForm } from "@/components/feedback/feedback-form";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
-import { siteConfig } from "@/config/site";
+import { getSiteData } from "@/lib/cms/content";
+import { telHref } from "@/lib/site-data";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 
 export const metadata: Metadata = {
@@ -14,7 +15,6 @@ export const metadata: Metadata = {
     "Share a compliment, suggestion, complaint or question with Life Helpers Initiative. Feedback is free, confidential and can be anonymous.",
 };
 
-const whatsappNumber = siteConfig.contact.feedbackLine.replace(/[^\d]/g, "");
 
 const steps = [
   { icon: ClipboardCheck, title: "We log it", text: "Every message gets a reference number and is recorded in our feedback register." },
@@ -31,7 +31,12 @@ const promises = [
   "You can write in English or Hausa, or stay anonymous.",
 ];
 
-export default function FeedbackPage() {
+/** Contact details come from Admin → Settings. */
+export const revalidate = 300;
+
+export default async function FeedbackPage() {
+  const { contact } = await getSiteData();
+  const whatsappNumber = contact.helpline.replace(/[^\d]/g, "");
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       <PageHeroBanner
@@ -52,12 +57,12 @@ export default function FeedbackPage() {
           <p className="text-sm text-foreground">
             <strong>Reporting sexual exploitation, abuse or harassment, or a child at risk?</strong> Please don&apos;t use this form. Contact our
             confidential safeguarding channel:{" "}
-            <a href={`mailto:${siteConfig.contact.pseaEmail}`} className="font-semibold text-primary hover:underline">
-              {siteConfig.contact.pseaEmail}
+            <a href={`mailto:${contact.pseaEmail}`} className="font-semibold text-primary hover:underline">
+              {contact.pseaEmail}
             </a>{" "}
             or{" "}
-            <a href={`tel:${siteConfig.contact.pseaHotline}`} className="font-semibold text-primary hover:underline">
-              {siteConfig.contact.feedbackLine}
+            <a href={telHref(contact.helpline)} className="font-semibold text-primary hover:underline">
+              {contact.helpline}
             </a>
             .
           </p>
@@ -84,17 +89,17 @@ export default function FeedbackPage() {
               <MessageCircle className="h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
               <span>
                 <span className="block font-semibold text-foreground">WhatsApp or SMS</span>
-                <span className="block text-sm text-muted-foreground">{siteConfig.contact.feedbackLine}</span>
+                <span className="block text-sm text-muted-foreground">{contact.helpline}</span>
               </span>
             </a>
             <a
-              href={`mailto:${siteConfig.contact.feedbackEmail}?subject=Feedback`}
+              href={`mailto:${contact.feedbackEmail}?subject=Feedback`}
               className="flex gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary"
             >
               <Mail className="h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
               <span>
                 <span className="block font-semibold text-foreground">Email</span>
-                <span className="block text-sm text-muted-foreground">{siteConfig.contact.feedbackEmail}</span>
+                <span className="block text-sm text-muted-foreground">{contact.feedbackEmail}</span>
               </span>
             </a>
             <Link href="/radio" className="flex gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary">

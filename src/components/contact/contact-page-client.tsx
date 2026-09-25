@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSiteData } from "@/components/site-data-provider";
+import { telHref } from "@/lib/site-data";
 import Image from "next/image";
 import { Check, Clock, Copy, Mail, MapPin, Navigation, Phone, ShieldAlert, Building2 } from "lucide-react";
 
@@ -122,6 +124,7 @@ function OfficeCard({ office, highlighted, onFocus }: { office: Office; highligh
 }
 
 export function ContactPageClient() {
+  const { contact } = useSiteData();
   const [selectedId, setSelectedId] = useState<string>("sokoto-hq");
   const offices = siteConfig.offices;
   const selected = offices.find((o) => o.id === selectedId) ?? offices[0];
@@ -156,15 +159,15 @@ export function ContactPageClient() {
             Headquartered in Sokoto, with offices in {offices.length} states across Nigeria. Find the office nearest to you, or send us a message.
           </p>
           <div className="mt-8 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
-            <a href={`tel:${siteConfig.contact.phone}`} className="rounded-2xl border border-white/20 bg-black/35 p-4 text-white backdrop-blur-md hover:border-white/50">
+            <a href={telHref(contact.phone)} className="rounded-2xl border border-white/20 bg-black/35 p-4 text-white backdrop-blur-md hover:border-white/50">
               <Phone className="h-4 w-4" aria-hidden="true" />
               <span className="mt-2 block text-[11px] uppercase tracking-wider text-zinc-200">Helpline</span>
-              <span className="block text-sm font-semibold">{siteConfig.contact.phone}</span>
+              <span className="block text-sm font-semibold">{contact.phone}</span>
             </a>
-            <a href={`mailto:${siteConfig.contact.officialEmail}`} className="rounded-2xl border border-white/20 bg-black/35 p-4 text-white backdrop-blur-md hover:border-white/50">
+            <a href={`mailto:${contact.email}`} className="rounded-2xl border border-white/20 bg-black/35 p-4 text-white backdrop-blur-md hover:border-white/50">
               <Mail className="h-4 w-4" aria-hidden="true" />
               <span className="mt-2 block text-[11px] uppercase tracking-wider text-zinc-200">Email</span>
-              <span className="block text-sm font-semibold">{siteConfig.contact.officialEmail}</span>
+              <span className="block text-sm font-semibold">{contact.email}</span>
             </a>
             <div className="rounded-2xl border border-white/20 bg-black/35 p-4 text-white backdrop-blur-md">
               <Clock className="h-4 w-4" aria-hidden="true" />
@@ -306,13 +309,13 @@ export function ContactPageClient() {
                   </p>
                   <div className="mt-3 flex flex-wrap gap-4 text-sm font-semibold">
                     <a
-                      href={`mailto:${siteConfig.contact.pseaEmail}?subject=CONFIDENTIAL%20PSEA%20REPORT`}
+                      href={`mailto:${contact.pseaEmail}?subject=CONFIDENTIAL%20PSEA%20REPORT`}
                       className="inline-flex items-center gap-1 text-red-700 hover:underline dark:text-red-400"
                     >
-                      <Mail className="h-4 w-4" aria-hidden="true" /> {siteConfig.contact.pseaEmail}
+                      <Mail className="h-4 w-4" aria-hidden="true" /> {contact.pseaEmail}
                     </a>
-                    <a href={`tel:${siteConfig.contact.pseaHotline}`} className="inline-flex items-center gap-1 text-red-700 hover:underline dark:text-red-400">
-                      <Phone className="h-4 w-4" aria-hidden="true" /> {siteConfig.contact.pseaHotline}
+                    <a href={telHref(contact.helpline)} className="inline-flex items-center gap-1 text-red-700 hover:underline dark:text-red-400">
+                      <Phone className="h-4 w-4" aria-hidden="true" /> {contact.helpline}
                     </a>
                   </div>
                 </div>
@@ -323,8 +326,8 @@ export function ContactPageClient() {
               <p className="mt-2">{fullAddress(hq)}</p>
               <p className="mt-3">
                 Recruitment:{" "}
-                <a href={`mailto:${siteConfig.contact.recruitmentEmail}`} className="font-medium text-primary hover:underline">
-                  {siteConfig.contact.recruitmentEmail}
+                <a href={`mailto:${contact.recruitmentEmail}`} className="font-medium text-primary hover:underline">
+                  {contact.recruitmentEmail}
                 </a>
               </p>
               <p className="mt-1">Office hours: Monday – Friday, 8:00 AM – 5:00 PM (WAT)</p>

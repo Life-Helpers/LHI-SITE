@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSiteData } from "@/components/site-data-provider";
 import Link from "next/link";
 import { ArrowRight, Building2, Handshake, Layers, MapPin, Users, X } from "lucide-react";
 
-import { siteConfig } from "@/config/site";
 import {
   getDonorsForState,
   getInterventionsForState,
@@ -29,6 +29,7 @@ export function OperationalMap({
   /** Frosted-glass cards, for use over a photo background. */
   glass?: boolean;
 }) {
+  const { stats } = useSiteData();
   const surface = glass
     ? "border-white/60 bg-white/85 shadow-xl backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-black/70"
     : "border-border bg-card";
@@ -145,11 +146,11 @@ export function OperationalMap({
           </div>
           <div>
             <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">Projects</dt>
-            <dd className="font-serif-display text-2xl text-foreground">{siteConfig.stats.projects}</dd>
+            <dd className="font-serif-display text-2xl text-foreground">{stats.projects}</dd>
           </div>
           <div>
             <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">People reached</dt>
-            <dd className="font-serif-display text-2xl text-foreground">{siteConfig.stats.peopleReached}</dd>
+            <dd className="font-serif-display text-2xl text-foreground">{stats.peopleReached}</dd>
           </div>
         </dl>
       </div>

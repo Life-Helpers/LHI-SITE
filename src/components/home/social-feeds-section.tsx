@@ -1,8 +1,8 @@
 import { ExternalLink } from "lucide-react";
 
 import { SocialWall } from "@/components/home/social-wall";
-import { SOCIAL_ACCOUNTS, SocialIcon } from "@/components/social-links";
-import { siteConfig } from "@/config/site";
+import { SOCIAL_ACCOUNTS, SocialIcon, socialAccounts } from "@/components/social-links";
+import { getSiteData } from "@/lib/cms/content";
 import { getSocialFeed } from "@/lib/social-feed";
 
 
@@ -13,9 +13,10 @@ import { getSocialFeed } from "@/lib/social-feed";
  * back to follow cards for each channel until an account is connected.
  */
 export async function SocialFeedsSection() {
-  const { items } = await getSocialFeed(10);
+  const [{ items }, { social }] = await Promise.all([getSocialFeed(10), getSiteData()]);
+  const accounts = socialAccounts(social);
   const fbPlugin = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(
-    siteConfig.social.facebook,
+    social.facebook,
   )}&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
 
   return (
@@ -51,7 +52,7 @@ export async function SocialFeedsSection() {
 
           {/* Channel dial */}
           <ul aria-label="Our social media accounts" className="flex flex-wrap gap-2.5">
-            {SOCIAL_ACCOUNTS.map((a) => (
+            {accounts.map((a) => (
               <li key={a.name}>
                 <a
                   href={a.href}
@@ -81,7 +82,7 @@ export async function SocialFeedsSection() {
                   <span className="inline-flex items-center gap-2 text-sm font-semibold">
                     <SocialIcon path={SOCIAL_ACCOUNTS[0].path} className="h-4 w-4" /> Live on Facebook
                   </span>
-                  <a href={siteConfig.social.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold hover:underline">
+                  <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold hover:underline">
                     Open <ExternalLink className="h-3 w-3" aria-hidden="true" />
                     <span className="sr-only">Facebook page (opens in a new tab)</span>
                   </a>
@@ -102,7 +103,7 @@ export async function SocialFeedsSection() {
               <SocialWall items={items} />
             ) : (
               <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {SOCIAL_ACCOUNTS.filter((a) => a.name !== "Facebook").map((a, i) => (
+                {accounts.filter((a) => a.name !== "Facebook").map((a, i) => (
                   <li key={a.name} className={i === 0 ? "sm:col-span-2" : ""}>
                     <a
                       href={a.href}

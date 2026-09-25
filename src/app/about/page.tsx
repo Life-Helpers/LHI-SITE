@@ -6,6 +6,7 @@ import { ArrowRight, Heart, Lock, MapPin, Music, Users } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { FaqAccordion } from "@/components/faq-accordion";
+import { getFaqs, getSiteData } from "@/lib/cms/content";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import {
@@ -30,16 +31,20 @@ export const metadata: Metadata = {
 
 const VALUE_ICONS = { Love: Heart, Honesty: Lock, Inclusion: Users } as const;
 
-const STATS = [
-  { value: siteConfig.stats.projects, label: "Projects implemented" },
-  { value: siteConfig.stats.peopleReached, label: "People directly reached" },
-  { value: siteConfig.stats.households, label: "Households" },
-  { value: siteConfig.stats.staff, label: "Staff members" },
-  { value: siteConfig.stats.volunteers, label: "Community volunteers" },
-  { value: "11", label: "States with offices" },
-];
 
-export default function AboutPage() {
+/** Figures come from Admin → Settings → Impact figures; FAQs from Admin → FAQs. */
+export const revalidate = 300;
+
+export default async function AboutPage() {
+  const [faqs, { stats }] = await Promise.all([getFaqs(), getSiteData()]);
+  const STATS = [
+    { value: stats.projects, label: "Projects implemented" },
+    { value: stats.peopleReached, label: "People directly reached" },
+    { value: stats.households, label: "Households" },
+    { value: stats.staff, label: "Staff members" },
+    { value: stats.volunteers, label: "Community volunteers" },
+    { value: stats.statesActive.replace(/\+$/, ""), label: "States with offices" },
+  ];
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       <PageHeroBanner
@@ -244,7 +249,7 @@ export default function AboutPage() {
       </section>
 
       <section className="border-t border-border bg-background py-16 sm:py-24">
-        <FaqAccordion />
+        <FaqAccordion items={faqs} />
       </section>
     </main>
   );

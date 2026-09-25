@@ -4,9 +4,8 @@ import { Briefcase, GraduationCap, HandHeart, ShieldCheck } from "lucide-react";
 
 import { ListingCard } from "@/components/careers/listing-card";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
-import { siteConfig } from "@/config/site";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
-import { getPublicJobs } from "@/lib/cms/content";
+import { getPublicJobs, getSiteData } from "@/lib/cms/content";
 
 export const revalidate = 300;
 
@@ -17,6 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CareersPage() {
+  const { stats, contact } = await getSiteData();
   const { open, closed } = await getPublicJobs();
 
   return (
@@ -28,7 +28,7 @@ export default async function CareersPage() {
             Build a career in <em className="font-light italic text-primary">humanitarian service.</em>
           </>
         }
-        subtitle={`${siteConfig.stats.staff} staff and ${siteConfig.stats.volunteers} volunteers across 11 states.`}
+        subtitle={`${stats.staff} staff and ${stats.volunteers} volunteers across 11 states.`}
         description="Life Helpers Initiative recruits people who share our commitment to dignity, integrity and accountability to the communities we serve. All current vacancies are listed here and applications are made online."
         image={{ ...LHI_PHOTOS.annualTeamEvent, tag: "The LHI team" }}
       />
@@ -111,7 +111,7 @@ export default async function CareersPage() {
               LHI is committed to safeguarding the children and adults we work with. Recruitment includes reference and background checks, and every
               staff member signs and is trained on LHI&apos;s safeguarding policies. Only applications made through this page or an official LHI email
               are considered. Never pay anyone to be shortlisted or employed; report such requests to{" "}
-              <a href={`mailto:${siteConfig.contact.email}`} className="font-medium text-primary hover:underline">{siteConfig.contact.email}</a>.
+              <a href={`mailto:${contact.email}`} className="font-medium text-primary hover:underline">{contact.email}</a>.
             </p>
           </div>
         </div>

@@ -103,13 +103,64 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
         </Row>
       </Card>
 
-      <Card title="Contact details on factsheets" bodyClassName="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
-        <Row label="Email">
+      <Card title="Contact details" bodyClassName="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
+        <Row label="Main email" help="Footer, contact page, factsheets and legal pages.">
           <input type="email" value={s.contact.email} onChange={(e) => set("contact", "email", e.target.value)} className={inputClass} />
         </Row>
-        <Row label="Phone">
+        <Row label="Main phone" help="Written as it should appear, e.g. +234 909 504 9086.">
           <input value={s.contact.phone} onChange={(e) => set("contact", "phone", e.target.value)} className={inputClass} />
         </Row>
+        <Row label="Feedback & PSEA helpline (WhatsApp / SMS)" help="The WhatsApp button, feedback page and radio page use this number.">
+          <input value={s.contact.helpline} onChange={(e) => set("contact", "helpline", e.target.value)} className={inputClass} />
+        </Row>
+        <Row label="Feedback email">
+          <input type="email" value={s.contact.feedbackEmail} onChange={(e) => set("contact", "feedbackEmail", e.target.value)} className={inputClass} />
+        </Row>
+        <Row label="Safeguarding (PSEA) email">
+          <input type="email" value={s.contact.pseaEmail} onChange={(e) => set("contact", "pseaEmail", e.target.value)} className={inputClass} />
+        </Row>
+        <Row label="Recruitment email">
+          <input type="email" value={s.contact.recruitmentEmail} onChange={(e) => set("contact", "recruitmentEmail", e.target.value)} className={inputClass} />
+        </Row>
+      </Card>
+
+      <Card title="Impact figures" bodyClassName="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
+        <p className="text-xs text-admin-muted sm:col-span-2">
+          Shown on the home page, About, Careers, the map and the anniversary pop-up. Use verified organisation-wide totals only. States and years of service
+          are counted automatically.
+        </p>
+        {(
+          [
+            ["peopleReached", "People reached", "e.g. 1.5M+"],
+            ["households", "Households reached", "e.g. 400,000+"],
+            ["projects", "Projects", "e.g. 45+"],
+            ["staff", "Staff", "e.g. 350+"],
+            ["volunteers", "Volunteers", "e.g. 700+"],
+            ["grants", "Grants secured", "e.g. ₦8bn+ (2021–2025)"],
+          ] as const
+        ).map(([key, label, placeholder]) => (
+          <Row key={key} label={label}>
+            <input value={s.stats[key]} placeholder={placeholder} onChange={(e) => set("stats", key, e.target.value)} className={inputClass} />
+          </Row>
+        ))}
+      </Card>
+
+      <Card title="Social media accounts" bodyClassName="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
+        <p className="text-xs text-admin-muted sm:col-span-2">Full links to LHI&apos;s official accounts. Used in the footer, the social feed and the share buttons.</p>
+        {(
+          [
+            ["facebook", "Facebook"],
+            ["instagram", "Instagram"],
+            ["x", "X (Twitter)"],
+            ["linkedin", "LinkedIn"],
+            ["youtube", "YouTube"],
+            ["linktree", "Linktree"],
+          ] as const
+        ).map(([key, label]) => (
+          <Row key={key} label={label}>
+            <input type="url" value={s.social[key]} placeholder="https://" onChange={(e) => set("social", key, e.target.value)} className={inputClass} />
+          </Row>
+        ))}
       </Card>
 
       <Card title="Donations: bank transfer details" bodyClassName="space-y-3 p-6">

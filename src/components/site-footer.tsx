@@ -6,12 +6,15 @@ import { Lock, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { SocialLinks } from "@/components/social-links";
+import { useSiteData } from "@/components/site-data-provider";
+import { telHref } from "@/lib/site-data";
 import { useLocale } from "@/i18n/locale-context";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { THEMATIC_AREAS } from "@/data/thematic-areas";
 
 export function SiteFooter() {
   const { t } = useLocale();
+  const { contact, social } = useSiteData();
 
   const whoWeAreLinks = [
     { label: t.whoWeAreMenu.aboutUs, href: "/about" },
@@ -90,22 +93,22 @@ export function SiteFooter() {
                 </span>
               </div>
               <a
-                href={`tel:${siteConfig.contact.phone}`}
+                href={telHref(contact.phone)}
                 className="flex items-center gap-2 hover:text-foreground transition-colors"
               >
                 <Phone className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                <span>Helpline: {siteConfig.contact.phoneDisplay}</span>
+                <span>Helpline: {contact.phone}</span>
               </a>
               <a
-                href={`mailto:${siteConfig.contact.email}`}
+                href={`mailto:${contact.email}`}
                 className="flex items-center gap-2 hover:text-foreground transition-colors"
               >
                 <Mail className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                <span>{siteConfig.contact.email}</span>
+                <span>{contact.email}</span>
               </a>
             </div>
 
-            <SocialLinks className="mt-4" />
+            <SocialLinks social={social} className="mt-4" />
 
           </div>
 

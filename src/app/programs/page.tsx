@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ProgramCard } from "@/components/program-card";
-import { programs } from "@/data/programs";
+import { getPrograms } from "@/lib/cms/content";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
@@ -13,7 +13,10 @@ export const metadata: Metadata = {
     "Explore Life Helpers Initiative's six thematic areas bringing smiles and fulfillment to vulnerable communities across Nigeria.",
 };
 
-export default function ProgramsPage() {
+export const revalidate = 300;
+
+export default async function ProgramsPage() {
+  const programs = await getPrograms();
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}

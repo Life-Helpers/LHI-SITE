@@ -2,6 +2,9 @@ import { slugify, type CollectionDef, type FieldDef } from "@/lib/cms/schema";
 
 export type FieldErrors = Record<string, string>;
 
+/** Site paths ("/donate", not "//host") and https, mailto or tel links: never javascript: or data:. */
+export const isSafeLink = (v: string) => (v.startsWith("/") && !v.startsWith("//")) || /^(https:\/\/|mailto:|tel:)/i.test(v);
+
 const isSafeAssetUrl = (v: string) => v === "" || v.startsWith("/") || /^https:\/\//.test(v);
 
 function coerceField(field: FieldDef, raw: unknown): { value: unknown; error?: string } {
@@ -43,6 +46,9 @@ function coerceField(field: FieldDef, raw: unknown): { value: unknown; error?: s
       }
       if (field.type === "date" && !/^\d{4}-\d{2}-\d{2}$/.test(v)) return { value: v, error: `${field.label} must be a date.` };
       if (field.type === "url" && !/^https?:\/\//.test(v)) return { value: v, error: `${field.label} must start with https://` };
+      if (field.type === "link" && !isSafeLink(v)) {
+        return { value: v, error: `${field.label} must be a page on this site (starting with /) or an https://, mailto: or tel: link.` };
+      }
       if ((field.type === "image" || field.type === "file" || field.type === "audio") && !isSafeAssetUrl(v)) {
         return { value: v, error: `${field.label} must be an uploaded file or an https:// link.` };
       }

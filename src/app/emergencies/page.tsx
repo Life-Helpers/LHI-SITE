@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { EmergencyCard } from "@/components/emergency-card";
-import { emergencies } from "@/data/emergencies";
+import { getEmergencies } from "@/lib/cms/content";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 
@@ -12,7 +12,11 @@ export const metadata: Metadata = {
     "Active and past crisis responses coordinated by Life Helpers Initiative bringing relief, dignity, and smiles in challenging times.",
 };
 
-export default function EmergenciesPage() {
+/** Emergencies come from Admin → Emergencies. */
+export const revalidate = 60;
+
+export default async function EmergenciesPage() {
+  const emergencies = await getEmergencies();
   const active = emergencies.filter((e) => e.status === "active");
   const resolved = emergencies.filter((e) => e.status === "resolved");
 

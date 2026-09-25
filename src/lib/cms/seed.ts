@@ -13,10 +13,160 @@ import { PHOTO_STORY_POSTS } from "@/data/photo-stories";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { HISTORY_MILESTONES } from "@/data/history-timeline";
 import { TEAM_MEMBERS } from "@/data/team";
+import { heroChildSlides } from "@/data/african-fulfillment-images";
+import { TESTIMONIALS } from "@/data/testimonials";
+import { BEFORE_AFTER_STORIES } from "@/data/before-after";
+import { impactReports } from "@/data/impact-reports";
+import { emergencies } from "@/data/emergencies";
+import { programs } from "@/data/programs";
+import { FAQ_DATA } from "@/data/faqs";
+import { OBSERVANCES } from "@/data/observances";
 import { slugify } from "@/lib/cms/schema";
+import { DEFAULT_SITE_DATA } from "@/lib/site-data";
 import { matchPartnersByDonor, postProjects } from "@/lib/cms/links";
 import type { CmsSettings } from "@/lib/cms/schema";
-import type { CmsDocument, CmsIntervention, CmsMilestone, CmsPartner, CmsPost, CmsState, CmsTeamMember } from "@/lib/cms/types";
+import type {
+  CmsBeforeAfter,
+  CmsDocument,
+  CmsEmergency,
+  CmsFaq,
+  CmsHeroSlide,
+  CmsImpactReport,
+  CmsIntervention,
+  CmsMilestone,
+  CmsObservance,
+  CmsPartner,
+  CmsPost,
+  CmsState,
+  CmsTeamMember,
+  CmsTestimonial,
+  CmsThematicArea,
+} from "@/lib/cms/types";
+
+const statLines = (stats: { label: string; value: string }[]) => stats.map((st) => `${st.label} | ${st.value}`);
+
+export function seedHeroSlides(): CmsHeroSlide[] {
+  return heroChildSlides.map((h, i) => ({
+    id: h.id,
+    image: h.src,
+    imageAlt: h.alt,
+    eyebrow: h.eyebrow,
+    prefix: h.prefix,
+    highlight: h.highlight,
+    suffix: h.suffix,
+    body: h.body,
+    caption: h.caption,
+    tag: h.tag,
+    mottoBadge: h.mottoBadge,
+    primaryLabel: h.primaryCta.label,
+    primaryHref: h.primaryCta.href,
+    secondaryLabel: h.secondaryCta.label,
+    secondaryHref: h.secondaryCta.href,
+    order: (i + 1) * 10,
+    status: "published",
+  }));
+}
+
+export function seedTestimonials(): CmsTestimonial[] {
+  return TESTIMONIALS.map((t, i) => ({ id: slugify(t.name), ...t, order: (i + 1) * 10, status: "published" }));
+}
+
+export function seedBeforeAfter(): CmsBeforeAfter[] {
+  return BEFORE_AFTER_STORIES.map((b, i) => ({
+    id: b.id,
+    name: b.name,
+    place: b.place,
+    photo: LHI_PHOTOS[b.photo].src,
+    photoAlt: LHI_PHOTOS[b.photo].alt,
+    beforePhoto: b.beforePhoto ? LHI_PHOTOS[b.beforePhoto].src : "",
+    beforeTitle: b.before.title,
+    beforeText: b.before.text,
+    afterTitle: b.after.title,
+    afterText: b.after.text,
+    href: b.href,
+    linkLabel: b.id === "noma" ? "Read the hub's story" : "",
+    order: (i + 1) * 10,
+    status: "published",
+  }));
+}
+
+export function seedImpactReports(): CmsImpactReport[] {
+  return impactReports.map((r, i) => ({
+    id: r.id,
+    title: r.title,
+    period: r.period,
+    publishedAt: r.publishedAt,
+    summary: r.summary,
+    description: r.description.join("\n\n"),
+    stats: statLines(r.stats),
+    relatedProgramIds: [...r.relatedProgramIds],
+    image: r.image ?? "",
+    imageAlt: r.imageAlt ?? "",
+    order: (i + 1) * 10,
+    status: "published",
+  }));
+}
+
+export function seedEmergencies(): CmsEmergency[] {
+  return emergencies.map((e) => ({
+    id: e.id,
+    title: e.title,
+    region: e.region,
+    status: e.status,
+    severity: e.severity,
+    summary: e.summary,
+    description: e.description.join("\n\n"),
+    declaredAt: e.declaredAt,
+    stats: statLines(e.stats),
+    relatedProgramIds: [...e.relatedProgramIds],
+    showAlert: false,
+    alertMessage: "",
+    alertCtaLabel: "",
+  }));
+}
+
+export function seedThematicAreas(): CmsThematicArea[] {
+  return programs.map((p) => ({
+    id: p.id,
+    name: p.name,
+    region: p.region,
+    summary: p.summary,
+    description: p.description.join("\n\n"),
+    metricLabel: p.metricLabel,
+    metricValue: p.metricValue,
+    stats: statLines(p.stats),
+    image: p.image ?? "",
+    imageAlt: p.imageAlt ?? "",
+  }));
+}
+
+export function seedFaqs(): CmsFaq[] {
+  return FAQ_DATA.map((f, i) => ({
+    id: f.id,
+    category: f.category,
+    question: f.question,
+    answer: f.answer,
+    tags: [...(f.tags ?? [])],
+    featured: Boolean(f.featured),
+    order: (i + 1) * 10,
+    status: "published",
+  }));
+}
+
+export function seedObservances(): CmsObservance[] {
+  return OBSERVANCES.map((o) => ({
+    id: o.id,
+    title: o.title,
+    month: o.month,
+    day: o.day,
+    endMonth: o.endMonth ?? 0,
+    endDay: o.endDay ?? 0,
+    area: o.area,
+    by: o.by,
+    description: o.description,
+    status: "published",
+  }));
+}
 
 /** First-run content, taken from the site's original static data files. */
 export function seedInterventions(): CmsIntervention[] {
@@ -120,9 +270,15 @@ export function seedSettings(): CmsSettings {
       yearsOfDignity: NIDAKE_KIT.yearsOfDignity,
       schoolDaysSaved: NIDAKE_KIT.schoolDaysSaved,
     },
-    contact: {
-      email: siteConfig.contact.email,
-      phone: siteConfig.contact.phone,
+    contact: { ...DEFAULT_SITE_DATA.contact },
+    social: { ...DEFAULT_SITE_DATA.social },
+    stats: {
+      peopleReached: DEFAULT_SITE_DATA.stats.peopleReached,
+      households: DEFAULT_SITE_DATA.stats.households,
+      projects: DEFAULT_SITE_DATA.stats.projects,
+      staff: DEFAULT_SITE_DATA.stats.staff,
+      volunteers: DEFAULT_SITE_DATA.stats.volunteers,
+      grants: DEFAULT_SITE_DATA.stats.grants,
     },
     donations: {
       bankDetails: "",

@@ -1,32 +1,33 @@
 "use client";
 
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
-import { siteConfig } from "@/config/site";
+import { useSiteData } from "@/components/site-data-provider";
 import { useLocale } from "@/i18n/locale-context";
 import { MapPin, Users, Home, Calendar } from "lucide-react";
 import { CountUp } from "@/components/home/count-up";
 
 export function StatsSection() {
+  const { stats } = useSiteData();
   const { t } = useLocale();
 
   const statsList = [
     {
-      value: siteConfig.stats.statesActive,
+      value: stats.statesActive,
       label: t.home.stats.statesActive,
       icon: MapPin,
     },
     {
-      value: siteConfig.stats.peopleReached,
+      value: stats.peopleReached,
       label: t.home.stats.individualsReached,
       icon: Users,
     },
     {
-      value: siteConfig.stats.households,
+      value: stats.households,
       label: t.home.stats.householdsReached,
       icon: Home,
     },
     {
-      value: siteConfig.stats.yearsOfService,
+      value: stats.yearsOfService,
       label: t.home.stats.yearsOfService,
       icon: Calendar,
     },

@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ProgramDetail } from "@/components/program-detail";
-import { programs } from "@/data/programs";
+import { getProgram } from "@/lib/cms/content";
 
-const program = programs.find((p) => p.id === "protection");
+/** Page text and photo come from Admin → Thematic Area Pages. */
+export const revalidate = 300;
 
-export const metadata: Metadata = program
-  ? { title: program.name, description: program.summary, alternates: { canonical: "/protection" } }
-  : {};
+export async function generateMetadata(): Promise<Metadata> {
+  const program = await getProgram("protection");
+  return program ? { title: program.name, description: program.summary, alternates: { canonical: "/protection" } } : {};
+}
 
-export default function ProtectionPage() {
+export default async function ProtectionPage() {
+  const program = await getProgram("protection");
   if (!program) notFound();
   return <ProgramDetail program={program} />;
 }

@@ -6,15 +6,13 @@ import { ArrowLeft, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ProgramCard } from "@/components/program-card";
-import { emergencies } from "@/data/emergencies";
-import { programs } from "@/data/programs";
+import { getEmergencies, getEmergency, getPrograms } from "@/lib/cms/content";
 
-function getEmergency(id: string) {
-  return emergencies.find((emergency) => emergency.id === id);
-}
+/** Emergencies come from Admin → Emergencies. */
+export const revalidate = 60;
 
-export function generateStaticParams() {
-  return emergencies.map((emergency) => ({ id: emergency.id }));
+export async function generateStaticParams() {
+  return (await getEmergencies()).map((emergency) => ({ id: emergency.id }));
 }
 
 export async function generateMetadata({
@@ -23,7 +21,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const emergency = getEmergency(id);
+  const emergency = await getEmergency(id);
   if (!emergency) return {};
   return {
     title: emergency.title,
@@ -38,10 +36,10 @@ export default async function EmergencyDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const emergency = getEmergency(id);
+  const emergency = await getEmergency(id);
   if (!emergency) notFound();
 
-  const relatedPrograms = programs.filter((program) =>
+  const relatedPrograms = (await getPrograms()).filter((program) =>
     emergency.relatedProgramIds.includes(program.id),
   );
 

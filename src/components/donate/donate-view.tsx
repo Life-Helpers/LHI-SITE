@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSiteData } from "@/components/site-data-provider";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import {
@@ -52,6 +53,7 @@ const ledgerItems = [
 ];
 
 export function DonateView({ bankDetails = "" }: { bankDetails?: string }) {
+  const { contact } = useSiteData();
   const searchParams = useSearchParams();
 
   const [frequency, setFrequency] = useState<"one_time" | "monthly">("one_time");
@@ -329,8 +331,8 @@ export function DonateView({ bankDetails = "" }: { bankDetails?: string }) {
                           ))}
                         <p className="text-[11px] italic">
                           After a transfer, please email the confirmation to{" "}
-                          <a href={`mailto:${siteConfig.contact.email}`} className="text-primary underline">
-                            {siteConfig.contact.email}
+                          <a href={`mailto:${contact.email}`} className="text-primary underline">
+                            {contact.email}
                           </a>{" "}
                           so we can acknowledge your gift.
                         </p>
@@ -338,8 +340,8 @@ export function DonateView({ bankDetails = "" }: { bankDetails?: string }) {
                     ) : (
                       <p>
                         To give by bank transfer, email{" "}
-                        <a href={`mailto:${siteConfig.contact.email}?subject=Bank%20transfer%20donation`} className="text-primary underline">
-                          {siteConfig.contact.email}
+                        <a href={`mailto:${contact.email}?subject=Bank%20transfer%20donation`} className="text-primary underline">
+                          {contact.email}
                         </a>{" "}
                         and our finance team will send LHI&apos;s official account details.
                       </p>

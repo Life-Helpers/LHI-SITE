@@ -5,97 +5,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MoveHorizontal } from "lucide-react";
 
-import { LHI_PHOTOS, type LhiPhotoKey } from "@/data/lhi-photos";
+import type { CmsBeforeAfter } from "@/lib/cms/types";
+import { isUnoptimized } from "@/lib/image";
 
 /**
- * "Before & After" stories. Every before/after statement is taken from LHI's project
- * magazines and newsletter; the photo is the person or place in the story. The
- * "before" side is shown in black and white: a real earlier photo when we have one,
- * otherwise the same photo.
+ * "Before & After" stories from Admin → Before & After. The "before" side is shown in black
+ * and white: a real earlier photo when there is one, otherwise the same photo.
  */
-const STORIES: {
-  id: string;
-  name: string;
-  place: string;
-  photo: LhiPhotoKey;
-  /** A real photo from before the support; when missing, the "before" side shows the main photo in black and white. */
-  beforePhoto?: LhiPhotoKey;
-  before: { title: string; text: string };
-  after: { title: string; text: string };
-  href: string;
-}[] = [
-  {
-    id: "jafaro",
-    name: "Jafaro Baro",
-    place: "Katsina LGA, Katsina State",
-    photo: "jafaroCabbage",
-    beforePhoto: "jafaroFieldBefore",
-    before: { title: "One harvest, low prices", text: "Poor seeds took 80 days to mature; his cabbages sold for ₦175–₦200 each." },
-    after: {
-      title: "Two harvests, three times the price",
-      text: "Improved seeds mature in 60 days, and his cabbages now sell for ₦500–₦600 each. “Now there is no day I return home without money in my hand.”",
-    },
-    href: "/blog/jafaro-harvesting-prosperity-twice-a-year",
-  },
-  {
-    id: "murja",
-    name: "Murja Yari",
-    place: "Katsina State",
-    photo: "murja",
-    beforePhoto: "murjaPassbook",
-    before: { title: "Eight years of struggle", text: "Widowed with 11 children and no income: “There were times when we spent up to five days without anything to eat.”" },
-    after: {
-      title: "A food business that runs all day",
-      text: "She invested her ₦75,000 WFP cash transfer in food supplies, sells from morning until evening and saves weekly with a VSLA.",
-    },
-    href: "/blog/murja-eight-years-of-struggle-to-renewed-hope",
-  },
-  {
-    id: "saudatu",
-    name: "Saudatu Aliyu, 14",
-    place: "Wurno LGA, Sokoto State",
-    photo: "saudatu",
-    before: { title: "Out of school", text: "Only her eldest sibling had ever attended school; Saudatu spent her days helping at the market." },
-    after: {
-      title: "Back in class, dreaming of medicine",
-      text: "Enrolled through the EU/UNICEF ABEP, she walks to school with her friends. “Ilmi shi ne hasken rayuwa” (Education is the light of life).",
-    },
-    href: "/blog/saudatu-a-bag-a-dream",
-  },
-  {
-    id: "azima",
-    name: "Azima Bello",
-    place: "Zamfara State",
-    photo: "azimaAtHome",
-    beforePhoto: "azima",
-    before: { title: "A child bride at fifteen", text: "Forced into marriage at fifteen, she returned home broken and without hope." },
-    after: {
-      title: "A skilled apprentice and saver",
-      text: "Through the UNICEF Early Child Marriage project she found a safe space, learned tailoring and is saving for her own sewing machine.",
-    },
-    href: "/blog/azima-future-stitched-with-hope",
-  },
-  {
-    id: "noma",
-    name: "Noma Tushen Arziki Hub",
-    place: "Wamakko LGA, Sokoto State",
-    photo: "hubAerial",
-    beforePhoto: "hubConstruction",
-    before: { title: "A construction site", text: "In October 2025 the hub in Wamakko was still a construction site, with buildings going up and the demonstration farm being laid out." },
-    after: {
-      title: "A working farming wealth hub",
-      text: "Commissioned on 27 November 2025 with WFP and FCDO: rice milling, cold storage, a fish farm, hire services and training, run by a community Facility Management Committee.",
-    },
-    href: "/blog/noma-tushen-arziki-farming-wealth-hub",
-  },
-];
 
-export function BeforeAfterSection() {
+export function BeforeAfterSection({ stories: STORIES }: { stories: CmsBeforeAfter[] }) {
   const [active, setActive] = useState(0);
   const [position, setPosition] = useState(50);
-  const story = STORIES[active];
-  const photo = LHI_PHOTOS[story.photo];
-  const beforePhoto = story.beforePhoto ? LHI_PHOTOS[story.beforePhoto] : null;
+  const story = STORIES[active] ?? STORIES[0];
+  if (!story) return null;
 
   return (
     <section aria-labelledby="before-after-heading" className="border-t border-border/70 py-20 sm:py-24">
@@ -134,17 +56,17 @@ export function BeforeAfterSection() {
         <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-5">
           <div className="relative aspect-[4/3] select-none overflow-hidden rounded-3xl border border-border bg-muted lg:col-span-3">
             {/* After (full colour) */}
-            <Image key={`after-${story.id}`} src={photo.src} alt={photo.alt} fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover" />
+            <Image key={`after-${story.id}`} src={story.photo} alt={story.photoAlt} unoptimized={isUnoptimized(story.photo)} fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover" />
             <span className="absolute bottom-5 right-5 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground shadow sm:bottom-7 sm:right-7">
               Now
             </span>
 
             {/* Before (black and white), clipped to the slider position */}
             <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }} aria-hidden="true">
-              {beforePhoto ? (
-                <Image key={`before-${story.id}`} src={beforePhoto.src} alt="" fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover grayscale" />
+              {story.beforePhoto ? (
+                <Image key={`before-${story.id}`} src={story.beforePhoto} alt="" unoptimized={isUnoptimized(story.beforePhoto)} fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover grayscale" />
               ) : (
-                <Image src={photo.src} alt="" fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover grayscale" />
+                <Image src={story.photo} alt="" unoptimized={isUnoptimized(story.photo)} fill sizes="(min-width: 1024px) 720px, 100vw" className="object-cover grayscale" />
               )}
               <span className="absolute bottom-5 left-5 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-foreground shadow sm:bottom-7 sm:left-7">
                 Before
@@ -178,17 +100,17 @@ export function BeforeAfterSection() {
             <div className="mt-6 space-y-5">
               <div className="rounded-2xl border border-border bg-muted/40 p-5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Before</p>
-                <p className="mt-1 font-semibold text-foreground">{story.before.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{story.before.text}</p>
+                <p className="mt-1 font-semibold text-foreground">{story.beforeTitle}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{story.beforeText}</p>
               </div>
               <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Now</p>
-                <p className="mt-1 font-semibold text-foreground">{story.after.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{story.after.text}</p>
+                <p className="mt-1 font-semibold text-foreground">{story.afterTitle}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{story.afterText}</p>
               </div>
             </div>
             <Link href={story.href} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-              {story.id === "noma" ? "Read the hub's story" : <>Read {story.name.split(",")[0]}&apos;s story</>} <ArrowRight className="h-4 w-4" />
+              {story.linkLabel || <>Read {story.name.split(",")[0]}&apos;s story</>} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

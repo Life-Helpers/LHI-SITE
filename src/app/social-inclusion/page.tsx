@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ProgramDetail } from "@/components/program-detail";
-import { programs } from "@/data/programs";
+import { getProgram } from "@/lib/cms/content";
 
-const program = programs.find((p) => p.id === "social-inclusion");
+/** Page text and photo come from Admin → Thematic Area Pages. */
+export const revalidate = 300;
 
-export const metadata: Metadata = program
-  ? { title: program.name, description: program.summary, alternates: { canonical: "/social-inclusion" } }
-  : {};
+export async function generateMetadata(): Promise<Metadata> {
+  const program = await getProgram("social-inclusion");
+  return program ? { title: program.name, description: program.summary, alternates: { canonical: "/social-inclusion" } } : {};
+}
 
-export default function SocialInclusionPage() {
+export default async function SocialInclusionPage() {
+  const program = await getProgram("social-inclusion");
   if (!program) notFound();
   return <ProgramDetail program={program} />;
 }
