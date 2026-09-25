@@ -3,8 +3,9 @@ import "server-only";
 import { notFound } from "next/navigation";
 
 import { requirePageUser } from "@/lib/cms/auth";
-import { can, COLLECTIONS, isCollectionName, type FieldDef } from "@/lib/cms/schema";
+import { can, COLLECTIONS, isCollectionName, type CollectionDef, type FieldDef, type FieldOption } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
+import { withRelationOptions } from "@/lib/cms/relations";
 
 export async function loadCollection(name: string) {
   if (!isCollectionName(name)) notFound();
@@ -13,7 +14,12 @@ export async function loadCollection(name: string) {
   let items = (await readStore(name)) as unknown as Record<string, unknown>[];
   // Authors only see and manage their own posts.
   if (name === "posts" && !can(user, "posts.all")) items = items.filter((i) => i.authorId === user.id);
-  return { def, user, items };
+  return { def: await withRelationOptions(def), user, items };
+}
+
+/** The loaded choices of a definition's relation fields, for the item editor. */
+export function relationOptionsOf(def: CollectionDef): Record<string, FieldOption[]> {
+  return Object.fromEntries(def.fields.filter((f) => f.relation).map((f) => [f.name, f.options ?? []]));
 }
 
 const optionLabel = (field: FieldDef, value: string) => field.options?.find((o) => o.value === value)?.label ?? value;

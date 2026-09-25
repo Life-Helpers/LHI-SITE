@@ -10,6 +10,8 @@ export type CmsIntervention = Omit<InterventionProject, "image" | "thematicAreas
   imageCaption: string;
   thematicIds: ThematicPillarId[];
   gallery: string[];
+  /** Linked partner profiles (ids). Absent on records saved before links existed. */
+  partnerIds?: string[];
 };
 
 export type CmsState = OperationalState;
@@ -49,6 +51,8 @@ export interface CmsPost {
   safeguarding?: string[];
   reviewedBy?: string;
   reviewedAt?: string;
+  /** Projects this post is about (intervention ids). Absent on posts saved before links existed. */
+  projects?: string[];
 }
 
 export interface CmsJob {

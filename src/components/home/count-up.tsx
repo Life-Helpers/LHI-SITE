@@ -39,7 +39,10 @@ export function CountUp({ value, duration = 1800, className }: { value: string; 
   }, [value, duration]);
 
   if (!match) return <span className={className}>{value}</span>;
-  const text = shown === null ? value : `${match[1]}${shown.toFixed(decimals)}${match[3]}`;
+  // Keep thousands separators ("400,000+") while counting.
+  const grouped = match[2].includes(",");
+  const number = grouped ? Math.round(shown ?? 0).toLocaleString("en-US") : (shown ?? 0).toFixed(decimals);
+  const text = shown === null ? value : `${match[1]}${number}${match[3]}`;
   return (
     <span ref={ref} className={className}>
       <span aria-hidden="true" className="tabular-nums">

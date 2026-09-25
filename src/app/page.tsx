@@ -10,7 +10,8 @@ import { LatestFromLHI } from "@/components/home/latest-from-lhi";
 import { RadioBanner } from "@/components/home/radio-banner";
 import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { SocialFeedsSection } from "@/components/home/social-feeds-section";
-import { PartnersStrip } from "@/components/home/partners-strip";
+import { PartnersStrip, type PartnerProjects } from "@/components/home/partners-strip";
+import { projectPartnerIds } from "@/lib/cms/links";
 import { PhilosophyQuote } from "@/components/home/philosophy-quote";
 import { NewsletterSubscribe } from "@/components/home/newsletter-subscribe";
 import { FeatureStory, type FeatureSlide } from "@/components/home/feature-story";
@@ -38,6 +39,12 @@ export default async function Home() {
   const projectCounts: Record<string, number> = {};
   for (const project of interventions) {
     for (const area of project.thematicAreas) projectCounts[area.id] = (projectCounts[area.id] ?? 0) + 1;
+  }
+  const partnerProjects: PartnerProjects = {};
+  for (const project of interventions) {
+    for (const partnerId of projectPartnerIds(project, partners)) {
+      (partnerProjects[partnerId] ??= []).push({ id: project.id, title: project.shortTitle });
+    }
   }
   const bySlug = new Map(posts.map((p) => [p.slug, p]));
   const featureSlides: FeatureSlide[] = FEATURED_STORY_BY_AREA.flatMap(({ area, slug }) => {
@@ -86,7 +93,7 @@ export default async function Home() {
           <SocialFeedsSection posts={posts.slice(0, 4)} />
         </div>
         <div className="defer-render">
-          <PartnersStrip partners={partners} />
+          <PartnersStrip partners={partners} projects={partnerProjects} />
         </div>
         <PhilosophyQuote />
         <NewsletterSubscribe />

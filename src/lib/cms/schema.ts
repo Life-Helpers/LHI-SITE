@@ -4,6 +4,8 @@
  * is enough for it to appear in the editor and be persisted.
  */
 
+import { OPERATIONAL_STATES } from "@/data/operational-states";
+import { THEMATIC_AREA_LIST } from "@/data/thematic-areas";
 import { SAFEGUARDING_CHECKS } from "@/lib/cms/safeguarding";
 import type { HomeTextByLocale } from "@/lib/home-text";
 
@@ -145,6 +147,8 @@ export interface FieldDef {
   sidebar?: boolean;
   /** For slug fields: the field the slug is generated from. */
   from?: string;
+  /** For select/multiselect fields: choices are the records of this collection (by id). */
+  relation?: CollectionName;
 }
 
 export interface CollectionDef {
@@ -168,14 +172,7 @@ export interface CollectionDef {
 
 export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents" | "jobs" | "tenders" | "episodes" | "events" | "milestones" | "team";
 
-export const PILLAR_OPTIONS: FieldOption[] = [
-  { value: "health", label: "Health & WASH" },
-  { value: "education", label: "Education" },
-  { value: "livelihood", label: "Livelihood" },
-  { value: "food-security", label: "Food Security" },
-  { value: "social-inclusion", label: "Social Inclusion" },
-  { value: "protection", label: "Protection & GBV" },
-];
+export const PILLAR_OPTIONS: FieldOption[] = THEMATIC_AREA_LIST.map((a) => ({ value: a.id, label: a.label }));
 
 export const EVENT_AREA_OPTIONS: FieldOption[] = [
   { value: "lhi", label: "LHI (organisation-wide)" },
@@ -183,19 +180,7 @@ export const EVENT_AREA_OPTIONS: FieldOption[] = [
   ...PILLAR_OPTIONS,
 ];
 
-export const STATE_OPTIONS: FieldOption[] = [
-  { value: "sokoto", label: "Sokoto" },
-  { value: "zamfara", label: "Zamfara" },
-  { value: "kebbi", label: "Kebbi" },
-  { value: "katsina", label: "Katsina" },
-  { value: "borno", label: "Borno" },
-  { value: "yobe", label: "Yobe" },
-  { value: "adamawa", label: "Adamawa" },
-  { value: "bauchi", label: "Bauchi" },
-  { value: "plateau", label: "Plateau" },
-  { value: "fct", label: "FCT Abuja" },
-  { value: "ebonyi", label: "Ebonyi" },
-];
+export const STATE_OPTIONS: FieldOption[] = OPERATIONAL_STATES.map((st) => ({ value: st.id, label: st.name }));
 
 export const POST_CATEGORIES: FieldOption[] = [
   "News",
@@ -232,6 +217,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "category", label: "Category", type: "select", sidebar: true, required: true, options: POST_CATEGORIES },
       { name: "featured", label: "Feature on home page", type: "boolean", sidebar: true },
       { name: "featuredImage", label: "Featured image", type: "image", sidebar: true },
+      { name: "projects", label: "Related projects", type: "multiselect", sidebar: true, relation: "interventions", help: "Lists this story under “Stories from this project” on each project's page." },
       { name: "author", label: "Author name", type: "text", sidebar: true },
       { name: "tags", label: "Tags", type: "list", sidebar: true, help: "One per line." },
     ],
@@ -265,6 +251,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "states", label: "States", type: "multiselect", sidebar: true, options: STATE_OPTIONS, help: "Pins the project on the map. Leave empty if not state-specific." },
       { name: "primaryThematic", label: "Primary thematic area", type: "select", sidebar: true, required: true, options: PILLAR_OPTIONS },
       { name: "thematicIds", label: "All thematic areas", type: "multiselect", sidebar: true, required: true, options: PILLAR_OPTIONS },
+      { name: "partnerIds", label: "Partners", type: "multiselect", sidebar: true, relation: "partners", help: "Partner profiles for this project; the partner's profile lists it." },
       { name: "featured", label: "Featured project", type: "boolean", sidebar: true },
       { name: "tags", label: "Tags", type: "list", sidebar: true },
     ],

@@ -1,3 +1,5 @@
+import { THEMATIC_AREAS } from "@/data/thematic-areas";
+
 /**
  * Organisational content from the LHI Organisational Profile and the
  * Strategic Plan 2026–2030 ("A plan towards Consolidation of Programme Impact
@@ -26,26 +28,26 @@ export const CORE_VALUES = [
 ] as const;
 
 export const THEMATIC_FOCUS = [
-  { id: "health", name: "Health", href: "/health", scope: "MNCH, Nutrition, WASH, Immunization, Malaria, SRH, HIV/AIDS & TB" },
+  { id: "health", name: THEMATIC_AREAS["health"].name, href: THEMATIC_AREAS["health"].href, scope: "MNCH, Nutrition, WASH, Immunization, Malaria, SRH, HIV/AIDS & TB" },
   {
     id: "education",
-    name: "Education",
-    href: "/education",
+    name: THEMATIC_AREAS["education"].name,
+    href: THEMATIC_AREAS["education"].href,
     scope: "Early Child Development, Formal & Non-Formal Education, Education Governance & Complementary Educational Services",
   },
   {
     id: "livelihood",
-    name: "Livelihoods",
-    href: "/livelihood",
+    name: THEMATIC_AREAS["livelihood"].name,
+    href: THEMATIC_AREAS["livelihood"].href,
     scope:
       "Technical & Vocational Training, Group/Village Savings & Loan Associations, Business, Entrepreneurial Development & Financial Literacy, Multi-Purpose Cash Assistance",
   },
-  { id: "social-inclusion", name: "Social Inclusion", href: "/social-inclusion", scope: "Governance, Peace Building & High-level Advocacy" },
-  { id: "protection", name: "Protection", href: "/protection", scope: "Violence against Women & Girls; Child Protection" },
+  { id: "social-inclusion", name: THEMATIC_AREAS["social-inclusion"].name, href: THEMATIC_AREAS["social-inclusion"].href, scope: "Governance, Peace Building & High-level Advocacy" },
+  { id: "protection", name: THEMATIC_AREAS["protection"].name, href: THEMATIC_AREAS["protection"].href, scope: "Violence against Women & Girls; Child Protection" },
   {
     id: "food-security",
-    name: "Food Security",
-    href: "/food-security",
+    name: THEMATIC_AREAS["food-security"].name,
+    href: THEMATIC_AREAS["food-security"].href,
     scope: "Agriculture, Small Ruminants / Aquaculture, Food Supplies / Supports, Climate Adaptation",
   },
 ] as const;

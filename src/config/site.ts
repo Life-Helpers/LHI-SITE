@@ -1,3 +1,5 @@
+import { OPERATIONAL_STATES } from "@/data/operational-states";
+
 /**
  * The site's public address. A blank or malformed NEXT_PUBLIC_SITE_URL falls back to the
  * Vercel deployment address (on Vercel) or lhinigeria.org, so builds never fail on it.
@@ -19,6 +21,13 @@ function resolveSiteUrl() {
     }
   }
   return "https://lhinigeria.org";
+}
+
+function yearsSince(isoDate: string) {
+  const start = new Date(isoDate);
+  const now = new Date();
+  const years = now.getFullYear() - start.getFullYear();
+  return now.getMonth() < start.getMonth() || (now.getMonth() === start.getMonth() && now.getDate() < start.getDate()) ? years - 1 : years;
 }
 
 export const siteConfig = {
@@ -49,6 +58,10 @@ export const siteConfig = {
   cacRegistration: "CAC/IT/25232 (September 2007)",
   postalAddress: "P. O. Box 1908, Sokoto 840001, Sokoto State, Nigeria",
   stats: {
+    /** States with an LHI office. */
+    statesActive: `${OPERATIONAL_STATES.length}+`,
+    /** Whole years since LHI was founded on 1 October 2004, kept current automatically. */
+    yearsOfService: `${yearsSince("2004-10-01")}+`,
     projects: "45+",
     peopleReached: "1.5M+",
     households: "400,000+",

@@ -68,7 +68,10 @@ function buildStrip(cmsPartners: CmsPartner[]): StripItem[] {
   return items;
 }
 
-export function PartnersStrip({ partners: rawPartners }: { partners: CmsPartner[] }) {
+/** Projects linked to each partner profile in the admin (by partner id). */
+export type PartnerProjects = Record<string, { id: string; title: string }[]>;
+
+export function PartnersStrip({ partners: rawPartners, projects = {} }: { partners: CmsPartner[]; projects?: PartnerProjects }) {
   const { t } = useLocale();
   const [selectedPartner, setSelectedPartner] = useState<PartnerItem | null>(null);
   const partners = React.useMemo(() => buildStrip(rawPartners), [rawPartners]);
@@ -167,6 +170,7 @@ export function PartnersStrip({ partners: rawPartners }: { partners: CmsPartner[
       {selectedPartner && (
         <PartnerDetailModal
           partner={selectedPartner}
+          projects={projects[selectedPartner.id] ?? []}
           onClose={() => setSelectedPartner(null)}
         />
       )}
@@ -215,10 +219,11 @@ function PartnerCard({ partner, onSelect, loopCopy = false }: PartnerCardProps &
  */
 interface PartnerDetailModalProps {
   partner: PartnerItem;
+  projects: { id: string; title: string }[];
   onClose: () => void;
 }
 
-function PartnerDetailModal({ partner, onClose }: PartnerDetailModalProps) {
+function PartnerDetailModal({ partner, projects, onClose }: PartnerDetailModalProps) {
   return (
     <div
       role="dialog"
@@ -296,6 +301,21 @@ function PartnerDetailModal({ partner, onClose }: PartnerDetailModalProps) {
             {partner.description}
           </p>
         </div>
+
+        {projects.length > 0 && (
+          <div className="mt-5">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Projects with LHI</h4>
+            <ul className="space-y-1.5">
+              {projects.map((p) => (
+                <li key={p.id}>
+                  <Link href={`/interventions/${p.id}`} className="text-xs font-medium text-primary hover:underline sm:text-sm">
+                    {p.title} →
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Joint Programs with LHI */}
         <div className="mt-5">

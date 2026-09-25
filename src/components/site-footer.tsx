@@ -8,6 +8,7 @@ import { siteConfig } from "@/config/site";
 import { SocialLinks } from "@/components/social-links";
 import { useLocale } from "@/i18n/locale-context";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { THEMATIC_AREAS } from "@/data/thematic-areas";
 
 export function SiteFooter() {
   const { t } = useLocale();
@@ -24,12 +25,12 @@ export function SiteFooter() {
 
   const programLinks = [
     { label: t.footer.programs, href: "/programs" },
-    { label: t.whatWeDoMenu.health, href: "/health" },
-    { label: t.whatWeDoMenu.education, href: "/education" },
-    { label: t.whatWeDoMenu.livelihood, href: "/livelihood" },
-    { label: t.whatWeDoMenu.foodSecurity, href: "/food-security" },
-    { label: t.whatWeDoMenu.socialInclusion, href: "/social-inclusion" },
-    { label: t.whatWeDoMenu.protection, href: "/protection" },
+    { label: t.whatWeDoMenu.health, href: THEMATIC_AREAS["health"].href },
+    { label: t.whatWeDoMenu.education, href: THEMATIC_AREAS["education"].href },
+    { label: t.whatWeDoMenu.livelihood, href: THEMATIC_AREAS["livelihood"].href },
+    { label: t.whatWeDoMenu.foodSecurity, href: THEMATIC_AREAS["food-security"].href },
+    { label: t.whatWeDoMenu.socialInclusion, href: THEMATIC_AREAS["social-inclusion"].href },
+    { label: t.whatWeDoMenu.protection, href: THEMATIC_AREAS["protection"].href },
     { label: t.whatWeDoMenu.radioAdvocacy, href: "/radio" },
   ];
 

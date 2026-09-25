@@ -2,6 +2,7 @@
 
 import * as m from "motion/react-m";
 
+import { OPERATIONAL_STATES } from "@/data/operational-states";
 import { NIGERIA_VB_H as VB_H, NIGERIA_VB_W as VB_W, NIGERIA_VIEWBOX as VIEWBOX, useNigeriaLocations } from "@/lib/nigeria-map";
 
 /** Where to drop the pin for each state LHI has expanded into, in the map's viewBox units (checked against the outlines). */
@@ -19,19 +20,7 @@ const STATE_PINS: Record<string, { x: number; y: number }> = {
   plateau: { x: 425, y: 290 },
 };
 
-const NAMES: Record<string, string> = {
-  sokoto: "Sokoto",
-  kebbi: "Kebbi",
-  zamfara: "Zamfara",
-  katsina: "Katsina",
-  bauchi: "Bauchi",
-  borno: "Borno",
-  yobe: "Yobe",
-  adamawa: "Adamawa",
-  fct: "Abuja (FCT)",
-  ebonyi: "Ebonyi",
-  plateau: "Plateau",
-};
+const NAMES: Record<string, string> = Object.fromEntries(OPERATIONAL_STATES.map((st) => [st.id, st.name]));
 
 /**
  * A map of Nigeria for a road-map stop: the states opened at this milestone are

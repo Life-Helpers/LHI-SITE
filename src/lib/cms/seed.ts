@@ -14,6 +14,7 @@ import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { HISTORY_MILESTONES } from "@/data/history-timeline";
 import { TEAM_MEMBERS } from "@/data/team";
 import { slugify } from "@/lib/cms/schema";
+import { matchPartnersByDonor, postProjects } from "@/lib/cms/links";
 import type { CmsSettings } from "@/lib/cms/schema";
 import type { CmsDocument, CmsIntervention, CmsMilestone, CmsPartner, CmsPost, CmsState, CmsTeamMember } from "@/lib/cms/types";
 
@@ -28,6 +29,7 @@ export function seedInterventions(): CmsIntervention[] {
     gallery: rest.gallery?.map((g) => g.src) ?? [],
     youtubeId: rest.youtubeId ?? "",
     featured: Boolean(rest.featured),
+    partnerIds: matchPartnersByDonor(rest.donor, PARTNERS_DATA),
   }));
 }
 
@@ -97,7 +99,7 @@ export function seedDocuments(): CmsDocument[] {
 export function seedPosts(): CmsPost[] {
   return [...PUBLICATION_POSTS, ...MAGAZINE_POSTS, ...BULLETIN_POSTS, ...PHOTO_STORY_POSTS]
     .sort((a, b) => b.date.localeCompare(a.date))
-    .map((post) => ({ ...post, tags: [...post.tags] }));
+    .map((post) => ({ ...post, tags: [...post.tags], projects: postProjects(post) }));
 }
 
 export function seedSettings(): CmsSettings {

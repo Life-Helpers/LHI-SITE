@@ -1,3 +1,5 @@
+import { THEMATIC_AREA_LIST, type ThematicAreaId } from "@/data/thematic-areas";
+
 /**
  * International and national observance days linked to LHI's six thematic areas and to
  * humanitarian action, plus LHI's own anniversary (1 October, founded 2004).
@@ -19,12 +21,7 @@ export type ObservanceArea =
 export const OBSERVANCE_AREAS: Record<ObservanceArea, { label: string; href: string }> = {
   lhi: { label: "LHI", href: "/about" },
   humanitarian: { label: "Humanitarian", href: "/emergencies" },
-  health: { label: "Health & WASH", href: "/health" },
-  education: { label: "Education", href: "/education" },
-  livelihood: { label: "Livelihood", href: "/livelihood" },
-  "food-security": { label: "Food Security", href: "/food-security" },
-  "social-inclusion": { label: "Social Inclusion", href: "/social-inclusion" },
-  protection: { label: "Protection & GBV", href: "/protection" },
+  ...(Object.fromEntries(THEMATIC_AREA_LIST.map((a) => [a.id, { label: a.label, href: a.href }])) as Record<ThematicAreaId, { label: string; href: string }>),
 };
 
 export interface Observance {

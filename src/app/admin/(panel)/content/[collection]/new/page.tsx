@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import { ItemEditor } from "@/components/cms/item-editor";
 import { PageHeader } from "@/components/cms/ui";
-import { loadCollection } from "@/lib/cms/admin-helpers";
+import { loadCollection, relationOptionsOf } from "@/lib/cms/admin-helpers";
 
 export default async function NewItemPage({ params }: { params: Promise<{ collection: string }> }) {
   const { collection } = await params;
@@ -32,7 +32,7 @@ export default async function NewItemPage({ params }: { params: Promise<{ collec
           { label: "Add new" },
         ]}
       />
-      <ItemEditor collection={def.name} initial={initial} originalId={null} />
+      <ItemEditor collection={def.name} initial={initial} originalId={null} relationOptions={relationOptionsOf(def)} />
     </>
   );
 }

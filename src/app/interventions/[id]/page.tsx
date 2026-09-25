@@ -15,8 +15,8 @@ import {
 
 import { FieldGallery } from "@/components/interventions/field-gallery";
 import { getInterventionGallery } from "@/data/intervention-media";
-import { PROJECT_STORIES } from "@/data/project-stories";
-import { getIntervention, getInterventions, getPublishedPosts, getStates } from "@/lib/cms/content";
+import { getIntervention, getInterventions, getPartners, getPublishedPosts, getStates } from "@/lib/cms/content";
+import { legacyStoryRank, postProjects, projectPartnerIds } from "@/lib/cms/links";
 import { formatPostDate } from "@/lib/posts";
 import { jsonLdScript } from "@/lib/validation";
 
@@ -52,7 +52,7 @@ export default async function InterventionDossierPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [all, allStates, posts] = await Promise.all([getInterventions(), getStates(), getPublishedPosts()]);
+  const [all, allStates, posts, partners] = await Promise.all([getInterventions(), getStates(), getPublishedPosts(), getPartners()]);
   const project = all.find((p) => p.id === id);
   if (!project) notFound();
 
@@ -60,11 +60,13 @@ export default async function InterventionDossierPage({
   const states = allStates.filter((s) => project.states.includes(s.id));
   const index = all.findIndex((p) => p.id === project.id);
   const next = all[(index + 1) % all.length];
-  const storySlugs = PROJECT_STORIES[id] ?? [];
-  const stories = storySlugs
-    .map((slug) => posts.find((p) => p.slug === slug))
-    .filter((p): p is (typeof posts)[number] => Boolean(p))
+  // Stories linked to this project in the admin (curated order first, then newest).
+  const stories = posts
+    .filter((p) => postProjects(p).includes(id))
+    .sort((a, b) => legacyStoryRank(id, a.slug) - legacyStoryRank(id, b.slug) || b.date.localeCompare(a.date))
     .slice(0, 6);
+  const linkedIds = new Set(projectPartnerIds(project, partners));
+  const projectPartners = partners.filter((p) => linkedIds.has(p.id));
   // Photos already shown as a story card further down the page are left out of the gallery.
   const storyImages = new Set(stories.map((s) => s.featuredImage));
   const withoutStoryImages = gallery.filter((img) => !storyImages.has(img.src));
@@ -109,6 +111,21 @@ export default async function InterventionDossierPage({
               <Building2 className="h-4 w-4 text-primary" aria-hidden="true" />
               {project.donor}
             </p>
+            {projectPartners.length > 0 && (
+              <ul className="mt-3 flex flex-wrap gap-2" aria-label="Partners on this project">
+                {projectPartners.map((p) => (
+                  <li key={p.id}>
+                    {p.websiteUrl ? (
+                      <a href={p.websiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground hover:border-primary/50 hover:text-primary">
+                        {p.shortName || p.name}
+                      </a>
+                    ) : (
+                      <span className="inline-flex rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground">{p.shortName || p.name}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
             <a

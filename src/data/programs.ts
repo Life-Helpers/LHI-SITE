@@ -1,5 +1,6 @@
 import type { Program } from "@/types/content";
 import { africanFulfillmentImages } from "./african-fulfillment-images";
+import { THEMATIC_AREAS } from "./thematic-areas";
 
 /**
  * LHI's real thematic areas, sourced from the organization's
@@ -7,8 +8,8 @@ import { africanFulfillmentImages } from "./african-fulfillment-images";
  */
 export const programs: Program[] = [
   {
-    id: "health",
-    name: "Health",
+    id: THEMATIC_AREAS["health"].id,
+    name: THEMATIC_AREAS["health"].name,
     region: "Northwest & Northeast Nigeria",
     status: "active",
     summary:
@@ -31,8 +32,8 @@ export const programs: Program[] = [
     imageAlt: africanFulfillmentImages.healthHero.alt,
   },
   {
-    id: "education",
-    name: "Education",
+    id: THEMATIC_AREAS["education"].id,
+    name: THEMATIC_AREAS["education"].name,
     region: "Northern Nigeria",
     status: "active",
     summary:
@@ -55,8 +56,8 @@ export const programs: Program[] = [
     imageAlt: africanFulfillmentImages.educationHero.alt,
   },
   {
-    id: "livelihood",
-    name: "Livelihood",
+    id: THEMATIC_AREAS["livelihood"].id,
+    name: THEMATIC_AREAS["livelihood"].name,
     region: "Adamawa, Bauchi, Benue, Borno, Ebonyi, Katsina, Kebbi, Plateau, Yobe, Zamfara",
     status: "active",
     summary:
@@ -78,8 +79,8 @@ export const programs: Program[] = [
     imageAlt: africanFulfillmentImages.livelihoodHero.alt,
   },
   {
-    id: "food-security",
-    name: "Food Security",
+    id: THEMATIC_AREAS["food-security"].id,
+    name: THEMATIC_AREAS["food-security"].name,
     region: "Rural Northern Nigeria",
     status: "active",
     summary:
@@ -101,8 +102,8 @@ export const programs: Program[] = [
     imageAlt: africanFulfillmentImages.foodSecurityHero.alt,
   },
   {
-    id: "social-inclusion",
-    name: "Social Inclusion",
+    id: THEMATIC_AREAS["social-inclusion"].id,
+    name: THEMATIC_AREAS["social-inclusion"].name,
     region: "Northern Nigeria",
     status: "active",
     summary:
@@ -123,8 +124,8 @@ export const programs: Program[] = [
     imageAlt: africanFulfillmentImages.socialInclusionHero.alt,
   },
   {
-    id: "protection",
-    name: "Protection",
+    id: THEMATIC_AREAS["protection"].id,
+    name: THEMATIC_AREAS["protection"].name,
     region: "Northern Nigeria",
     status: "active",
     summary:

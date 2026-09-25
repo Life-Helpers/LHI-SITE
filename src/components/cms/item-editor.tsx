@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
@@ -9,7 +9,7 @@ import { CheckCircle2, ExternalLink, ImagePlus, Loader2, Paperclip, Save, Trash2
 import { deleteItemAction, saveItemAction } from "@/app/admin/actions";
 import { MediaPicker, MediaThumb } from "@/components/cms/media-picker";
 import { buttonClass, Card, inputClass } from "@/components/cms/ui";
-import { COLLECTIONS, slugify, type CollectionName, type FieldDef, type MediaItem } from "@/lib/cms/schema";
+import { COLLECTIONS, slugify, type CollectionName, type FieldDef, type FieldOption, type MediaItem } from "@/lib/cms/schema";
 
 type Values = Record<string, unknown>;
 
@@ -19,14 +19,21 @@ export function ItemEditor({
   originalId,
   viewHref,
   meta,
+  relationOptions,
 }: {
   collection: CollectionName;
+  /** Choices for relation fields (e.g. the projects a post can link to), loaded on the server. */
+  relationOptions?: Record<string, FieldOption[]>;
   initial: Values;
   originalId: string | null;
   viewHref?: string | null;
   meta?: { label: string; value: string }[];
 }) {
-  const def = COLLECTIONS[collection];
+  const def = useMemo(() => {
+    const base = COLLECTIONS[collection];
+    if (!relationOptions) return base;
+    return { ...base, fields: base.fields.map((f) => (f.relation ? { ...f, options: relationOptions[f.name] ?? [] } : f)) };
+  }, [collection, relationOptions]);
   const router = useRouter();
   const [values, setValues] = useState<Values>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});

@@ -51,6 +51,7 @@ import QRCode from "qrcode";
 import { localeMeta, locales, type Locale } from "@/i18n";
 import { sanitizeHomeText } from "@/lib/home-text";
 import { isSensitivePost, missingChecks } from "@/lib/cms/safeguarding";
+import { withRelationOptions } from "@/lib/cms/relations";
 
 export interface ActionResult {
   ok: boolean;
@@ -273,9 +274,15 @@ export async function saveItemAction(
 ): Promise<ActionResult> {
   return guard(async () => {
     if (!isCollectionName(collection)) return { ok: false, error: "Unknown collection." };
-    const def = COLLECTIONS[collection];
+    const def = await withRelationOptions(COLLECTIONS[collection]);
     const user = await requireUser(def.permission);
     if (def.fixed && !originalId) return { ok: false, error: `${def.label} cannot be added.` };
+
+    // Links to records that have since been deleted are dropped rather than blocking the save.
+    for (const f of def.fields.filter((field) => field.relation && Array.isArray(values[field.name]))) {
+      const known = new Set(f.options?.map((o) => o.value));
+      values = { ...values, [f.name]: (values[f.name] as unknown[]).filter((v) => known.has(String(v))) };
+    }
 
     const { record, errors } = validateRecord(def, values);
     if (Object.keys(errors).length) return { ok: false, errors, error: "Please fix the highlighted fields." };

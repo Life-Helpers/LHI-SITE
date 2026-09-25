@@ -2,6 +2,7 @@ import "server-only";
 
 import { COURSES } from "@/data/training/courses";
 import { getAllMagazines, getCalendarEvents, getInterventions, getPublicJobs, getPublicTenders, getPublishedPosts } from "@/lib/cms/content";
+import { THEMATIC_AREAS } from "@/data/thematic-areas";
 
 export interface SearchResult {
   title: string;
@@ -19,12 +20,12 @@ const PAGES: { title: string; href: string; excerpt: string }[] = [
   { title: "Board of Trustees", href: "/board-of-trustees", excerpt: "Our Board of Trustees." },
   { title: "Management team", href: "/management-team", excerpt: "Directors and state coordinators." },
   { title: "Programmes", href: "/programs", excerpt: "Our six thematic areas." },
-  { title: "Health & WASH", href: "/health", excerpt: "Maternal and child health, nutrition, malaria, water and sanitation." },
-  { title: "Education", href: "/education", excerpt: "Learning centres, girls' education and literacy." },
-  { title: "Livelihood", href: "/livelihood", excerpt: "Savings groups, vocational skills and small businesses." },
-  { title: "Food security", href: "/food-security", excerpt: "Climate-smart agriculture, farmer service hubs and food assistance." },
-  { title: "Social inclusion", href: "/social-inclusion", excerpt: "Disability inclusion, women's participation and peacebuilding." },
-  { title: "Protection & GBV", href: "/protection", excerpt: "Gender-based violence prevention and response, child protection." },
+  { title: THEMATIC_AREAS["health"].label, href: THEMATIC_AREAS["health"].href, excerpt: "Maternal and child health, nutrition, malaria, water and sanitation." },
+  { title: THEMATIC_AREAS["education"].label, href: THEMATIC_AREAS["education"].href, excerpt: "Learning centres, girls' education and literacy." },
+  { title: THEMATIC_AREAS["livelihood"].label, href: THEMATIC_AREAS["livelihood"].href, excerpt: "Savings groups, vocational skills and small businesses." },
+  { title: THEMATIC_AREAS["food-security"].label, href: THEMATIC_AREAS["food-security"].href, excerpt: "Climate-smart agriculture, farmer service hubs and food assistance." },
+  { title: THEMATIC_AREAS["social-inclusion"].label, href: THEMATIC_AREAS["social-inclusion"].href, excerpt: "Disability inclusion, women's participation and peacebuilding." },
+  { title: THEMATIC_AREAS["protection"].label, href: THEMATIC_AREAS["protection"].href, excerpt: "Gender-based violence prevention and response, child protection." },
   { title: "Emergencies", href: "/emergencies", excerpt: "Emergency relief and restoration." },
   { title: "Annual reports", href: "/impact", excerpt: "Organisation-wide results and the 2024 Annual Report." },
   { title: "Fact sheet", href: "/fact-sheet", excerpt: "Project results in numbers, reports and presentations." },

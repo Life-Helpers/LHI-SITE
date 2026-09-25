@@ -28,6 +28,7 @@ import {
 
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { useLocale } from "@/i18n/locale-context";
+import { THEMATIC_AREAS } from "@/data/thematic-areas";
 
 export type NavCard = {
   label: string;
@@ -81,48 +82,48 @@ export const whoWeAreFeatured: {
 
 export const whatWeDoCards: NavCard[] = [
   {
-    label: "Health & WASH",
-    href: "/health",
+    label: THEMATIC_AREAS["health"].label,
+    href: THEMATIC_AREAS["health"].href,
     description: "MNCH, nutrition, WASH, malaria and HIV services",
     icon: HeartPulse,
     image: LHI_PHOTOS.healthScreening.src,
     tag: "Maternal & Child",
   },
   {
-    label: "Education",
-    href: "/education",
+    label: THEMATIC_AREAS["education"].label,
+    href: THEMATIC_AREAS["education"].href,
     description: "Accelerated and non-formal learning for out-of-school children",
     icon: GraduationCap,
     image: LHI_PHOTOS.abepGirls.src,
     tag: "Basic Education",
   },
   {
-    label: "Livelihood",
-    href: "/livelihood",
+    label: THEMATIC_AREAS["livelihood"].label,
+    href: THEMATIC_AREAS["livelihood"].href,
     description: "Vocational skills, VSLAs and cash assistance",
     icon: Handshake,
     image: LHI_PHOTOS.gidanArzikiTailoring.src,
     tag: "Resilience",
   },
   {
-    label: "Food Security",
-    href: "/food-security",
+    label: THEMATIC_AREAS["food-security"].label,
+    href: THEMATIC_AREAS["food-security"].href,
     description: "Smallholder farming, farmers hubs and climate adaptation",
     icon: Wheat,
     image: LHI_PHOTOS.farmerWomanHarvest.src,
     tag: "Food Systems",
   },
   {
-    label: "Social Inclusion",
-    href: "/social-inclusion",
+    label: THEMATIC_AREAS["social-inclusion"].label,
+    href: THEMATIC_AREAS["social-inclusion"].href,
     description: "Governance, peacebuilding and advocacy",
     icon: Users,
     image: LHI_PHOTOS.communityDialogue.src,
     tag: "Equal Rights",
   },
   {
-    label: "Protection & GBV",
-    href: "/protection",
+    label: THEMATIC_AREAS["protection"].label,
+    href: THEMATIC_AREAS["protection"].href,
     description: "Violence against women and girls; child protection",
     icon: ShieldCheck,
     image: LHI_PHOTOS.activismWomen.src,
@@ -233,7 +234,7 @@ export function useLocalizedNav() {
     {
       label: t.whatWeDoMenu.health,
       description: t.whatWeDoMenu.healthDesc,
-      href: "/health",
+      href: THEMATIC_AREAS["health"].href,
       icon: HeartPulse,
       image: LHI_PHOTOS.healthScreening.src,
       tag: "Maternal & Child",
@@ -241,7 +242,7 @@ export function useLocalizedNav() {
     {
       label: t.whatWeDoMenu.education,
       description: t.whatWeDoMenu.educationDesc,
-      href: "/education",
+      href: THEMATIC_AREAS["education"].href,
       icon: GraduationCap,
       image: LHI_PHOTOS.abepGirls.src,
       tag: "Basic Education",
@@ -249,7 +250,7 @@ export function useLocalizedNav() {
     {
       label: t.whatWeDoMenu.livelihood,
       description: t.whatWeDoMenu.livelihoodDesc,
-      href: "/livelihood",
+      href: THEMATIC_AREAS["livelihood"].href,
       icon: Handshake,
       image: LHI_PHOTOS.gidanArzikiTailoring.src,
       tag: "Resilience",
@@ -257,7 +258,7 @@ export function useLocalizedNav() {
     {
       label: t.whatWeDoMenu.foodSecurity,
       description: t.whatWeDoMenu.foodSecurityDesc,
-      href: "/food-security",
+      href: THEMATIC_AREAS["food-security"].href,
       icon: Wheat,
       image: LHI_PHOTOS.farmerWomanHarvest.src,
       tag: "Food Systems",
@@ -265,7 +266,7 @@ export function useLocalizedNav() {
     {
       label: t.whatWeDoMenu.socialInclusion,
       description: t.whatWeDoMenu.socialInclusionDesc,
-      href: "/social-inclusion",
+      href: THEMATIC_AREAS["social-inclusion"].href,
       icon: Users,
       image: LHI_PHOTOS.communityDialogue.src,
       tag: "Equal Rights",
@@ -273,7 +274,7 @@ export function useLocalizedNav() {
     {
       label: t.whatWeDoMenu.protection,
       description: t.whatWeDoMenu.protectionDesc,
-      href: "/protection",
+      href: THEMATIC_AREAS["protection"].href,
       icon: ShieldCheck,
       image: LHI_PHOTOS.activismWomen.src,
       tag: "Protection",

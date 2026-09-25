@@ -1,13 +1,8 @@
 import { LHI_PHOTOS, type LhiPhotoKey } from "@/data/lhi-photos";
 import type { OperationalStateId } from "@/data/operational-states";
+import { THEMATIC_AREA_LIST, type ThematicAreaId } from "@/data/thematic-areas";
 
-export type ThematicPillarId =
-  | "health"
-  | "education"
-  | "livelihood"
-  | "food-security"
-  | "social-inclusion"
-  | "protection";
+export type ThematicPillarId = ThematicAreaId;
 
 export interface ThematicPillarRef {
   id: ThematicPillarId;
@@ -43,49 +38,16 @@ export interface InterventionProject {
   impactMetric: string;
   tags: string[];
   featured?: boolean;
+  /** Linked partner profiles (ids), set in the admin. */
+  partnerIds?: string[];
 }
 
-export const THEMATIC_PILLARS: Record<
-  ThematicPillarId,
-  { name: string; href: string; badgeColor: string; description: string }
-> = {
-  health: {
-    name: "Health & WASH",
-    href: "/health",
-    badgeColor: "bg-primary/10 text-primary border-primary/20",
-    description: "Maternal & infant care, clinical malaria mitigation, Tom Brown nutrition, solar clean water.",
-  },
-  education: {
-    name: "Education",
-    href: "/education",
-    badgeColor: "bg-primary/10 text-primary border-primary/20",
-    description: "Accelerated learning centers, girl-child retention, literacy hubs & non-formal learning.",
-  },
-  livelihood: {
-    name: "Livelihood",
-    href: "/livelihood",
-    badgeColor: "bg-primary/10 text-primary border-primary/20",
-    description: "VSLA community savings, vocational start-up kits (tailoring, soap making), and cash grants.",
-  },
-  "food-security": {
-    name: "Food Security",
-    href: "/food-security",
-    badgeColor: "bg-primary/10 text-primary border-primary/20",
-    description: "Climate-smart agriculture, dry-season irrigation, small ruminant livestock & market linkages.",
-  },
-  "social-inclusion": {
-    name: "Social Inclusion",
-    href: "/social-inclusion",
-    badgeColor: "bg-primary/10 text-primary border-primary/20",
-    description: "Civic governance, women in decision-making, disability rights & civic dialogues.",
-  },
-  protection: {
-    name: "Protection & GBV",
-    href: "/protection",
-    badgeColor: "bg-primary/10 text-primary border-primary/20",
-    description: "Spotlight Initiative, safe spaces, SGBV survivor psycho-social aid & child safeguarding.",
-  },
-};
+const BADGE = "bg-primary/10 text-primary border-primary/20";
+
+/** Thematic areas as used by the project directory (badges and filters), from the shared registry. */
+export const THEMATIC_PILLARS: Record<ThematicPillarId, { name: string; href: string; badgeColor: string; description: string }> = Object.fromEntries(
+  THEMATIC_AREA_LIST.map((a) => [a.id, { name: a.label, href: a.href, badgeColor: BADGE, description: a.scope }]),
+) as Record<ThematicPillarId, { name: string; href: string; badgeColor: string; description: string }>;
 
 export function getPillarRef(id: ThematicPillarId): ThematicPillarRef {
   const p = THEMATIC_PILLARS[id];

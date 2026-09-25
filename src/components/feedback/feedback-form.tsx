@@ -6,9 +6,10 @@ import { CheckCircle2, EyeOff, Loader2 } from "lucide-react";
 
 import { fieldClass, labelClass } from "@/components/forms/use-multipart-submit";
 import { FEEDBACK_PROGRAMMES, FEEDBACK_TYPES, RESPONSE_CHANNELS } from "@/data/feedback";
+import { OPERATIONAL_STATES } from "@/data/operational-states";
 import { Turnstile, turnstileHeaders } from "@/components/forms/turnstile";
 
-const STATES = ["Sokoto", "Kebbi", "Zamfara", "Katsina", "Borno", "Yobe", "Adamawa", "Bauchi", "Plateau", "Ebonyi", "FCT Abuja", "Other"];
+const STATES = [...OPERATIONAL_STATES.map((s) => s.name), "Other"];
 
 const TYPE_HELP: Record<(typeof FEEDBACK_TYPES)[number], string> = {
   Compliment: "Something that went well",

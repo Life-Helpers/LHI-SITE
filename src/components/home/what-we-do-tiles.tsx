@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { LHI_PHOTOS } from "@/data/lhi-photos";
+import { THEMATIC_AREAS, type ThematicAreaId } from "@/data/thematic-areas";
 import { useLocale } from "@/i18n/locale-context";
 
 interface StrategicPillar {
@@ -32,45 +33,39 @@ interface StrategicPillar {
   image: string;
 }
 
-type PillarId = "health" | "education" | "livelihood" | "food-security" | "social-inclusion" | "protection";
+type PillarId = ThematicAreaId;
+
+/** Id, number, name and link come from the shared thematic area registry. */
+const areaTile = (id: ThematicAreaId) => ({ id, pillarNumber: THEMATIC_AREAS[id].number, title: THEMATIC_AREAS[id].name, href: THEMATIC_AREAS[id].href });
 
 /** Thematic areas and scope from LHI's Organisational Profile; photos are LHI's own. */
 const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
   // 3 UP (Top Row)
   {
-    id: "health",
-    pillarNumber: "01",
-    title: "Health",
+    ...areaTile("health"),
     subtitle: "MNCH, Nutrition, WASH & Malaria",
     description:
       "Maternal, newborn and child health, nutrition, WASH, immunisation, malaria, sexual and reproductive health, HIV/AIDS and TB.",
-    href: "/health",
     icon: HeartPulse,
     tag: "Health & Nutrition",
     accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.healthScreening.src,
   },
   {
-    id: "education",
-    pillarNumber: "02",
-    title: "Education",
+    ...areaTile("education"),
     subtitle: "Formal & Non-Formal Learning",
     description:
       "Early child development, formal and non-formal education, accelerated learning for out-of-school children, and education governance.",
-    href: "/education",
     icon: GraduationCap,
     tag: "Basic Education",
     accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.abepGirls.src,
   },
   {
-    id: "livelihood",
-    pillarNumber: "03",
-    title: "Livelihoods",
+    ...areaTile("livelihood"),
     subtitle: "Skills, Savings & Enterprise",
     description:
       "Technical and vocational training, village savings and loan associations, entrepreneurship, financial literacy and multi-purpose cash assistance.",
-    href: "/livelihood",
     icon: Handshake,
     tag: "Resilience & Skills",
     accentColor: "from-primary/15 to-accent/10",
@@ -78,37 +73,28 @@ const strategicPillars: (StrategicPillar & { id: PillarId })[] = [
   },
   // 3 DOWN (Bottom Row)
   {
-    id: "food-security",
-    pillarNumber: "04",
-    title: "Food Security",
+    ...areaTile("food-security"),
     subtitle: "Agriculture & Climate Adaptation",
     description:
       "Smallholder agriculture, small ruminants and aquaculture, food supplies and climate adaptation, including farmers service hubs.",
-    href: "/food-security",
     icon: Wheat,
     tag: "Food Systems",
     accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.farmerWomanHarvest.src,
   },
   {
-    id: "social-inclusion",
-    pillarNumber: "05",
-    title: "Social Inclusion",
+    ...areaTile("social-inclusion"),
     subtitle: "Governance & Peacebuilding",
     description: "Governance, peacebuilding and high-level advocacy so that marginalised people have a voice in decisions that affect them.",
-    href: "/social-inclusion",
     icon: Users,
     tag: "Voice & Participation",
     accentColor: "from-primary/15 to-accent/10",
     image: LHI_PHOTOS.communityDialogue.src,
   },
   {
-    id: "protection",
-    pillarNumber: "06",
-    title: "Protection",
+    ...areaTile("protection"),
     subtitle: "Women, Girls & Children",
     description: "Preventing and responding to violence against women and girls, child protection, and safeguarding in every programme.",
-    href: "/protection",
     icon: ShieldCheck,
     tag: "Safe Spaces",
     accentColor: "from-primary/15 to-accent/10",
