@@ -1,11 +1,10 @@
-import { unlink, writeFile, mkdir } from "node:fs/promises";
-import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 
 import { logActivity } from "@/lib/cms/activity";
 import { AuthError, requireUser } from "@/lib/cms/auth";
 import { slugify } from "@/lib/cms/schema";
-import { readStore, UPLOADS_DIR, updateStore } from "@/lib/cms/store";
+import { deleteFile, fileInfo, putFile } from "@/lib/cms/files";
+import { readStore, updateStore } from "@/lib/cms/store";
 import { revalidatePath } from "next/cache";
 import { optimizeUpload } from "@/lib/media/optimize";
 
@@ -43,15 +42,21 @@ export async function POST(req: NextRequest) {
   const action = String(form.get("action") ?? "");
   const slug = slugify(String(form.get("slug") ?? ""));
   if (!slug) return NextResponse.json({ error: "Missing magazine slug." }, { status: 400 });
-  await mkdir(UPLOADS_DIR, { recursive: true });
 
   if (action === "page") {
     const n = Number(form.get("page"));
     const file = form.get("file");
     if (!Number.isInteger(n) || n < 1 || n > MAX_PAGES || !(file instanceof File)) return NextResponse.json({ error: "Invalid page." }, { status: 400 });
     if (file.type !== "image/webp" || file.size > MAX_PAGE_BYTES) return NextResponse.json({ error: "Pages must be WebP images under 4 MB." }, { status: 400 });
-    await writeFile(path.join(UPLOADS_DIR, pageFile(slug, n)), Buffer.from(await file.arrayBuffer()));
+    await putFile(`uploads/${pageFile(slug, n)}`, Buffer.from(await file.arrayBuffer()), "image/webp");
     return NextResponse.json({ ok: true });
+  }
+
+  // The PDF was uploaded straight to Vercel Blob by the browser (files over 4 MB).
+  if (action === "pdf-uploaded") {
+    const info = await fileInfo(`uploads/mag-${slug}.pdf`);
+    if (!info) return NextResponse.json({ error: "The PDF upload did not complete. Please try again." }, { status: 400 });
+    return NextResponse.json({ ok: true, url: `/media/mag-${slug}.pdf` });
   }
 
   if (action === "pdf") {
@@ -61,7 +66,7 @@ export async function POST(req: NextRequest) {
     }
     const bytes = Buffer.from(await file.arrayBuffer());
     if (bytes.subarray(0, 5).toString() !== "%PDF-") return NextResponse.json({ error: "That file is not a PDF." }, { status: 400 });
-    await writeFile(path.join(UPLOADS_DIR, `mag-${slug}.pdf`), (await optimizeUpload(bytes, "application/pdf")).buffer);
+    await putFile(`uploads/mag-${slug}.pdf`, (await optimizeUpload(bytes, "application/pdf")).buffer, "application/pdf");
     return NextResponse.json({ ok: true, url: `/media/mag-${slug}.pdf` });
   }
 
@@ -108,8 +113,8 @@ export async function DELETE(req: NextRequest) {
   const removed = await updateStore("magazines", (items) => ({ items: items.filter((m) => m.slug !== slug), result: items.find((m) => m.slug === slug) }));
   if (!removed) return NextResponse.json({ error: "Not found." }, { status: 404 });
   await Promise.all([
-    ...Array.from({ length: removed.pages }, (_, i) => unlink(path.join(UPLOADS_DIR, pageFile(slug, i + 1))).catch(() => undefined)),
-    unlink(path.join(UPLOADS_DIR, `mag-${slug}.pdf`)).catch(() => undefined),
+    ...Array.from({ length: removed.pages }, (_, i) => deleteFile(`uploads/${pageFile(slug, i + 1)}`).catch(() => undefined)),
+    deleteFile(`uploads/mag-${slug}.pdf`).catch(() => undefined),
   ]);
   await logActivity(user, "deleted magazine", removed.title);
   revalidatePath("/project-magazines", "layout");

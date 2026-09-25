@@ -1,10 +1,7 @@
-import { createReadStream } from "node:fs";
-import { stat } from "node:fs/promises";
-import { Readable } from "node:stream";
 import path from "node:path";
 
+import { fileInfo, readFileRange } from "@/lib/cms/files";
 import { ALLOWED_MEDIA } from "@/lib/cms/media-types";
-import { UPLOADS_DIR } from "@/lib/cms/store";
 
 export const dynamic = "force-dynamic";
 
@@ -14,15 +11,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ file: st
   const name = path.basename(file);
   const mimeType = ALLOWED_MEDIA[path.extname(name).slice(1).toLowerCase()];
   if (!mimeType || name !== file) return new Response("Not found", { status: 404 });
-  const full = path.join(UPLOADS_DIR, name);
-  let size: number;
-  let mtime: Date;
-  try {
-    ({ size, mtime } = await stat(full));
-  } catch {
-    return new Response("Not found", { status: 404 });
-  }
-  const etag = `W/"${size.toString(16)}-${mtime.getTime().toString(16)}"`;
+  const key = `uploads/${name}`;
+  const info = await fileInfo(key);
+  if (!info) return new Response("Not found", { status: 404 });
+  const { size, etag, lastModified: mtime } = info;
 
   const headers: Record<string, string> = {
     "Content-Type": mimeType,
@@ -54,7 +46,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ file: st
   const length = end - start + 1;
   headers["Content-Length"] = String(length);
 
-  // Stream from disk so large audio and video files never sit whole in memory.
-  const stream = Readable.toWeb(createReadStream(full, { start, end })) as ReadableStream<Uint8Array>;
+  // Streamed so large audio and video files never sit whole in memory.
+  const stream = await readFileRange(key, start, end);
+  if (!stream) return new Response("Not found", { status: 404 });
   return new Response(stream, { status, headers });
 }

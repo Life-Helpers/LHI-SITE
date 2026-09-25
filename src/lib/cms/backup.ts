@@ -63,3 +63,19 @@ export function backupStream(dir: string) {
   }
   return Readable.from(tar()).pipe(createGzip());
 }
+
+/** Streams a .tar.gz of in-memory documents (the database-backed store: one JSON file per collection). */
+export function backupDocumentsStream(docs: { name: string; data: unknown }[]) {
+  async function* tar() {
+    const now = new Date();
+    for (const doc of docs) {
+      const data = Buffer.from(JSON.stringify(doc.data, null, 2), "utf8");
+      yield header(`${doc.name}.json`, data.length, now);
+      yield data;
+      const pad = (512 - (data.length % 512)) % 512;
+      if (pad) yield Buffer.alloc(pad, 0);
+    }
+    yield Buffer.alloc(1024, 0);
+  }
+  return Readable.from(tar()).pipe(createGzip());
+}

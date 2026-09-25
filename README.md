@@ -111,19 +111,45 @@ In local development (`npm run dev`) the setup token is not required.
 
 ### Storage — read before deploying
 
-Content is stored as JSON files (plus uploads) in `CMS_DATA_DIR` (default
-`./cms-data`, git-ignored). Until a section is first saved, the site shows the
-original content from `src/data/*`.
+Until a section is first saved, the site shows the original content from `src/data/*`.
+Where saved content and uploads live depends on the environment:
 
-- The server needs a **persistent, writable disk** (VPS, or a Docker volume mounted
-  at `CMS_DATA_DIR`). On serverless/ephemeral hosting edits would be lost; swap
-  `src/lib/cms/store.ts` for a database-backed implementation in that case.
-- **Back up `CMS_DATA_DIR` regularly** — it holds all edited content, uploads,
-  user accounts, CVs and bids. Anyone with the *Site settings* permission can
-  download a full `.tar.gz` snapshot from **Admin → Settings → Backup**
-  (`/api/admin/backup`); store it somewhere private (it contains personal data).
-  Restore by extracting it into an empty `CMS_DATA_DIR` and restarting.
-- Run a single server instance (the store serialises writes in-process).
+| Setting | Content, users, submissions | Uploaded files (media, magazines, CVs, bids) |
+|---|---|---|
+| `DATABASE_URL` (or `POSTGRES_URL`) | Postgres table `cms_store` (created automatically) | — |
+| `BLOB_READ_WRITE_TOKEN` | — | Vercel Blob (private store), served through `/media/…` |
+| neither | JSON files in `CMS_DATA_DIR` (default `./cms-data`) | `CMS_DATA_DIR/uploads` and `/private` |
+
+**On Vercel both a database and Blob are required** — the server disk there is temporary,
+and the admin shows a red *Storage is not permanent yet* notice until they are connected.
+
+**Deploying on Vercel (one-time):**
+
+1. Vercel dashboard → the project → **Storage** → **Create Database** → *Neon (Postgres)*;
+   connect it to the project (this sets `DATABASE_URL`/`POSTGRES_URL`).
+2. **Storage** → **Create** → *Blob*, choose **Private** access, connect it to the project
+   (this sets `BLOB_READ_WRITE_TOKEN`).
+3. **Settings → Environment Variables**: add `CMS_SETUP_TOKEN` (a long random string, used
+   once to create the first administrator) and `CMS_SESSION_SECRET` (another long random
+   string, signs admin sign-ins). Generate each with `openssl rand -base64 32`.
+4. Redeploy, open `https://<your-site>/admin/setup`, enter the setup token and create the
+   first **Administrator** account. Setup closes itself once an account exists.
+
+To move content from an existing server (or an unpacked backup) into the database and Blob:
+`DATABASE_URL=… BLOB_READ_WRITE_TOKEN=… node scripts/cms-import.mjs ./cms-data`
+(add `--overwrite` to replace collections that already exist in the database).
+
+Large files (radio MP3s, magazine PDFs over 4 MB) upload straight from the browser to Blob,
+so they are not limited by Vercel's 4.5 MB request size.
+
+**Backups.** Anyone with the *Site settings* permission can download a `.tar.gz` from
+**Admin → Settings → Backup** (`/api/admin/backup`): with the database it contains every
+saved collection as JSON; with disk storage it contains the whole `CMS_DATA_DIR`. Store it
+somewhere private (it contains personal data). Postgres providers also keep their own
+point-in-time backups; uploaded files stay in Blob.
+
+With disk storage (no `DATABASE_URL`), run a single server instance with a persistent,
+backed-up `CMS_DATA_DIR`.
 
 ### Site settings worth filling in
 

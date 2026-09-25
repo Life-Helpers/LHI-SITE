@@ -1,17 +1,13 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import path from "node:path";
-
-import { DATA_DIR } from "@/lib/cms/store";
+import { deleteFile, putFile, readWholeFile } from "@/lib/cms/files";
 import { optimizeUpload } from "@/lib/media/optimize";
 
 /**
- * Private uploads (CVs, vendor quotations). Stored outside the public uploads
- * folder and only served through the authenticated admin route.
+ * Private uploads (CVs, vendor quotations). Stored under private/ (on disk or as private
+ * blobs) and only served through the authenticated admin route.
  */
-const PRIVATE_DIR = path.join(DATA_DIR, "private");
 
 export const PRIVATE_UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
 
@@ -36,23 +32,21 @@ export async function savePrivateUpload(file: File, folder: string): Promise<Pri
   if (!kind) return "Attach a PDF or Word document.";
   const safeFolder = folder.replace(/[^a-z0-9-]/gi, "");
   const stored = `${safeFolder}/${randomUUID()}.${kind.ext}`;
-  await mkdir(path.join(PRIVATE_DIR, safeFolder), { recursive: true });
   const { buffer: optimized } = await optimizeUpload(buffer, kind.mime);
-  await writeFile(path.join(PRIVATE_DIR, stored), optimized);
+  await putFile(`private/${stored}`, optimized, kind.mime);
   const filename = file.name.replace(/[^\w.\- ()]/g, "_").slice(0, 120) || `attachment.${kind.ext}`;
   return { filename, stored, size: optimized.length };
 }
 
-function resolveStored(stored: string) {
-  const full = path.resolve(PRIVATE_DIR, stored);
-  if (!full.startsWith(PRIVATE_DIR + path.sep)) throw new Error("Invalid path");
-  return full;
+function keyFor(stored: string) {
+  if (!/^[a-z0-9-]+\/[\w-]+\.(pdf|docx?)$/i.test(stored)) throw new Error("Invalid path");
+  return `private/${stored}`;
 }
 
 export function readPrivateUpload(stored: string) {
-  return readFile(resolveStored(stored));
+  return readWholeFile(keyFor(stored));
 }
 
 export async function deletePrivateUpload(stored: string) {
-  await rm(resolveStored(stored), { force: true });
+  await deleteFile(keyFor(stored));
 }

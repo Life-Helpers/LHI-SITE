@@ -5,15 +5,36 @@ import { FileText, Loader2, Music, Upload, X } from "lucide-react";
 
 import { buttonClass } from "@/components/cms/ui";
 import { AUDIO_ACCEPT } from "@/lib/cms/media-types";
+import { directUploadAccess, mediaFilename, SERVER_UPLOAD_LIMIT, uploadDirect } from "@/lib/cms/direct-upload";
 import type { MediaItem } from "@/lib/cms/schema";
 
-export async function uploadFiles(files: FileList | File[]): Promise<MediaItem[]> {
+async function postForm(files: File[]): Promise<MediaItem[]> {
   const body = new FormData();
-  Array.from(files).forEach((f) => body.append("file", f));
+  files.forEach((f) => body.append("file", f));
   const res = await fetch("/api/admin/media", { method: "POST", body });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error ?? "Upload failed.");
   return data.items as MediaItem[];
+}
+
+/** Small files go through the server (which optimises images); large ones straight to storage when possible. */
+export async function uploadFiles(files: FileList | File[]): Promise<MediaItem[]> {
+  const list = Array.from(files);
+  const large = list.filter((f) => f.size > SERVER_UPLOAD_LIMIT);
+  const small = list.filter((f) => f.size <= SERVER_UPLOAD_LIMIT);
+  const saved: MediaItem[] = small.length ? await postForm(small) : [];
+  if (large.length === 0) return saved;
+  const access = await directUploadAccess();
+  if (!access) return [...saved, ...(await postForm(large))];
+  for (const file of large) {
+    const filename = mediaFilename(file);
+    await uploadDirect(`uploads/${filename}`, file, "media", access);
+    const res = await fetch("/api/admin/media", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ register: filename }) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error ?? "Upload failed.");
+    saved.push(...(data.items as MediaItem[]));
+  }
+  return saved;
 }
 
 export function MediaThumb({ item, className = "" }: { item: Pick<MediaItem, "url" | "mimeType" | "filename">; className?: string }) {

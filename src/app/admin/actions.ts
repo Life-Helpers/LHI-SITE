@@ -1,7 +1,6 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import { unlink } from "node:fs/promises";
 import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -40,7 +39,8 @@ import {
   type Role,
   type SubmissionStatus,
 } from "@/lib/cms/schema";
-import { readSettings, readStore, UPLOADS_DIR, updateStore, writeSettings } from "@/lib/cms/store";
+import { readSettings, readStore, updateStore, writeSettings } from "@/lib/cms/store";
+import { deleteFile } from "@/lib/cms/files";
 import type { FieldErrors } from "@/lib/cms/validate";
 import { validateRecord } from "@/lib/cms/validate";
 import { sendPasswordResetEmail } from "@/lib/email/notifications";
@@ -536,7 +536,7 @@ export async function deleteMediaAction(id: string): Promise<ActionResult> {
     const item = (await readStore("media")).find((m) => m.id === id);
     if (!item) return { ok: false, error: "File not found." };
     await updateStore("media", (items) => ({ items: items.filter((m) => m.id !== id) }));
-    await unlink(path.join(UPLOADS_DIR, path.basename(item.filename))).catch(() => undefined);
+    await deleteFile(`uploads/${path.basename(item.filename)}`).catch(() => undefined);
     await logActivity(user, "deleted media", item.filename);
     return { ok: true };
   });

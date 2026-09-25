@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FileUp, Loader2 } from "lucide-react";
 
 import { buttonClass, inputClass } from "@/components/cms/ui";
+import { directUploadAccess, SERVER_UPLOAD_LIMIT, uploadDirect } from "@/lib/cms/direct-upload";
 
 const slugify = (v: string) =>
   v
@@ -72,9 +73,16 @@ export function MagazineUploader() {
       }
       setProgress({ done: total, total, label: "Uploading the PDF for download…" });
       const pdfBody = new FormData();
-      pdfBody.set("action", "pdf");
       pdfBody.set("slug", finalSlug);
-      pdfBody.set("file", pdfFile);
+      const direct = pdfFile.size > SERVER_UPLOAD_LIMIT ? await directUploadAccess() : null;
+      if (direct) {
+        // Large PDFs go straight to storage; the server then checks the upload arrived.
+        await uploadDirect(`uploads/mag-${finalSlug}.pdf`, pdfFile, "magazine-pdf", direct);
+        pdfBody.set("action", "pdf-uploaded");
+      } else {
+        pdfBody.set("action", "pdf");
+        pdfBody.set("file", pdfFile);
+      }
       await post(pdfBody);
       setProgress({ done: total, total, label: "Saving…" });
       fd.set("action", "save");
