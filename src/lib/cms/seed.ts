@@ -11,8 +11,11 @@ import { BULLETIN_POSTS } from "@/data/bulletin-stories";
 import { PUBLICATION_POSTS } from "@/data/publication-stories";
 import { PHOTO_STORY_POSTS } from "@/data/photo-stories";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
+import { HISTORY_MILESTONES } from "@/data/history-timeline";
+import { TEAM_MEMBERS } from "@/data/team";
+import { slugify } from "@/lib/cms/schema";
 import type { CmsSettings } from "@/lib/cms/schema";
-import type { CmsDocument, CmsIntervention, CmsPartner, CmsPost, CmsState } from "@/lib/cms/types";
+import type { CmsDocument, CmsIntervention, CmsMilestone, CmsPartner, CmsPost, CmsState, CmsTeamMember } from "@/lib/cms/types";
 
 /** First-run content, taken from the site's original static data files. */
 export function seedInterventions(): CmsIntervention[] {
@@ -26,6 +29,31 @@ export function seedInterventions(): CmsIntervention[] {
     youtubeId: rest.youtubeId ?? "",
     featured: Boolean(rest.featured),
   }));
+}
+
+export function seedMilestones(): CmsMilestone[] {
+  return HISTORY_MILESTONES.map((m, index) => {
+    const photos = m.media?.kind === "photos" ? m.media.photos : [];
+    return {
+      id: slugify(`${m.year}-${m.title}`),
+      year: m.year,
+      title: m.title,
+      location: m.location ?? "",
+      summary: m.summary,
+      photos: photos.map((p) => p.src),
+      photoAlts: photos.map((p) => p.alt),
+      photoLabels: photos.some((p) => p.label) ? photos.map((p) => p.label ?? "") : [],
+      caption: m.media?.caption ?? "",
+      showLogos: m.media?.kind === "logos",
+      states: m.states ?? [],
+      order: (index + 1) * 10,
+      status: "published",
+    };
+  });
+}
+
+export function seedTeam(): CmsTeamMember[] {
+  return structuredClone(TEAM_MEMBERS);
 }
 
 export function seedStates(): CmsState[] {
@@ -74,6 +102,7 @@ export function seedPosts(): CmsPost[] {
 
 export function seedSettings(): CmsSettings {
   return {
+    homeText: {},
     homeFeature: {
       enabled: true,
       eyebrow: "Feature story · Cultivating Resilience",

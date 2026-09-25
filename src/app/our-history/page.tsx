@@ -4,8 +4,8 @@ import { Sparkles } from "lucide-react";
 
 import { RoadmapTimeline } from "@/components/history/roadmap-timeline";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
-import { HISTORY_MILESTONES } from "@/data/history-timeline";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { getMilestones } from "@/lib/cms/content";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/our-history" },
@@ -14,7 +14,11 @@ export const metadata: Metadata = {
     "The journey of Life Helpers Initiative: from the Beulah Project in 2004 to a national humanitarian and development organization operating across 11 states in Nigeria.",
 };
 
-export default function OurHistoryPage() {
+/** Milestones come from Admin → History Timeline; saves refresh the page instantly, this is a safety net. */
+export const revalidate = 300;
+
+export default async function OurHistoryPage() {
+  const milestones = await getMilestones();
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}
@@ -66,7 +70,7 @@ export default function OurHistoryPage() {
               From a passion project in Sokoto to a national organisation in 11 states. Archive photos are dated by the banners and captions in them.
             </p>
           </div>
-          <RoadmapTimeline milestones={HISTORY_MILESTONES} />
+          <RoadmapTimeline milestones={milestones} />
         </div>
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mt-20 rounded-2xl border border-border bg-card p-8 text-center sm:p-12">

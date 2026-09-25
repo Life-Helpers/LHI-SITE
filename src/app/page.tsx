@@ -19,6 +19,7 @@ import { THEMATIC_PILLARS } from "@/data/interventions-data";
 import { UpcomingEvents } from "@/components/home/upcoming-events";
 import { getCalendarEvents, getEpisodes, getInterventions, getPartners, getPublishedPosts, getSettings, todayInLagos } from "@/lib/cms/content";
 import { toRadioEpisode } from "@/lib/radio";
+import { HomeTextOverrides } from "@/i18n/locale-context";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -60,34 +61,36 @@ export default async function Home() {
     });
   }
   return (
-    <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
-      <HeroSlider />
-      <StatsSection />
-      <WhoWeAreBand />
-      <WhatWeDoTiles projectCounts={projectCounts} />
-      <FeatureStory slides={featureSlides} />
-      <BeforeAfterSection />
-      <div className="defer-render">
-        <OperationalMapSection />
-      </div>
-      <UpcomingEvents events={events.slice(0, 5)} today={todayInLagos()} />
-      <div className="defer-render">
-        <LatestFromLHI />
-      </div>
-      <div className="defer-render">
-        <RadioBanner episodes={episodes.slice(0, 12).map(toRadioEpisode)} />
-      </div>
-      <div className="defer-render">
-        <TestimonialsSection />
-      </div>
-      <div className="defer-render">
-        <SocialFeedsSection posts={posts.slice(0, 4)} />
-      </div>
-      <div className="defer-render">
-        <PartnersStrip partners={partners} />
-      </div>
-      <PhilosophyQuote />
-      <NewsletterSubscribe />
-    </main>
+    <HomeTextOverrides text={settings.homeText}>
+      <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
+        <HeroSlider />
+        <StatsSection />
+        <WhoWeAreBand />
+        <WhatWeDoTiles projectCounts={projectCounts} />
+        <FeatureStory slides={featureSlides} />
+        <BeforeAfterSection />
+        <div className="defer-render">
+          <OperationalMapSection />
+        </div>
+        <UpcomingEvents events={events.slice(0, 5)} today={todayInLagos()} />
+        <div className="defer-render">
+          <LatestFromLHI />
+        </div>
+        <div className="defer-render">
+          <RadioBanner episodes={episodes.slice(0, 12).map(toRadioEpisode)} />
+        </div>
+        <div className="defer-render">
+          <TestimonialsSection />
+        </div>
+        <div className="defer-render">
+          <SocialFeedsSection posts={posts.slice(0, 4)} />
+        </div>
+        <div className="defer-render">
+          <PartnersStrip partners={partners} />
+        </div>
+        <PhilosophyQuote />
+        <NewsletterSubscribe />
+      </main>
+    </HomeTextOverrides>
   );
 }

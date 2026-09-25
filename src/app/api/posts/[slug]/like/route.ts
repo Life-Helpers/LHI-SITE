@@ -6,7 +6,7 @@ import { rateLimited } from "@/lib/cms/submissions";
 
 /** POST {"liked": true|false}: the browser remembers its own like; this keeps the shared count. */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
-  if (rateLimited(req, "like", 120)) return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  if (await rateLimited(req, "like", 120)) return NextResponse.json({ error: "Too many requests." }, { status: 429 });
   const { slug } = await params;
   if (!(await getPostBySlug(slug))) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const body = await req.json().catch(() => null);

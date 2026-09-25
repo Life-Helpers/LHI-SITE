@@ -4,7 +4,7 @@ import { z } from "zod";
 import { sendCertificateEmail } from "@/lib/email/notifications";
 import { gradeExam, issueCertificate } from "@/lib/training/grading";
 import { getCurrentLearner, updateLearnerProgress } from "@/lib/training/learners";
-import { clientIp } from "@/lib/client-ip";
+import { rateLimited } from "@/lib/rate-limit";
 import { formError } from "@/lib/validation";
 
 const schema = z.object({
@@ -14,16 +14,9 @@ const schema = z.object({
   answers: z.record(z.string(), z.number().int().min(0).max(10)),
 });
 
-// Light abuse protection: 20 attempts per IP per hour.
-const attempts = new Map<string, { count: number; until: number }>();
-
 export async function POST(req: NextRequest) {
-  const ip = clientIp(req);
-  const entry = attempts.get(ip);
-  const fresh = !entry || entry.until < Date.now();
-  const count = fresh ? 1 : entry.count + 1;
-  attempts.set(ip, { count, until: fresh ? Date.now() + 3600_000 : entry.until });
-  if (count > 20) {
+  // Light abuse protection: 20 attempts per IP per hour.
+  if (await rateLimited(req, "certificates", 20)) {
     return NextResponse.json({ error: "Too many attempts. Please try again in an hour." }, { status: 429 });
   }
 

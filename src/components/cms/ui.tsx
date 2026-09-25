@@ -93,6 +93,7 @@ export function statusTone(value: unknown): Tone {
     case "new":
       return "warning";
     case "multi-year":
+    case "review":
       return "primary";
     case "archived":
     case "false":

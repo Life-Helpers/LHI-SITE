@@ -25,10 +25,12 @@ import { BUILT_IN_ROLES } from "@/lib/cms/schema";
 import {
   seedDocuments,
   seedInterventions,
+  seedMilestones,
   seedPartners,
   seedPosts,
   seedSettings,
   seedStates,
+  seedTeam,
 } from "@/lib/cms/seed";
 import type { CollectionRecords } from "@/lib/cms/types";
 
@@ -83,6 +85,8 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   tenders: () => [],
   episodes: () => [],
   events: () => [],
+  milestones: seedMilestones,
+  team: seedTeam,
   users: () => [],
   media: () => [],
   submissions: () => [],
@@ -170,6 +174,7 @@ export async function readSettings(): Promise<CmsSettings> {
     contact: { ...defaults.contact, ...stored.contact },
     donations: { ...defaults.donations, ...stored.donations },
     engagement: { ...defaults.engagement, ...stored.engagement },
+    homeText: stored.homeText ?? {},
   };
 }
 

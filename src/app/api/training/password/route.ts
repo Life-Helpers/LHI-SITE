@@ -19,7 +19,7 @@ const reset = z.object({
 
 /** Learner password reset: request a link by email, then set a new password with the link's token. */
 export async function POST(req: NextRequest) {
-  if (rateLimited(req, "learner-reset", 10)) {
+  if (await rateLimited(req, "learner-reset", 10)) {
     return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
   }
   const parsed = z.discriminatedUnion("mode", [request, reset]).safeParse(await req.json().catch(() => null));

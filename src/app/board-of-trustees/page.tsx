@@ -6,6 +6,7 @@ import { Award, ShieldCheck, Users } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
+import { getTeam } from "@/lib/cms/content";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/board-of-trustees" },
@@ -14,17 +15,11 @@ export const metadata: Metadata = {
     "Meet the Board of Trustees providing strategic governance, fiduciary stewardship, and mission alignment for Life Helpers Initiative (LHI).",
 };
 
-/** Board members and roles as published by LHI (Strategic Plan 2026–2030 and LHI's board listing). */
-const trustees = [
-  { name: "Engr. Godfrey Mayoku", role: "Board Chairman", qualification: "", photo: "/images/lhi/board/godfrey-mayoku.jpg" },
-  { name: "Mr Tayo Fatinikun", role: "National Executive Director", qualification: "FICA, FIMC, CMC", photo: "/images/lhi/board/tayo-fatinikun.jpg" },
-  { name: "Pharm. Iyabo Adebisi", role: "Board Secretary", qualification: "", photo: "/images/lhi/board/iyabo-adebisi.jpg" },
-  { name: "Barr. Joy Ihenacho", role: "Board Member", qualification: "", photo: "/images/lhi/board/joy-ihenacho.jpg" },
-  { name: "Pharm. Sam Olaoye", role: "Board Member", qualification: "", photo: "/images/lhi/board/sam-olaoye.jpg" },
-  { name: "Mrs Bukola Fatinikun", role: "Board Member", qualification: "", photo: "/images/lhi/board/bukola-fatinikun.jpg" },
-];
+/** Profiles come from Admin → Team; saves refresh the page instantly, this is a safety net. */
+export const revalidate = 300;
 
-export default function BoardOfTrusteesPage() {
+export default async function BoardOfTrusteesPage() {
+  const trustees = await getTeam("board");
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}
@@ -81,12 +76,12 @@ export default function BoardOfTrusteesPage() {
           <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {trustees.map((trustee) => (
               <li
-                key={trustee.name}
+                key={trustee.id}
                 className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
               >
                 <div className="relative aspect-[9/10] bg-white">
                   <Image
-                    src={trustee.photo}
+                    src={trustee.photo || "/icon.png"}
                     alt={`Portrait of ${trustee.name}`}
                     fill
                     sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
@@ -96,7 +91,7 @@ export default function BoardOfTrusteesPage() {
                 <div className="border-t border-border p-5">
                   <h3 className="text-lg font-semibold text-foreground">{trustee.name}</h3>
                   <p className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-primary">{trustee.role}</p>
-                  {trustee.qualification && <p className="mt-1 text-xs text-muted-foreground">{trustee.qualification}</p>}
+                  {trustee.credentials && <p className="mt-1 text-xs text-muted-foreground">{trustee.credentials}</p>}
                 </div>
               </li>
             ))}

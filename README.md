@@ -79,6 +79,11 @@ live site without touching code.
 | Section | What it manages | Where it appears |
 |---|---|---|
 | Posts | News, success stories, field blog, magazine, press releases (Markdown) | `/blog`, `/blog/[slug]`, `/success-stories`, `/news-updates` |
+
+**Sensitive stories.** Posts about health status (e.g. HIV), GBV or abuse, child protection or mental health
+are flagged (by the "Sensitive story" box, or automatically from the title, excerpt and tags). Only users with
+*Approve sensitive stories* (Administrators by default) can publish them, and only after ticking all four
+safeguarding checks; everyone else saves them as *Pending review*.
 | Media Library | Uploaded photos, logos, PDFs, video (served from `/media/...`) | Everywhere via the image/file pickers |
 | Interventions | The project directory, dossiers, gallery photos, YouTube video | `/interventions/*`, factsheet PDFs, programme pages, map |
 | Map States | Offices, LGAs covered and reach for the 11 states | Operational map (home + interventions) |
@@ -86,6 +91,9 @@ live site without touching code.
 | Compliance Docs | CAC, tax clearance, audits, PSEA/safeguarding/anti-fraud PDFs | `/partner-portal` |
 | Submissions | Contact, volunteer and consortium/RFP forms (inbox) | Admin only |
 | Users | Accounts with roles: Administrator, Editor, Author | Admin only |
+| Home Page Text | Home page headings and text in English, French, Hausa, Yoruba and Igbo (empty = built-in text) | Home page |
+| History Timeline | Road-map milestones: year, story, photos with alt text/labels, state map pins | `/our-history` |
+| Team | Board of Trustees, management team, state office coordinators | `/board-of-trustees`, `/management-team` |
 | Settings | Home feature story, NIDAKE kit figures, factsheet contact details | Home page, `/nidake`, PDFs |
 | Activity Log | Sign-ins, edits, uploads, deletions | Admin only |
 

@@ -6,6 +6,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
+  Languages,
+  Route,
+  UsersRound,
   Activity,
   BookOpen,
   CalendarDays,
@@ -70,6 +73,13 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
       ],
     },
     {
+      label: "About LHI",
+      items: [
+        { label: "History Timeline", href: "/admin/content/milestones", icon: Route, permission: "about" },
+        { label: "Team", href: "/admin/content/team", icon: UsersRound, permission: "about" },
+      ],
+    },
+    {
       label: "Programmes",
       items: [
         { label: "Interventions", href: "/admin/content/interventions", icon: FolderKanban, permission: "interventions" },
@@ -110,6 +120,7 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
       items: [
         { label: "Users", href: "/admin/users", icon: Users, permission: "users" },
         { label: "Roles & Permissions", href: "/admin/users/roles", icon: ShieldCheck, permission: "users" },
+        { label: "Home Page Text", href: "/admin/home-text", icon: Languages, permission: "settings" },
         { label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings" },
         { label: "Activity Log", href: "/admin/activity", icon: Activity, permission: "activity" },
       ],

@@ -1,6 +1,7 @@
 import type { InterventionProject, ThematicPillarId } from "@/data/interventions-data";
 import type { OperationalState } from "@/data/operational-states";
 import type { PartnerItem } from "@/data/partners-data";
+import type { TeamMember } from "@/data/team";
 
 /** Stored shape of an intervention: flat so the generic editor can edit every field. */
 export type CmsIntervention = Omit<InterventionProject, "image" | "thematicAreas" | "gallery"> & {
@@ -39,10 +40,15 @@ export interface CmsPost {
   category: string;
   date: string;
   featuredImage: string;
-  status: "draft" | "published";
+  status: "draft" | "review" | "published";
   tags: string[];
   featured: boolean;
   updatedAt: string;
+  /** Sensitive stories need an approver (posts.review) and all safeguarding checks to be published. */
+  sensitive?: boolean;
+  safeguarding?: string[];
+  reviewedBy?: string;
+  reviewedAt?: string;
 }
 
 export interface CmsJob {
@@ -118,4 +124,26 @@ export interface CollectionRecords {
   tenders: CmsTender;
   episodes: CmsEpisode;
   events: CmsEvent;
+  milestones: CmsMilestone;
+  team: CmsTeamMember;
 }
+
+/** A stop on the Our History road map. Photos, their alt text and labels are parallel lists. */
+export interface CmsMilestone {
+  id: string;
+  year: string;
+  title: string;
+  location: string;
+  summary: string;
+  photos: string[];
+  photoAlts: string[];
+  photoLabels: string[];
+  caption: string;
+  /** Shows the old → new logo card instead of photos. */
+  showLogos: boolean;
+  states: string[];
+  order: number;
+  status: "published" | "draft";
+}
+
+export type CmsTeamMember = TeamMember;

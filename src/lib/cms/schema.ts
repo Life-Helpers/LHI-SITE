@@ -4,6 +4,9 @@
  * is enough for it to appear in the editor and be persisted.
  */
 
+import { SAFEGUARDING_CHECKS } from "@/lib/cms/safeguarding";
+import type { HomeTextByLocale } from "@/lib/home-text";
+
 /** A role id: one of the built-in roles or a custom role created in Users → Roles. */
 export type Role = string;
 
@@ -14,12 +17,14 @@ export const PERMISSION_GROUPS = [
     items: [
       { id: "posts.own", label: "Write posts", help: "Create posts and edit their own." },
       { id: "posts.all", label: "Edit everyone's posts", help: "Edit, publish and delete any post." },
+      { id: "posts.review", label: "Approve sensitive stories", help: "Publish stories flagged as sensitive (health status, GBV, child protection, mental health) after the safeguarding checks." },
       { id: "media", label: "Upload media", help: "Upload files and use the media library." },
       { id: "media.delete", label: "Delete media", help: "Remove files from the media library." },
       { id: "comments", label: "Moderate comments", help: "Approve or delete reader comments." },
       { id: "episodes", label: "Radio episodes", help: "Upload and publish radio recordings." },
       { id: "events", label: "Events", help: "Add LHI events to the events calendar and home page." },
       { id: "magazines", label: "Project magazines", help: "Upload magazine PDFs as flipbooks." },
+      { id: "about", label: "History & team", help: "Edit the history timeline and the board, management and coordinator profiles." },
     ],
   },
   {
@@ -89,7 +94,7 @@ export const BUILT_IN_ROLES: CmsRole[] = [
     id: "editor",
     name: "Editor",
     description: "Manages all content, programmes, inbox, recruitment and training.",
-    permissions: ALL_PERMISSIONS.filter((p) => !["users", "settings", "activity", "submissions.delete"].includes(p)),
+    permissions: ALL_PERMISSIONS.filter((p) => !["users", "settings", "activity", "submissions.delete", "posts.review"].includes(p)),
     builtIn: true,
   },
   {
@@ -161,7 +166,7 @@ export interface CollectionDef {
   fields: FieldDef[];
 }
 
-export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents" | "jobs" | "tenders" | "episodes" | "events";
+export type CollectionName = "posts" | "interventions" | "states" | "partners" | "documents" | "jobs" | "tenders" | "episodes" | "events" | "milestones" | "team";
 
 export const PILLAR_OPTIONS: FieldOption[] = [
   { value: "health", label: "Health & WASH" },
@@ -220,7 +225,9 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "slug", label: "Permalink", type: "slug", from: "title", required: true },
       { name: "excerpt", label: "Excerpt", type: "textarea", required: true, help: "One or two sentences shown on cards and in search results." },
       { name: "content", label: "Content", type: "markdown", required: true, help: "Markdown: ## headings, **bold**, - lists, [links](https://…), ![images](/media/…)." },
-      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "draft", label: "Draft" }, { value: "published", label: "Published" }] },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "draft", label: "Draft" }, { value: "review", label: "Pending review" }, { value: "published", label: "Published" }] },
+      { name: "sensitive", label: "Sensitive story", type: "boolean", sidebar: true, help: "Tick for stories about health status (e.g. HIV), GBV or abuse, child protection or mental health. Detected automatically from the title, excerpt and tags too. Sensitive stories need approval before they go live." },
+      { name: "safeguarding", label: "Safeguarding checks", type: "multiselect", sidebar: true, options: SAFEGUARDING_CHECKS, help: "All four must be ticked before a sensitive story can be published." },
       { name: "date", label: "Publish date", type: "date", sidebar: true, required: true, help: "Choose a future date to schedule the post; it goes live automatically on that day." },
       { name: "category", label: "Category", type: "select", sidebar: true, required: true, options: POST_CATEGORIES },
       { name: "featured", label: "Feature on home page", type: "boolean", sidebar: true },
@@ -432,6 +439,58 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "area", label: "Thematic area", type: "select", sidebar: true, required: true, options: EVENT_AREA_OPTIONS },
     ],
   },
+  milestones: {
+    name: "milestones",
+    label: "History Timeline",
+    singular: "Milestone",
+    description:
+      "The stops on the Our History road map. Date milestones only from LHI's own records or what the photos show, and keep to verifiable facts.",
+    permission: "about",
+    titleField: "title",
+    columns: ["year", "title", "location", "order", "status"],
+    statusField: "status",
+    publicPath: (item) => (item.status === "published" ? "/our-history" : null),
+    fields: [
+      { name: "title", label: "Title", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
+      { name: "year", label: "Year", type: "text", required: true, help: "e.g. 2013, or a range such as 2021–2025." },
+      { name: "location", label: "Location", type: "text", help: "Shown as a pin label, e.g. Sokoto State." },
+      { name: "summary", label: "Story", type: "textarea", required: true },
+      { name: "photos", label: "Photos", type: "images", help: "Shown in a grid beside the story (1–4 photos work best)." },
+      { name: "photoAlts", label: "Photo descriptions (alt text)", type: "list", help: "One per line, in the same order as the photos. Describe what each photo shows." },
+      { name: "photoLabels", label: "Photo labels", type: "list", help: "Optional. One per line in photo order, printed on each photo (e.g. its archive title). Give a label for every photo or for none." },
+      { name: "caption", label: "Caption under the photos", type: "text" },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "published", label: "Published" }, { value: "draft", label: "Draft" }] },
+      { name: "order", label: "Position on the road", type: "number", sidebar: true, required: true, help: "Lower numbers come first. Leave gaps (10, 20, 30…) to insert later." },
+      { name: "states", label: "States opened (map pins)", type: "multiselect", sidebar: true, options: STATE_OPTIONS, help: "Shows a map of Nigeria with a pin on each state." },
+      { name: "showLogos", label: "Show the old → new logo card", type: "boolean", sidebar: true, help: "Replaces the photos with the logo change card." },
+    ],
+  },
+  team: {
+    name: "team",
+    label: "Team",
+    singular: "Team member",
+    description: "The Board of Trustees, the management team and the state office coordinators.",
+    permission: "about",
+    titleField: "name",
+    columns: ["name", "group", "role", "order", "status"],
+    statusField: "status",
+    publicPath: (item) => (item.status !== "published" ? null : item.group === "board" ? "/board-of-trustees" : "/management-team"),
+    fields: [
+      { name: "name", label: "Full name", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "name", required: true },
+      { name: "role", label: "Role / title", type: "text", required: true },
+      { name: "credentials", label: "Credentials", type: "text", help: "e.g. FICA, FIMC, CMC" },
+      { name: "department", label: "Department (management)", type: "text" },
+      { name: "overview", label: "Overview (management)", type: "textarea" },
+      { name: "state", label: "State (coordinators)", type: "text" },
+      { name: "email", label: "Email", type: "text" },
+      { name: "photo", label: "Portrait", type: "image", help: "Board and management cards show a portrait; coordinators don't." },
+      { name: "group", label: "Group", type: "select", sidebar: true, required: true, options: [{ value: "board", label: "Board of Trustees" }, { value: "management", label: "Management team" }, { value: "coordinator", label: "State office coordinator" }] },
+      { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "published", label: "Published" }, { value: "draft", label: "Draft" }] },
+      { name: "order", label: "Order", type: "number", sidebar: true, required: true, help: "Lower numbers come first within the group." },
+    ],
+  },
 };
 
 export const COLLECTION_NAMES = Object.keys(COLLECTIONS) as CollectionName[];
@@ -452,6 +511,8 @@ export function slugify(value: string) {
 
 /** Site-wide settings edited on the Settings screen. */
 export interface CmsSettings {
+  /** Home page text overrides per language (Admin → Home Page Text). Empty means the built-in text. */
+  homeText: HomeTextByLocale;
   homeFeature: {
     enabled: boolean;
     eyebrow: string;

@@ -4,11 +4,13 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
 
 import { detectBrowserLocale, dictionaries, type Dictionary, type Locale } from "@/i18n";
+import { applyHomeText, type HomeTextByLocale } from "@/lib/home-text";
 
 const STORAGE_KEY = "lhi-locale";
 
@@ -127,4 +129,18 @@ export function useLocale() {
   const ctx = useContext(LocaleContext);
   if (!ctx) throw new Error("useLocale must be used within a LocaleProvider");
   return ctx;
+}
+
+/**
+ * Applies the home page text saved in Admin → Home Page Text on top of the built-in
+ * translations, for everything rendered inside it. Languages without saved text keep the defaults.
+ */
+export function HomeTextOverrides({ text, children }: { text: HomeTextByLocale; children: ReactNode }) {
+  const parent = useLocale();
+  const values = text[parent.locale];
+  const value = useMemo(
+    () => (values ? { ...parent, t: { ...parent.t, home: applyHomeText(parent.t.home, values) } } : parent),
+    [parent, values],
+  );
+  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }

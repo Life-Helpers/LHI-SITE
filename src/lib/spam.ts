@@ -38,7 +38,7 @@ export async function checkSpam(
   req: Request,
   { key, max, honeypot, token }: { key: string; max: number; honeypot?: unknown; token?: unknown },
 ): Promise<SpamCheck> {
-  if (rateLimited(req, key, max)) {
+  if (await rateLimited(req, key, max)) {
     return { blocked: NextResponse.json({ error: "Too many submissions from this connection. Please try again later." }, { status: 429 }) };
   }
   if (typeof honeypot === "string" && honeypot.trim()) return { drop: true };

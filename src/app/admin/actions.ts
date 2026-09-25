@@ -40,7 +40,7 @@ import {
   type Role,
   type SubmissionStatus,
 } from "@/lib/cms/schema";
-import { readStore, UPLOADS_DIR, updateStore, writeSettings } from "@/lib/cms/store";
+import { readSettings, readStore, UPLOADS_DIR, updateStore, writeSettings } from "@/lib/cms/store";
 import type { FieldErrors } from "@/lib/cms/validate";
 import { validateRecord } from "@/lib/cms/validate";
 import { sendPasswordResetEmail } from "@/lib/email/notifications";
@@ -48,6 +48,9 @@ import { consumeResetToken, createResetToken } from "@/lib/email/reset";
 import { absoluteUrl } from "@/lib/email/template";
 import { generateTotpSecret, otpauthUrl, verifyTotp } from "@/lib/cms/totp";
 import QRCode from "qrcode";
+import { localeMeta, locales, type Locale } from "@/i18n";
+import { sanitizeHomeText } from "@/lib/home-text";
+import { isSensitivePost, missingChecks } from "@/lib/cms/safeguarding";
 
 export interface ActionResult {
   ok: boolean;
@@ -295,7 +298,32 @@ export async function saveItemAction(
       return { ok: false, errors: { [uniqueKey]: "Another item already uses this value." }, error: "Please fix the highlighted fields." };
     }
 
+    if (isPost && isSensitivePost(record)) {
+      record.sensitive = true;
+      if (record.status === "published") {
+        if (!can(user, "posts.review")) {
+          return {
+            ok: false,
+            errors: { status: "Sensitive stories are published by an approver." },
+            error: "This story is sensitive. Save it as “Pending review” and an approver will check and publish it.",
+          };
+        }
+        const missing = missingChecks(record.safeguarding);
+        if (missing.length) {
+          return {
+            ok: false,
+            errors: { safeguarding: "Tick every check before publishing." },
+            error: `Before publishing this sensitive story, confirm: ${missing.join("; ")}.`,
+          };
+        }
+      }
+    }
+
     const next: Record<string, unknown> = { ...existing, ...record, id };
+    if (isPost && record.sensitive && record.status === "published" && (existing?.status !== "published" || !existing?.reviewedAt)) {
+      next.reviewedBy = user.name;
+      next.reviewedAt = new Date().toISOString();
+    }
     if (isPost) {
       next.authorId = existing?.authorId || user.id;
       next.author = String(record.author || existing?.author || user.name);
@@ -339,6 +367,23 @@ export async function deleteItemAction(collection: string, id: string): Promise<
 
 /* --------------------------------------------------------------- Settings */
 
+/** Save the home page text overrides for one language (Admin → Home Page Text). */
+export async function saveHomeTextAction(locale: string, values: Record<string, unknown>): Promise<ActionResult> {
+  return guard(async () => {
+    const user = await requireUser("settings");
+    if (!(locales as string[]).includes(locale)) return { ok: false, error: "Unknown language." };
+    const current = await readSettings();
+    const cleaned = sanitizeHomeText(values);
+    const homeText = { ...current.homeText };
+    if (Object.keys(cleaned).length) homeText[locale as Locale] = cleaned;
+    else delete homeText[locale as Locale];
+    await writeSettings({ ...current, homeText });
+    await logActivity(user, "updated home page text", `Home page text (${localeMeta[locale as Locale].label})`, "/admin/home-text");
+    refreshSite();
+    return { ok: true };
+  });
+}
+
 export async function saveSettingsAction(settings: CmsSettings): Promise<ActionResult> {
   return guard(async () => {
     const user = await requireUser("settings");
@@ -361,7 +406,10 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
     if (href && !(href.startsWith("/") || href.startsWith("https://"))) {
       return { ok: false, error: "Feature link must start with / or https://" };
     }
+    const current = await readSettings();
     await writeSettings({
+      // Home page text is edited on its own screen; keep it as saved.
+      homeText: current.homeText,
       homeFeature: {
         enabled: Boolean(settings.homeFeature.enabled),
         eyebrow: str(settings.homeFeature.eyebrow, 80),

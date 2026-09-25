@@ -4,7 +4,7 @@ import { Mail, MapPin, ShieldAlert, Sparkles, Target } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
-import { LEADERSHIP_TEAM, STATE_COORDINATORS } from "@/data/lhi-photos";
+import { getTeam } from "@/lib/cms/content";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/management-team" },
@@ -13,50 +13,11 @@ export const metadata: Metadata = {
     "Meet the executive leadership and management team executing Life Helpers Initiative (LHI) programs across 11 Nigerian states.",
 };
 
-/** Directors per the Organisational Profile; unit descriptions from the Strategic Plan 2026–2030. */
-const UNIT_OVERVIEWS: Record<string, { department: string; overview: string; credentials?: string }> = {
-  "Tayo Fatinikun": {
-    department: "Executive Directorate",
-    credentials: "FICA, FIMC, CMC",
-    overview:
-      "Provides overall leadership of LHI, working with the Board of Trustees and the National Management Team to deliver the vision of “a more fulfilled life for everyone”.",
-  },
-  "Hadiza Ibrahim Yaro": {
-    department: "Safeguarding, Accountability & Gender (SAG)",
-    overview:
-      "Coordinates safeguarding, accountability to affected populations, feedback mechanisms and inclusive gender programming across all projects.",
-  },
-  "Kolawole Adeniyi Famokun": {
-    department: "Programmes",
-    overview: "Coordinates and provides leadership across all six thematic areas of LHI's work.",
-  },
-  "Taiye Lawal": {
-    department: "Business Development, Partnership & Grant Management (BuDPaGM)",
-    overview:
-      "Leads resource mobilisation, partner relationships, research into fundable opportunities and overall grant management.",
-  },
-  "Precious Afuaman": {
-    department: "Monitoring, Evaluation, Research & Learning (MERL)",
-    overview:
-      "Coordinates data management, operational and programmatic research and assessment, knowledge management and learning.",
-  },
-  "Dapo Ogunyemi": {
-    department: "Compliance & Internal Audit (CIA)",
-    overview: "Ensures policy and procedural compliance across the organisation and upholds internal financial integrity.",
-  },
-  "James Olasunkanmi David": {
-    department: "Operations",
-    overview: "Oversees administration, security, supply chain and general logistics.",
-  },
-  "Ijeoma Beatrice Ekpunobi": {
-    department: "Finance",
-    overview: "Coordinates and manages all financial transactions and documentation.",
-  },
-};
+/** Profiles come from Admin → Team; saves refresh the page instantly, this is a safety net. */
+export const revalidate = 300;
 
-const leaders = LEADERSHIP_TEAM.map((person) => ({ ...person, ...UNIT_OVERVIEWS[person.name] }));
-
-export default function ManagementTeamPage() {
+export default async function ManagementTeamPage() {
+  const [leaders, coordinators] = await Promise.all([getTeam("management"), getTeam("coordinator")]);
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       {/* Hero with African Fulfillment Demo Image */}
@@ -80,12 +41,12 @@ export default function ManagementTeamPage() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             {leaders.map((leader) => (
               <div
-                key={leader.name}
+                key={leader.id}
                 className="flex flex-col rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
               >
                 <div className="flex items-center gap-4 border-b border-border pb-4">
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-muted">
-                    <Image src={leader.photo} alt={`Portrait of ${leader.name}`} fill sizes="80px" className="object-cover object-top" />
+                    <Image src={leader.photo || "/icon.png"} alt={`Portrait of ${leader.name}`} fill sizes="80px" className="object-cover object-top" />
                   </div>
                   <div className="min-w-0">
                     <span className="text-[11px] font-semibold uppercase tracking-wider text-accent">
@@ -103,11 +64,13 @@ export default function ManagementTeamPage() {
                   {leader.overview}
                 </p>
 
-                <div className="mt-6 border-t border-border pt-4 text-xs">
-                  <a href={`mailto:${leader.email}`} className="inline-flex items-center gap-1.5 text-primary hover:underline">
-                    <Mail size={12} /> {leader.email}
-                  </a>
-                </div>
+                {leader.email && (
+                  <div className="mt-6 border-t border-border pt-4 text-xs">
+                    <a href={`mailto:${leader.email}`} className="inline-flex items-center gap-1.5 text-primary hover:underline">
+                      <Mail size={12} /> {leader.email}
+                    </a>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -120,15 +83,17 @@ export default function ManagementTeamPage() {
               Responsible for the day-to-day operations of LHI in each state, working with the Senior Leadership Team.
             </p>
             <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {STATE_COORDINATORS.map((c) => (
-                <li key={c.email} className="rounded-2xl border border-border bg-card p-5">
+              {coordinators.map((c) => (
+                <li key={c.id} className="rounded-2xl border border-border bg-card p-5">
                   <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-accent">
                     <MapPin size={12} /> {c.state}
                   </p>
                   <p className="mt-1.5 font-bold text-foreground">{c.name}</p>
-                  <a href={`mailto:${c.email}`} className="mt-1 inline-block break-all text-xs text-primary hover:underline">
-                    {c.email}
-                  </a>
+                  {c.email && (
+                    <a href={`mailto:${c.email}`} className="mt-1 inline-block break-all text-xs text-primary hover:underline">
+                      {c.email}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

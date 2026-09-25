@@ -13,7 +13,7 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  if (rateLimited(req, "newsletter", 10)) {
+  if (await rateLimited(req, "newsletter", 10)) {
     return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
   }
   const parsed = schema.safeParse(await req.json().catch(() => null));

@@ -5,7 +5,6 @@ import { randomUUID } from "node:crypto";
 import type { Submission, SubmissionType } from "@/lib/cms/schema";
 import { updateStore } from "@/lib/cms/store";
 import { notifySubmission } from "@/lib/email/notifications";
-import { clientIp } from "@/lib/client-ip";
 
 const MAX_SUBMISSIONS = 5000;
 
@@ -41,15 +40,4 @@ export async function addSubmission(input: {
   return submission;
 }
 
-/** Simple per-process rate limit for public forms: `max` requests per IP per hour. */
-const buckets = new Map<string, { count: number; until: number }>();
-
-export function rateLimited(req: Request, key: string, max: number) {
-  const ip = clientIp(req);
-  const id = `${key}:${ip}`;
-  const entry = buckets.get(id);
-  const fresh = !entry || entry.until < Date.now();
-  const count = fresh ? 1 : entry.count + 1;
-  buckets.set(id, { count, until: fresh ? Date.now() + 3600_000 : entry.until });
-  return count > max;
-}
+export { rateLimited } from "@/lib/rate-limit";

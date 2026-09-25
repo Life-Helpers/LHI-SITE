@@ -43,10 +43,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   const published = posts.filter((p) => p.status === "published").length;
   const drafts = posts.filter((p) => p.status === "draft");
+  const awaitingReview = posts.filter((p) => p.status === "review").length;
   const newSubs = submissions.filter((s) => s.status === "new").length;
 
   const tiles = [
-    { label: "Published posts", value: published, sub: `${drafts.length} drafts`, icon: FileText, href: "/admin/content/posts" },
+    { label: "Published posts", value: published, sub: `${drafts.length} drafts${awaitingReview ? ` · ${awaitingReview} awaiting review` : ""}`, icon: FileText, href: "/admin/content/posts" },
     ...(isEditor
       ? [
           {

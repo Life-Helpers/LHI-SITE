@@ -10,7 +10,9 @@ import {
 import { getPillarRef, type InterventionProject } from "@/data/interventions-data";
 import { MAGAZINES, type Magazine } from "@/data/magazines";
 import { readSettings, readStore } from "@/lib/cms/store";
-import type { CmsIntervention } from "@/lib/cms/types";
+import type { HistoryMilestone } from "@/data/history-timeline";
+import type { TeamGroup } from "@/data/team";
+import type { CmsIntervention, CmsMilestone } from "@/lib/cms/types";
 
 export function hydrateIntervention(item: CmsIntervention): InterventionProject {
   const { imageSrc, imageAlt, imageCaption, thematicIds, gallery, youtubeId, ...rest } = item;
@@ -151,4 +153,33 @@ export async function getAllMagazines(): Promise<Magazine[]> {
 
 export async function getAnyMagazine(slug: string) {
   return (await getAllMagazines()).find((m) => m.slug === slug);
+}
+
+/** Published history milestones, in road order, shaped for the road-map timeline. */
+export async function getMilestones(): Promise<HistoryMilestone[]> {
+  return (await readStore("milestones"))
+    .filter((m) => m.status === "published")
+    .sort((a, b) => a.order - b.order)
+    .map(toHistoryMilestone);
+}
+
+export function toHistoryMilestone(m: CmsMilestone): HistoryMilestone {
+  const photos = m.photos.map((src, i) => ({ src, alt: m.photoAlts[i] || `${m.title} (${m.year})`, label: m.photoLabels[i] || undefined }));
+  return {
+    year: m.year,
+    title: m.title,
+    location: m.location || undefined,
+    summary: m.summary,
+    states: m.states.length ? m.states : undefined,
+    media: m.showLogos
+      ? { kind: "logos", caption: m.caption || undefined }
+      : photos.length
+        ? { kind: "photos", photos, caption: m.caption || undefined }
+        : undefined,
+  };
+}
+
+/** Published members of one team group, in display order. */
+export async function getTeam(group: TeamGroup) {
+  return (await readStore("team")).filter((t) => t.group === group && t.status === "published").sort((a, b) => a.order - b.order);
 }

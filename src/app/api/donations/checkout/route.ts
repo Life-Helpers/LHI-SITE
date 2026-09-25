@@ -7,7 +7,7 @@ const MIN_USD = 5;
 const MAX_USD = 50_000;
 
 export async function POST(req: NextRequest) {
-  if (rateLimited(req, "donate-checkout", 20)) {
+  if (await rateLimited(req, "donate-checkout", 20)) {
     return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429 });
   }
   try {

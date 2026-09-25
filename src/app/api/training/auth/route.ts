@@ -21,7 +21,7 @@ const login = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  if (rateLimited(req, "learner-auth", 30)) {
+  if (await rateLimited(req, "learner-auth", 30)) {
     return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429 });
   }
   const body = await req.json().catch(() => null);
