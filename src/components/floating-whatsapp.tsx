@@ -38,12 +38,12 @@ export function FloatingWhatsApp() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="whatsapp-dialog-title"
-          className="mb-3 w-[min(92vw,380px)] rounded-2xl border border-border bg-card text-card-foreground shadow-2xl transition-all animate-in fade-in zoom-in-95 duration-200"
+          className="mb-3 w-[min(92vw,380px)] rounded-2xl border border-border bg-white text-foreground shadow-2xl dark:bg-neutral-900 transition-all animate-in fade-in zoom-in-95 duration-200"
         >
           {/* Header */}
           <div className="flex items-center justify-between rounded-t-2xl bg-emerald-600 px-4 py-3.5 text-white">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-700 text-white">
                 <MessageCircle className="h-6 w-6 fill-white text-emerald-600" />
               </div>
               <div>
@@ -68,13 +68,13 @@ export function FloatingWhatsApp() {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex border-b border-border bg-muted/30 p-1.5 text-xs">
+          <div className="flex border-b border-border bg-muted p-1.5 text-xs">
             <button
               type="button"
               onClick={() => setActiveTab("general")}
               className={`flex-1 rounded-lg py-2 font-medium transition-all ${
                 activeTab === "general"
-                  ? "bg-card text-foreground shadow-xs font-semibold"
+                  ? "bg-white text-foreground shadow-xs font-semibold dark:bg-neutral-800"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -85,7 +85,7 @@ export function FloatingWhatsApp() {
               onClick={() => setActiveTab("psea")}
               className={`flex-1 rounded-lg py-2 font-medium transition-all flex items-center justify-center gap-1.5 ${
                 activeTab === "psea"
-                  ? "bg-red-500/10 text-red-700 dark:text-red-400 shadow-xs font-semibold"
+                  ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400 shadow-xs font-semibold"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -106,7 +106,7 @@ export function FloatingWhatsApp() {
                   href={generalWhatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 transition-all"
+                  className="group flex items-center justify-between rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950 dark:hover:bg-emerald-900 transition-all"
                 >
                   <div className="flex items-center gap-2.5">
                     <MessageCircle className="h-4 w-4 shrink-0" />
@@ -132,7 +132,7 @@ export function FloatingWhatsApp() {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-3">
+                <div className="rounded-xl border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950">
                   <div className="flex items-start gap-2">
                     <ShieldAlert className="h-4 w-4 shrink-0 text-red-700 dark:text-red-400 mt-0.5" />
                     <div>
@@ -159,7 +159,7 @@ export function FloatingWhatsApp() {
                   <ExternalLink className="h-3.5 w-3.5 opacity-80" />
                 </a>
 
-                <div className="rounded-xl border border-border bg-muted/40 p-2.5 space-y-2 text-[11px]">
+                <div className="rounded-xl border border-border bg-muted p-2.5 space-y-2 text-[11px]">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground flex items-center gap-1.5">
                       <Phone className="h-3 w-3 text-red-500" />
@@ -189,7 +189,7 @@ export function FloatingWhatsApp() {
           </div>
 
           {/* Footer note */}
-          <div className="rounded-b-2xl border-t border-border bg-muted/20 px-4 py-2 text-center text-[10px] text-muted-foreground">
+          <div className="rounded-b-2xl border-t border-border bg-muted px-4 py-2 text-center text-[10px] text-muted-foreground">
             LHI PSEA & Accountability to Affected Populations (AAP)
           </div>
         </div>
