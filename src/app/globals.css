@@ -566,3 +566,25 @@ body {
   content-visibility: auto;
   contain-intrinsic-size: auto 900px;
 }
+
+/* Our Philosophy: the smiley winks now and then, with a little nod. */
+@keyframes wink-eye {
+  0%, 38%, 50%, 100% { transform: scaleY(1); }
+  42%, 46% { transform: scaleY(0.1); }
+}
+@keyframes wink-nod {
+  0%, 36%, 54%, 100% { transform: rotate(0deg) scale(1); }
+  44% { transform: rotate(-10deg) scale(1.08); }
+}
+.wink-face {
+  animation: wink-nod 3.2s ease-in-out infinite;
+  transform-origin: 50% 60%;
+}
+.wink-face .wink-eye {
+  animation: wink-eye 3.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wink-face, .wink-face .wink-eye { animation: none; }
+}

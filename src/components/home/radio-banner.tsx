@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CalendarClock, Radio } from "lucide-react";
+import { ArrowRight, CalendarClock, Radio, Tv } from "lucide-react";
 
 import { Eyebrow } from "@/components/eyebrow";
+import { RADIO_PROGRAMMES, TV_PROGRAMMES } from "@/data/broadcasts";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { TiltCard } from "@/components/effects/tilt-card";
 import { RetroRadio } from "@/components/radio/retro-radio";
@@ -32,15 +33,28 @@ export function RadioBanner({ episodes }: { episodes: RadioEpisode[] }) {
               {t.home.radio.heading}
             </h2>
             <p className="mt-3 max-w-xl text-primary-foreground/90">{t.home.radio.body}</p>
-            <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-black/20 px-4 py-2 text-sm font-medium">
-              <CalendarClock className="h-4 w-4" /> Every Tuesday, 11:00 AM – 12:00 PM · Royal FM 101.5
-            </p>
+            <ul className="mt-5 space-y-2">
+              {RADIO_PROGRAMMES.map((p) => (
+                <li key={p.id} className="flex items-start gap-2 rounded-2xl bg-black/20 px-4 py-2 text-sm">
+                  <CalendarClock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>
+                    <span className="font-semibold">{p.name}{p.alias ? ` (${p.alias})` : ""}</span> · {p.schedule} · {p.station}
+                  </span>
+                </li>
+              ))}
+              <li className="flex items-start gap-2 rounded-2xl bg-black/20 px-4 py-2 text-sm">
+                <Tv className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>
+                  <span className="font-semibold">On TV:</span> {TV_PROGRAMMES.map((tv) => `${tv.name} (${tv.project}) on NTA`).join(", ")}
+                </span>
+              </li>
+            </ul>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/radio"
                 className="group inline-flex items-center gap-1.5 rounded-full bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:scale-105"
               >
-                {episodes.length > 0 ? "All episodes" : t.home.radio.cta}
+                {episodes.length > 0 ? "Episodes, radio & TV" : t.home.radio.cta}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
               </Link>
             </div>

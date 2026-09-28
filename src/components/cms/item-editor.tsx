@@ -7,6 +7,7 @@ import ReactMarkdown from "react-markdown";
 import { CheckCircle2, ExternalLink, ImagePlus, Loader2, Paperclip, Save, Trash2, X } from "lucide-react";
 
 import { deleteItemAction, saveItemAction } from "@/app/admin/actions";
+import { playableAudioUrl } from "@/lib/radio";
 import { MediaPicker, MediaThumb } from "@/components/cms/media-picker";
 import { buttonClass, Card, inputClass } from "@/components/cms/ui";
 import { COLLECTIONS, slugify, type CollectionName, type FieldDef, type FieldOption, type MediaItem } from "@/lib/cms/schema";
@@ -393,7 +394,7 @@ function AssetField({
       )}
       {value && kind === "audio" && (
         <div className="space-y-1 rounded-lg border border-admin-border bg-admin-bg p-2">
-          <audio src={value} controls preload="none" className="w-full" />
+          <audio src={playableAudioUrl(value)} controls preload="none" className="w-full" />
           <button type="button" onClick={() => onChange("")} className="text-xs text-admin-muted hover:text-admin-danger">
             Remove audio
           </button>
@@ -418,7 +419,7 @@ function AssetField({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="…or paste a URL"
+        placeholder={kind === "audio" ? "…or paste a link (Google Drive links work)" : "…or paste a URL"}
         className={`${inputClass} text-xs`}
       />
       {open && <MediaPicker kind={kind} onSelect={pick} onClose={() => setOpen(false)} />}

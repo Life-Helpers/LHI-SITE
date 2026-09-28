@@ -229,6 +229,8 @@ export const TESTIMONIAL_TONES: FieldOption[] = [
   { value: "from-accent to-[#7a3605]", label: "LHI orange" },
   { value: "from-[#7d0c10] to-[#4a0709]", label: "Deep maroon" },
   { value: "from-[#b45309] to-[#7c2d12]", label: "Amber" },
+  { value: "from-[#15803d] to-[#14532d]", label: "Green" },
+  { value: "from-[#1d4ed8] to-[#1e3a8a]", label: "Blue" },
 ];
 
 export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
@@ -416,7 +418,8 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     name: "episodes",
     label: "Radio Episodes",
     singular: "Episode",
-    description: "Radio programme recordings played by the home-page radio and the Radio page. Upload MP3/M4A audio up to 100 MB.",
+    description:
+      "Radio programme recordings played by the home-page radio and the Radio & TV page. Upload an MP3/M4A, or paste a Google Drive link to the audio file (shared as \"Anyone with the link\") — best for recordings over 4 MB.",
     permission: "episodes",
     titleField: "title",
     columns: ["title", "programme", "language", "status", "date"],
@@ -425,12 +428,18 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     fields: [
       { name: "title", label: "Episode title", type: "text", required: true },
       { name: "id", label: "URL slug", type: "slug", from: "title", required: true },
-      { name: "audio", label: "Audio recording", type: "audio", required: true, help: "MP3, M4A, AAC, WAV or OGG, up to 100 MB." },
+      {
+        name: "audio",
+        label: "Audio recording",
+        type: "audio",
+        required: true,
+        help: "Upload MP3, M4A, AAC, WAV or OGG, or paste a Google Drive link to the file (Share → Anyone with the link → Copy link).",
+      },
       { name: "summary", label: "Summary", type: "textarea", required: true, help: "What the episode covers, shown under the player." },
       { name: "topics", label: "Topics", type: "list", help: "One per line, e.g. Malaria prevention." },
       { name: "guests", label: "Guests / speakers", type: "list", help: "One per line." },
       { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "published", label: "Published" }, { value: "draft", label: "Draft" }] },
-      { name: "programme", label: "Programme", type: "select", sidebar: true, required: true, options: opts("WeSpeak (Muyi Magana)", "The Women Situation Room", "Special broadcast", "Jingle / PSA") },
+      { name: "programme", label: "Programme", type: "select", sidebar: true, required: true, options: opts("WeSpeak (Muyi Magana)", "UNESCO Project", "SARAH Project", "The Women Situation Room", "Special broadcast", "Jingle / PSA") },
       { name: "date", label: "Broadcast date", type: "date", sidebar: true, required: true },
       { name: "language", label: "Language", type: "select", sidebar: true, required: true, options: opts("Hausa", "English", "Hausa & English", "Fulfulde", "Kanuri", "Other") },
       { name: "duration", label: "Duration", type: "text", sidebar: true, help: "e.g. 58:30 (shown until the audio loads)." },

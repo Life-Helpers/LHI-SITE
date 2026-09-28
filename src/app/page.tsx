@@ -108,9 +108,8 @@ export default async function Home() {
         <div className="defer-render">
           <RadioBanner episodes={episodes.slice(0, 12).map(toRadioEpisode)} />
         </div>
-        <div className="defer-render">
-          <TestimonialsSection testimonials={testimonials} />
-        </div>
+        {/* Not deferred: the pinned, sideways-scrolling row needs its real height */}
+        <TestimonialsSection testimonials={testimonials} />
         <div className="defer-render">
           <SocialFeedsSection />
         </div>

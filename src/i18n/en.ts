@@ -34,7 +34,7 @@ export const en: Dictionary = {
     socialInclusionDesc: "Civic participation & disability inclusion",
     protection: "Protection",
     protectionDesc: "GBV response & safeguarding",
-    radioAdvocacy: "Radio Program",
+    radioAdvocacy: "Radio & TV",
   },
   impactMenu: {
     blog: "Blog",
@@ -43,7 +43,7 @@ export const en: Dictionary = {
     projectsInterventions: "Projects & Interventions",
     eventsUpdates: "Events & Updates",
     newsletter: "Newsletter",
-    radioStory: "Radio Program",
+    radioStory: "Radio & TV",
   },
   accessibility: {
     settingsLabel: "Accessibility settings",
@@ -129,10 +129,10 @@ export const en: Dictionary = {
       blogCta: "Read the latest",
     },
     radio: {
-      eyebrow: "Radio Program",
-      heading: "WeSpeak (Muyi Magana)",
-      body: "LHI's weekly radio programme on Radio Nigeria Royal FM 101.5, Sokoto, every Tuesday 11 AM – 12 PM: health, education, livelihood, agriculture and gender equity, with space for your questions and feedback.",
-      cta: "About the programme",
+      eyebrow: "Radio & TV",
+      heading: "LHI on air",
+      body: "Our radio programmes in Sokoto bring health, education, livelihood, agriculture and gender equity to the airwaves, with space for your questions and feedback, and our Maternal Health programme airs on NTA.",
+      cta: "Our programmes",
     },
     testimonials: {
       heading: "What People Say About Us",
@@ -154,7 +154,7 @@ export const en: Dictionary = {
     },
     newsletter: {
       heading: "Subscribe to our Newsletter",
-      body: "There's no automated mailing list connected yet — submitting this form opens your email client so we can add you manually.",
+      body: "Field stories, project updates, events and magazines from Life Helpers Initiative, straight to your inbox. You can unsubscribe at any time.",
       placeholder: "you@example.com",
       subscribeCta: "Subscribe",
     },

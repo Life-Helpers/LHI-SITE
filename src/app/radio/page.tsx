@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { CalendarClock, MessageSquareText, Phone, Radio as RadioIcon, Users } from "lucide-react";
+import { CalendarClock, MessageSquareText, Phone, Radio as RadioIcon, Tv, Users } from "lucide-react";
 
 import { RadioStation } from "@/components/radio/radio-station";
+import { TvPlayer } from "@/components/radio/tv-player";
+import { RADIO_PROGRAMMES, TV_PROGRAMMES } from "@/data/broadcasts";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { getEpisodes, getSiteData } from "@/lib/cms/content";
 import { toRadioEpisode } from "@/lib/radio";
@@ -14,9 +16,9 @@ export const revalidate = 300;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/radio" },
-  title: "Radio Program: WeSpeak (Muyi Magana)",
+  title: "Radio & TV Programmes",
   description:
-    "Life Helpers Initiative's Radio Program. WeSpeak (Muyi Magana) airs every Tuesday, 11 AM – 12 PM on Radio Nigeria Royal FM 101.5, Sokoto.",
+    "Life Helpers Initiative on air: WeSpeak (Muyi Magana) on Royal FM, the UNESCO Project on Iconic FM and the SARAH Project on RIMA Radio in Sokoto, and Maternal Health on NTA.",
 };
 
 const features = [
@@ -49,6 +51,46 @@ export default async function RadioPage() {
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       <RadioStation episodes={episodes} />
+
+      <section className="border-t border-border py-16 md:py-20" aria-labelledby="programmes-heading">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— On air</p>
+          <h2 id="programmes-heading" className="mt-2 font-serif-display text-3xl font-light text-foreground sm:text-4xl">
+            Our radio &amp; TV <em className="italic text-primary">programmes</em>
+          </h2>
+
+          <h3 className="mt-10 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-foreground">
+            <RadioIcon className="h-4 w-4 text-primary" aria-hidden="true" /> Radio
+          </h3>
+          <ul className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+            {RADIO_PROGRAMMES.map((p) => (
+              <li key={p.id} id={`programme-${p.id}`} className="flex flex-col rounded-3xl border border-border bg-card p-6 shadow-sm transition-colors hover:border-primary/40">
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <RadioIcon className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <p className="mt-4 font-serif-display text-2xl font-light text-foreground">
+                  {p.name}
+                  {p.alias && <span className="block text-base italic text-primary">({p.alias})</span>}
+                </p>
+                <p className="mt-3 inline-flex items-start gap-2 text-sm font-semibold text-foreground">
+                  <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" /> {p.schedule}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">{p.station}</p>
+                <p className="mt-auto pt-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">{p.partners}</p>
+              </li>
+            ))}
+          </ul>
+
+          <h3 className="mt-12 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-foreground">
+            <Tv className="h-4 w-4 text-primary" aria-hidden="true" /> TV
+          </h3>
+          <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {TV_PROGRAMMES.map((tv) => (
+              <TvPlayer key={tv.id} programme={tv} />
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="border-t border-border bg-muted/20 py-16 md:py-20" aria-labelledby="about-wespeak">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
@@ -91,10 +133,10 @@ export default async function RadioPage() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
             >
-              <Phone className="h-4 w-4" /> WhatsApp 0201 330 9033
+              <Phone className="h-4 w-4" /> WhatsApp {contact.helpline}
             </a>
-            <a href="mailto:feedback@lhinigeria.org" className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-muted">
-              feedback@lhinigeria.org
+            <a href={`mailto:${contact.feedbackEmail}`} className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-muted">
+              {contact.feedbackEmail}
             </a>
             <Link href="/blog" className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-muted">
               Blog &amp; newsletter

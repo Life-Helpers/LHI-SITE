@@ -132,18 +132,18 @@ export const whatWeDoCards: NavCard[] = [
 ];
 
 export const whatWeDoExtra: NavLink = {
-  label: "Radio Program",
+  label: "Radio & TV",
   href: "/radio",
-  description: "Weekly on Royal FM 101.5 Sokoto, Tuesdays 11 AM",
+  description: "Royal FM, Iconic FM and RIMA Radio in Sokoto, and NTA",
   icon: Radio,
 };
 
 export const whatWeDoFeatured: FeaturedNavStory = {
-  title: "WeSpeak (Muyi Magana)",
-  subtitle: "LHI's weekly radio programme on health, education, livelihood, agriculture and gender equity.",
+  title: "LHI on Radio & TV",
+  subtitle: "WeSpeak (Muyi Magana), the UNESCO and SARAH projects on Sokoto radio, and Maternal Health on NTA.",
   href: "/radio",
   image: LHI_PHOTOS.solarRadioFarmer.src,
-  tag: "Radio Program",
+  tag: "Radio & TV",
 };
 
 export const impactFeatured: {
@@ -297,7 +297,7 @@ export function useLocalizedNav() {
     { label: t.impactMenu.successStories, href: "/success-stories", description: "Lives changed, in their own words", icon: Award, tag: "Human Stories", group: "stories" },
     { label: "Project Magazines", href: "/project-magazines", description: "Flip through our magazines and Helpers Digest bulletins", icon: BookOpen, tag: "Read", group: "stories" },
     { label: "LHI Blog & Newsletter", href: "/blog", description: "News, field stories, newsletters and publications", icon: Newspaper, tag: "Dispatches", group: "stories" },
-    { label: "Radio Program", href: "/radio", description: "Our community radio programme and recordings", icon: Radio, tag: "On air", group: "stories" },
+    { label: "Radio & TV", href: "/radio", description: "Our radio and TV programmes and recordings", icon: Radio, tag: "On air", group: "stories" },
     { label: "Events & Observance Days", href: "/events", description: "Upcoming events and international days, add to calendar", icon: CalendarDays, tag: "Calendar", group: "stories" },
   ];
 

@@ -5,7 +5,7 @@ import { FAQ_DATA } from "@/data/faqs";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 import { OBSERVANCES, upcomingObservances } from "@/data/observances";
 import { TESTIMONIALS } from "@/data/testimonials";
-import { COLLECTIONS } from "@/lib/cms/schema";
+import { COLLECTIONS, TESTIMONIAL_TONES } from "@/lib/cms/schema";
 import { paragraphs, parseStats } from "@/lib/cms/text";
 import { isSafeLink, validateRecord } from "@/lib/cms/validate";
 import { DEFAULT_SITE_DATA, telHref, whatsappHref } from "@/lib/site-data";
@@ -42,6 +42,7 @@ describe("phase 2: content moved into the CMS", () => {
   it("seed data is complete and safe to publish", () => {
     expect(TESTIMONIALS.length).toBeGreaterThan(0);
     expect(TESTIMONIALS.every((t) => isSafeLink(t.href))).toBe(true);
+    expect(TESTIMONIALS.every((t) => TESTIMONIAL_TONES.some((o) => o.value === t.tone))).toBe(true);
     expect(BEFORE_AFTER_STORIES.every((b) => b.photo in LHI_PHOTOS && (!b.beforePhoto || b.beforePhoto in LHI_PHOTOS) && isSafeLink(b.href))).toBe(true);
     expect(new Set(FAQ_DATA.map((f) => f.id)).size).toBe(FAQ_DATA.length);
     expect(new Set(OBSERVANCES.map((o) => o.id)).size).toBe(OBSERVANCES.length);

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Clock, Languages, Mic2, Pause, Play, Radio as RadioIcon, Search, Tag, Users } from "lucide-react";
 
+import { TiltCard } from "@/components/effects/tilt-card";
 import { RetroRadio } from "@/components/radio/retro-radio";
 import { useRadio, type RadioEpisode } from "@/components/radio/use-radio";
 
@@ -79,7 +80,9 @@ export function RadioStation({ episodes }: { episodes: RadioEpisode[] }) {
             )}
           </div>
           <div className="pt-14 lg:pt-0">
-            <RetroRadio radio={radio} total={episodes.length} size="large" />
+            <TiltCard>
+              <RetroRadio radio={radio} total={episodes.length} size="large" />
+            </TiltCard>
           </div>
         </div>
       </section>

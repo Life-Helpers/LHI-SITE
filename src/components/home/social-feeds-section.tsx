@@ -5,7 +5,6 @@ import { SOCIAL_ACCOUNTS, SocialIcon, socialAccounts } from "@/components/social
 import { getSiteData } from "@/lib/cms/content";
 import { getSocialFeed } from "@/lib/social-feed";
 
-
 /**
  * "Follow our work": a live social media newsroom. The phone on the left streams the
  * official Facebook Page timeline (Meta's page plugin, always live). The wall on the right
@@ -20,21 +19,14 @@ export async function SocialFeedsSection() {
   )}&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
 
   return (
-    <section aria-labelledby="social-heading" className="relative isolate overflow-hidden bg-[#140809] py-20 text-white sm:py-28">
-      {/* Signal glow and grid */}
-      <div aria-hidden="true" className="absolute -left-40 top-10 -z-10 h-[520px] w-[520px] rounded-full bg-primary/35 blur-[140px]" />
-      <div aria-hidden="true" className="absolute -right-32 bottom-0 -z-10 h-[420px] w-[420px] rounded-full bg-accent/25 blur-[140px]" />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 opacity-[0.07] [background-image:linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] [background-size:48px_48px]"
-      />
+    <section aria-labelledby="social-heading" className="border-t border-border/60 bg-background py-20 text-foreground sm:py-28">
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <div className="flex flex-wrap items-center gap-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/70">— Follow our work</p>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">— Follow our work</p>
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em]">
                 <span className="relative flex h-2 w-2" aria-hidden="true">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75 motion-reduce:animate-none" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
@@ -43,9 +35,9 @@ export async function SocialFeedsSection() {
               </span>
             </div>
             <h2 id="social-heading" className="mt-3 font-serif-display text-4xl font-light leading-tight sm:text-5xl">
-              Life Helpers Initiative <em className="italic text-[#ff8a7a]">on social media</em>
+              Life Helpers Initiative <em className="italic text-primary">on social media</em>
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-white/70 sm:text-base">
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
               Field updates, stories and events as they happen, straight from our official accounts. What we post appears here.
             </p>
           </div>
@@ -59,7 +51,7 @@ export async function SocialFeedsSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={`${a.name}: ${a.handle}`}
-                  className="group flex h-12 w-12 items-center justify-center rounded-2xl border border-white/15 bg-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-transparent"
+                  className="group flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-card text-foreground transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:text-white"
                   style={{ ["--brand" as string]: a.color === "#000000" ? "#2b2b2b" : a.color }}
                 >
                   <span className="sr-only">Life Helpers Initiative on {a.name} (opens in a new tab)</span>
@@ -75,7 +67,7 @@ export async function SocialFeedsSection() {
         <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* Phone streaming the live Facebook timeline */}
           <div className="lg:col-span-4">
-            <div className="relative mx-auto w-full max-w-[360px] rounded-[2.75rem] border border-white/15 bg-gradient-to-b from-white/15 to-white/5 p-3 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]">
+            <div className="relative mx-auto w-full max-w-[360px] rounded-[2.75rem] border border-border bg-gradient-to-b from-muted to-muted/40 p-3 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.35)]">
               <div aria-hidden="true" className="absolute left-1/2 top-4 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-black" />
               <div className="overflow-hidden rounded-[2.2rem] bg-white">
                 <div className="flex items-center justify-between bg-[#0866FF] px-5 pb-3 pt-10 text-white">
@@ -109,22 +101,17 @@ export async function SocialFeedsSection() {
                       href={a.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group relative flex h-full min-h-40 flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] p-6 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-white/30"
+                      className="group relative flex h-full min-h-40 flex-col justify-between overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-foreground/20 hover:shadow-md"
                     >
-                      <span
-                        aria-hidden="true"
-                        className="absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-30 blur-3xl transition-opacity group-hover:opacity-60"
-                        style={{ backgroundColor: a.color === "#000000" ? "#ffffff" : a.color }}
-                      />
-                      <SocialIcon path={a.path} className="absolute -bottom-6 -right-4 h-32 w-32 text-white/[0.06]" />
+                      <SocialIcon path={a.path} className="absolute -bottom-6 -right-4 h-32 w-32 text-foreground/[0.05]" />
                       <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl text-white" style={{ backgroundColor: a.color }}>
                         <SocialIcon path={a.path} className="h-5 w-5" />
                       </span>
                       <span className="relative mt-6">
                         <span className="block font-serif-display text-2xl font-light">{a.name}</span>
-                        <span className="block text-sm text-white/65">{a.handle}</span>
+                        <span className="block text-sm text-muted-foreground">{a.handle}</span>
                       </span>
-                      <span className="relative mt-4 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-white/60 group-hover:text-white">
+                      <span className="relative mt-4 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground">
                         {a.name === "Linktree" ? "All our links" : a.name === "YouTube" ? "Watch" : "Follow"} <ExternalLink className="h-3 w-3" aria-hidden="true" />
                         <span className="sr-only">(opens in a new tab)</span>
                       </span>

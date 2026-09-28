@@ -1,6 +1,6 @@
 /**
  * Seed testimonials for the home page (Admin → Testimonials). Quotes published in LHI's
- * project magazines (Gidan Arziki Vol. 2 and the ABEP magazine); each links to the full story.
+ * project magazines (Gidan Arziki Vol. 2, Cultivating Resilience Vol. 1 and the ABEP magazine); each links to the full story.
  */
 export interface Testimonial {
   quote: string;
@@ -38,5 +38,19 @@ export const TESTIMONIALS: Testimonial[] = [
     role: "WFP cash transfer beneficiary, Katsina State",
     href: "/blog/murja-eight-years-of-struggle-to-renewed-hope",
     tone: "from-[#b45309] to-[#7c2d12]",
+  },
+  {
+    quote: "In my lifetime, I have never seen maize with four cobs on one stalk. Dry-season farming allows you to harvest twice instead of remaining idle.",
+    name: "Karba Mohamad, 65",
+    role: "Farmer, Dabaibayawa Ward, Batagarawa LGA, Katsina State",
+    href: "/blog/karba-four-cobs-on-one-stalk",
+    tone: "from-[#15803d] to-[#14532d]",
+  },
+  {
+    quote: "When my youngest son told me that my shop looks more beautiful now, I felt very proud.",
+    name: "Mustafa Almajiri, 44",
+    role: "Cap seller, Batagarawa, Katsina State",
+    href: "/blog/mustafa-saving-a-family-business",
+    tone: "from-[#1d4ed8] to-[#1e3a8a]",
   },
 ];
