@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Clock, Languages, Mic2, Pause, Play, Radio as RadioIcon, Search, Tag, Users } from "lucide-react";
+import { CalendarDays, Clock, Languages, Mic2, Pause, Play, Radio as RadioIcon, Search, Tag, Users, X } from "lucide-react";
 
 import { TiltCard } from "@/components/effects/tilt-card";
 import { RetroRadio } from "@/components/radio/retro-radio";
@@ -14,6 +14,8 @@ export function RadioStation({ episodes }: { episodes: RadioEpisode[] }) {
   const [programme, setProgramme] = useState("All");
   const [language, setLanguage] = useState("All");
   const [query, setQuery] = useState("");
+  /** The floating play/pause button shows once an episode is started from the playlist. */
+  const [fromPlaylist, setFromPlaylist] = useState(false);
 
   // Open a shared link like /radio#episode-slug on that episode.
   useEffect(() => {
@@ -156,7 +158,11 @@ export function RadioStation({ episodes }: { episodes: RadioEpisode[] }) {
                   <li key={e.id} id={`episode-${e.id}`} className={`flex gap-4 p-4 sm:p-5 ${active ? "bg-primary/5" : ""}`}>
                     <button
                       type="button"
-                      onClick={() => (active ? radio.toggle() : radio.play(i))}
+                      onClick={() => {
+                        setFromPlaylist(true);
+                        if (active) radio.toggle();
+                        else radio.play(i);
+                      }}
                       aria-label={isPlaying ? `Pause ${e.title}` : `Play ${e.title}`}
                       className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-white ${active ? "bg-primary" : "bg-foreground/80 hover:bg-primary"}`}
                     >
@@ -187,6 +193,37 @@ export function RadioStation({ episodes }: { episodes: RadioEpisode[] }) {
           )}
         </div>
       </section>
+
+      {fromPlaylist && current && (
+        <div className="fixed bottom-5 left-4 z-40 flex items-center gap-2 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 sm:left-6">
+          <button
+            type="button"
+            onClick={radio.toggle}
+            aria-label={radio.playing ? `Pause ${current.title}` : `Play ${current.title}`}
+            className="relative flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_12px_30px_-8px_rgba(200,20,28,0.7)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
+          >
+            {radio.playing && <span aria-hidden="true" className="absolute inset-0 rounded-full bg-primary/60 motion-safe:animate-ping" />}
+            <span className="relative">{radio.playing ? <Pause className="h-6 w-6 fill-current" /> : <Play className="ml-0.5 h-6 w-6 fill-current" />}</span>
+          </button>
+          <div className="hidden max-w-[16rem] items-center gap-2 rounded-full border border-border bg-background/90 py-1.5 pl-4 pr-1.5 shadow-lg backdrop-blur sm:flex">
+            <span className="min-w-0">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">{radio.playing ? "Now playing" : "Paused"}</span>
+              <span className="block truncate text-xs font-semibold text-foreground">{current.title}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                if (radio.playing) radio.toggle();
+                setFromPlaylist(false);
+              }}
+              aria-label="Stop and hide the mini player"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -588,3 +588,50 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .wink-face, .wink-face .wink-eye { animation: none; }
 }
+
+/* Testimonials: soft neumorphic glass on a plain surface of the same colour. */
+.neu-surface {
+  background-color: #eef0f4;
+}
+.neu-glass {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(230, 233, 239, 0.5));
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 14px 14px 30px #cfd3dc, -14px -14px 30px #ffffff, inset 1px 1px 0 rgba(255, 255, 255, 0.9);
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+.neu-glass:hover {
+  box-shadow: 8px 8px 18px #cfd3dc, -8px -8px 18px #ffffff, inset 1px 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+.neu-inset {
+  background: #eef0f4;
+  box-shadow: inset 4px 4px 8px #cfd3dc, inset -4px -4px 8px #ffffff;
+}
+.neu-raised {
+  background: #eef0f4;
+  box-shadow: 4px 4px 10px #cfd3dc, -4px -4px 10px #ffffff;
+}
+.dark .neu-surface {
+  background-color: #16181d;
+}
+.dark .neu-glass {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  border-color: rgba(255, 255, 255, 0.07);
+  box-shadow: 14px 14px 30px #0b0c0f, -12px -12px 26px #22252c, inset 1px 1px 0 rgba(255, 255, 255, 0.05);
+}
+.dark .neu-glass:hover {
+  box-shadow: 8px 8px 18px #0b0c0f, -8px -8px 18px #22252c, inset 1px 1px 0 rgba(255, 255, 255, 0.05);
+}
+.dark .neu-inset {
+  background: #16181d;
+  box-shadow: inset 4px 4px 8px #0b0c0f, inset -4px -4px 8px #22252c;
+}
+.dark .neu-raised {
+  background: #16181d;
+  box-shadow: 4px 4px 10px #0b0c0f, -4px -4px 10px #22252c;
+}
+@media (prefers-reduced-motion: reduce) {
+  .neu-glass:hover { transform: none; }
+}

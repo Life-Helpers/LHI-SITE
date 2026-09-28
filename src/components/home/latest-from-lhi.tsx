@@ -33,7 +33,7 @@ const dateLabel = (iso: string, style: "long" | "short" = "short") => {
 /**
  * "Latest from LHI" as a newspaper front page: a masthead with the date line, section
  * tabs, a lead story with a drop cap, a numbered column of headlines, and two "notices"
- * pointing to the events calendar and the blog, printed on crumpled kraft paper that drifts
+ * pointing to the events calendar and the blog, printed on soft off-white paper that drifts
  * with the scroll.
  */
 export function LatestFromLHI({ posts, today }: { posts: LatestPost[]; today: string }) {
@@ -45,10 +45,10 @@ export function LatestFromLHI({ posts, today }: { posts: LatestPost[]; today: st
   const [lead, ...rest] = list;
 
   return (
-    <section aria-labelledby="latest-heading" className="bg-[#efe2cc] text-[#1d1512] dark:bg-[#17110f] dark:text-[#f3ebe0]">
-      <ParallaxBackground src="/images/textures/kraft-paper.webp" strength={0.2} opacity={0.75} className="py-20 sm:py-24">
-        {/* Keeps the print readable on the paper: a light wash by day, a dark one at night */}
-        <div aria-hidden="true" className="absolute inset-0 -z-[5] bg-[#fbf7f0]/35 dark:bg-[#17110f]/80" />
+    <section aria-labelledby="latest-heading" className="bg-[#f8f5ee] text-[#1d1512] dark:bg-[#17110f] dark:text-[#f3ebe0]">
+      <ParallaxBackground src="/images/textures/offwhite-paper.webp" strength={0.2} opacity={1} className="py-20 sm:py-24">
+        {/* At night the paper sits under a dark wash so the print stays readable */}
+        <div aria-hidden="true" className="absolute inset-0 -z-[5] dark:bg-[#17110f]/90" />
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           {/* Masthead */}
           <header className="border-b-4 border-double border-current pb-4">

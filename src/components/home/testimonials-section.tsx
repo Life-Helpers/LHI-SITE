@@ -27,7 +27,7 @@ function Stars() {
 }
 
 /**
- * Quotes from Admin → Testimonials as frosted-glass cards on lined paper. The cards sit on a
+ * Quotes from Admin → Testimonials as soft neumorphic glass cards. The cards sit on a
  * row that slides sideways as the visitor scrolls down the page (and back as they scroll up):
  * the section pins to the screen until the last card has passed. Without JavaScript, or for
  * reduced motion, the row is an ordinary swipeable strip.
@@ -94,18 +94,10 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
     <section
       ref={sectionRef}
       aria-labelledby="testimonials-heading"
-      className="relative bg-[#fcfbf6] dark:bg-[#0f1116]"
+      className="neu-surface relative"
       style={linked ? { height: `calc(100svh + ${distance}px)` } : undefined}
     >
       <div className={`${linked ? "sticky top-0 flex h-svh flex-col justify-center" : "py-20 sm:py-24"} isolate overflow-hidden`}>
-        {/* Hand-drawn blue lined paper, half transparent */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[url('/images/textures/blue-lined-paper.webp')] bg-cover bg-center opacity-50 dark:opacity-15"
-        />
-        <div aria-hidden="true" className="absolute -left-24 top-1/4 -z-10 h-72 w-72 rounded-full bg-primary/15 blur-3xl" />
-        <div aria-hidden="true" className="absolute -right-24 bottom-10 -z-10 h-80 w-80 rounded-full bg-[#3b82f6]/15 blur-3xl" />
-
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -128,12 +120,11 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
           <ul
             ref={trackRef}
             aria-label={t.home.testimonials.heading}
-            className="flex w-max gap-5 px-4 py-6 will-change-transform sm:gap-6 sm:px-6 lg:px-[max(2rem,calc((100vw-80rem)/2+2rem))]"
+            className="flex w-max gap-7 px-6 py-10 will-change-transform sm:gap-8 sm:px-6 lg:px-[max(2rem,calc((100vw-80rem)/2+2rem))]"
           >
             {testimonials.map((item) => (
               <li key={item.name} className="w-[82vw] max-w-[380px] shrink-0 snap-start">
-                <figure className="group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/45 p-7 shadow-[0_20px_50px_-20px_rgba(30,41,59,0.35)] backdrop-blur-xl transition-transform duration-300 hover:-translate-y-1 dark:border-white/15 dark:bg-white/[0.07]">
-                  <span aria-hidden="true" className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${item.tone}`} />
+                <figure className="neu-glass group relative flex h-full flex-col rounded-[2rem] p-7">
                   <div className="flex items-center justify-between">
                     <span
                       className={`flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br ${item.tone} text-white shadow-lg`}
@@ -144,7 +135,7 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
                     <Stars />
                   </div>
                   <blockquote className="mt-5 flex-1 font-serif-display text-lg italic leading-relaxed text-foreground">“{item.quote}”</blockquote>
-                  <figcaption className="mt-6 flex items-center gap-3 border-t border-dashed border-foreground/15 pt-5">
+                  <figcaption className="neu-inset mt-6 flex items-center gap-3 rounded-2xl p-3">
                     <span
                       className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${item.tone} text-sm font-bold text-white`}
                       aria-hidden="true"
@@ -158,7 +149,7 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
                     <Link
                       href={item.href}
                       aria-label={`Read the story: ${item.name}`}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-foreground/20 bg-white/50 text-foreground transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground dark:bg-white/10"
+                      className="neu-raised flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-foreground transition-colors hover:!bg-primary hover:text-primary-foreground"
                     >
                       <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
