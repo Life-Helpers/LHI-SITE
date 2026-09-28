@@ -51,3 +51,6 @@ next-env.d.ts
 
 # Local one-off scripts
 *.tmp.*
+
+# Neon CLI local context
+.neon
