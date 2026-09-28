@@ -881,6 +881,8 @@ export interface CmsUser {
   totpSecret?: string;
   /** Secret being set up, until the first code is confirmed. */
   totpPending?: string;
+  /** Signed in with the default Admin/Admin login: must set a real email and password before doing anything else. */
+  mustChangePassword?: boolean;
 }
 
 export type PublicUser = Omit<CmsUser, "passwordHash" | "totpSecret" | "totpPending"> & {

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Loader2, Lock } from "lucide-react";
 
-import { forgotPasswordAction, loginAction, resetPasswordAction, setupAction, verifyTwoFactorLoginAction, type ActionResult } from "@/app/admin/actions";
+import { forgotPasswordAction, loginAction, resetPasswordAction, setupAction, verifyTwoFactorLoginAction, type ActionResult, completeFirstLoginAction } from "@/app/admin/actions";
 
 const inputClass =
   "mt-1.5 block w-full rounded-lg border border-admin-border bg-admin-card px-3.5 py-2.5 text-sm text-admin-text outline-none placeholder:text-admin-muted focus:border-admin-primary focus:ring-3 focus:ring-admin-primary/20";
@@ -59,8 +59,8 @@ export function LoginForm() {
       <form action={action} className="space-y-4">
         <ErrorBox state={state} />
         <label className="block text-sm font-medium">
-          Email
-          <input name="email" type="email" autoComplete="username" required defaultValue={state?.values?.email} className={inputClass} />
+          Email or username
+          <input name="email" type="text" autoComplete="username" autoCapitalize="none" required defaultValue={state?.values?.email} className={inputClass} />
         </label>
         <label className="block text-sm font-medium">
           Password
@@ -187,6 +187,35 @@ export function SetupForm({ tokenRequired }: { tokenRequired: boolean }) {
           <span className="mt-1 block text-xs font-normal text-admin-muted">At least 10 characters, with letters and numbers.</span>
         </label>
         <SubmitButton pending={pending}>Create administrator</SubmitButton>
+      </form>
+    </AuthCard>
+  );
+}
+
+export function FirstLoginForm() {
+  const [state, action, pending] = useActionState(completeFirstLoginAction, null);
+  return (
+    <AuthCard title="Secure your admin account" subtitle="The default Admin login works only once. Set your own details to continue.">
+      <form action={action} className="space-y-4">
+        <ErrorBox state={state} />
+        <label className="block text-sm font-medium">
+          Your name
+          <input name="name" autoComplete="name" required defaultValue={state?.values?.name} className={inputClass} />
+        </label>
+        <label className="block text-sm font-medium">
+          Email (you will sign in with this)
+          <input name="email" type="email" autoComplete="username" required defaultValue={state?.values?.email} className={inputClass} />
+        </label>
+        <label className="block text-sm font-medium">
+          New password
+          <input name="password" type="password" autoComplete="new-password" minLength={10} required className={inputClass} />
+          <span className="mt-1 block text-xs font-normal text-admin-muted">At least 10 characters, with letters and numbers.</span>
+        </label>
+        <label className="block text-sm font-medium">
+          Confirm new password
+          <input name="confirm" type="password" autoComplete="new-password" minLength={10} required className={inputClass} />
+        </label>
+        <SubmitButton pending={pending}>Save and open the dashboard</SubmitButton>
       </form>
     </AuthCard>
   );

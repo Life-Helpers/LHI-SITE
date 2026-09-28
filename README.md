@@ -118,12 +118,16 @@ state ids that the map and filters depend on.
 
 ### First-time setup
 
-1. Set `CMS_SETUP_TOKEN` (any long random string) in the server environment.
-2. Visit `/admin` — with no users yet you are sent to `/admin/setup`.
-3. Enter the token and create the first **Administrator** account.
-4. Add other staff under **Users**. Setup is disabled once any user exists.
+1. Click **Team login** in the site footer (or open `/admin/login`).
+2. While the site has no admin accounts yet, sign in with the default login:
+   username **`Admin`**, password **`Admin`**.
+3. You are asked straight away for your name, email and a strong password. Nothing else in the
+   admin opens until you save them, and from then on `Admin`/`Admin` no longer works.
+4. Add other staff under **Users**.
 
-In local development (`npm run dev`) the setup token is not required.
+Do this right after the first deployment: until an account exists, anyone who knows the
+default login could claim it. (`/admin/setup` with `CMS_SETUP_TOKEN` still works as an
+alternative way to create the first account.)
 
 ### Storage — read before deploying
 

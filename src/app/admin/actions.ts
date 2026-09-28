@@ -13,8 +13,11 @@ import {
   clearLoginFailures,
   clearPendingTwoFactor,
   createSession,
+  DEFAULT_ADMIN,
   destroySession,
+  getCurrentUser,
   hashPassword,
+  isDefaultAdminLogin,
   hasAnyUsers,
   loginLocked,
   readPendingTwoFactor,
@@ -88,6 +91,26 @@ export async function loginAction(_prev: ActionResult | null, form: FormData): P
   const values = { email };
   if (!email || !password) return { ok: false, error: "Enter your email and password.", values };
   if (loginLocked(email)) return { ok: false, error: "Too many failed attempts. Try again in 15 minutes.", values };
+
+  // Default first sign-in (Admin / Admin), only while no admin account exists yet.
+  if (isDefaultAdminLogin(email, password)) {
+    const bootstrap: CmsUser = {
+      id: randomUUID(),
+      name: "Admin",
+      email: DEFAULT_ADMIN.username,
+      role: "administrator",
+      passwordHash: await hashPassword(randomUUID()),
+      createdAt: new Date().toISOString(),
+      mustChangePassword: true,
+    };
+    const created = await updateStore("users", (items) =>
+      items.length > 0 ? { items, result: false } : { items: [bootstrap], result: true },
+    );
+    if (created) {
+      await completeLogin(bootstrap);
+      redirect("/admin/welcome");
+    }
+  }
 
   const user = (await readStore("users")).find((u) => u.email === email);
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
@@ -257,6 +280,34 @@ export async function setupAction(_prev: ActionResult | null, form: FormData): P
   if (!created) return { ok: false, error: "Setup has already been completed. Please log in." };
   await createSession(user.id);
   await logActivity(user, "completed setup and created account", name);
+  redirect("/admin");
+}
+
+/** After the default Admin/Admin sign-in: set the real name, email and password. */
+export async function completeFirstLoginAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  const name = String(form.get("name") ?? "").trim();
+  const email = normEmail(form.get("email"));
+  const password = String(form.get("password") ?? "");
+  const confirm = String(form.get("confirm") ?? "");
+  const fail = (error: string): ActionResult => ({ ok: false, error, values: { name, email } });
+
+  const current = await getCurrentUser();
+  if (!current) redirect("/admin/login");
+  if (!current.mustChangePassword) redirect("/admin");
+  if (!name) return fail("Enter your name.");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("Enter a valid email address.");
+  const weak = validatePasswordStrength(password);
+  if (weak) return fail(weak);
+  if (password !== confirm) return fail("The two passwords don't match.");
+  if (isDefaultAdminLogin("admin", password)) return fail("Choose a password other than the default.");
+  const users = await readStore("users");
+  if (users.some((u) => u.id !== current.id && u.email === email)) return fail("Another account already uses that email.");
+
+  const passwordHash = await hashPassword(password);
+  await updateStore("users", (items) => ({
+    items: items.map((u) => (u.id === current.id ? { ...u, name, email, passwordHash, mustChangePassword: false } : u)),
+  }));
+  await logActivity({ name }, "set their email and password after the first sign-in", name);
   redirect("/admin");
 }
 
