@@ -635,3 +635,23 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .neu-glass:hover { transform: none; }
 }
+
+/* Brand-red neumorphic card (featured observance). */
+.neu-brand {
+  background: linear-gradient(145deg, #e8262c, #b90f15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 14px 14px 30px #cfd3dc, -14px -14px 30px #ffffff, inset 1px 1px 0 rgba(255, 255, 255, 0.25), inset -2px -2px 6px rgba(0, 0, 0, 0.15);
+}
+.dark .neu-brand {
+  box-shadow: 14px 14px 30px #0b0c0f, -12px -12px 26px #22252c, inset 1px 1px 0 rgba(255, 255, 255, 0.2);
+}
+/* Raised tile that presses in on hover. */
+.neu-press {
+  transition: box-shadow 0.3s ease;
+}
+.neu-press:hover {
+  box-shadow: inset 4px 4px 8px #cfd3dc, inset -4px -4px 8px #ffffff;
+}
+.dark .neu-press:hover {
+  box-shadow: inset 4px 4px 8px #0b0c0f, inset -4px -4px 8px #22252c;
+}

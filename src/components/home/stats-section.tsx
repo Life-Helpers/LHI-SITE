@@ -40,15 +40,15 @@ export function StatsSection() {
     >
       <h2 id="impact-stats-heading" className="sr-only">Impact Statistics</h2>
       <ScrollReveal>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 bg-card/90 dark:bg-slate-900/90 backdrop-blur-xl border border-border/70 rounded-3xl p-6 sm:p-8 shadow-xl">
+        <div className="neu-glass grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 rounded-[2rem] p-5 sm:p-8">
           {statsList.map((stat) => {
             const Icon = stat.icon;
             return (
               <div
                 key={stat.label}
-                className="flex flex-col items-center text-center p-4 rounded-2xl bg-background/50 dark:bg-slate-800/40 border border-border/40 hover:border-primary/40 transition-all duration-300 group"
+                className="neu-raised neu-press flex flex-col items-center text-center p-4 rounded-2xl group"
               >
-                <div className="mb-3 inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                <div className="neu-inset mb-3 inline-flex items-center justify-center w-12 h-12 rounded-full text-primary group-hover:scale-110 transition-transform">
                   <Icon className="h-6 w-6" />
                 </div>
                 <CountUp

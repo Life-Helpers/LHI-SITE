@@ -26,10 +26,8 @@ export function UpcomingEvents({
   const lhi = next.area === "lhi";
 
   return (
-    <section
-      aria-labelledby="upcoming-heading"
-      className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24"
-    >
+    <section aria-labelledby="upcoming-heading" className="neu-surface">
+      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
@@ -55,8 +53,8 @@ export function UpcomingEvents({
         <article
           className={`relative overflow-hidden rounded-3xl p-7 sm:p-9 lg:col-span-3 ${
             lhi
-              ? "bg-primary text-primary-foreground shadow-xl"
-              : "border border-border bg-card/95 text-foreground shadow-xl backdrop-blur"
+              ? "neu-brand text-primary-foreground"
+              : "neu-glass text-foreground"
           }`}
         >
           <div className="flex items-start gap-5">
@@ -94,11 +92,11 @@ export function UpcomingEvents({
           </div>
         </article>
 
-        <ul className="flex flex-col divide-y divide-border rounded-3xl border border-border bg-card/95 shadow-lg backdrop-blur lg:col-span-2">
+        <ul className="neu-glass flex flex-col gap-3 rounded-3xl p-3 lg:col-span-2">
           {rest.slice(0, 4).map((e) => (
             <li
               key={`${e.id}-${e.start}`}
-              className="flex items-center gap-4 p-4"
+              className="neu-inset flex items-center gap-4 rounded-2xl p-3.5"
             >
               <EventDateTile event={e} />
               <div className="min-w-0 flex-1">
@@ -116,6 +114,7 @@ export function UpcomingEvents({
             </li>
           ))}
         </ul>
+      </div>
       </div>
     </section>
   );
