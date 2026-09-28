@@ -210,6 +210,12 @@
   to { width: 100%; }
 }
 
+/* Pages with the photo hero have their own menu inside it (glass over the hero, solid once
+   scrolled past). Never show the site-wide menu as well, whatever the URL looks like. */
+body:has(#hero-slider-container) .site-header-global {
+  display: none;
+}
+
 @keyframes header-drop {
   from { transform: translateY(-100%); }
   to { transform: translateY(0); }
