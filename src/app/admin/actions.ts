@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 
 import { logActivity } from "@/lib/cms/activity";
 import { deletePrivateUpload } from "@/lib/cms/private-uploads";
@@ -86,6 +86,22 @@ const normEmail = (v: FormDataEntryValue | null) => String(v ?? "").trim().toLow
 /* ------------------------------------------------------------------ Auth */
 
 export async function loginAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  try {
+    return await signIn(form);
+  } catch (err) {
+    // redirect() works by throwing; let it through.
+    unstable_rethrow(err);
+    console.error("Sign-in failed:", err);
+    return {
+      ok: false,
+      error:
+        "Sign-in couldn't be completed because the website can't reach its database. In Vercel, check that DATABASE_URL points to your Neon database, then redeploy.",
+      values: { email: normEmail(form.get("email")) },
+    };
+  }
+}
+
+async function signIn(form: FormData): Promise<ActionResult> {
   const email = normEmail(form.get("email"));
   const password = String(form.get("password") ?? "");
   const values = { email };

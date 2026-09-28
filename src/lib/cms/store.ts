@@ -58,6 +58,16 @@ export { DATA_DIR, UPLOADS_DIR } from "@/lib/cms/paths";
 
 const USE_DATABASE = Boolean(databaseUrl());
 
+let databaseDownAt = 0;
+const markDatabaseDown = () => {
+  databaseDownAt = Date.now();
+};
+
+/** True when a database read failed in the last five minutes (for admin and sign-in messages). */
+export function databaseRecentlyDown() {
+  return USE_DATABASE && Date.now() - databaseDownAt < 5 * 60_000;
+}
+
 /** Where content and files are kept, for the admin's storage notice. */
 export function storageStatus() {
   const onVercel = Boolean(process.env.VERCEL);
@@ -142,7 +152,17 @@ function seeded<T>(name: string, fallback: () => T): T {
 
 async function readJson<T>(name: string, fallback: () => T): Promise<T> {
   if (USE_DATABASE) {
-    const stored = await dbRead<T>(name);
+    let stored: T | undefined;
+    try {
+      stored = await dbRead<T>(name);
+    } catch (err) {
+      // Keep the public site up with the original content if the database can't be reached
+      // (wrong or old DATABASE_URL, provider outage). Saving still fails loudly, so nothing
+      // in the database is overwritten with this fallback.
+      console.error(`CMS database unavailable while reading "${name}"; showing built-in content.`, err);
+      markDatabaseDown();
+      return seeded(name, fallback);
+    }
     return stored === undefined ? seeded(name, fallback) : stored;
   }
   const file = fileFor(name);

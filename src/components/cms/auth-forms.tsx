@@ -52,11 +52,17 @@ function SubmitButton({ pending, children }: { pending: boolean; children: React
   );
 }
 
-export function LoginForm() {
+export function LoginForm({ databaseDown = false }: { databaseDown?: boolean }) {
   const [state, action, pending] = useActionState(loginAction, null);
   return (
     <AuthCard title="Sign in to LHI Admin" subtitle="Manage the Life Helpers Initiative website">
       <form action={action} className="space-y-4">
+        {databaseDown && !state && (
+          <p role="alert" className="rounded-lg bg-admin-danger-soft px-3 py-2 text-sm text-admin-danger">
+            The website can&apos;t reach its database right now, so signing in won&apos;t work. In Vercel, check that DATABASE_URL points
+            to your Neon database, then redeploy.
+          </p>
+        )}
         <ErrorBox state={state} />
         <label className="block text-sm font-medium">
           Email or username
