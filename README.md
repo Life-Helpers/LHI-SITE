@@ -136,12 +136,15 @@ Where saved content and uploads live depends on the environment:
 
 | Setting | Content, users, submissions | Uploaded files (media, magazines, CVs, bids) |
 |---|---|---|
-| `DATABASE_URL` (or `POSTGRES_URL`) | Postgres table `cms_store` (created automatically) | — |
+| `DATABASE_URL` (or `POSTGRES_URL`) | Postgres table `cms_store` (created automatically) | Postgres table `cms_files`, when Blob is not set up |
 | `BLOB_READ_WRITE_TOKEN` | — | Vercel Blob (private store), served through `/media/…` |
 | neither | JSON files in `CMS_DATA_DIR` (default `./cms-data`) | `CMS_DATA_DIR/uploads` and `/private` |
 
-**On Vercel both a database and Blob are required** — the server disk there is temporary,
-and the admin shows a red *Storage is not permanent yet* notice until they are connected.
+**On Vercel a database is required** — the server disk there is temporary, and the admin shows a
+red *Storage is not permanent yet* notice until one is connected. With only the database, uploads
+are kept in it too (mind the plan's size limit, e.g. 512 MB on Neon's free plan). Add Vercel Blob
+for large or many files: it also allows uploads over 4.5 MB (radio episodes, magazine PDFs), which
+Vercel can't accept through the server.
 
 **Deploying on Vercel (one-time):**
 

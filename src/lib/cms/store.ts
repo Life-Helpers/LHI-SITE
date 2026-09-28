@@ -73,7 +73,7 @@ export function storageStatus() {
   const onVercel = Boolean(process.env.VERCEL);
   return {
     content: USE_DATABASE ? "database" : onVercel ? "temporary" : "disk",
-    files: process.env.BLOB_READ_WRITE_TOKEN ? "blob" : onVercel ? "temporary" : "disk",
+    files: process.env.BLOB_READ_WRITE_TOKEN ? "blob" : USE_DATABASE ? "database" : onVercel ? "temporary" : "disk",
     sessionSecret: Boolean(process.env.CMS_SESSION_SECRET) || USE_DATABASE || !onVercel,
   } as const;
 }

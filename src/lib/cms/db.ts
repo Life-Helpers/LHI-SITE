@@ -95,3 +95,64 @@ export async function dbDumpAll(): Promise<{ name: string; data: unknown }[]> {
   await ensureTable();
   return sql()<{ name: string; data: unknown }[]>`select name, data from cms_store order by name`;
 }
+
+/* ---------------------------------------------------------------- Files */
+
+let filesReady: Promise<void> | null = null;
+
+async function ensureFilesTable() {
+  await ensureTable();
+  filesReady ??= sql()`
+    create table if not exists cms_files (
+      key text primary key,
+      content_type text not null,
+      size integer not null,
+      data bytea not null,
+      updated_at timestamptz not null default now()
+    )
+  `.then(() => undefined);
+  try {
+    await filesReady;
+  } catch (err) {
+    filesReady = null;
+    throw err;
+  }
+}
+
+/** Store (or replace) an uploaded file in the database. */
+export async function dbPutFile(key: string, data: Buffer, contentType: string) {
+  await ensureFilesTable();
+  await sql()`
+    insert into cms_files (key, content_type, size, data, updated_at)
+    values (${key}, ${contentType}, ${data.length}, ${data}, now())
+    on conflict (key) do update set content_type = excluded.content_type, size = excluded.size, data = excluded.data, updated_at = now()
+  `;
+}
+
+export async function dbDeleteFile(key: string) {
+  await ensureFilesTable();
+  await sql()`delete from cms_files where key = ${key}`;
+}
+
+export async function dbFileInfo(key: string): Promise<{ size: number; updatedAt: Date } | null> {
+  await ensureFilesTable();
+  const rows = await sql()<{ size: number; updated_at: Date }[]>`select size, updated_at from cms_files where key = ${key}`;
+  return rows[0] ? { size: rows[0].size, updatedAt: new Date(rows[0].updated_at) } : null;
+}
+
+/** Bytes `start`…`end` (inclusive) of a stored file. */
+export async function dbReadFile(key: string, start = 0, end?: number): Promise<Buffer | null> {
+  await ensureFilesTable();
+  const rows =
+    end === undefined
+      ? await sql()<{ data: Buffer }[]>`select data from cms_files where key = ${key}`
+      : await sql()<{ data: Buffer }[]>`select substring(data from ${start + 1} for ${end - start + 1}) as data from cms_files where key = ${key}`;
+  return rows[0] ? Buffer.from(rows[0].data) : null;
+}
+
+/** Total size of stored files, for the admin's storage notice. */
+export async function dbFilesSize(): Promise<number> {
+  await ensureFilesTable();
+  const rows = await sql()<{ total: string | null }[]>`select sum(size)::text as total from cms_files`;
+  return Number(rows[0]?.total ?? 0);
+}
