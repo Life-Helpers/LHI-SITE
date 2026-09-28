@@ -7,6 +7,7 @@ import QRCode from "qrcode";
 
 import { siteConfig } from "@/config/site";
 import type { Certificate } from "@/lib/cms/schema";
+import { SIGNATURE_LEFT_PNG, SIGNATURE_RIGHT_PNG } from "@/lib/training/certificate-signatures";
 
 const RED = rgb(0xeb / 255, 0x16 / 255, 0x1c / 255);
 const ORANGE = rgb(0xc0 / 255, 0x57 / 255, 0x09 / 255);
@@ -63,14 +64,21 @@ export async function buildCertificatePdf(cert: Certificate): Promise<Uint8Array
     MUTED,
   );
 
-  // Signatures (typed names)
-  const sig = (x: number, name: string, role: string) => {
+  // Signatures: the handwritten signature sits on the line, above the typed name and role.
+  const [leftSig, rightSig] = await Promise.all([
+    doc.embedPng(Buffer.from(SIGNATURE_LEFT_PNG, "base64")),
+    doc.embedPng(Buffer.from(SIGNATURE_RIGHT_PNG, "base64")),
+  ]);
+  const sig = (x: number, image: typeof leftSig, name: string, role: string) => {
+    const scale = Math.min(180 / image.width, 46 / image.height);
+    const w = image.width * scale;
+    page.drawImage(image, { x: x + 8, y: 124, width: w, height: image.height * scale });
     page.drawLine({ start: { x, y: 128 }, end: { x: x + 210, y: 128 }, thickness: 0.8, color: INK });
     page.drawText(clean(name), { x, y: 112, size: 11, font: sansBold, color: INK });
     page.drawText(clean(role), { x, y: 98, size: 8.5, font: sans, color: MUTED });
   };
-  sig(90, "Hadiza Ibrahim Yaro", "Director, Safeguarding, Accountability & Gender");
-  sig(W - 300, "Tayo Fatinikun", "Executive Director");
+  sig(90, leftSig, "Hadiza Ibrahim Yaro", "Director, Safeguarding, Accountability & Gender");
+  sig(W - 300, rightSig, "Tayo Fatinikun", "Executive Director");
 
   const verify = `${siteConfig.url.replace(/\/$/, "")}/get-involved/training/verify/${cert.id}`;
   // QR code to the public verification page, between the signatures.
