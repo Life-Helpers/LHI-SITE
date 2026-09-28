@@ -26,3 +26,13 @@ describe.skipIf(!url)("Postgres store", () => {
     expect(result).toBe(25);
   });
 });
+
+describe("database URL", () => {
+  it("drops Neon's channel_binding option, which the driver rejects, and keeps sslmode", async () => {
+    const { connectionUrl } = await import("./db");
+    const url = connectionUrl("postgresql://u:p@ep-x.neon.tech/neondb?sslmode=require&channel_binding=require");
+    expect(url).toContain("sslmode=require");
+    expect(url).not.toContain("channel_binding");
+    expect(connectionUrl("postgresql://u:p@host/db")).toBe("postgresql://u:p@host/db");
+  });
+});

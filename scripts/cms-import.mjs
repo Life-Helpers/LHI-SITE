@@ -30,7 +30,17 @@ const MIME = {
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 };
 
-const sql = postgres(url, { max: 1, prepare: false, onnotice: () => {} });
+// Neon URLs end in channel_binding=require, which the driver rejects; sslmode=require still applies.
+const connection = (() => {
+  try {
+    const u = new URL(url);
+    u.searchParams.delete("channel_binding");
+    return u.toString();
+  } catch {
+    return url;
+  }
+})();
+const sql = postgres(connection, { max: 1, prepare: false, onnotice: () => {} });
 await sql`create table if not exists cms_store (name text primary key, data jsonb not null, updated_at timestamptz not null default now())`;
 
 let imported = 0;

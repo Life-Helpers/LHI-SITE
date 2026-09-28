@@ -18,6 +18,7 @@ import { LocaleProvider } from "@/i18n/locale-context";
 import { GoogleTranslateBridge } from "@/components/google-translate-bridge";
 import { SiteDataProvider } from "@/components/site-data-provider";
 import { getActiveAlerts, getSiteData } from "@/lib/cms/content";
+import { DEFAULT_SITE_DATA } from "@/lib/site-data";
 import { siteConfig } from "@/config/site";
 import { jsonLdScript } from "@/lib/validation";
 
@@ -97,7 +98,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   // Contact details, social accounts, impact figures and emergency alerts are managed in the admin.
-  const [siteData, alerts] = await Promise.all([getSiteData(), getActiveAlerts()]);
+  // If the database can't be reached, keep the site up with the built-in values rather than failing every page.
+  const [siteData, alerts] = await Promise.all([
+    getSiteData().catch((err) => {
+      console.error("Site data unavailable, using built-in values:", err);
+      return DEFAULT_SITE_DATA;
+    }),
+    getActiveAlerts().catch(() => []),
+  ]);
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "NGO",

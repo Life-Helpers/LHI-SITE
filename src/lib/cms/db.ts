@@ -12,6 +12,22 @@ export function databaseUrl() {
   return process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim() || "";
 }
 
+/**
+ * The connection URL with the options the driver doesn't understand removed. Neon's
+ * connection strings end in `channel_binding=require`, which the driver would otherwise send to
+ * the server as a setting and fail with "unrecognized configuration parameter". TLS is still
+ * required by `sslmode=require`.
+ */
+export function connectionUrl(raw = databaseUrl()) {
+  try {
+    const url = new URL(raw);
+    url.searchParams.delete("channel_binding");
+    return url.toString();
+  } catch {
+    return raw;
+  }
+}
+
 type Sql = ReturnType<typeof postgres>;
 
 let client: Sql | null = null;
@@ -19,7 +35,7 @@ let ready: Promise<void> | null = null;
 
 function sql(): Sql {
   if (!client) {
-    client = postgres(databaseUrl(), {
+    client = postgres(connectionUrl(), {
       // Serverless functions each hold a small pool; the provider's pooler does the rest.
       max: 3,
       idle_timeout: 20,
