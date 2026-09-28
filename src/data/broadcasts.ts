@@ -22,6 +22,8 @@ export interface TvProgramme {
   partners: string;
   youtubeId: string;
   url: string;
+  /** Still from the broadcast, shown before the video is played (falls back to YouTube's). */
+  thumbnail?: string;
 }
 
 export const RADIO_PROGRAMMES: RadioProgramme[] = [
@@ -57,9 +59,10 @@ export const TV_PROGRAMMES: TvProgramme[] = [
     id: "sarah-maternal-health",
     name: "Maternal Health",
     project: "SARAH Project",
-    channel: "NTA (Nigerian Television Authority)",
+    channel: "NTA Sokoto (Nigerian Television Authority)",
     partners: "EU · UNICEF · Life Helpers Initiative",
     youtubeId: "gwm1H7vY-4c",
     url: "https://www.youtube.com/live/gwm1H7vY-4c",
+    thumbnail: "/images/tv/maternal-health-nta-sokoto.webp",
   },
 ];

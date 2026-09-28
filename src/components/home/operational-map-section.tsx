@@ -15,7 +15,7 @@ export async function OperationalMapSection() {
   return (
     <ParallaxBackground
       src={LHI_PHOTOS.partnersLogoWall.src}
-      opacity={0.35} mouse
+      opacity={0.08} mouse
       className="border-y border-border bg-background"
     >
       <section

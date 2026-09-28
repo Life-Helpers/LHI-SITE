@@ -23,10 +23,10 @@ export function TvPlayer({ programme }: { programme: TvProgramme }) {
         ) : (
           <button type="button" onClick={() => setPlaying(true)} className="group absolute inset-0 h-full w-full" aria-label={`Play ${programme.name}`}>
             <Image
-              src={`https://i.ytimg.com/vi/${programme.youtubeId}/hqdefault.jpg`}
+              src={programme.thumbnail ?? `https://i.ytimg.com/vi/${programme.youtubeId}/hqdefault.jpg`}
               alt=""
               fill
-              unoptimized
+              unoptimized={!programme.thumbnail}
               sizes="(min-width: 1024px) 720px, 100vw"
               onError={(e) => (e.currentTarget.style.visibility = "hidden")}
               className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
@@ -35,7 +35,7 @@ export function TvPlayer({ programme }: { programme: TvProgramme }) {
             <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_0_0_10px_rgba(220,38,38,0.25)] transition-transform group-hover:scale-110">
               <Play className="h-6 w-6 translate-x-0.5 fill-current" aria-hidden="true" />
             </span>
-            <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur">
+            <span className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur">
               <Tv className="h-3.5 w-3.5" aria-hidden="true" /> {programme.channel.split(" ")[0]} TV
             </span>
           </button>
