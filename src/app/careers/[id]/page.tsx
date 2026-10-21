@@ -23,7 +23,7 @@ export default async function JobPage({ params }: { params: Promise<{ id: string
   const facts = [
     { icon: Briefcase, label: "Department", value: job.department },
     { icon: MapPin, label: "Duty station", value: job.location },
-    { icon: Users, label: "Contract", value: job.positions > 1 ? `${job.employmentType} · ${job.positions} positions` : job.employmentType },
+    ...(job.employmentType ? [{ icon: Users, label: "Contract", value: job.positions > 1 ? `${job.employmentType} · ${job.positions} positions` : job.employmentType }] : []),
     { icon: CalendarClock, label: "Deadline", value: formatDeadline(job.deadline) },
     ...(job.reference ? [{ icon: Hash, label: "Reference", value: job.reference }] : []),
   ];

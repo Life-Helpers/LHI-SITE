@@ -29,9 +29,11 @@ export function ListingCard({
     <Link href={href} className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:shadow-md">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-accent">{eyebrow}</span>
-        <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${closed ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary"}`}>
-          {closed ?? badge}
-        </span>
+        {(closed ?? badge) && (
+          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${closed ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary"}`}>
+            {closed ?? badge}
+          </span>
+        )}
       </div>
       <h3 className="mt-3 text-lg font-bold text-foreground group-hover:text-primary">{title}</h3>
       <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">{summary}</p>

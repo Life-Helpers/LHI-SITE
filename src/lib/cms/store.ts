@@ -23,6 +23,7 @@ import type {
 import { BUILT_IN_ROLES } from "@/lib/cms/schema";
 import { databaseUrl, dbRead, dbUpdate } from "@/lib/cms/db";
 import { DATA_DIR } from "@/lib/cms/paths";
+import { JOB_ADVERT_2026_10 } from "@/data/job-advert-2026-10";
 import {
   seedBeforeAfter,
   seedEmergencies,
@@ -203,7 +204,55 @@ function withLock<T>(name: string, fn: () => Promise<T>): Promise<T> {
   return next;
 }
 
-export function readStore<K extends StoreName>(name: K): Promise<StoreShape[K][]> {
+/**
+ * One-time content imports. Each is added to its collection the first time that collection is
+ * read and is then recorded as done, so items removed afterwards in the admin stay removed.
+ * Items whose id is already in the collection are skipped.
+ */
+const IMPORTS: { key: string; collection: StoreName; items: () => { id: string }[] }[] = [
+  { key: "jobs-advert-2026-10", collection: "jobs", items: () => JOB_ADVERT_2026_10 },
+];
+const importsDone = new Set<string>();
+const importsRunning = new Set<string>();
+
+async function markImported(key: string) {
+  const at = new Date().toISOString();
+  if (USE_DATABASE) {
+    await dbUpdate<Record<string, string>, void>("imports", () => ({}), (done) => ({ data: { ...done, [key]: at } }));
+    return;
+  }
+  await withLock("imports", async () => {
+    const done = await readJson<Record<string, string>>("imports", () => ({}));
+    await writeJson("imports", { ...done, [key]: at });
+  });
+}
+
+async function applyImports(name: StoreName) {
+  for (const imp of IMPORTS) {
+    if (imp.collection !== name || importsDone.has(imp.key) || importsRunning.has(imp.key)) continue;
+    importsRunning.add(imp.key);
+    try {
+      const done = await readJson<Record<string, string>>("imports", () => ({}));
+      if (!done[imp.key]) {
+        await updateStore(name, (current) => {
+          const have = new Set(current.map((i) => (i as { id?: string }).id));
+          const added = imp.items().filter((i) => !have.has(i.id)) as typeof current;
+          return { items: [...current, ...added] };
+        });
+        await markImported(imp.key);
+      }
+      importsDone.add(imp.key);
+    } catch (err) {
+      // Try again on a later read (e.g. the database was briefly unreachable).
+      console.error(`Content import "${imp.key}" failed; will retry.`, err);
+    } finally {
+      importsRunning.delete(imp.key);
+    }
+  }
+}
+
+export async function readStore<K extends StoreName>(name: K): Promise<StoreShape[K][]> {
+  await applyImports(name);
   return readJson(name, SEEDS[name]);
 }
 
