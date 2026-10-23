@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Briefcase, Building2, CalendarCheck, CalendarClock, CalendarDays, ClipboardList, Gift, PartyPopper, UserCheck, Users } from "lucide-react";
 
-import { decideLeaveAction } from "@/app/hrportal/actions";
-import { LEAVE_STYLE, leaveLabel } from "@/components/hr/leave-style";
+import { decideLeaveAction, loadSampleDataAction, removeSampleDataAction } from "@/app/hrportal/actions";
+import { ActionForm } from "@/components/hr/action-form";
+import { leaveName, leaveStyle } from "@/components/hr/leave-style";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { QuickAction } from "@/components/hr/quick-action";
-import { Card, fmtDate, fmtDateTime, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
+import { Card, Field, fmtDate, fmtDateTime, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { canDecideLeave, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
@@ -65,6 +66,8 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
     .map((d) => ({ d, n: active.filter((e) => e.department === d).length }))
     .sort((a, b) => b.n - a.n);
   const unassigned = active.filter((e) => !e.department).length;
+  const sampleCount = employees.filter((e) => e.sample).length;
+  const sampleLogins = accounts.filter((a) => a.sample).length;
   const nameOf = (id: string) => employeeName(employees.find((e) => e.id === id));
   const personHref = (id: string) => (seesPeople ? `/hrportal/hr/employees/${id}` : undefined);
 
@@ -152,7 +155,7 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
                   <li key={l.id} className="flex items-center justify-between gap-3 px-5 py-3">
                     <Person name={employeeName(e)} sub={e?.jobTitle || e?.department} href={personHref(l.employeeId)} />
                     <span className="text-right">
-                      <span className={`inline-flex rounded-md border px-2 py-0.5 text-xs font-medium ${LEAVE_STYLE[l.type].pill}`}>{leaveLabel(l.type)}</span>
+                      <span className={`inline-flex rounded-md border px-2 py-0.5 text-xs font-medium ${leaveStyle(l.type, ctx.leaveTypes).pill}`}>{leaveName(l.type, ctx.leaveTypes)}</span>
                       <span className="mt-0.5 block text-[11px] text-admin-muted">until {fmtDate(l.endDate)}</span>
                     </span>
                   </li>
@@ -183,8 +186,8 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
                     <span className="min-w-0">
                       <span className="block truncate font-medium">{nameOf(l.employeeId)}</span>
                       <span className="flex items-center gap-1.5 text-xs text-admin-muted">
-                        <span className={`h-2 w-2 rounded-full ${LEAVE_STYLE[l.type].dot}`} aria-hidden="true" />
-                        {leaveLabel(l.type)} · {fmtDate(l.startDate)} – {fmtDate(l.endDate)} · {l.days} day{l.days === 1 ? "" : "s"}
+                        <span className={`h-2 w-2 rounded-full ${leaveStyle(l.type, ctx.leaveTypes).dot}`} aria-hidden="true" />
+                        {leaveName(l.type, ctx.leaveTypes)} · {fmtDate(l.startDate)} – {fmtDate(l.endDate)} · {l.days} day{l.days === 1 ? "" : "s"}
                       </span>
                     </span>
                     {canDecideLeave(ctx.actor, l, employees, ctx.departments) && (
@@ -249,6 +252,26 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
           </Card>
         )}
       </div>
+      {has(p, "accounts.manage") && has(p, "employees.manage") && (
+        <div className="mt-6">
+          <Card title="Sample data for testing" subtitle="Five made-up staff (staff numbers SAMPLE-001 to SAMPLE-005) with leave requests, to try the portal safely">
+            {/* Both forms stay mounted so each one's result message survives the refresh. */}
+            <p className="mb-4 text-sm text-admin-muted">
+              {sampleCount
+                ? `${sampleCount} sample employees are loaded${sampleLogins ? `, with ${sampleLogins} sample logins` : ""}. Their staff numbers start with SAMPLE.`
+                : "No sample data is loaded."}
+            </p>
+            <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+              <ActionForm action={loadSampleDataAction} submitLabel="Load sample data" className="space-y-3">
+                <Field label="Password for sample logins (optional)" hint="Leave blank for records only. With a password, each sample person gets a login (e.g. aisha.bello.sample@example.test) so you can test each role.">
+                  <input type="password" name="password" autoComplete="new-password" className={`${inputClass} max-w-sm`} />
+                </Field>
+              </ActionForm>
+              <ActionForm action={removeSampleDataAction} submitLabel="Remove sample data" danger confirmText="Remove all sample employees, their leave and sample logins?" />
+            </div>
+          </Card>
+        </div>
+      )}
     </PortalShell>
   );
 }

@@ -44,7 +44,6 @@ export default async function TeamMemberPage({ params, searchParams }: { params:
               ["Work email", person.email || "—"],
               ["Work phone", person.phone || "—"],
               ["Start date", fmtDate(person.startDate)],
-              ["Annual leave", `${person.annualLeaveDays} days`],
             ].map(([k, v]) => (
               <div key={k}>
                 <dt className="text-xs uppercase tracking-wider text-admin-muted">{k}</dt>
@@ -54,7 +53,7 @@ export default async function TeamMemberPage({ params, searchParams }: { params:
           </dl>
         </Card>
         <div className="lg:col-span-2">
-          <LeaveListing
+          <LeaveListing leaveTypes={ctx.leaveTypes}
             rows={theirLeave}
             employees={employees}
             basePath={`/hrportal/team/${person.id}`}

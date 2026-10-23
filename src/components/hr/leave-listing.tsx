@@ -3,11 +3,11 @@ import { ChevronsUpDown, ChevronDown, ChevronUp, Eye, Search } from "lucide-reac
 
 import { cancelMyLeaveAction, decideLeaveAction } from "@/app/hrportal/actions";
 import { AutoSubmitSelect } from "@/components/hr/filters";
-import { LEAVE_STYLE, leaveLabel } from "@/components/hr/leave-style";
+import { leaveName, leaveStyle } from "@/components/hr/leave-style";
 import { hrefWith } from "@/components/hr/query";
 import { QuickAction } from "@/components/hr/quick-action";
 import { Badge, fmtDate, inputClass, Person } from "@/components/hr/ui";
-import { employeeName, LEAVE_TYPES, type HrEmployee, type HrLeaveRequest } from "@/lib/hr/types";
+import { employeeName, type HrEmployee, type HrLeaveRequest, type HrLeaveType } from "@/lib/hr/types";
 
 const TABS = [
   { id: "pending", label: "Pending" },
@@ -36,7 +36,9 @@ export function LeaveListing({
   canCancel,
   viewHref,
   statusParam = "tab",
+  leaveTypes,
 }: {
+  leaveTypes: HrLeaveType[];
   rows: HrLeaveRequest[];
   employees: HrEmployee[];
   basePath: string;
@@ -61,7 +63,7 @@ export function LeaveListing({
     if (params.type && l.type !== params.type) return false;
     if (q) {
       const e = byId.get(l.employeeId);
-      if (![employeeName(e), e?.email ?? "", l.type, l.reason].some((v) => v.toLowerCase().includes(q))) return false;
+      if (![employeeName(e), e?.email ?? "", leaveName(l.type, leaveTypes), l.reason].some((v) => v.toLowerCase().includes(q))) return false;
     }
     return true;
   });
@@ -124,9 +126,9 @@ export function LeaveListing({
         )}
         <AutoSubmitSelect name="type" defaultValue={params.type ?? ""} aria-label="Leave type" className={`${inputClass} mt-0 max-w-48`}>
           <option value="">All Leave Types</option>
-          {LEAVE_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {leaveLabel(t)}
+          {leaveTypes.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
             </option>
           ))}
         </AutoSubmitSelect>
@@ -162,8 +164,8 @@ export function LeaveListing({
                   )}
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center gap-2">
-                      <span className={`h-2.5 w-2.5 rounded-full ${LEAVE_STYLE[l.type].dot}`} aria-hidden="true" />
-                      {leaveLabel(l.type)}
+                      <span className={`h-2.5 w-2.5 rounded-full ${leaveStyle(l.type, leaveTypes).dot}`} aria-hidden="true" />
+                      {leaveName(l.type, leaveTypes)}
                     </span>
                     {l.reason && <span className="mt-0.5 block max-w-[220px] truncate text-xs text-admin-muted" title={l.reason}>{l.reason}</span>}
                   </td>

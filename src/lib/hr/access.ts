@@ -174,12 +174,3 @@ export function workingDays(start: string, end: string): number {
   }
   return days;
 }
-
-/** Annual leave days approved or pending in a calendar year. */
-export function annualLeaveUsed(employeeId: string, year: number, leave: HrLeaveRequest[]) {
-  const inYear = leave.filter((l) => l.employeeId === employeeId && l.type === "Annual" && l.startDate.startsWith(String(year)));
-  return {
-    approved: inYear.filter((l) => l.status === "approved").reduce((n, l) => n + l.days, 0),
-    pending: inYear.filter((l) => l.status === "pending").reduce((n, l) => n + l.days, 0),
-  };
-}

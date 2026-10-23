@@ -110,14 +110,83 @@ export interface HrAccount {
   sessionVersion: number;
   /** Set when HR chose the password: the person must pick their own before doing anything else. */
   mustChangePassword?: boolean;
+  /** Test record from "Load sample data"; removed by "Remove sample data". */
+  sample?: boolean;
   createdAt: string;
   createdBy: string;
   lastLoginAt?: string;
   deactivatedAt?: string;
 }
 
+/** The leave types the portal started with; HR can rename, recolour, add and retire types. */
 export const LEAVE_TYPES = ["Annual", "Sick", "Compassionate", "Maternity", "Paternity", "Study", "Unpaid", "Other"] as const;
-export type LeaveType = (typeof LEAVE_TYPES)[number];
+
+export const LEAVE_COLORS = ["emerald", "rose", "slate", "pink", "blue", "violet", "orange", "cyan", "amber", "teal", "indigo", "lime"] as const;
+export type LeaveColor = (typeof LEAVE_COLORS)[number];
+
+/** A kind of leave staff can request. Its id is stored on each request. */
+export interface HrLeaveType {
+  id: string;
+  name: string;
+  description: string;
+  color: LeaveColor;
+  paid: boolean;
+  /** Days a year when no policy says otherwise; null means not limited (no balance kept). */
+  defaultDays: number | null;
+  /** Unused days can roll into the next year, up to the policy's carry-over limit. */
+  carryOver: boolean;
+  active: boolean;
+}
+
+const START_COLORS: LeaveColor[] = ["emerald", "rose", "slate", "pink", "blue", "violet", "orange", "cyan"];
+
+/**
+ * Starting leave types. Only Annual leave has a set allowance (20 days, as before); HR sets the
+ * others under Leave Types or Leave Policies to match LHI's leave policy.
+ */
+export const DEFAULT_LEAVE_TYPES: HrLeaveType[] = LEAVE_TYPES.map((id, i) => ({
+  id,
+  name: `${id} Leave`,
+  description: "",
+  color: START_COLORS[i],
+  paid: id !== "Unpaid",
+  defaultDays: id === "Annual" ? 20 : null,
+  carryOver: false,
+  active: true,
+}));
+
+/**
+ * Leave allowances for a group of staff. The most specific active policy wins for each leave
+ * type: a department's policy, then an employment-type policy, then the all-staff policy.
+ */
+export interface HrLeavePolicy {
+  id: string;
+  name: string;
+  description: string;
+  scope: "all" | "department" | "employmentType";
+  /** Department id or employment type, for the narrower scopes. */
+  scopeValue: string;
+  /** Days a year per leave type id. Types not listed fall back to a broader policy or the type's default. */
+  entitlements: Record<string, number>;
+  /** Most days of carried-over leave allowed into the next year (for types that carry over). */
+  carryOverMax: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** A manual change to one person's balance for a year (e.g. days earned for weekend work). */
+export interface HrLeaveAdjustment {
+  id: string;
+  employeeId: string;
+  typeId: string;
+  year: number;
+  /** Positive adds days, negative removes them. */
+  days: number;
+  reason: string;
+  byName: string;
+  at: string;
+}
 
 export interface HrEmployee {
   id: string;
@@ -140,7 +209,8 @@ export interface HrEmployee {
   /** Active and probation are current staff (portal access); inactive and left (terminated) are not. */
   status: EmployeeStatus;
   /** Annual leave entitlement in working days. */
-  annualLeaveDays: number;
+  /** No longer used: allowances come from leave types and policies. Kept on older records. */
+  annualLeaveDays?: number;
   /** Optional, for the birthdays panel (HR only; the year is never shown). */
   dateOfBirth?: string;
   gender?: string;
@@ -149,6 +219,8 @@ export interface HrEmployee {
   bankName?: string;
   bankAccountName?: string;
   bankAccountNumber?: string;
+  /** Test record from "Load sample data". */
+  sample?: boolean;
   address: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
@@ -191,7 +263,8 @@ export const STANDARD_DEPARTMENTS = [
 export interface HrLeaveRequest {
   id: string;
   employeeId: string;
-  type: LeaveType;
+  /** Leave type id (see HrLeaveType). */
+  type: string;
   startDate: string;
   endDate: string;
   /** Working days (Monday to Friday) in the range. */
@@ -203,6 +276,8 @@ export interface HrLeaveRequest {
   decidedByName?: string;
   decidedAt?: string;
   decisionNote?: string;
+  /** Test record from "Load sample data". */
+  sample?: boolean;
 }
 
 export interface HrAuditEntry {

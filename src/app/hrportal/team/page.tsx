@@ -36,9 +36,9 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
         <TintStat tint="amber" icon={CalendarClock} label="Leave awaiting decision" value={pending} note={has(ctx.permissions, "team.leave.approve") ? "You can approve or reject below" : undefined} />
         <TintStat tint="green" icon={CalendarCheck} label="On leave today" value={away} />
       </div>
-      <LeaveCalendar employees={team} leave={teamLeave} weekStart={weekStart} basePath="/hrportal/team" params={params} personHref={memberHref} />
+      <LeaveCalendar leaveTypes={ctx.leaveTypes} employees={team} leave={teamLeave} weekStart={weekStart} basePath="/hrportal/team" params={params} personHref={memberHref} />
       <div className="mt-6">
-        <LeaveListing
+        <LeaveListing leaveTypes={ctx.leaveTypes}
           rows={teamLeave}
           employees={employees}
           basePath="/hrportal/team"

@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { sessionKey, sign } from "@/lib/cms/auth";
 import { readStore } from "@/lib/cms/store";
 import { accessProblem, effectivePermissions, findRole, homePath, type AccessProblem, type Actor } from "@/lib/hr/access";
-import type { HrAccount, HrDepartment, HrEmployee, HrPermission, HrRole } from "@/lib/hr/types";
+import type { HrAccount, HrDepartment, HrEmployee, HrLeaveType, HrPermission, HrRole } from "@/lib/hr/types";
 
 /**
  * HR portal sessions. The cookie only says which account signed in and which version of that
@@ -63,6 +63,8 @@ export interface HrContext {
   actor: Actor;
   /** Every department (for routing leave to heads and approvers). */
   departments: HrDepartment[];
+  /** Configured leave types (active and retired). */
+  leaveTypes: HrLeaveType[];
   /** Shown in the portal header. */
   displayName: string;
 }
@@ -82,6 +84,7 @@ export async function loadHrSession(): Promise<HrSessionState> {
     readStore("hrRoles"),
     readStore("hrDepartments"),
   ]);
+  const leaveTypes = await readStore("hrLeaveTypes");
   const account = accounts.find((a) => a.id === claims.aid);
   // Unknown account, or access changed since this session was issued: treat as signed out.
   if (!account || account.sessionVersion !== claims.v || !account.passwordHash) return { status: "signed-out" };
@@ -100,6 +103,7 @@ export async function loadHrSession(): Promise<HrSessionState> {
       permissions,
       actor: { accountId: account.id, employeeId: employee!.id, permissions },
       departments,
+      leaveTypes,
       displayName: `${employee!.firstName} ${employee!.lastName}`.trim() || account.email,
     },
   };

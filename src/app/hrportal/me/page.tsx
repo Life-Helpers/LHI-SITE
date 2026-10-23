@@ -3,13 +3,15 @@ import { CalendarCheck, CalendarClock, CalendarDays, Palmtree } from "lucide-rea
 import { requestLeaveAction, setMyDepartmentAction, updateMyContactAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { BankingCard } from "@/components/hr/banking-card";
+import { BalanceTable } from "@/components/hr/balance-table";
 import { LeaveFields } from "@/components/hr/leave-form";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, Person, TintStat } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { annualLeaveUsed, approversFor, has } from "@/lib/hr/access";
+import { approversFor, has } from "@/lib/hr/access";
+import { balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName } from "@/lib/hr/types";
 
@@ -20,13 +22,20 @@ export const metadata = { title: "My record" };
 export default async function MyRecordPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage("self.view");
   const params = (await searchParams) as LeaveParams;
-  const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
+  const [employees, leave, policies, adjustments] = await Promise.all([
+    readStore("hrEmployees"),
+    readStore("hrLeave"),
+    readStore("hrLeavePolicies"),
+    readStore("hrLeaveAdjustments"),
+  ]);
   const me = ctx.employee;
   const manager = employees.find((e) => e.id === me.managerId);
   const mine = leave.filter((l) => l.employeeId === me.id);
   const year = new Date().getFullYear();
-  const used = annualLeaveUsed(me.id, year, leave);
-  const left = Math.max(0, me.annualLeaveDays - used.approved - used.pending);
+  const balances = balanceFor(me, year, ctx.leaveTypes, policies, leave, adjustments);
+  const annual = balances.find((r) => r.type.id === "Annual") ?? balances.find((r) => r.total !== null);
+  const total = annual?.total ?? 0;
+  const left = Math.max(0, annual?.available ?? 0);
   const canRequest = has(ctx.permissions, "leave.request");
   const openDepartments = ctx.departments.filter((d) => d.active).sort((a, b) => a.name.localeCompare(b.name));
   const myDepartment = ctx.departments.find((d) => d.id === me.departmentId);
@@ -40,9 +49,9 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         subtitle="Your employee record and leave"
         actions={
           canRequest && (
-            <Modal label="Request Leave" title="Request leave" description={`You have ${left} annual leave days left this year.`}>
+            <Modal label="Request Leave" title="Request leave" description={annual ? `You have ${left} ${annual.type.name.toLowerCase()} days left this year.` : undefined}>
               <ActionForm action={requestLeaveAction} submitLabel="Send request" resetOnSuccess className="space-y-4">
-                <LeaveFields />
+                <LeaveFields types={ctx.leaveTypes} />
               </ActionForm>
             </Modal>
           )
@@ -50,10 +59,10 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <TintStat tint="teal" icon={CalendarDays} label={`Annual leave ${year}`} value={`${me.annualLeaveDays} days`} />
-        <TintStat tint="green" icon={CalendarCheck} label="Taken or approved" value={used.approved} note="Annual leave, this year" />
-        <TintStat tint="amber" icon={CalendarClock} label="Awaiting approval" value={used.pending} note="Annual leave days" />
-        <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} progress={me.annualLeaveDays ? (left / me.annualLeaveDays) * 100 : 0} />
+        <TintStat tint="teal" icon={CalendarDays} label={`${annual?.type.name ?? "Leave"} ${year}`} value={annual?.total === null || !annual ? "No limit" : `${total} days`} />
+        <TintStat tint="green" icon={CalendarCheck} label="Taken or approved" value={annual?.used ?? 0} note={`${annual?.type.name ?? "Leave"}, this year`} />
+        <TintStat tint="amber" icon={CalendarClock} label="Awaiting approval" value={annual?.pending ?? 0} note="Days in pending requests" />
+        <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} progress={total ? (left / total) * 100 : 0} />
       </div>
 
       {openDepartments.length > 0 && !myDepartment && has(ctx.permissions, "self.update") && (
@@ -149,12 +158,18 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
       </div>
 
       <div className="mt-6">
+        <Card title={`My leave balances ${year}`} subtitle="Allowances come from LHI's leave policies; hover the (i) for the breakdown." flush>
+          <BalanceTable rows={balances} />
+        </Card>
+      </div>
+
+      <div className="mt-6">
         <BankingCard person={me} editable={has(ctx.permissions, "self.update")} />
       </div>
 
       <div className="mt-6">
         <h2 className="mb-3 text-lg font-semibold">My leave applications</h2>
-        <LeaveListing
+        <LeaveListing leaveTypes={ctx.leaveTypes}
           rows={mine}
           employees={employees}
           basePath="/hrportal/me"

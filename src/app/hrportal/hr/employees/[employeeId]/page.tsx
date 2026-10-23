@@ -165,7 +165,6 @@ export default async function EmployeePage({ params, searchParams }: { params: P
                     ["Joined", fmtDate(person.startDate)],
                     ["Line Manager", nameOf(person.managerId)],
                     ["Leave approvers", approversFor(person, employees, ctx.departments).map(employeeName).join(", ")],
-                    ["Annual Leave", `${person.annualLeaveDays} days a year`],
                     ["Direct Reports", directReports.length ? `${directReports.map(employeeName).join(", ")} (${reportsOf(person.id, employees).size} in total)` : "None"],
                   ]}
                 />
@@ -189,7 +188,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
             {tab === "banking" && canSeeBanking && <BankingCard person={person} editable={canEdit || isSelf} />}
 
             {tab === "leave" && (
-              <LeaveListing
+              <LeaveListing leaveTypes={ctx.leaveTypes}
                 rows={theirLeave}
                 employees={employees}
                 basePath={base}

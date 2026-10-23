@@ -40,7 +40,7 @@ export type NavIcon = keyof typeof ICONS;
 
 export interface ShellNavGroup {
   label: string;
-  items: { href: string; label: string; icon: NavIcon; active: boolean; badge?: number }[];
+  items: { href: string; label: string; icon: NavIcon; active: boolean; badge?: number; children?: { href: string; label: string; active: boolean }[] }[];
 }
 
 export interface Crumb {
@@ -122,6 +122,41 @@ export function ShellFrame({
               <ul className="space-y-0.5">
                 {group.items.map((item) => {
                   const Icon = ICONS[item.icon];
+                  if (item.children) {
+                    const open = item.children.some((c) => c.active);
+                    return (
+                      <li key={item.href}>
+                        <details open={open} className="group/sub">
+                          <summary
+                            title={collapsed ? item.label : undefined}
+                            className={`flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium [&::-webkit-details-marker]:hidden ${
+                              open ? "text-admin-primary" : "text-admin-nav-text hover:bg-admin-nav-hover hover:text-admin-text"
+                            } ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
+                          >
+                            <Icon className="h-[18px] w-[18px] shrink-0" aria-hidden="true" />
+                            <span className={`flex-1 ${collapsed ? "lg:sr-only" : ""}`}>{item.label}</span>
+                            <ChevronDown className={`h-4 w-4 transition-transform group-open/sub:rotate-180 ${collapsed ? "lg:hidden" : ""}`} aria-hidden="true" />
+                          </summary>
+                          <ul className={`ml-5 mt-0.5 space-y-0.5 border-l border-admin-border pl-2 ${collapsed ? "lg:ml-0 lg:border-l-0 lg:pl-0" : ""}`}>
+                            {item.children.map((c) => (
+                              <li key={c.href}>
+                                <Link
+                                  href={c.href}
+                                  aria-current={c.active ? "page" : undefined}
+                                  onClick={() => setMobileOpen(false)}
+                                  className={`relative block rounded-md px-3 py-1.5 text-sm ${
+                                    c.active ? "font-semibold text-admin-primary before:absolute before:-left-[9px] before:top-1 before:bottom-1 before:w-[3px] before:rounded before:bg-admin-primary" : "text-admin-text hover:bg-admin-nav-hover"
+                                  } ${collapsed ? "lg:text-[11px] lg:px-1 lg:text-center" : ""}`}
+                                >
+                                  {c.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </details>
+                      </li>
+                    );
+                  }
                   return (
                     <li key={item.href}>
                       <Link

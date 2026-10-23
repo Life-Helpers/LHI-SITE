@@ -4,7 +4,7 @@ import { CalendarCheck, CalendarClock, UserPlus, Users } from "lucide-react";
 import { Card, Notice, PageTitle, Table, TintStat } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { requireHrPage } from "@/lib/hr/session";
-import { LEAVE_TYPES, isCurrentStaff } from "@/lib/hr/types";
+import { isCurrentStaff } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Reports" };
@@ -61,11 +61,11 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         </Card>
         <Card title={`Approved leave in ${year}`}>
           <Table head={["Type", "Requests", "Working days"]}>
-            {LEAVE_TYPES.map((t) => {
-              const rows = approved.filter((l) => l.type === t);
+            {ctx.leaveTypes.map((type) => {
+              const rows = approved.filter((l) => l.type === type.id);
               return (
-                <tr key={t}>
-                  <td className="px-3 py-2">{t}</td>
+                <tr key={type.id}>
+                  <td className="px-3 py-2">{type.name}</td>
                   <td className="px-3 py-2">{rows.length}</td>
                   <td className="px-3 py-2 font-semibold">{rows.reduce((n, l) => n + l.days, 0)}</td>
                 </tr>

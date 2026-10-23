@@ -11,7 +11,6 @@ import { readStore, updateStore } from "@/lib/cms/store";
 import { rateLimited } from "@/lib/rate-limit";
 import {
   accessProblem,
-  annualLeaveUsed,
   canDecideLeave,
   canGrant,
   canManageAccount,
@@ -23,6 +22,7 @@ import {
   workingDays,
 } from "@/lib/hr/access";
 import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
+import { balanceFor, withinBalance } from "@/lib/hr/leave-balance";
 import { consumeHrToken, createHrToken, hrAudit, peekHrToken } from "@/lib/hr/data";
 import { createHrSession, destroyHrSession, HrAccessError, loadHrSession, requireHrAction, type HrContext } from "@/lib/hr/session";
 import {
@@ -34,12 +34,14 @@ import {
   isEmployeeStatus,
   statusLabel,
   isHrPermission,
-  LEAVE_TYPES,
   type HrAccount,
   type HrDepartment,
   type HrEmployee,
+  type HrLeavePolicy,
+  type HrLeaveRequest,
+  type HrLeaveType,
+  LEAVE_COLORS,
   type HrPermission,
-  type LeaveType,
   isCurrentStaff,
 } from "@/lib/hr/types";
 
@@ -193,7 +195,6 @@ export async function hrBootstrapAction(_prev: HrResult | null, form: FormData):
       managerId: null,
       startDate: "",
       status: "active",
-      annualLeaveDays: 20,
       address: "",
       emergencyContactName: "",
       emergencyContactPhone: "",
@@ -244,28 +245,34 @@ export async function updateMyContactAction(_prev: HrResult | null, form: FormDa
 
 /** Validate a leave request for `employee`. Returns the details, or an error message. */
 async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "they") {
-  const type = text(form, "type", 40) as LeaveType;
+  const type = text(form, "type", 64);
   const startDate = text(form, "startDate", 10);
   const endDate = text(form, "endDate", 10);
   const reason = text(form, "reason", 500);
-  if (!LEAVE_TYPES.includes(type)) return { error: "Choose a leave type." };
+  const [types, policies, adjustments, leave] = await Promise.all([
+    readStore("hrLeaveTypes"),
+    readStore("hrLeavePolicies"),
+    readStore("hrLeaveAdjustments"),
+    readStore("hrLeave"),
+  ]);
+  const leaveType = types.find((t) => t.id === type && t.active);
+  if (!leaveType) return { error: "Choose a leave type." };
   if (!isDate(startDate) || !isDate(endDate) || endDate < startDate) return { error: "Enter a valid start and end date." };
   const days = workingDays(startDate, endDate);
   if (days < 1) return { error: "The dates chosen don't include any working days." };
   if (days > 130) return { error: "A single request can cover at most 130 working days." };
-  const leave = await readStore("hrLeave");
+  if (startDate.slice(0, 4) !== endDate.slice(0, 4)) return { error: "Split leave that crosses into a new year into two requests (one per year)." };
   const booked = leave.filter((l) => l.employeeId === employee.id && (l.status === "pending" || l.status === "approved"));
   if (booked.some((l) => l.startDate <= endDate && l.endDate >= startDate)) {
     return { error: `${who === "you" ? "You already have" : "They already have"} leave booked or pending in those dates.` };
   }
-  if (type === "Annual") {
-    const used = annualLeaveUsed(employee.id, Number(startDate.slice(0, 4)), leave);
-    const left = employee.annualLeaveDays - used.approved - used.pending;
-    if (days > left) {
-      return { error: `That's ${days} working days, but ${who === "you" ? "you have" : "they have"} ${Math.max(0, left)} annual leave days left this year (including pending requests).` };
-    }
+  const row = balanceFor(employee, Number(startDate.slice(0, 4)), types, policies, leave, adjustments).find((r) => r.type.id === type);
+  if (!withinBalance(row, days)) {
+    return {
+      error: `That's ${days} working days, but ${who === "you" ? "you have" : "they have"} ${Math.max(0, row!.available!)} ${leaveType.name.toLowerCase()} days left in ${startDate.slice(0, 4)} (including pending requests).`,
+    };
   }
-  return { type, startDate, endDate, reason, days };
+  return { type, startDate, endDate, reason, days, typeName: leaveType.name };
 }
 
 export async function requestLeaveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
@@ -316,9 +323,9 @@ export async function recordLeaveAction(_prev: HrResult | null, form: FormData):
         ...items,
       ],
     }));
-    await hrAudit(ctx, approved ? "recorded approved leave" : "recorded leave application", `leave of ${employeeName(employee)}`, `${type}, ${startDate} to ${endDate} (${days} days)`);
+    await hrAudit(ctx, approved ? "recorded approved leave" : "recorded leave application", `leave of ${employeeName(employee)}`, `${checked.typeName}, ${startDate} to ${endDate} (${days} days)`);
     refresh();
-    return done(`${type} leave recorded for ${employeeName(employee)} (${days} working day${days === 1 ? "" : "s"}, ${approved ? "approved" : "pending"}).`);
+    return done(`${checked.typeName} recorded for ${employeeName(employee)} (${days} working day${days === 1 ? "" : "s"}, ${approved ? "approved" : "pending"}).`);
   });
 }
 
@@ -372,7 +379,6 @@ export async function decideLeaveAction(_prev: HrResult | null, form: FormData):
 /* ------------------------------------------------------------------ Employee records */
 
 function employeeFields(form: FormData, departments: HrDepartment[]) {
-  const annual = Number(text(form, "annualLeaveDays", 4));
   const departmentId = text(form, "departmentId", 64);
   const dept = departments.find((d) => d.id === departmentId && d.active);
   return {
@@ -391,7 +397,6 @@ function employeeFields(form: FormData, departments: HrDepartment[]) {
     dateOfBirth: text(form, "dateOfBirth", 10),
     gender: (GENDERS as readonly string[]).includes(text(form, "gender", 30)) ? text(form, "gender", 30) : "",
     employmentType: (EMPLOYMENT_TYPES as readonly string[]).includes(text(form, "employmentType", 40)) ? text(form, "employmentType", 40) : "",
-    annualLeaveDays: Number.isFinite(annual) && annual >= 0 && annual <= 365 ? Math.round(annual) : 20,
   };
 }
 
@@ -818,8 +823,7 @@ export async function importEmployeesAction(_prev: HrResult | null, form: FormDa
         managerId: null,
         startDate,
         status: status === "terminated" || status === "left" ? "left" : isEmployeeStatus(status) ? status : "active",
-        annualLeaveDays: 20,
-        address: "",
+          address: "",
         emergencyContactName: "",
         emergencyContactPhone: "",
         createdAt: now,
@@ -947,5 +951,287 @@ export async function updateBankingAction(_prev: HrResult | null, form: FormData
     await hrAudit(ctx, self ? "updated own banking details" : "updated banking details", employeeName(person), bankAccountNumber ? `Account ending ${bankAccountNumber.slice(-4)}` : "Cleared");
     refresh();
     return done("Banking details saved.");
+  });
+}
+
+/* ------------------------------------------------------------------ Leave types, policies, adjustments */
+
+const daysOrNull = (v: string): number | null | undefined => {
+  if (v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 && n <= 366 ? Math.round(n * 2) / 2 : undefined;
+};
+
+export async function saveLeaveTypeAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("leave.manage");
+    const existingId = text(form, "typeId", 64);
+    const name = text(form, "name", 60);
+    const color = text(form, "color", 20) as HrLeaveType["color"];
+    const defaultDays = daysOrNull(text(form, "defaultDays", 6));
+    if (!name) return fail("Give the leave type a name.");
+    if (!LEAVE_COLORS.includes(color)) return fail("Choose a colour.");
+    if (defaultDays === undefined) return fail("Days a year must be a number from 0 to 366, or blank for no limit.");
+    const types = await readStore("hrLeaveTypes");
+    const current = existingId ? types.find((t) => t.id === existingId) : undefined;
+    if (existingId && !current) return fail("Leave type not found.");
+    if (types.some((t) => t.name.toLowerCase() === name.toLowerCase() && t.id !== existingId)) return fail("There is already a leave type with that name.");
+    const type: HrLeaveType = {
+      id: current?.id ?? `lt_${slug(name) || "leave"}_${randomUUID().slice(0, 6)}`,
+      name,
+      description: text(form, "description", 300),
+      color,
+      paid: form.get("paid") !== null,
+      defaultDays,
+      carryOver: form.get("carryOver") !== null,
+      active: existingId ? text(form, "active", 5) !== "false" : true,
+    };
+    await updateStore("hrLeaveTypes", (items) => ({ items: current ? items.map((t) => (t.id === type.id ? type : t)) : [...items, type] }));
+    const days = (d: number | null) => (d === null ? "no limit" : `${d} days`);
+    await hrAudit(
+      ctx,
+      current ? "changed leave type" : "created leave type",
+      `leave type ${name}`,
+      current
+        ? [current.name !== name ? `Name: ${current.name} → ${name}` : "", current.defaultDays !== defaultDays ? `Default: ${days(current.defaultDays)} → ${days(defaultDays)}` : "", current.active !== type.active ? (type.active ? "Reopened" : "Retired") : ""].filter(Boolean).join(". ")
+        : `Default: ${days(defaultDays)}${type.paid ? ", paid" : ", unpaid"}`,
+    );
+    refresh();
+    return done(current ? `${name} saved.` : `${name} created.`);
+  });
+}
+
+export async function saveLeavePolicyAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("leave.manage");
+    const existingId = text(form, "policyId", 64);
+    const name = text(form, "name", 80);
+    const scope = text(form, "scope", 20) as HrLeavePolicy["scope"];
+    const scopeValue = scope === "department" ? text(form, "departmentId", 64) : scope === "employmentType" ? text(form, "employmentType", 40) : "";
+    if (!name) return fail("Give the policy a name.");
+    if (!["all", "department", "employmentType"].includes(scope)) return fail("Choose who the policy applies to.");
+    if (scope === "department" && !ctx.departments.some((d) => d.id === scopeValue)) return fail("Choose a department.");
+    if (scope === "employmentType" && !(EMPLOYMENT_TYPES as readonly string[]).includes(scopeValue)) return fail("Choose an employment type.");
+    const types = await readStore("hrLeaveTypes");
+    const entitlements: Record<string, number> = {};
+    for (const t of types) {
+      const raw = text(form, `days_${t.id}`, 6);
+      if (raw === "") continue;
+      const d = daysOrNull(raw);
+      if (d === undefined || d === null) return fail(`Days for ${t.name} must be a number from 0 to 366, or blank.`);
+      entitlements[t.id] = d;
+    }
+    const carry = Number(text(form, "carryOverMax", 4) || 0);
+    if (!Number.isFinite(carry) || carry < 0 || carry > 366) return fail("Carry-over must be a number of days from 0 to 366.");
+    const policies = await readStore("hrLeavePolicies");
+    const current = existingId ? policies.find((p) => p.id === existingId) : undefined;
+    if (existingId && !current) return fail("Policy not found.");
+    if (policies.some((p) => p.active && p.id !== existingId && p.scope === scope && p.scopeValue === scopeValue && text(form, "active", 5) !== "false")) {
+      return fail("Another active policy already covers the same staff. Edit that one instead.");
+    }
+    const now = new Date().toISOString();
+    const policy: HrLeavePolicy = {
+      id: current?.id ?? `lp_${randomUUID().slice(0, 8)}`,
+      name,
+      description: text(form, "description", 300),
+      scope,
+      scopeValue,
+      entitlements,
+      carryOverMax: Math.round(carry),
+      active: existingId ? text(form, "active", 5) !== "false" : true,
+      createdAt: current?.createdAt ?? now,
+      updatedAt: now,
+    };
+    await updateStore("hrLeavePolicies", (items) => ({ items: current ? items.map((p) => (p.id === policy.id ? policy : p)) : [...items, policy] }));
+    const summary = Object.entries(entitlements)
+      .map(([id, d]) => `${types.find((t) => t.id === id)?.name ?? id}: ${d}`)
+      .join(", ");
+    await hrAudit(ctx, current ? "changed leave policy" : "created leave policy", `leave policy ${name}`, `${summary || "no allowances"}; carry-over up to ${policy.carryOverMax} days${policy.active ? "" : "; inactive"}`);
+    refresh();
+    return done(current ? `${name} saved. Balances are updated straight away.` : `${name} created. Balances are updated straight away.`);
+  });
+}
+
+export async function deleteLeavePolicyAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("leave.manage");
+    const id = text(form, "policyId", 64);
+    const policy = (await readStore("hrLeavePolicies")).find((p) => p.id === id);
+    if (!policy) return fail("Policy not found.");
+    await updateStore("hrLeavePolicies", (items) => ({ items: items.filter((p) => p.id !== id) }));
+    await hrAudit(ctx, "deleted leave policy", `leave policy ${policy.name}`);
+    refresh();
+    return done(`${policy.name} deleted.`);
+  });
+}
+
+/** Add or remove days on one person's balance for a year, with a reason. */
+export async function addLeaveAdjustmentAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("leave.manage");
+    const employeeId = text(form, "employeeId", 64);
+    const typeId = text(form, "typeId", 64);
+    const year = Number(text(form, "year", 4));
+    const days = Number(text(form, "days", 6));
+    const reason = text(form, "reason", 300);
+    if (employeeId === ctx.employee.id) return fail("Ask another HR colleague to adjust your own balance.");
+    const [employees, types] = await Promise.all([readStore("hrEmployees"), readStore("hrLeaveTypes")]);
+    const person = employees.find((e) => e.id === employeeId);
+    const type = types.find((t) => t.id === typeId);
+    if (!person) return fail("Choose an employee.");
+    if (!type || type.defaultDays === null && !(await readStore("hrLeavePolicies")).some((p) => typeId in p.entitlements)) {
+      return fail("Choose a leave type that has an allowance (unlimited types have no balance).");
+    }
+    if (!Number.isInteger(year) || year < 2000 || year > 2100) return fail("Enter a valid year.");
+    if (!Number.isFinite(days) || days === 0 || Math.abs(days) > 366) return fail("Enter the number of days to add (or a negative number to remove).");
+    if (!reason) return fail("Give a reason (it's kept in the record).");
+    await updateStore("hrLeaveAdjustments", (items) => ({
+      items: [...items, { id: randomUUID(), employeeId, typeId, year, days: Math.round(days * 2) / 2, reason, byName: ctx.displayName, at: new Date().toISOString() }],
+    }));
+    await hrAudit(ctx, "adjusted leave balance", employeeName(person), `${type.name} ${year}: ${days > 0 ? "+" : ""}${days} days. ${reason}`);
+    refresh();
+    return done(`${type.name} for ${employeeName(person)} adjusted by ${days > 0 ? "+" : ""}${days} days.`);
+  });
+}
+
+/* ------------------------------------------------------------------ Sample data for testing */
+
+/** Five made-up staff (clearly marked SAMPLE) to try the portal with. */
+const SAMPLE_PEOPLE = [
+  { first: "Aisha", last: "Bello", title: "Programme Manager", dept: "Programmes", station: "Sokoto", type: "Full-time", role: "manager", status: "active", manager: null },
+  { first: "Ibrahim", last: "Musa", title: "Field Officer", dept: "Programmes", station: "Sokoto", type: "Full-time", role: "employee", status: "active", manager: 0 },
+  { first: "Fatima", last: "Abubakar", title: "Nutrition Officer", dept: "Health & Nutrition", station: "Maiduguri", type: "Fixed-term contract", role: "employee", status: "probation", manager: 0 },
+  { first: "Chinedu", last: "Okafor", title: "Finance Officer", dept: "Finance & Grants", station: "Abuja", type: "Full-time", role: "employee", status: "active", manager: null },
+  { first: "Grace", last: "Danjuma", title: "Deputy Director", dept: "Human Resources & Administration", station: "Sokoto", type: "Full-time", role: "management", status: "active", manager: null },
+] as const;
+
+const sampleEmail = (first: string, last: string) => `${first}.${last}.sample@example.test`.toLowerCase();
+
+export async function loadSampleDataAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction(["accounts.manage"]);
+    if (!has(ctx.permissions, "employees.manage")) throw new HrAccessError("You don't have permission to do that.");
+    const password = String(form.get("password") ?? "");
+    if (password) {
+      const weak = validatePasswordStrength(password);
+      if (weak) return fail(`Sample login password: ${weak}`);
+    }
+    const [employees, departments] = await Promise.all([readStore("hrEmployees"), readStore("hrDepartments")]);
+    if (employees.some((e) => e.sample)) return fail("Sample data is already loaded. Remove it first to load it again.");
+
+    const now = new Date().toISOString();
+    const today = new Date(`${new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(new Date())}T12:00:00Z`);
+    const day = (offset: number) => {
+      const d = new Date(today);
+      d.setUTCDate(d.getUTCDate() + offset);
+      return d.toISOString().slice(0, 10);
+    };
+    const monday = (weeks: number) => day(((8 - today.getUTCDay()) % 7 || 7) - 7 + weeks * 7);
+
+    const people: HrEmployee[] = SAMPLE_PEOPLE.map((p, i) => {
+      const dept = departments.find((d) => d.active && d.name.toLowerCase() === p.dept.toLowerCase());
+      return {
+        id: randomUUID(),
+        staffNumber: `SAMPLE-00${i + 1}`,
+        firstName: p.first,
+        lastName: p.last,
+        email: sampleEmail(p.first, p.last),
+        phone: "",
+        jobTitle: p.title,
+        department: dept?.name ?? p.dept,
+        ...(dept ? { departmentId: dept.id } : {}),
+        location: p.station,
+        managerId: null,
+        startDate: day(-(120 + i * 90)),
+        status: p.status,
+        employmentType: p.type,
+        address: "",
+        emergencyContactName: "",
+        emergencyContactPhone: "",
+        createdAt: now,
+        updatedAt: now,
+        sample: true,
+      };
+    });
+    SAMPLE_PEOPLE.forEach((p, i) => {
+      if (p.manager !== null) people[i].managerId = people[p.manager].id;
+    });
+
+    const req = (who: number, type: string, start: string, end: string, status: HrLeaveRequest["status"], reason: string): HrLeaveRequest => ({
+      id: randomUUID(),
+      employeeId: people[who].id,
+      type,
+      startDate: start,
+      endDate: end,
+      days: workingDays(start, end),
+      reason,
+      status,
+      createdAt: now,
+      ...(status === "approved" || status === "rejected" ? { decidedByAccountId: "sample", decidedByName: "Aisha Bello (sample)", decidedAt: now } : {}),
+      sample: true,
+    });
+    const thisMonday = monday(0);
+    const leave = [
+      req(1, "Annual", thisMonday, day(Math.round((Date.parse(thisMonday) - today.getTime()) / 86_400_000) + 4), "approved", "Sample: family visit"),
+      req(2, "Sick", monday(1), day(Math.round((Date.parse(monday(1)) - today.getTime()) / 86_400_000) + 1), "pending", "Sample: medical appointment"),
+      req(3, "Annual", monday(3), day(Math.round((Date.parse(monday(3)) - today.getTime()) / 86_400_000) + 4), "pending", "Sample: annual leave"),
+      req(4, "Study", monday(-4), day(Math.round((Date.parse(monday(-4)) - today.getTime()) / 86_400_000) + 1), "rejected", "Sample: workshop"),
+      req(0, "Annual", monday(5), day(Math.round((Date.parse(monday(5)) - today.getTime()) / 86_400_000) + 1), "approved", "Sample: personal leave"),
+    ].filter((l) => l.days > 0 && l.startDate.slice(0, 4) === l.endDate.slice(0, 4));
+
+    await updateStore("hrEmployees", (items) => ({ items: [...items, ...people] }));
+    await updateStore("hrLeave", (items) => ({ items: [...leave, ...items] }));
+
+    let logins = 0;
+    if (password) {
+      const passwordHash = await hashPassword(password);
+      const accounts: HrAccount[] = people.map((e, i) => ({
+        id: randomUUID(),
+        email: e.email,
+        employeeId: e.id,
+        roleId: SAMPLE_PEOPLE[i].role,
+        extraPermissions: [],
+        active: true,
+        passwordHash,
+        sessionVersion: 1,
+        createdAt: now,
+        createdBy: ctx.account.email,
+        sample: true,
+      }));
+      await updateStore("hrAccounts", (items) => {
+        const taken = new Set(items.map((a) => a.email));
+        const fresh = accounts.filter((a) => !taken.has(a.email));
+        logins = fresh.length;
+        return { items: [...items, ...fresh] };
+      });
+    }
+    await hrAudit(ctx, "loaded sample data", "sample records", `${people.length} sample employees, ${leave.length} leave requests, ${logins} sample logins`);
+    refresh();
+    return done(
+      `Loaded ${people.length} sample employees and ${leave.length} leave requests${logins ? `, with ${logins} sample logins (e.g. ${people[0].email} as Manager)` : ""}. Remove them any time with "Remove sample data".`,
+    );
+  });
+}
+
+export async function removeSampleDataAction(): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction(["accounts.manage"]);
+    if (!has(ctx.permissions, "employees.manage")) throw new HrAccessError("You don't have permission to do that.");
+    const [employees, accounts] = await Promise.all([readStore("hrEmployees"), readStore("hrAccounts")]);
+    const ids = new Set(employees.filter((e) => e.sample).map((e) => e.id));
+    const accountIds = new Set(accounts.filter((a) => a.sample || ids.has(a.employeeId)).map((a) => a.id));
+    if (!ids.size && !accountIds.size) return done("There is no sample data to remove.");
+    if (accountIds.has(ctx.account.id)) return fail("You're signed in with a sample login; sign in with your own account to remove sample data.");
+    await updateStore("hrEmployees", (items) => ({ items: items.filter((e) => !ids.has(e.id)).map((e) => (e.managerId && ids.has(e.managerId) ? { ...e, managerId: null } : e)) }));
+    await updateStore("hrAccounts", (items) => ({ items: items.filter((a) => !accountIds.has(a.id)) }));
+    await updateStore("hrTokens", (items) => ({ items: items.filter((t) => !accountIds.has(t.accountId)) }));
+    await updateStore("hrLeave", (items) => ({ items: items.filter((l) => !l.sample && !ids.has(l.employeeId)) }));
+    await updateStore("hrLeaveAdjustments", (items) => ({ items: items.filter((a) => !ids.has(a.employeeId)) }));
+    await updateStore("hrDepartments", (items) => ({
+      items: items.map((d) => ({ ...d, headEmployeeId: d.headEmployeeId && ids.has(d.headEmployeeId) ? null : d.headEmployeeId, approverIds: d.approverIds.filter((x) => !ids.has(x)) })),
+    }));
+    await hrAudit(ctx, "removed sample data", "sample records", `${ids.size} sample employees and ${accountIds.size} sample logins removed`);
+    refresh();
+    return done(`Removed ${ids.size} sample employees, their leave and ${accountIds.size} sample logins.`);
   });
 }

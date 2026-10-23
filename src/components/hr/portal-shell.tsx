@@ -10,14 +10,26 @@ import type { HrContext } from "@/lib/hr/session";
 import type { HrPermission } from "@/lib/hr/types";
 
 /** Menu built from the signed-in person's permissions (display only: every page checks again). */
-const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrPermission[] }[] = [
+const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrPermission[]; children?: { href: string; label: string }[] }[] = [
   { group: "Overview", href: "/hrportal/hr", label: "Dashboard", icon: "dashboard", any: ["employees.view", "employees.manage", "accounts.manage"] },
   { group: "Overview", href: "/hrportal/reports", label: "Reports", icon: "reports", any: ["reports.view"] },
   { group: "Me", href: "/hrportal/me", label: "My record", icon: "me", any: ["self.view"] },
   { group: "Me", href: "/hrportal/team", label: "My team", icon: "team", any: ["team.view"] },
   { group: "HR", href: "/hrportal/hr/employees", label: "Employees", icon: "employees", any: ["employees.view", "employees.manage"] },
   { group: "HR", href: "/hrportal/hr/departments", label: "Departments", icon: "departments", any: ["employees.view", "employees.manage"] },
-  { group: "HR", href: "/hrportal/hr/leave", label: "Leave applications", icon: "leave", any: ["leave.view_all", "leave.manage"] },
+  {
+    group: "HR",
+    href: "/hrportal/hr/leave",
+    label: "Leave Management",
+    icon: "leave",
+    any: ["leave.view_all", "leave.manage"],
+    children: [
+      { href: "/hrportal/hr/leave", label: "Leave Applications" },
+      { href: "/hrportal/hr/leave/balances", label: "Leave Balances" },
+      { href: "/hrportal/hr/leave/types", label: "Leave Types" },
+      { href: "/hrportal/hr/leave/policies", label: "Leave Policies" },
+    ],
+  },
   { group: "Administration", href: "/hrportal/hr/accounts", label: "Accounts", icon: "accounts", any: ["accounts.manage"] },
   { group: "Administration", href: "/hrportal/hr/roles", label: "Roles & permissions", icon: "roles", any: ["roles.manage"] },
   { group: "Administration", href: "/hrportal/hr/audit", label: "Audit trail", icon: "audit", any: ["audit.view"] },
@@ -34,7 +46,14 @@ export async function PortalShell({ ctx, current, crumbs = [], children }: { ctx
   for (const n of NAV.filter((item) => item.any.some((p) => has(ctx.permissions, p)))) {
     const active = current === n.href || (n.href !== "/hrportal/hr" && current.startsWith(`${n.href}/`));
     const group = groups.find((g) => g.label === n.group) ?? groups[groups.push({ label: n.group, items: [] }) - 1];
-    group.items.push({ href: n.href, label: n.label, icon: n.icon, active, ...(n.href === "/hrportal/team" && waiting ? { badge: waiting } : {}) });
+    group.items.push({
+      href: n.href,
+      label: n.label,
+      icon: n.icon,
+      active,
+      ...(n.href === "/hrportal/team" && waiting ? { badge: waiting } : {}),
+      ...(n.children ? { children: n.children.map((c) => ({ ...c, active: current === c.href })) } : {}),
+    });
   }
   return (
     <ShellFrame

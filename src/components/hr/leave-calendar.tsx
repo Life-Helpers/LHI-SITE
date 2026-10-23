@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { AutoSubmitSelect } from "@/components/hr/filters";
-import { LEAVE_STYLE, leaveLabel } from "@/components/hr/leave-style";
+import { LEAVE_COLOR_STYLE, leaveName, leaveStyle } from "@/components/hr/leave-style";
 import { addDays, hrefWith } from "@/components/hr/query";
 import { Card, inputClass, Person, todayLagos } from "@/components/hr/ui";
-import { employeeName, LEAVE_TYPES, type HrEmployee, type HrLeaveRequest, isCurrentStaff } from "@/lib/hr/types";
+import { employeeName, type HrEmployee, type HrLeaveRequest, type HrLeaveType, isCurrentStaff } from "@/lib/hr/types";
 
 const DAY = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTH_FMT = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
@@ -23,7 +23,9 @@ export function LeaveCalendar({
   basePath,
   params,
   personHref,
+  leaveTypes,
 }: {
+  leaveTypes: HrLeaveType[];
   employees: HrEmployee[];
   leave: HrLeaveRequest[];
   weekStart: string;
@@ -96,11 +98,13 @@ export function LeaveCalendar({
           <span className="inline-flex items-center gap-1.5 rounded-md border border-admin-primary/40 px-2 py-1 text-admin-primary">
             <span className="h-2 w-2 rounded-full border-2 border-admin-primary" aria-hidden="true" /> Today
           </span>
-          {LEAVE_TYPES.map((t) => (
-            <span key={t} className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 ${LEAVE_STYLE[t].pill}`}>
-              <span className={`h-2 w-2 rounded-full ${LEAVE_STYLE[t].dot}`} aria-hidden="true" /> {leaveLabel(t)}
-            </span>
-          ))}
+          {leaveTypes
+            .filter((t) => t.active)
+            .map((t) => (
+              <span key={t.id} className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 ${LEAVE_COLOR_STYLE[t.color].pill}`}>
+                <span className={`h-2 w-2 rounded-full ${LEAVE_COLOR_STYLE[t.color].dot}`} aria-hidden="true" /> {t.name}
+              </span>
+            ))}
           <span className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-admin-border px-2 py-1 text-admin-muted">Dashed = pending</span>
         </div>
       </Card>
@@ -150,11 +154,11 @@ export function LeaveCalendar({
                       return (
                         <div
                           key={l.id}
-                          title={`${leaveLabel(l.type)}: ${l.startDate} to ${l.endDate} (${l.status})`}
-                          className={`pointer-events-auto mx-1 flex flex-col justify-center overflow-hidden rounded-lg border px-3 ${LEAVE_STYLE[l.type].bar} ${l.status === "pending" ? "border-dashed" : ""}`}
+                          title={`${leaveName(l.type, leaveTypes)}: ${l.startDate} to ${l.endDate} (${l.status})`}
+                          className={`pointer-events-auto mx-1 flex flex-col justify-center overflow-hidden rounded-lg border px-3 ${leaveStyle(l.type, leaveTypes).bar} ${l.status === "pending" ? "border-dashed" : ""}`}
                           style={{ gridColumn: `${from + 1} / ${to + 2}`, gridRow: 1 }}
                         >
-                          <span className="truncate text-sm font-semibold">{leaveLabel(l.type)}</span>
+                          <span className="truncate text-sm font-semibold">{leaveName(l.type, leaveTypes)}</span>
                           <span className="truncate text-[11px] opacity-80">{l.status === "pending" ? "Pending approval" : `${l.days} working day${l.days === 1 ? "" : "s"}`}</span>
                         </div>
                       );

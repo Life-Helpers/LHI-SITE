@@ -1,16 +1,16 @@
-import { leaveLabel } from "@/components/hr/leave-style";
 import { Field, inputClass } from "@/components/hr/ui";
-import { LEAVE_TYPES } from "@/lib/hr/types";
+import type { HrLeaveType } from "@/lib/hr/types";
 
 /** Leave type, dates and reason; shared by self-service and HR forms. */
-export function LeaveFields() {
+export function LeaveFields({ types }: { types: HrLeaveType[] }) {
+  const open = types.filter((t) => t.active);
   return (
     <>
       <Field label="Leave type">
-        <select name="type" className={inputClass} defaultValue="Annual">
-          {LEAVE_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {leaveLabel(t)}
+        <select name="type" className={inputClass} defaultValue={open[0]?.id}>
+          {open.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
             </option>
           ))}
         </select>

@@ -281,7 +281,7 @@ test("leave goes from employee to manager, and nobody can approve their own", as
   // An outsider manager-less employee replaying it gets the same.
   expect(await replay(pages.outsider, captured, [[firstLeaveId, ownLeaveId]])).toContain("You don't have permission to do that.");
   await staff.reload();
-  await expect(staff.getByRole("cell", { name: "pending" })).toBeVisible();
+  await expect(staff.getByRole("cell", { name: "pending", exact: true })).toBeVisible();
   // Control: the same replay from the manager's own session does go through.
   expect(await replay(manager, captured, [[firstLeaveId, ownLeaveId]])).toContain("Leave approved for Esther Staff");
 });
@@ -299,7 +299,7 @@ test("HR records leave for others (never themselves) and only HR can export leav
   await form.getByLabel("To", { exact: true }).fill("2026-11-17");
   await form.locator('select[name="status"]').selectOption("approved");
   await form.getByRole("button", { name: "Save leave application" }).click();
-  await expect(form.getByRole("status")).toContainText("Study leave recorded");
+  await expect(form.getByRole("status")).toContainText("Study Leave recorded");
 
   const csv = await admin.request.get("/hrportal/hr/leave/export?tab=all");
   expect(csv.headers()["content-type"]).toContain("text/csv");
@@ -503,6 +503,93 @@ test("a deactivated account loses access at once and can't sign in", async () =>
   for (const action of ["created account", "changed role", "deactivated account", "approved leave", "created first HR administrator"]) {
     await expect(admin.getByRole("cell", { name: action, exact: true }).first()).toBeVisible();
   }
+});
+
+test("leave types, policies and balances: HR sets allowances and requests can't exceed them", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  const managerName = `${people.manager.first} ${people.manager.last}`;
+
+  await admin.goto("/hrportal/hr/leave/types");
+  await admin.getByRole("button", { name: "Add Leave Type" }).click();
+  let form = admin.getByRole("dialog").locator("form");
+  await form.locator('input[name="name"]').fill("Hajj Leave");
+  await form.locator('input[name="defaultDays"]').fill("3");
+  await form.getByRole("button", { name: "Create leave type" }).click();
+  await expect(form.getByRole("status")).toBeVisible();
+  await admin.reload();
+  await expect(admin.getByRole("cell", { name: "Hajj Leave" })).toBeVisible();
+
+  await admin.goto("/hrportal/hr/leave/policies");
+  await admin.getByRole("button", { name: "Add Leave Policy" }).click();
+  form = admin.getByRole("dialog").locator("form");
+  await form.locator('input[name="name"]').fill("E2E short allowance");
+  await form.locator('input[name="days_Annual"]').fill("5");
+  await form.getByRole("button", { name: "Create policy" }).click();
+  await expect(form.getByRole("status")).toBeVisible();
+
+  // The policy's 5 days apply at once, and a 6-day request is refused.
+  await admin.goto(`/hrportal/hr/leave/balances?emp=${employeeIds.manager}&year=2026`);
+  await expect(admin.getByRole("button", { name: /^Annual Leave: Allowance 5 / })).toBeVisible();
+  await admin.goto("/hrportal/hr/leave");
+  await admin.getByRole("button", { name: "Add Leave Application" }).click();
+  form = admin.getByRole("dialog").locator("form");
+  await form.locator('select[name="employeeId"]').selectOption({ label: managerName });
+  await form.locator('select[name="type"]').selectOption("Annual");
+  await form.getByLabel("From", { exact: true }).fill("2026-12-07");
+  await form.getByLabel("To", { exact: true }).fill("2026-12-14");
+  await form.getByRole("button", { name: "Save leave application" }).click();
+  await expect(form.getByRole("alert")).toBeVisible();
+
+  // An adjustment adds days and shows in the breakdown.
+  await admin.goto(`/hrportal/hr/leave/balances?emp=${employeeIds.manager}&year=2026`);
+  await admin.getByRole("button", { name: "Adjust" }).click();
+  form = admin.getByRole("dialog").locator("form");
+  await form.locator('select[name="typeId"]').selectOption("Annual");
+  await form.locator('input[name="days"]').fill("2");
+  await form.locator('input[name="reason"]').fill("Worked on a public holiday");
+  await form.getByRole("button", { name: "Save adjustment" }).click();
+  await expect(form.getByRole("status")).toBeVisible();
+  await admin.reload();
+  await expect(admin.getByRole("button", { name: /^Annual Leave: Allowance 5 \+ adjusted 2/ })).toBeVisible();
+
+  // Staff and managers can't reach leave settings.
+  for (const path of ["/hrportal/hr/leave/types", "/hrportal/hr/leave/policies", "/hrportal/hr/leave/balances"]) {
+    await pages.staff.goto(path);
+    await expect(pages.staff).toHaveURL(/denied=1$/);
+  }
+
+  await admin.goto("/hrportal/hr/leave/policies");
+  admin.once("dialog", (d) => void d.accept());
+  await admin.getByRole("button", { name: "Delete" }).click();
+  await expect(admin.getByText("E2E short allowance")).toHaveCount(0);
+});
+
+test("HR loads sample records for testing and removes them in one go", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  await admin.goto("/hrportal/hr");
+  await admin.getByLabel(/Password for sample logins/).fill(PASSWORD);
+  await admin.getByRole("button", { name: "Load sample data" }).click();
+  await expect(admin.getByRole("main").getByRole("status")).toContainText("Loaded 5 sample employees");
+  await admin.goto("/hrportal/hr/employees?q=SAMPLE");
+  await expect(admin.getByText("SAMPLE-005")).toBeVisible();
+
+  // A sample login works with its role's limits.
+  const sample = await freshPage();
+  await signIn(sample, "aisha.bello.sample@example.test");
+  await expect(sample).toHaveURL(/\/hrportal\/team/);
+  await sample.goto("/hrportal/hr/employees");
+  await expect(sample).toHaveURL(/denied=1$/);
+
+  await admin.goto("/hrportal/hr");
+  admin.once("dialog", (d) => void d.accept());
+  await admin.getByRole("button", { name: "Remove sample data" }).click();
+  await expect(admin.getByRole("main").getByRole("status")).toContainText("Removed 5 sample employees");
+  await admin.goto("/hrportal/hr/employees?q=SAMPLE");
+  await expect(admin.getByText("SAMPLE-001")).toHaveCount(0);
+  await sample.goto("/hrportal/me");
+  await expect(sample).toHaveURL(/\/hrportal(\?.*)?$/);
 });
 
 test("the public website stays open to everyone", async ({ page }) => {

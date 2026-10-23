@@ -51,7 +51,7 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
                       ))}
                     </select>
                   </Field>
-                  <LeaveFields />
+                  <LeaveFields types={ctx.leaveTypes} />
                   <Field label="Status">
                     <select name="status" defaultValue="pending" className={inputClass}>
                       <option value="pending">Pending (needs a decision)</option>
@@ -64,9 +64,9 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
           </>
         }
       />
-      <LeaveCalendar employees={employees} leave={leave} weekStart={weekStart} basePath="/hrportal/hr/leave" params={params} personHref={viewHref} />
+      <LeaveCalendar leaveTypes={ctx.leaveTypes} employees={employees} leave={leave} weekStart={weekStart} basePath="/hrportal/hr/leave" params={params} personHref={viewHref} />
       <div className="mt-6">
-        <LeaveListing rows={leave} employees={employees} basePath="/hrportal/hr/leave" params={params} canDecide={(l) => canDecideLeave(ctx.actor, l, employees, ctx.departments)} viewHref={viewHref} />
+        <LeaveListing leaveTypes={ctx.leaveTypes} rows={leave} employees={employees} basePath="/hrportal/hr/leave" params={params} canDecide={(l) => canDecideLeave(ctx.actor, l, employees, ctx.departments)} viewHref={viewHref} />
       </div>
     </PortalShell>
   );
