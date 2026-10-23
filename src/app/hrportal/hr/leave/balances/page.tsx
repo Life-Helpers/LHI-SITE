@@ -55,7 +55,7 @@ export default async function LeaveBalancesPage({ searchParams }: { searchParams
         </span>
       </p>
 
-      <section className="mb-5 rounded-xl border border-admin-border bg-admin-card px-4 py-4">
+      <section className="mb-5 hr-card px-4 py-4">
         <form action="/hrportal/hr/leave/balances" className="flex flex-wrap items-center gap-3" role="search">
           <span className="relative w-full max-w-64">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-admin-muted" aria-hidden="true" />
@@ -83,12 +83,12 @@ export default async function LeaveBalancesPage({ searchParams }: { searchParams
 
       <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
         {shown.map((e) => (
-          <section key={e.id} className="flex flex-col rounded-xl border border-admin-border bg-admin-card">
-            <div className="flex items-center justify-between gap-3 border-b border-admin-border px-4 py-4">
+          <section key={e.id} className="hr-card flex min-w-0 flex-col p-4">
+            <div className="flex items-center justify-between gap-3 border-b border-admin-border pb-4">
               <span className="flex min-w-0 items-center gap-3">
-                <Avatar name={employeeName(e)} />
+                <Avatar name={employeeName(e)} size="lg" square />
                 <span className="min-w-0">
-                  <Link href={`/hrportal/hr/employees/${e.id}?tab=leave`} className="block truncate font-semibold hover:text-admin-primary">
+                  <Link href={`/hrportal/hr/employees/${e.id}?tab=leave`} className="block truncate text-base font-semibold hover:text-admin-primary">
                     {employeeName(e)}
                   </Link>
                   <span className="block truncate text-xs text-admin-muted">{e.staffNumber || e.department || e.jobTitle || "—"}</span>
@@ -122,7 +122,7 @@ export default async function LeaveBalancesPage({ searchParams }: { searchParams
                 </Modal>
               )}
             </div>
-            <div className="max-h-72 overflow-y-auto">
+            <div className="hr-scroll mt-3 max-h-64 overflow-y-auto overflow-x-hidden pr-1">
               <BalanceTable rows={balanceFor(e, year, ctx.leaveTypes, policies, leave, adjustments)} />
             </div>
           </section>

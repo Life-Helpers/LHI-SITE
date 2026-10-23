@@ -221,7 +221,7 @@ export function ShellFrame({
               <ChevronDown className="h-4 w-4 text-admin-muted transition-transform group-open:rotate-180" aria-hidden="true" />
               <span className="sr-only">Account menu</span>
             </summary>
-            <div className="absolute right-0 mt-2 w-60 rounded-xl border border-admin-border bg-admin-card p-2 shadow-lg">
+            <div className="absolute right-0 mt-2 w-60 hr-card p-2 shadow-lg">
               <p className="px-3 py-2 text-xs text-admin-muted">
                 Signed in as <span className="font-semibold text-admin-text">{user.role}</span>
               </p>

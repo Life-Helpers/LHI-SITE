@@ -102,7 +102,7 @@ export default async function EmployeesPage({ searchParams }: { searchParams: Pr
         }
       />
 
-      <section className="overflow-hidden rounded-xl border border-admin-border bg-admin-card">
+      <section className="overflow-hidden hr-card">
         <form action="/hrportal/hr/employees" className="flex flex-wrap items-center gap-3 px-4 py-4" role="search">
           {kept(["q", "branch", "dept", "role", "page"])}
           <span className="relative w-full max-w-64">

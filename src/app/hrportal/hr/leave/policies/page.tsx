@@ -121,7 +121,7 @@ export default async function LeavePoliciesPage() {
       )}
       <div className="grid gap-5 lg:grid-cols-2">
         {sorted.map((p) => (
-          <section key={p.id} className="rounded-xl border border-admin-border bg-admin-card">
+          <section key={p.id} className="hr-card">
             <div className="flex items-start justify-between gap-3 border-b border-admin-border px-5 py-4">
               <div className="flex items-start gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-admin-primary-soft text-admin-primary">

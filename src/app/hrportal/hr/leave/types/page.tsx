@@ -81,7 +81,7 @@ export default async function LeaveTypesPage() {
           )
         }
       />
-      <section className="overflow-hidden rounded-xl border border-admin-border bg-admin-card">
+      <section className="overflow-hidden hr-card">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead>

@@ -65,6 +65,29 @@
   --a-danger: #e02424;
   --a-danger-soft: #fdecec;
 }
+/* Crisp text and the soft white card used across the HR portal. */
+.hr-root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+.hr-root .hr-card {
+  border-radius: 1rem;
+  border: 1px solid var(--a-border);
+  background: var(--a-card);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 14px rgba(16, 24, 40, 0.06);
+}
+.dark .hr-root .hr-card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+/* Slim scrollbar for panels that scroll inside a card. */
+.hr-root .hr-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--a-muted) 55%, transparent) transparent;
+}
+.hr-root .hr-scroll::-webkit-scrollbar { width: 6px; }
+.hr-root .hr-scroll::-webkit-scrollbar-thumb { border-radius: 9999px; background: color-mix(in srgb, var(--a-muted) 55%, transparent); }
+
 .dark .hr-root {
   --a-bg: #0e1116;
   --a-card: #151a21;

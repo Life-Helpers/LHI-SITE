@@ -90,7 +90,7 @@ export function LeaveListing({
   };
 
   return (
-    <section className="overflow-hidden rounded-xl border border-admin-border bg-admin-card">
+    <section className="overflow-hidden hr-card">
       <nav aria-label="Leave status" className="flex overflow-x-auto border-b border-admin-border px-2">
         {TABS.map((t) => (
           <Link

@@ -88,7 +88,7 @@ export default async function AccountsPage() {
           const manageable = canManageAccount(ctx.actor, a);
           const state = !a.active ? "inactive" : a.passwordHash ? "active" : "invited";
           return (
-            <details key={a.id} id={`account-${a.id}`} className="rounded-xl border border-admin-border bg-admin-card">
+            <details key={a.id} id={`account-${a.id}`} className="hr-card">
               <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2 px-5 py-4">
                 <span className="flex min-w-0 items-center gap-3">
                   <Avatar name={person ? employeeName(person) : a.email} />

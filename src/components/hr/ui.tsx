@@ -39,7 +39,7 @@ export function Card({
   className?: string;
 }) {
   return (
-    <section className={`overflow-hidden rounded-xl border border-admin-border bg-admin-card shadow-[0_1px_2px_rgba(16,24,40,0.04)] ${className}`}>
+    <section className={`hr-card overflow-hidden ${className}`}>
       {(title || actions) && (
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-admin-border px-5 py-4">
           <div>
@@ -142,7 +142,7 @@ export function TintStat({
 /** Plain stat, used on self-service pages. */
 export function Stat({ label, value, note }: { label: string; value: string | number; note?: string }) {
   return (
-    <div className="rounded-xl border border-admin-border bg-admin-card p-5">
+    <div className="hr-card p-5">
       <p className="text-sm text-admin-muted">{label}</p>
       <p className="mt-1 text-2xl font-bold tracking-tight text-admin-text">{value}</p>
       {note && <p className="mt-1 text-xs text-admin-muted">{note}</p>}
@@ -209,10 +209,10 @@ export function toneFor(name: string) {
 }
 
 /** Initials avatar (staff photos aren't stored in the portal). */
-export function Avatar({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
+export function Avatar({ name, size = "md", square = false }: { name: string; size?: "sm" | "md" | "lg"; square?: boolean }) {
   const dims = { sm: "h-8 w-8 text-[11px]", md: "h-10 w-10 text-xs", lg: "h-14 w-14 text-base" }[size];
   return (
-    <span className={`inline-flex shrink-0 items-center justify-center rounded-full font-bold text-white ${dims} ${toneFor(name)}`} aria-hidden="true">
+    <span className={`inline-flex shrink-0 items-center justify-center font-bold text-white ${square ? "rounded-xl" : "rounded-full"} ${dims} ${toneFor(name)}`} aria-hidden="true">
       {initialsOf(name)}
     </span>
   );

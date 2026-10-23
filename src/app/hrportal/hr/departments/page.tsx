@@ -102,7 +102,7 @@ export default async function DepartmentsPage() {
         {departments.map((d) => {
           const members = staff.filter((e) => e.departmentId === d.id);
           return (
-            <section key={d.id} className="rounded-xl border border-admin-border bg-admin-card">
+            <section key={d.id} className="hr-card">
               <div className="flex items-start justify-between gap-3 border-b border-admin-border px-5 py-4">
                 <div className="flex items-start gap-3">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-admin-primary-soft text-admin-primary">

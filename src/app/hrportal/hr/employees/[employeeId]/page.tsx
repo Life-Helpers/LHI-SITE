@@ -83,7 +83,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
       </div>
       {isSelf && has(p, "employees.manage") && <Notice>This is your own record. Ask another HR colleague to change it; you can update your contact and bank details under My record.</Notice>}
 
-      <div className="grid gap-6 rounded-xl border border-admin-border bg-admin-card p-5 lg:grid-cols-[320px_minmax(0,1fr)] lg:p-6">
+      <div className="grid gap-6 hr-card p-5 lg:grid-cols-[320px_minmax(0,1fr)] lg:p-6">
         <aside className="rounded-xl border border-admin-border p-6">
           <div className="flex flex-col items-center text-center">
             <span className={`flex h-28 w-28 items-center justify-center rounded-full text-3xl font-bold text-white ${toneFor(name)}`} aria-hidden="true">
