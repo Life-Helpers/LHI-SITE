@@ -1,5 +1,5 @@
 import { inputClass, Field } from "@/components/hr/ui";
-import { employeeName, type HrDepartment, type HrEmployee, isCurrentStaff } from "@/lib/hr/types";
+import { EMPLOYMENT_TYPES, employeeName, GENDERS, type HrDepartment, type HrEmployee, isCurrentStaff } from "@/lib/hr/types";
 
 
 /** Employee record fields, shared by the create and edit forms. */
@@ -62,6 +62,22 @@ export function EmployeeFields({ employee, managers, departments }: { employee?:
       </Field>
       <Field label="Start date">
         <input name="startDate" type="date" defaultValue={e?.startDate} className={inputClass} />
+      </Field>
+      <Field label="Gender (optional)">
+        <select name="gender" defaultValue={e?.gender ?? ""} className={inputClass}>
+          <option value="">—</option>
+          {GENDERS.map((g) => (
+            <option key={g}>{g}</option>
+          ))}
+        </select>
+      </Field>
+      <Field label="Employment type">
+        <select name="employmentType" defaultValue={e?.employmentType ?? ""} className={inputClass}>
+          <option value="">—</option>
+          {EMPLOYMENT_TYPES.map((t) => (
+            <option key={t}>{t}</option>
+          ))}
+        </select>
       </Field>
       <Field label="Date of birth (optional)" hint="Only HR sees it; used for birthday wishes.">
         <input name="dateOfBirth" type="date" defaultValue={e?.dateOfBirth} className={inputClass} />

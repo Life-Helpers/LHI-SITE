@@ -35,6 +35,7 @@ export function LeaveListing({
   canDecide,
   canCancel,
   viewHref,
+  statusParam = "tab",
 }: {
   rows: HrLeaveRequest[];
   employees: HrEmployee[];
@@ -44,8 +45,10 @@ export function LeaveListing({
   canDecide?: (l: HrLeaveRequest) => boolean;
   canCancel?: (l: HrLeaveRequest) => boolean;
   viewHref?: (employeeId: string) => string | undefined;
+  /** Query parameter for the status tabs (when the page already uses `tab`). */
+  statusParam?: string;
 }) {
-  const tab = TABS.some((t) => t.id === params.tab) ? params.tab! : "pending";
+  const tab = TABS.some((t) => t.id === params[statusParam]) ? params[statusParam]! : "pending";
   const per = PER_PAGE.includes(Number(params.per)) ? Number(params.per) : 10;
   const sortKey = (params.sort && params.sort in SORTS ? params.sort : "applied") as keyof typeof SORTS;
   const dir = params.dir === "asc" ? "asc" : "desc";
@@ -90,7 +93,7 @@ export function LeaveListing({
         {TABS.map((t) => (
           <Link
             key={t.id}
-            href={link({ tab: t.id, page: undefined })}
+            href={link({ [statusParam]: t.id, page: undefined })}
             aria-current={tab === t.id ? "page" : undefined}
             className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium ${tab === t.id ? "border-admin-primary text-admin-primary" : "border-transparent text-admin-muted hover:text-admin-text"}`}
           >

@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { FileUp, Plus, X } from "lucide-react";
+import { FileUp, KeyRound, Plus, X } from "lucide-react";
+
+import { Tip } from "@/components/hr/tooltip";
 
 /** A button that opens a native dialog with a form inside (e.g. "Add employee"). */
 export function Modal({
@@ -12,6 +14,7 @@ export function Modal({
   wide = false,
   outline = false,
   icon = "plus",
+  iconOnly = false,
 }: {
   label: string;
   title: string;
@@ -20,12 +23,21 @@ export function Modal({
   wide?: boolean;
   /** Secondary (outlined) button instead of the green one. */
   outline?: boolean;
-  icon?: "plus" | "upload";
+  icon?: "plus" | "upload" | "key";
+  /** Show just the icon (with a tooltip), e.g. in a table row. */
+  iconOnly?: boolean;
 }) {
-  const Icon = icon === "upload" ? FileUp : Plus;
+  const Icon = icon === "upload" ? FileUp : icon === "key" ? KeyRound : Plus;
   const ref = useRef<HTMLDialogElement>(null);
   return (
     <>
+      {iconOnly ? (
+        <Tip label={label}>
+          <button type="button" onClick={() => ref.current?.showModal()} aria-label={title} className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
+            <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+          </button>
+        </Tip>
+      ) : (
       <button
         type="button"
         onClick={() => ref.current?.showModal()}
@@ -37,6 +49,7 @@ export function Modal({
       >
         <Icon className="h-4 w-4" aria-hidden="true" /> {label}
       </button>
+      )}
       <dialog
         ref={ref}
         aria-label={title}

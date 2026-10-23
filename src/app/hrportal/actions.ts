@@ -24,11 +24,13 @@ import {
 } from "@/lib/hr/access";
 import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
 import { consumeHrToken, createHrToken, hrAudit, peekHrToken } from "@/lib/hr/data";
-import { createHrSession, destroyHrSession, HrAccessError, requireHrAction, type HrContext } from "@/lib/hr/session";
+import { createHrSession, destroyHrSession, HrAccessError, loadHrSession, requireHrAction, type HrContext } from "@/lib/hr/session";
 import {
   BUILT_IN_HR_ROLES,
   employeeName,
   STANDARD_DEPARTMENTS,
+  EMPLOYMENT_TYPES,
+  GENDERS,
   isEmployeeStatus,
   statusLabel,
   isHrPermission,
@@ -122,6 +124,7 @@ export async function hrSignInAction(_prev: HrResult | null, form: FormData): Pr
     }));
     await createHrSession(account);
     if (accessProblem(account, customRoles, employee)) redirect("/hrportal/no-access");
+    if (account.mustChangePassword) redirect("/hrportal/password?required=1");
     redirect(homePath(effectivePermissions(account, customRoles, employee, departments)));
   } catch (err) {
     unstable_rethrow(err);
@@ -150,7 +153,7 @@ export async function hrActivateAction(_prev: HrResult | null, form: FormData): 
     const account = await updateStore("hrAccounts", (items) => {
       const found = items.find((a) => a.id === used.accountId);
       if (!found) return { items, result: null };
-      const next = { ...found, passwordHash, sessionVersion: found.sessionVersion + 1 };
+      const next = { ...found, passwordHash, mustChangePassword: false, sessionVersion: found.sessionVersion + 1 };
       return { items: items.map((a) => (a.id === found.id ? next : a)), result: next };
     });
     if (!account) return fail("This account no longer exists. Contact the HR team.");
@@ -386,6 +389,8 @@ function employeeFields(form: FormData, departments: HrDepartment[]) {
     managerId: text(form, "managerId", 64) || null,
     startDate: text(form, "startDate", 10),
     dateOfBirth: text(form, "dateOfBirth", 10),
+    gender: (GENDERS as readonly string[]).includes(text(form, "gender", 30)) ? text(form, "gender", 30) : "",
+    employmentType: (EMPLOYMENT_TYPES as readonly string[]).includes(text(form, "employmentType", 40)) ? text(form, "employmentType", 40) : "",
     annualLeaveDays: Number.isFinite(annual) && annual >= 0 && annual <= 365 ? Math.round(annual) : 20,
   };
 }
@@ -838,5 +843,109 @@ export async function importEmployeesAction(_prev: HrResult | null, form: FormDa
     refresh();
     const more = skipped.length > 5 ? ` and ${skipped.length - 5} more` : "";
     return done(`Imported ${records2.length} employee${records2.length === 1 ? "" : "s"}.${skipped.length ? ` Skipped ${skipped.length}: ${skipped.slice(0, 5).join("; ")}${more}.` : ""}`);
+  });
+}
+
+/* ------------------------------------------------------------------ Passwords */
+
+/** HR sets someone's password (e.g. they can't receive links). By default they must change it at next sign-in. */
+export async function setPasswordAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("accounts.manage");
+    const target = await loadAccountTarget(ctx, text(form, "accountId", 64));
+    const password = String(form.get("password") ?? "");
+    if (password !== String(form.get("confirm") ?? "")) return fail("The two passwords don't match.");
+    const weak = validatePasswordStrength(password);
+    if (weak) return fail(weak);
+    const mustChange = form.get("mustChange") !== null;
+    const passwordHash = await hashPassword(password);
+    await changeAccount(target.id, (a) => ({ ...a, passwordHash, mustChangePassword: mustChange }));
+    // Links issued earlier stop working.
+    await updateStore("hrTokens", (items) => ({ items: items.filter((t) => t.accountId !== target.id || t.usedAt) }));
+    await hrAudit(ctx, "changed password", `account ${target.email}`, mustChange ? "They must choose their own at next sign-in." : "Set by HR.");
+    refresh();
+    return done(`Password changed for ${target.email}. Their other sessions have ended.${mustChange ? " They'll choose their own when they next sign in." : ""}`);
+  });
+}
+
+/** Anyone signed in changes their own password (also used when HR set it). */
+export async function changeOwnPasswordAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const state = await loadHrSession();
+    if (state.status !== "ok") throw new HrAccessError("Your session has ended. Please sign in again.");
+    const { account } = state.ctx;
+    const current = String(form.get("current") ?? "");
+    const password = String(form.get("password") ?? "");
+    if (!account.passwordHash || !(await verifyPassword(current, account.passwordHash))) return fail("Your current password isn't right.");
+    if (password !== String(form.get("confirm") ?? "")) return fail("The two new passwords don't match.");
+    if (password === current) return fail("Choose a password different from the current one.");
+    const weak = validatePasswordStrength(password);
+    if (weak) return fail(weak);
+    const passwordHash = await hashPassword(password);
+    const updated = await changeAccount(account.id, (a) => ({ ...a, passwordHash, mustChangePassword: false }));
+    if (!updated) return fail("Your account no longer exists.");
+    // Other devices are signed out; this one gets a fresh session.
+    await createHrSession(updated);
+    await hrAudit(state.ctx, "changed own password", `account ${account.email}`);
+    redirect(homePath(state.ctx.permissions));
+  });
+}
+
+/* ------------------------------------------------------------------ Delete employee */
+
+/**
+ * Permanently remove an employee record with its portal login and leave history. Prefer marking
+ * people as Terminated; deletion is for records created by mistake.
+ */
+export async function deleteEmployeeAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("employees.manage");
+    const id = text(form, "employeeId", 64);
+    if (id === ctx.employee.id) return fail("You can't delete your own record.");
+    const [employees, accounts] = await Promise.all([readStore("hrEmployees"), readStore("hrAccounts")]);
+    const person = employees.find((e) => e.id === id);
+    if (!person) return fail("Employee not found.");
+    const account = accounts.find((a) => a.employeeId === id);
+    if (account && !canManageAccount(ctx.actor, account)) return fail("This person has a portal login; only an HR administrator can delete them.");
+    if (account && !canGrant(ctx.actor, effectivePermissions(account, await readStore("hrRoles"), person, ctx.departments))) {
+      return fail("You can't delete someone with more access than you.");
+    }
+    const removedLeave = (await readStore("hrLeave")).filter((l) => l.employeeId === id).length;
+    await updateStore("hrEmployees", (items) => ({ items: items.filter((e) => e.id !== id).map((e) => (e.managerId === id ? { ...e, managerId: null } : e)) }));
+    if (account) {
+      await updateStore("hrAccounts", (items) => ({ items: items.filter((a) => a.id !== account.id) }));
+      await updateStore("hrTokens", (items) => ({ items: items.filter((t) => t.accountId !== account.id) }));
+    }
+    await updateStore("hrLeave", (items) => ({ items: items.filter((l) => l.employeeId !== id) }));
+    await updateStore("hrDepartments", (items) => ({
+      items: items.map((d) => ({ ...d, headEmployeeId: d.headEmployeeId === id ? null : d.headEmployeeId, approverIds: d.approverIds.filter((x) => x !== id) })),
+    }));
+    await hrAudit(ctx, "deleted employee", employeeName(person), `${person.email || "no email"}; ${account ? `login ${account.email} removed; ` : ""}${removedLeave} leave request(s) removed.`);
+    refresh();
+    return done(`${employeeName(person)} deleted.`);
+  });
+}
+
+/* ------------------------------------------------------------------ Banking */
+
+/** Salary account details: the person themselves, or HR staff who manage records. */
+export async function updateBankingAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const employeeId = text(form, "employeeId", 64);
+    const ctx = await requireHrAction(["self.update", "employees.manage"]);
+    const self = employeeId === ctx.employee.id;
+    if (self ? !has(ctx.permissions, "self.update") : !has(ctx.permissions, "employees.manage")) throw new HrAccessError("You don't have permission to do that.");
+    const bankName = text(form, "bankName", 80);
+    const bankAccountName = text(form, "bankAccountName", 120);
+    const bankAccountNumber = text(form, "bankAccountNumber", 30).replace(/\s+/g, "");
+    if (bankAccountNumber && !/^\d{6,20}$/.test(bankAccountNumber)) return fail("The account number should be digits only (Nigerian NUBAN numbers have 10).");
+    const person = (await readStore("hrEmployees")).find((e) => e.id === employeeId);
+    if (!person) return fail("Employee not found.");
+    await updateStore("hrEmployees", (items) => ({
+      items: items.map((e) => (e.id === employeeId ? { ...e, bankName, bankAccountName, bankAccountNumber, updatedAt: new Date().toISOString() } : e)),
+    }));
+    await hrAudit(ctx, self ? "updated own banking details" : "updated banking details", employeeName(person), bankAccountNumber ? `Account ending ${bankAccountNumber.slice(-4)}` : "Cleared");
+    refresh();
+    return done("Banking details saved.");
   });
 }

@@ -108,6 +108,8 @@ export interface HrAccount {
   passwordHash?: string;
   /** Bumped whenever access changes; sessions carrying an older value stop working. */
   sessionVersion: number;
+  /** Set when HR chose the password: the person must pick their own before doing anything else. */
+  mustChangePassword?: boolean;
   createdAt: string;
   createdBy: string;
   lastLoginAt?: string;
@@ -141,6 +143,12 @@ export interface HrEmployee {
   annualLeaveDays: number;
   /** Optional, for the birthdays panel (HR only; the year is never shown). */
   dateOfBirth?: string;
+  gender?: string;
+  employmentType?: string;
+  /** Salary account. Visible only to the person and to HR staff who manage records. */
+  bankName?: string;
+  bankAccountName?: string;
+  bankAccountNumber?: string;
   address: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
@@ -230,6 +238,9 @@ export const statusLabel = (s: EmployeeStatus) => EMPLOYEE_STATUSES.find((x) => 
 
 /** Current staff: active or on probation. Only they can use the portal or be chosen as managers and approvers. */
 export const isCurrentStaff = (e: Pick<HrEmployee, "status"> | undefined | null) => e?.status === "active" || e?.status === "probation";
+
+export const GENDERS = ["Female", "Male", "Prefer not to say"] as const;
+export const EMPLOYMENT_TYPES = ["Full-time", "Part-time", "Fixed-term contract", "Consultancy", "Internship", "Volunteer"] as const;
 
 export const employeeName = (e: Pick<HrEmployee, "firstName" | "lastName"> | undefined | null) =>
   e ? `${e.firstName} ${e.lastName}`.trim() : "Unknown employee";

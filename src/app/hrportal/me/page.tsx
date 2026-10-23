@@ -2,6 +2,7 @@ import { CalendarCheck, CalendarClock, CalendarDays, Palmtree } from "lucide-rea
 
 import { requestLeaveAction, setMyDepartmentAction, updateMyContactAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
+import { BankingCard } from "@/components/hr/banking-card";
 import { LeaveFields } from "@/components/hr/leave-form";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { Modal } from "@/components/hr/modal";
@@ -145,6 +146,10 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
             </ActionForm>
           </Card>
         )}
+      </div>
+
+      <div className="mt-6">
+        <BankingCard person={me} editable={has(ctx.permissions, "self.update")} />
       </div>
 
       <div className="mt-6">

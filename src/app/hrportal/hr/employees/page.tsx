@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { CalendarDays, CircleCheck, CircleX, Clock3, Eye, FileDown, LayoutGrid, Pencil, Search, UserMinus, UserPlus } from "lucide-react";
 
-import { createEmployeeAction, importEmployeesAction, issueResetLinkAction, setAccountActiveAction } from "@/app/hrportal/actions";
+import { createEmployeeAction, deleteEmployeeAction, importEmployeesAction, setAccountActiveAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { EmployeeFields } from "@/components/hr/employee-form";
 import { AutoSubmitSelect } from "@/components/hr/filters";
 import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { hrefWith } from "@/components/hr/query";
+import { ChangePasswordModal } from "@/components/hr/password-panel";
 import { QuickAction } from "@/components/hr/quick-action";
+import { Tip } from "@/components/hr/tooltip";
 import { Badge, Field, inputClass, outlineButtonClass, PageTitle, Person } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { canManageAccount, has } from "@/lib/hr/access";
@@ -193,30 +195,45 @@ export default async function EmployeesPage({ searchParams }: { searchParams: Pr
                     </td>
                     <td className="px-4 py-3">
                       <span className="flex items-center justify-center gap-1">
-                        <Link href={`/hrportal/hr/employees/${e.id}`} title="View" aria-label={`View ${employeeName(e)}`} className={icon}>
-                          <Eye className="h-[18px] w-[18px]" aria-hidden="true" />
-                        </Link>
-                        {canManage && e.id !== ctx.employee.id && (
-                          <Link href={`/hrportal/hr/employees/${e.id}#edit`} title="Edit" aria-label={`Edit ${employeeName(e)}`} className={icon}>
-                            <Pencil className="h-[18px] w-[18px]" aria-hidden="true" />
+                        <Tip label="View">
+                          <Link href={`/hrportal/hr/employees/${e.id}`} aria-label={`View ${employeeName(e)}`} className={icon}>
+                            <Eye className="h-[18px] w-[18px]" aria-hidden="true" />
                           </Link>
+                        </Tip>
+                        {canManage && e.id !== ctx.employee.id && (
+                          <Tip label="Edit">
+                            <Link href={`/hrportal/hr/employees/${e.id}?tab=edit`} aria-label={`Edit ${employeeName(e)}`} className={icon}>
+                              <Pencil className="h-[18px] w-[18px]" aria-hidden="true" />
+                            </Link>
+                          </Tip>
                         )}
-                        {manageLogin && account.active && (
-                          <QuickAction action={issueResetLinkAction} kind="key" label={`${account.passwordHash ? "Password reset" : "Invite"} link for ${employeeName(e)}`} fields={{ accountId: account.id }} />
-                        )}
+                        {manageLogin && account.active && <ChangePasswordModal account={account} name={employeeName(e)} />}
                         {manageLogin && (
                           <QuickAction
                             action={setAccountActiveAction}
                             kind={account.active ? "lock" : "unlock"}
+                            tip={account.active ? "Lock Login" : "Unlock Login"}
                             label={`${account.active ? "Lock" : "Unlock"} ${employeeName(e)}'s login`}
                             fields={{ accountId: account.id, active: account.active ? "false" : "true" }}
                             confirmText={account.active ? `Lock ${employeeName(e)}'s login? They'll be signed out everywhere.` : undefined}
                           />
                         )}
                         {canAccounts && !account && isCurrentStaff(e) && (
-                          <Link href="/hrportal/hr/accounts" title="Create login" aria-label={`Create a login for ${employeeName(e)}`} className={icon}>
-                            <UserPlus className="h-[18px] w-[18px]" aria-hidden="true" />
-                          </Link>
+                          <Tip label="Create Login">
+                            <Link href="/hrportal/hr/accounts" aria-label={`Create a login for ${employeeName(e)}`} className={icon}>
+                              <UserPlus className="h-[18px] w-[18px]" aria-hidden="true" />
+                            </Link>
+                          </Tip>
+                        )}
+                        {canManage && e.id !== ctx.employee.id && (!account || canAccounts) && (
+                          <QuickAction
+                            action={deleteEmployeeAction}
+                            kind="delete"
+                            tip="Delete"
+                            label={`Delete ${employeeName(e)}`}
+                            fields={{ employeeId: e.id }}
+                            confirmText={`Permanently delete ${employeeName(e)}, their login and leave history? This can't be undone. For staff who have left, set their status to Terminated instead.`}
+                          />
                         )}
                       </span>
                     </td>

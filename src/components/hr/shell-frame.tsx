@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronRight,
   ClipboardList,
+  KeyRound,
   LayoutDashboard,
   LogOut,
   PanelLeft,
@@ -191,6 +192,9 @@ export function ShellFrame({
               </p>
               <Link href="/hrportal/me" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-admin-bg">
                 <UserCircle className="h-4 w-4" aria-hidden="true" /> My record
+              </Link>
+              <Link href="/hrportal/password" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-admin-bg">
+                <KeyRound className="h-4 w-4" aria-hidden="true" /> Change password
               </Link>
               <form action={signOutAction}>
                 <button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-admin-danger hover:bg-admin-danger-soft">

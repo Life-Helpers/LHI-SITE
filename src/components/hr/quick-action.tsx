@@ -4,13 +4,15 @@ import { useActionState, useState } from "react";
 import { Check, CircleCheck, CircleX, Copy, KeyRound, Loader2, Lock, LockOpen, Trash2 } from "lucide-react";
 
 import type { HrResult } from "@/app/hrportal/actions";
+import { Tip } from "@/components/hr/tooltip";
 
-const ICONS = { approve: CircleCheck, reject: CircleX, cancel: Trash2, key: KeyRound, lock: Lock, unlock: LockOpen } as const;
+const ICONS = { approve: CircleCheck, reject: CircleX, cancel: Trash2, delete: Trash2, key: KeyRound, lock: Lock, unlock: LockOpen } as const;
 const TONES = {
   approve: "text-admin-success hover:bg-admin-success-soft",
   reject: "text-admin-danger hover:bg-admin-danger-soft",
   cancel: "text-admin-muted hover:bg-admin-bg hover:text-admin-danger",
   key: "text-admin-muted hover:bg-admin-bg hover:text-admin-text",
+  delete: "text-admin-muted hover:bg-admin-danger-soft hover:text-admin-danger",
   lock: "text-admin-muted hover:bg-admin-danger-soft hover:text-admin-danger",
   unlock: "text-admin-danger hover:bg-admin-success-soft hover:text-admin-success",
 } as const;
@@ -24,6 +26,7 @@ export function QuickAction({
   fields,
   kind,
   label,
+  tip,
   confirmText,
   askNote,
 }: {
@@ -31,6 +34,8 @@ export function QuickAction({
   fields: Record<string, string>;
   kind: keyof typeof ICONS;
   label: string;
+  /** Short hover label (defaults to none; `label` is always the accessible name). */
+  tip?: string;
   confirmText?: string;
   /** Ask for an optional note (e.g. reason for rejecting). */
   askNote?: string;
@@ -63,9 +68,14 @@ export function QuickAction({
         <input key={k} type="hidden" name={k} value={v} />
       ))}
       {askNote && <input type="hidden" name="note" defaultValue="" />}
-      <button type="submit" disabled={pending} title={label} aria-label={label} className={`rounded-lg p-1.5 disabled:opacity-50 ${TONES[kind]}`}>
-        {pending ? <Loader2 className="h-[18px] w-[18px] animate-spin" aria-hidden="true" /> : <Icon className="h-[18px] w-[18px]" aria-hidden="true" />}
-      </button>
+      {(() => {
+        const button = (
+          <button type="submit" disabled={pending} title={tip ? undefined : label} aria-label={label} className={`rounded-lg p-1.5 disabled:opacity-50 ${TONES[kind]}`}>
+            {pending ? <Loader2 className="h-[18px] w-[18px] animate-spin" aria-hidden="true" /> : <Icon className="h-[18px] w-[18px]" aria-hidden="true" />}
+          </button>
+        );
+        return tip ? <Tip label={tip}>{button}</Tip> : button;
+      })()}
       {state?.ok && state.link && dismissed !== state && (
         <span role="status" className="absolute right-0 top-full z-20 mt-1 w-80 space-y-2 rounded-lg border border-admin-border bg-admin-card p-3 text-left text-xs text-admin-text shadow-lg">
           <span className="block">{state.message}</span>

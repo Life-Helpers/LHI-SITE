@@ -117,6 +117,8 @@ export async function requireHrPage(need?: Need): Promise<HrContext> {
   const state = await loadHrSession();
   if (state.status === "signed-out") redirect("/hrportal");
   if (state.status === "problem") redirect("/hrportal/no-access");
+  // A password HR chose must be replaced before anything else.
+  if (state.ctx.account.mustChangePassword) redirect("/hrportal/password?required=1");
   if (!allowed(state.ctx.permissions, need)) redirect(`${homePath(state.ctx.permissions)}?denied=1`);
   return state.ctx;
 }
@@ -128,6 +130,7 @@ export async function requireHrAction(need?: Need): Promise<HrContext> {
   const state = await loadHrSession();
   if (state.status === "signed-out") throw new HrAccessError("Your session has ended. Please sign in again.");
   if (state.status === "problem") throw new HrAccessError("Your account doesn't have access to the HR portal. Contact HR.");
+  if (state.ctx.account.mustChangePassword) throw new HrAccessError("Choose your own password first.");
   if (!allowed(state.ctx.permissions, need)) throw new HrAccessError("You don't have permission to do that.");
   return state.ctx;
 }

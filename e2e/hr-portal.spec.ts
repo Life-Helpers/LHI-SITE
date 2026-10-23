@@ -158,7 +158,7 @@ test("an HR administrator creates employee records, reporting lines and accounts
   await add("outsider");
 
   // Reporting loops are refused: the director can't report to her own report.
-  await admin.goto(`/hrportal/hr/employees/${employeeIds.boss}`);
+  await admin.goto(`/hrportal/hr/employees/${employeeIds.boss}?tab=edit`);
   await admin.locator('select[name="managerId"]').selectOption({ label: `${people.manager.first} ${people.manager.last} — ${people.manager.first}'s job` });
   await admin.getByRole("button", { name: "Save record" }).click();
   await expect(admin.getByRole("main").getByRole("alert")).toContainText("reporting loop");
@@ -374,6 +374,76 @@ test("HR imports employees from CSV and manages their status", async () => {
   await admin.goto("/hrportal/hr/employees?tab=probation");
   await expect(admin.getByRole("link", { name: "Amina Bello", exact: true })).toBeVisible();
   await expect(admin.getByRole("row", { name: /Amina Bello/ }).getByText("Probation")).toBeVisible();
+});
+
+test("HR changes a password; the person must choose their own at next sign-in", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  const who = `${people.manager.first} ${people.manager.last}`;
+  await admin.goto("/hrportal/hr/employees");
+  await admin.getByRole("row", { name: new RegExp(who) }).getByRole("button", { name: `Change password for ${who}` }).click();
+  const dialog = admin.getByRole("dialog", { name: `Change password for ${who}` });
+  await dialog.locator('input[name="password"]').fill("Temporary-pass-1");
+  await dialog.locator('input[name="confirm"]').fill("Temporary-pass-1");
+  await dialog.getByRole("button", { name: "Set password" }).click();
+  await expect(dialog.getByRole("status")).toContainText("Password changed");
+
+  const manager = pages.manager;
+  await manager.goto("/hrportal/team");
+  await expect(manager).toHaveURL(/\/hrportal$/);
+  await manager.getByLabel("Email").fill(people.manager.email);
+  await manager.getByLabel("Password").fill("Temporary-pass-1");
+  await manager.getByRole("button", { name: "Sign in" }).click();
+  await expect(manager).toHaveURL(/\/hrportal\/password\?required=1$/);
+  // Nothing else opens until they choose their own password.
+  await manager.goto("/hrportal/team");
+  await expect(manager).toHaveURL(/\/hrportal\/password\?required=1$/);
+  await manager.locator('input[name="current"]').fill("Temporary-pass-1");
+  await manager.locator('input[name="password"]').fill(PASSWORD);
+  await manager.locator('input[name="confirm"]').fill(PASSWORD);
+  await manager.getByRole("button", { name: "Change password" }).click();
+  await expect(manager).toHaveURL(/\/hrportal\/team$/);
+});
+
+test("bank details are visible to the person and HR only; the view page has tabs", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const staff = pages.staff;
+  await staff.goto("/hrportal/me");
+  await staff.getByText("Update bank details").click();
+  await staff.locator('input[name="bankName"]').fill("First Bank");
+  await staff.locator('input[name="bankAccountName"]').fill("Esther Staff");
+  await staff.locator('input[name="bankAccountNumber"]').fill("0123457890");
+  await staff.getByRole("button", { name: "Save bank details" }).click();
+  await expect(staff.getByRole("main").getByRole("status").last()).toContainText("Banking details saved");
+
+  // Her line manager sees her work details, never her bank account.
+  const managerView = await pages.manager.goto(`/hrportal/team/${employeeIds.staff}`);
+  expect(managerView?.status()).toBe(200);
+  expect(await pages.manager.content()).not.toContain("0123457890");
+  expect(await pages.manager.content()).not.toContain("First Bank");
+
+  const admin = pages.admin;
+  await admin.goto(`/hrportal/hr/employees/${employeeIds.staff}`);
+  await expect(admin.getByRole("heading", { name: "Basic Information" })).toBeVisible();
+  await admin.getByRole("link", { name: "Employment", exact: true }).click();
+  await expect(admin.getByText("Leave approvers")).toBeVisible();
+  await admin.getByRole("link", { name: "Banking", exact: true }).click();
+  await expect(admin.getByText("••••••7890")).toBeVisible();
+  expect(await admin.content()).not.toContain(">0123457890<");
+});
+
+test("HR deletes an employee record created by mistake", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  await admin.goto("/hrportal/hr/employees");
+  const row = admin.getByRole("row", { name: /No Email/ });
+  admin.once("dialog", (d) => void d.accept());
+  await row.getByRole("button", { name: "Delete No Email" }).click();
+  await expect(admin.getByRole("row", { name: /No Email/ })).toHaveCount(0);
+  // Nobody can delete their own record, and the delete is audited.
+  await expect(admin.getByRole("row", { name: new RegExp(`${people.admin.first} ${people.admin.last}`) }).getByRole("button", { name: /^Delete/ })).toHaveCount(0);
+  await admin.goto("/hrportal/hr/audit");
+  await expect(admin.getByRole("cell", { name: "deleted employee", exact: true })).toBeVisible();
 });
 
 test("nobody can raise their own access, even by replaying an administrator's request", async () => {
