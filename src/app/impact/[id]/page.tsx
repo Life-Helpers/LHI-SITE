@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowLeft, FileText, Heart, Sparkles } from "lucide-react";
+import { ArrowLeft, FileText, Heart } from "lucide-react";
 
 import { ProgramCard } from "@/components/program-card";
 import { getImpactReport, getImpactReports, getPrograms } from "@/lib/cms/content";
@@ -67,7 +67,7 @@ export default async function ImpactReportDetailPage({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-primary/90 px-3 py-1 text-xs font-semibold text-primary-foreground backdrop-blur-md shadow-sm">
-                <Sparkles className="h-3 w-3" />
+                <Heart className="h-3 w-3" />
                 Putting A Smile On A Face
               </div>
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">

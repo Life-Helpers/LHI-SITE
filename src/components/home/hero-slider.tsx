@@ -9,7 +9,7 @@ import {
   ChevronRight,
   Pause,
   Play,
-  Sparkles,
+  Heart,
 } from "lucide-react";
 
 import { heroChildSlides, type HeroSlideItem } from "@/data/african-fulfillment-images";
@@ -149,7 +149,7 @@ export function HeroSlider({ slides = heroChildSlides }: HeroSliderProps) {
         {/* ========================================================================= */}
         <div className="relative z-10 flex items-center justify-between gap-4">
           <div className="inline-flex min-w-0 items-center gap-2 rounded-full bg-black/40 backdrop-blur-md border border-white/15 px-3.5 py-1.5 text-xs text-white/90">
-            <Sparkles className="h-3.5 w-3.5 shrink-0 text-accent" />
+            <Heart className="h-3.5 w-3.5 shrink-0 text-accent" />
             <span className="truncate font-semibold text-white">Life Helpers Initiative</span>
             <span className="hidden text-white/60 sm:inline">·</span>
             <span className="hidden text-white/80 sm:inline">{currentSlide.tag}</span>

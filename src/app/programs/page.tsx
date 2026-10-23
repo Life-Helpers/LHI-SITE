@@ -28,7 +28,7 @@ export default async function ProgramsPage() {
           </>
         }
         subtitle="Putting a smile on a face across health, education, livelihoods, agriculture, and protection."
-        description="Life Helpers Initiative implements integrated multi-sectoral programs across 11 frontline states in Nigeria, breaking cycles of vulnerability and unlocking human potential with dignity and love."
+        description="Life Helpers Initiative runs health, education, livelihood, food security, social inclusion and protection programmes across 11 states in Nigeria."
         image={africanFulfillmentImages.programsHero}
       />
 

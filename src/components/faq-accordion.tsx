@@ -9,12 +9,12 @@ import {
   HeartHandshake,
   CreditCard,
   HelpCircle,
-  Sparkles,
   Phone,
   Mail,
   ArrowRight,
   CheckCircle2,
   X,
+  Heart,
 } from "lucide-react";
 
 import type { FaqItem } from "@/data/faqs";
@@ -105,7 +105,7 @@ export function FaqAccordion({
         {showHeading && (
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary mb-3">
-              <Sparkles className="h-3.5 w-3.5 text-accent" />
+              <Heart className="h-3.5 w-3.5 text-accent" />
               <span>Got Questions? We Have Answers</span>
             </div>
             <h2

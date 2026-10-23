@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle2, Heart, Leaf, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { CheckCircle2, Heart, Leaf, ShieldCheck, Users } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { NidakeImpactCalculator } from "@/components/nidake/impact-calculator";
@@ -159,7 +159,7 @@ export default async function NidakePage() {
           </div>
 
           <div className="mt-16 rounded-2xl border border-primary/20 bg-muted/40 p-8 text-center sm:p-12">
-            <Sparkles className="mx-auto h-8 w-8 text-accent fill-accent" />
+            <Heart className="mx-auto h-8 w-8 text-accent fill-accent" />
             <h3 className="mt-3 font-serif-display text-2xl font-light text-foreground sm:text-3xl">
               Sponsor a NIDAKE Dignity Kit
             </h3>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
+import { Heart } from "lucide-react";
 
 import { RoadmapTimeline } from "@/components/history/roadmap-timeline";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
@@ -74,7 +74,7 @@ export default async function OurHistoryPage() {
         </div>
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mt-20 rounded-2xl border border-border bg-card p-8 text-center sm:p-12">
-            <Sparkles className="mx-auto h-8 w-8 text-accent fill-accent" />
+            <Heart className="mx-auto h-8 w-8 text-accent fill-accent" />
             <h2 className="mt-4 font-serif-display text-2xl font-light text-foreground sm:text-3xl">
               &ldquo;Putting a smile on a face&rdquo;
             </h2>

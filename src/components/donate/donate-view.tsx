@@ -14,7 +14,6 @@ import {
   Info,
   Lock,
   RefreshCw,
-  Sparkles,
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -268,7 +267,7 @@ export function DonateView({ bankDetails = "" }: { bankDetails?: string }) {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
                   <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-primary/90 px-2.5 py-0.5 text-[11px] font-semibold text-primary-foreground backdrop-blur-md">
-                    <Sparkles className="h-3 w-3" />
+                    <Heart className="h-3 w-3" />
                     Putting A Smile On A Face
                   </div>
                   <div className="absolute bottom-3 left-3 right-3 text-white">
@@ -360,7 +359,7 @@ export function DonateView({ bankDetails = "" }: { bankDetails?: string }) {
               >
                 {/* Gold/Orange Sparkle Eyebrow */}
                 <div className="mb-6 flex items-center gap-3">
-                  <Sparkles
+                  <Heart
                     size={18}
                     className="fill-accent text-accent stroke-none"
                     aria-hidden="true"

@@ -20,10 +20,11 @@ import {
   Scale,
   ShieldAlert,
   ShieldCheck,
-  Sparkles,
   Target,
   Users,
   Wheat,
+  Heart,
+  HandHeart,
 } from "lucide-react";
 
 import { LHI_PHOTOS } from "@/data/lhi-photos";
@@ -204,7 +205,7 @@ export function useLocalizedNav() {
       label: t.whoWeAreMenu.nidake,
       href: "/nidake",
       description: "Locally made reusable sanitary pads for girls and women",
-      icon: Sparkles,
+      icon: Heart,
       tag: "Enterprise",
     },
     {
@@ -303,7 +304,7 @@ export function useLocalizedNav() {
 
   const getInvolved: NavLink[] = [
     { label: "Volunteer & Get Involved", href: "/get-involved", description: "Volunteer openings and ways to support our work", icon: HeartHandshake, tag: "Join us" },
-    { label: "Donate", href: "/donate", description: "Support families in the communities we serve", icon: Sparkles, tag: "Give" },
+    { label: "Donate", href: "/donate", description: "Support families in the communities we serve", icon: HandHeart, tag: "Give" },
     { label: "Humanitarian Training", href: "/get-involved/training", description: "Free safeguarding courses with certificates", icon: GraduationCap, tag: "Learn" },
     { label: "Careers", href: "/careers", description: "Current vacancies and how to apply", icon: Users, tag: "Work with us" },
     { label: "Procurement", href: "/procurement", description: "Vendor requests, bids and supplier registration", icon: FileText, tag: "Suppliers" },

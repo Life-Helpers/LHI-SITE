@@ -7,13 +7,13 @@ import { LazyMotion, domAnimation, useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
 import {
   ArrowRight,
-  Sparkles,
   HeartPulse,
   GraduationCap,
   Handshake,
   Wheat,
   Users,
   ShieldCheck,
+  Heart,
 } from "lucide-react";
 
 import { LHI_PHOTOS } from "@/data/lhi-photos";
@@ -125,7 +125,7 @@ export function WhatWeDoTiles({ projectCounts }: { projectCounts: Partial<Record
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 border-b border-border/60">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
-                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                <Heart className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Our Thematic Areas</span>
               </div>
               <h2

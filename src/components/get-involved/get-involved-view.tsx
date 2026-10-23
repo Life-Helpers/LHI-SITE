@@ -15,7 +15,6 @@ import {
   MapPin,
   Megaphone,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
@@ -371,7 +370,7 @@ export function GetInvolvedView({ openings = [] }: { openings?: { id: string; ti
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <Heart className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                   <div>
                     <strong className="text-foreground">Flexible Engagements:</strong> From weekend medical outreaches to ongoing youth mentorship and digital advocacy.
                   </div>

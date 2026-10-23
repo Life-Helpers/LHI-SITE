@@ -86,7 +86,7 @@ export const heroChildSlides: HeroSlideItem[] = [
     highlight: "vulnerable children",
     suffix: ".",
     body: "Delivering life-saving primary healthcare, routine immunization, therapeutic nutrition for malnourished children, and clean WASH facilities in remote rural settlements.",
-    caption: "Clinical nutrition and immunization restoring vibrant health and childhood smiles.",
+    caption: "Clinical nutrition and immunization for children.",
     tag: "Vitality & Nutrition",
     mottoBadge: "Every Child Healthy & Thriving",
     primaryCta: {
@@ -236,7 +236,7 @@ export const africanFulfillmentImages = {
   healthHero: {
     src: LHI_PHOTOS.healthScreening.src,
     alt: LHI_PHOTOS.healthScreening.alt,
-    caption: "Primary healthcare, immunization, and clinical nutrition that restore vibrant smiles.",
+    caption: "Primary healthcare, immunization and clinical nutrition.",
     tag: "Vitality & Care",
   },
 

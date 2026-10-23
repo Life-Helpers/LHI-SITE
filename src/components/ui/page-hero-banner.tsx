@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { type ReactNode } from "react";
-import { Sparkles } from "lucide-react";
+import { Heart } from "lucide-react";
 
 interface PageHeroBannerProps {
   eyebrow?: string;
@@ -70,7 +70,7 @@ export function PageHeroBanner({
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                   {image.tag && (
                     <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-primary/90 px-3 py-1 text-[11px] font-semibold text-primary-foreground backdrop-blur-md shadow-sm">
-                      <Sparkles className="h-3 w-3" />
+                      <Heart className="h-3 w-3" />
                       {image.tag}
                     </div>
                   )}

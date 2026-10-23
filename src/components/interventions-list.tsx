@@ -17,10 +17,10 @@ import {
   MapPin,
   Search,
   ShieldCheck,
-  Sparkles,
   Users,
   Wheat,
   X,
+  Heart,
 } from "lucide-react";
 
 import {
@@ -460,7 +460,7 @@ export function InterventionsList({ projects, initialFilter = "all" }: Intervent
 
                   {/* Impact Metric Highlight */}
                   <div className="mt-4 flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-primary font-medium">
-                    <Sparkles size={16} className="shrink-0 text-primary" />
+                    <Heart size={16} className="shrink-0 text-primary" />
                     <span className="text-[11px] leading-tight">
                       <strong>Impact:</strong> {project.impactMetric}
                     </span>

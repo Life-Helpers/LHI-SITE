@@ -10,7 +10,7 @@ import {
   Download,
   Handshake,
   MapPin,
-  Sparkles,
+  Heart,
 } from "lucide-react";
 
 import { FieldGallery } from "@/components/interventions/field-gallery";
@@ -172,7 +172,7 @@ export default async function InterventionDossierPage({
             </section>
 
             <section className="rounded-3xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
-              <Sparkles className="h-6 w-6 text-primary" aria-hidden="true" />
+              <Heart className="h-6 w-6 text-primary" aria-hidden="true" />
               <h2 className="mt-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-primary">
                 Headline impact
               </h2>

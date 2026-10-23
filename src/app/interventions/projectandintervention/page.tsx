@@ -10,8 +10,8 @@ import {
   Layers,
   MapPin,
   ShieldCheck,
-  Sparkles,
   Users,
+  Heart,
 } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
@@ -110,7 +110,7 @@ export default async function ProjectsAndInterventionsPage() {
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-2xs">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Sparkles size={20} />
+                <Heart size={20} />
               </div>
               <div>
                 <div className="text-xl font-bold text-foreground">{projects.length}</div>
@@ -238,7 +238,7 @@ export default async function ProjectsAndInterventionsPage() {
             Partner With Life Helpers Initiative
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm leading-relaxed text-muted-foreground">
-            Looking for a battle-tested grassroots implementing partner across Northern Nigeria? LHI brings 20+ years of community trust, robust financial management (CAC/IT/NO: 20121), security risk mitigation, and proven delivery across all 6 thematic areas.
+            Looking for an implementing partner in Northern Nigeria? LHI has worked with communities since 2004, is registered with the CAC (IT/NO: 20121) and delivers programmes across six thematic areas: health, education, livelihood, food security, social inclusion and protection.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link

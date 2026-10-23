@@ -8,7 +8,6 @@ import {
   FolderGit2,
   Heart,
   MapPin,
-  Sparkles,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -53,7 +52,7 @@ export async function ProgramDetail({ program }: { program: Program }) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               
               <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-primary/90 px-3 py-1 text-xs font-semibold text-primary-foreground backdrop-blur-md shadow-sm">
-                <Sparkles className="h-3 w-3" />
+                <Heart className="h-3 w-3" />
                 Putting A Smile On A Face
               </div>
 

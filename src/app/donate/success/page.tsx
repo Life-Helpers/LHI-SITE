@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowRight, CheckCircle2, Loader2, Sparkles, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2, XCircle, Heart } from "lucide-react";
 
 function DonateSuccessContent() {
   const searchParams = useSearchParams();
@@ -118,7 +118,7 @@ function DonateSuccessContent() {
                 href="/programs"
                 className="inline-flex items-center gap-3 rounded-full border border-border px-7 py-4 text-[12px] font-semibold uppercase tracking-[0.22em] text-foreground hover:border-primary/50 dark:border-border"
               >
-                See the work <Sparkles size={14} className="text-accent" />
+                See the work <Heart size={14} className="text-accent" />
               </Link>
             </div>
           </div>

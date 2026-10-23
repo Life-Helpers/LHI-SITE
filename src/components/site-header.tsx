@@ -4,7 +4,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Menu, Radio, Search, Sparkles, X } from "lucide-react";
+import { ArrowRight, Menu, Radio, Search, X, Heart } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -845,7 +845,7 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
           {/* Quick Support Badge */}
           <div className="mt-2 rounded-2xl border border-primary/20 bg-primary/5 p-3">
             <div className="flex items-center gap-2 text-xs font-semibold text-primary">
-              <Sparkles className="h-4 w-4" />
+              <Heart className="h-4 w-4" />
               <span>NIDAKE Pad Social Enterprise</span>
             </div>
             <p className="mt-1 text-[11px] text-muted-foreground">

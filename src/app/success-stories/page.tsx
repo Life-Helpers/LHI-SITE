@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Download, Sparkles } from "lucide-react";
+import { Download, Heart } from "lucide-react";
 
 import { BlogFeed } from "@/components/blog/blog-feed";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
@@ -65,7 +65,7 @@ export default async function SuccessStoriesPage() {
           <BlogFeed posts={stories.map(toPostCard)} />
 
           <div className="mt-16 rounded-2xl border border-border bg-muted/40 p-8 text-center sm:p-12">
-            <Sparkles className="mx-auto h-8 w-8 fill-primary/20 text-primary" />
+            <Heart className="mx-auto h-8 w-8 fill-primary/20 text-primary" />
             <h3 className="mt-3 font-serif-display text-2xl font-light text-foreground sm:text-3xl">Help Us Write the Next Story</h3>
             <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
               Your support helps families like these move from vulnerability to stability and growth.

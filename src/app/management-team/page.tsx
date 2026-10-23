@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Mail, MapPin, ShieldAlert, Sparkles, Target } from "lucide-react";
+import { Mail, MapPin, ShieldAlert, Target, Heart } from "lucide-react";
 
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
@@ -120,7 +120,7 @@ export default async function ManagementTeamPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Sparkles className="h-5 w-5 shrink-0 text-accent" />
+              <Heart className="h-5 w-5 shrink-0 text-accent" />
               <div>
                 <h4 className="text-sm font-semibold text-foreground">People-Centered Impact</h4>
                 <p className="mt-1 text-xs text-muted-foreground">
