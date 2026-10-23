@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -578,6 +578,9 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  /** True for a second copy of the site-wide menu; only the first one on the page is shown. */
+  const [duplicate, setDuplicate] = useState(false);
   const { t } = useLocale();
   const {
     whoWeAreLinks,
@@ -607,6 +610,14 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
       window.removeEventListener("resize", handleScroll);
     };
   }, [insideHero]);
+
+  // Never show two site-wide menus (e.g. a page from a newer deploy arriving in a tab that
+  // still has the previous layout): any copy after the first hides itself.
+  useLayoutEffect(() => {
+    if (insideHero) return;
+    const all = document.querySelectorAll("header[data-site-header='global']");
+    setDuplicate(all.length > 1 && all[0] !== headerRef.current);
+  }, [insideHero, pathname]);
 
   // Close the mobile menu on navigation.
   useEffect(() => {
@@ -640,6 +651,9 @@ export function SiteHeader({ insideHero = false }: SiteHeaderProps) {
 
   return (
     <header
+      ref={headerRef}
+      data-site-header={insideHero ? "hero" : "global"}
+      hidden={duplicate || undefined}
       className={
         insideHero
           ? isScrolled
