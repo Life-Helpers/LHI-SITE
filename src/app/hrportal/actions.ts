@@ -16,6 +16,7 @@ import {
   canManageAccount,
   createsReportingLoop,
   effectivePermissions,
+  exceptWebsiteAdminOnly,
   findRole,
   has,
   homePath,
@@ -220,6 +221,34 @@ export async function hrBootstrapAction(_prev: HrResult | null, form: FormData):
     const token = await createHrToken(account.id, "invite");
     await hrAudit({ system: `website administrator ${cmsUser.email}` }, "created first HR administrator", `account ${address}`, "Role: HR Administrator");
     return done(`${firstName} ${lastName} is the first HR Administrator. Send them this one-time link (valid 7 days) to set their password.`, `${await baseUrl()}/hrportal/activate?token=${token}`);
+  });
+}
+
+/**
+ * Audit trail access is for the IT team only. It is granted and removed by a website
+ * administrator (signed in to /admin with Users & roles), never from inside the HR portal,
+ * so HR administrators can't give themselves a view of the record of their own changes.
+ */
+export async function setAuditAccessAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const cmsUser = await getCurrentUser();
+    if (!cmsUser || cmsUser.mustChangePassword || !can(cmsUser, "users")) {
+      return fail("Sign in to the website admin as an administrator (with Users & roles) first.");
+    }
+    const grant = text(form, "grant", 5) === "true";
+    const accounts = await readStore("hrAccounts");
+    const target = accounts.find((a) => a.id === text(form, "accountId", 64));
+    if (!target) return fail("Choose a portal account.");
+    if (grant && !target.active) return fail("That account is deactivated.");
+    const hasIt = target.extraPermissions.includes("audit.view");
+    if (grant === hasIt) return done("No change.");
+    await changeAccount(target.id, (a) => ({
+      ...a,
+      extraPermissions: grant ? [...a.extraPermissions, "audit.view"] : a.extraPermissions.filter((p) => p !== "audit.view"),
+    }));
+    await hrAudit({ system: `website administrator ${cmsUser.email}` }, grant ? "granted audit trail access" : "removed audit trail access", `account ${target.email}`, "IT team");
+    refresh();
+    return done(grant ? `${target.email} can now open the audit trail (after signing in again).` : `${target.email} no longer has audit trail access.`);
   });
 }
 
@@ -541,7 +570,8 @@ export async function setAccountRoleAction(_prev: HrResult | null, form: FormDat
     const role = findRole(text(form, "roleId", 64), customRoles);
     if (!role) return fail("Choose a role.");
     if (role.id === target.roleId) return done("No change.");
-    if (!canGrant(ctx.actor, [...role.permissions, ...target.extraPermissions])) return fail("You can't give access you don't have yourself.");
+    // IT audit access (granted by a website administrator) stays as it is and doesn't block a role change.
+    if (!canGrant(ctx.actor, [...role.permissions, ...exceptWebsiteAdminOnly(target.extraPermissions)])) return fail("You can't give access you don't have yourself.");
     const before = findRole(target.roleId, customRoles)?.name ?? `missing role "${target.roleId}"`;
     await changeAccount(target.id, (a) => ({ ...a, roleId: role.id }));
     await hrAudit(ctx, "changed role", `account ${target.email}`, `${before} → ${role.name}`);
@@ -555,11 +585,14 @@ export async function setExtraPermissionsAction(_prev: HrResult | null, form: Fo
     const ctx = await requireHrAction(["accounts.manage"]);
     if (!has(ctx.permissions, "roles.manage")) return fail("Changing permissions needs the Configure roles & permissions permission.");
     const target = await loadAccountTarget(ctx, text(form, "accountId", 64));
-    const extra = permsFrom(form);
+    // Permissions the editor doesn't hold (e.g. IT-only audit access) show as locked boxes and stay as they are.
+    const locked = target.extraPermissions.filter((p) => !has(ctx.permissions, p));
+    const extra = [...new Set([...permsFrom(form), ...locked])];
     const added = extra.filter((p) => !target.extraPermissions.includes(p));
     const removed = target.extraPermissions.filter((p) => !extra.includes(p));
     if (!added.length && !removed.length) return done("No change.");
     if (!canGrant(ctx.actor, added)) return fail("You can't give permissions you don't have yourself.");
+    if (!canGrant(ctx.actor, removed)) return fail("You can't remove permissions you don't have yourself.");
     await changeAccount(target.id, (a) => ({ ...a, extraPermissions: extra }));
     await hrAudit(ctx, "changed extra permissions", `account ${target.email}`, `Added: ${permList(added)}. Removed: ${permList(removed)}.`);
     refresh();
@@ -575,7 +608,7 @@ export async function setAccountActiveAction(_prev: HrResult | null, form: FormD
     if (active === target.active) return done("No change.");
     if (active) {
       const role = findRole(target.roleId, await readStore("hrRoles"));
-      if (role && !canGrant(ctx.actor, [...role.permissions, ...target.extraPermissions])) return fail("You can't reactivate an account with more access than you have.");
+      if (role && !canGrant(ctx.actor, [...role.permissions, ...exceptWebsiteAdminOnly(target.extraPermissions)])) return fail("You can't reactivate an account with more access than you have.");
     }
     await changeAccount(target.id, (a) => ({ ...a, active, deactivatedAt: active ? undefined : new Date().toISOString() }));
     if (!active) {
@@ -911,7 +944,7 @@ export async function deleteEmployeeAction(_prev: HrResult | null, form: FormDat
     if (!person) return fail("Employee not found.");
     const account = accounts.find((a) => a.employeeId === id);
     if (account && !canManageAccount(ctx.actor, account)) return fail("This person has a portal login; only an HR administrator can delete them.");
-    if (account && !canGrant(ctx.actor, effectivePermissions(account, await readStore("hrRoles"), person, ctx.departments))) {
+    if (account && !canGrant(ctx.actor, exceptWebsiteAdminOnly(effectivePermissions(account, await readStore("hrRoles"), person, ctx.departments)))) {
       return fail("You can't delete someone with more access than you.");
     }
     const removedLeave = (await readStore("hrLeave")).filter((l) => l.employeeId === id).length;

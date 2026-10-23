@@ -35,7 +35,7 @@ export const HR_PERMISSION_GROUPS = [
     items: [
       { id: "accounts.manage", label: "Manage portal accounts", help: "Create, deactivate and reactivate accounts, link them to employees and assign roles." },
       { id: "roles.manage", label: "Configure roles & permissions", help: "Create and edit custom roles and give accounts extra permissions." },
-      { id: "audit.view", label: "View audit trail", help: "See the record of account, role and permission changes." },
+      { id: "audit.view", label: "View audit trail (IT team)", help: "IT team only: see the record of account, role and permission changes. Granted by a website administrator, not from inside the portal." },
     ],
   },
   {
@@ -88,8 +88,8 @@ export const BUILT_IN_HR_ROLES: HrRole[] = [
   {
     id: "hr_admin",
     name: "HR Administrator",
-    description: "Everything, including portal accounts, roles, permissions and the audit trail.",
-    permissions: [...ALL_HR_PERMISSIONS],
+    description: "Everything, including portal accounts, roles and permissions. The audit trail is for the IT team only.",
+    permissions: ALL_HR_PERMISSIONS.filter((p) => p !== "audit.view"),
     builtIn: true,
   },
 ];

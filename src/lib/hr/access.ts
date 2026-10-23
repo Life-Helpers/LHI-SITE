@@ -140,6 +140,12 @@ export function canManageAccount(actor: Actor, target: HrAccount): boolean {
   return has(actor.permissions, "accounts.manage") && target.id !== actor.accountId;
 }
 
+/** Permissions only a website administrator grants or removes (the IT team's audit trail access). */
+export const WEBSITE_ADMIN_ONLY: readonly HrPermission[] = ["audit.view"];
+
+/** Leave out website-admin-only permissions, for checks on changes that don't touch them. */
+export const exceptWebsiteAdminOnly = (perms: readonly HrPermission[]) => perms.filter((p) => !WEBSITE_ADMIN_ONLY.includes(p));
+
 /** Least privilege: the actor may only hand out permissions they hold themselves. */
 export function canGrant(actor: Actor, permissions: readonly HrPermission[]): boolean {
   return permissions.every((p) => has(actor.permissions, p));

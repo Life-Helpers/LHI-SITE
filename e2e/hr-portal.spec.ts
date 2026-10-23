@@ -35,6 +35,7 @@ const people = {
 };
 type Key = keyof typeof people;
 const pages = {} as Record<Key, Page>;
+let webAdmin: Page;
 const employeeIds = {} as Record<Key, string>;
 const accountIds = {} as Record<Key, string>;
 
@@ -130,6 +131,13 @@ test("the portal is protected and set up by a website administrator", async ({ p
   // Setup closes once an account exists.
   await page.goto("/hrportal/setup");
   await expect(page.getByText("Already set up")).toBeVisible();
+
+  webAdmin = await freshPage();
+  await webAdmin.goto("/admin/login");
+  await webAdmin.getByLabel(/email/i).fill(mail("webadmin"));
+  await webAdmin.getByLabel(/password/i).fill(PASSWORD);
+  await webAdmin.getByRole("button", { name: /sign in/i }).click();
+  await webAdmin.waitForURL(/\/admin$/);
 });
 
 test("an HR administrator creates employee records, reporting lines and accounts", async () => {
@@ -233,6 +241,30 @@ test("people can't open pages or records outside their access by typing a URL", 
   // Management sees totals, not people's records.
   await pages.boss.goto("/hrportal/hr/employees");
   await expect(pages.boss).toHaveURL(/\/hrportal\/reports\?denied=1$/);
+});
+
+test("only the IT team sees the audit trail, and only a website administrator grants it", async () => {
+  test.skip(!pages.admin || !webAdmin, "setup did not run");
+  const admin = pages.admin;
+  await admin.goto("/hrportal/hr/audit");
+  await expect(admin).toHaveURL(/\/hrportal\/hr\?denied=1$/);
+  await expect(admin.getByRole("navigation", { name: "HR portal" }).getByRole("link", { name: "Audit trail" })).toHaveCount(0);
+
+  // HR administrators can't hand it out themselves.
+  await admin.goto("/hrportal/hr/accounts");
+  const row = admin.locator(`details#account-${accountIds.staff}`);
+  await row.locator("summary").click();
+  await expect(row.locator('input[value="audit.view"]').first()).toBeDisabled();
+
+  // A website administrator gives it to an IT team member's portal account.
+  await webAdmin.goto("/hrportal/setup");
+  await webAdmin.locator('select[name="accountId"]').selectOption({ label: people.staff.email });
+  await webAdmin.getByRole("button", { name: "Give audit trail access" }).click();
+  await expect(webAdmin.getByRole("status")).toContainText("can now open the audit trail");
+  await signIn(pages.staff, people.staff.email);
+  await expect(pages.staff).toHaveURL(/\/hrportal\/me$/);
+  await pages.staff.goto("/hrportal/hr/audit");
+  await expect(pages.staff.getByRole("cell", { name: "granted audit trail access", exact: true })).toBeVisible();
 });
 
 test("a forged or edited session cookie gets nowhere", async () => {
@@ -442,8 +474,8 @@ test("HR deletes an employee record created by mistake", async () => {
   await expect(admin.getByRole("row", { name: /No Email/ })).toHaveCount(0);
   // Nobody can delete their own record, and the delete is audited.
   await expect(admin.getByRole("row", { name: new RegExp(`${people.admin.first} ${people.admin.last}`) }).getByRole("button", { name: /^Delete/ })).toHaveCount(0);
-  await admin.goto("/hrportal/hr/audit");
-  await expect(admin.getByRole("cell", { name: "deleted employee", exact: true })).toBeVisible();
+  await pages.staff.goto("/hrportal/hr/audit");
+  await expect(pages.staff.getByRole("cell", { name: "deleted employee", exact: true })).toBeVisible();
 });
 
 test("nobody can raise their own access, even by replaying an administrator's request", async () => {
@@ -498,10 +530,10 @@ test("a deactivated account loses access at once and can't sign in", async () =>
   await signIn(outsider, people.outsider.email);
   await expect(outsider.getByRole("main").getByRole("alert")).toContainText("deactivated");
 
-  // Every change above is in the audit trail.
-  await admin.goto("/hrportal/hr/audit");
+  // Every change above is in the audit trail (seen by the IT team member).
+  await pages.staff.goto("/hrportal/hr/audit");
   for (const action of ["created account", "changed role", "deactivated account", "approved leave", "created first HR administrator"]) {
-    await expect(admin.getByRole("cell", { name: action, exact: true }).first()).toBeVisible();
+    await expect(pages.staff.getByRole("cell", { name: action, exact: true }).first()).toBeVisible();
   }
 });
 
