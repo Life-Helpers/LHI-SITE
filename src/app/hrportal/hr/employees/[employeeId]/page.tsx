@@ -1,0 +1,140 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { updateEmployeeAction } from "@/app/hrportal/actions";
+import { ActionForm } from "@/components/hr/action-form";
+import { EmployeeFields } from "@/components/hr/employee-form";
+import { LeaveTable } from "@/components/hr/leave-parts";
+import { PortalShell } from "@/components/hr/portal-shell";
+import { Badge, Card, Field, fmtDate, inputClass, Notice, PageTitle } from "@/components/hr/ui";
+import { readStore } from "@/lib/cms/store";
+import { canDecideLeave, findRole, has, reportsOf } from "@/lib/hr/access";
+import { requireHrPage } from "@/lib/hr/session";
+import { employeeName } from "@/lib/hr/types";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Employee" };
+
+export default async function EmployeePage({ params }: { params: Promise<{ employeeId: string }> }) {
+  const ctx = await requireHrPage(["employees.view", "employees.manage"]);
+  const { employeeId } = await params;
+  const [employees, accounts, leave, customRoles] = await Promise.all([readStore("hrEmployees"), readStore("hrAccounts"), readStore("hrLeave"), readStore("hrRoles")]);
+  const person = employees.find((e) => e.id === employeeId);
+  if (!person) notFound();
+  const p = ctx.permissions;
+  const isSelf = person.id === ctx.employee.id;
+  const canEdit = has(p, "employees.manage") && !isSelf;
+  const account = accounts.find((a) => a.employeeId === person.id);
+  const directReports = employees.filter((e) => e.managerId === person.id && e.status === "active");
+  const allReports = reportsOf(person.id, employees);
+  const theirLeave = leave.filter((l) => l.employeeId === person.id).sort((a, b) => b.startDate.localeCompare(a.startDate));
+  const showLeave = has(p, "leave.view_all") || has(p, "leave.manage");
+
+  return (
+    <PortalShell ctx={ctx} current="/hrportal/hr/employees">
+      <Link href="/hrportal/hr/employees" className="text-sm text-admin-primary hover:underline">
+        ← Employees
+      </Link>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <PageTitle title={employeeName(person)} subtitle={[person.jobTitle, person.department, person.location].filter(Boolean).join(" · ")} />
+        <Badge status={person.status} />
+      </div>
+      {isSelf && has(p, "employees.manage") && <Notice>This is your own record. Ask another HR colleague to change it; you can update your contact details under My record.</Notice>}
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          {canEdit ? (
+            <Card title="Employee record">
+              <ActionForm action={updateEmployeeAction} submitLabel="Save record" className="space-y-4">
+                <input type="hidden" name="employeeId" value={person.id} />
+                <EmployeeFields employee={person} managers={employees} />
+                <Field label="Status" hint="Marking someone as left removes their portal access.">
+                  <select name="status" defaultValue={person.status} className={`${inputClass} sm:w-1/2`}>
+                    <option value="active">Active</option>
+                    <option value="left">Left LHI</option>
+                  </select>
+                </Field>
+              </ActionForm>
+            </Card>
+          ) : (
+            <Card title="Employee record">
+              <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                {[
+                  ["Work email", person.email || "—"],
+                  ["Phone", person.phone || "—"],
+                  ["Staff number", person.staffNumber || "—"],
+                  ["Reports to", person.managerId ? employeeName(employees.find((e) => e.id === person.managerId)) : "—"],
+                  ["Start date", fmtDate(person.startDate)],
+                  ["Annual leave", `${person.annualLeaveDays} days`],
+                ].map(([k, v]) => (
+                  <div key={k}>
+                    <dt className="text-xs uppercase tracking-wider text-admin-muted">{k}</dt>
+                    <dd className="font-medium">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Card>
+          )}
+          {showLeave && (
+            <Card title="Leave">
+              <LeaveTable rows={theirLeave} canDecide={(l) => canDecideLeave(ctx.actor, l, employees)} />
+            </Card>
+          )}
+        </div>
+        <div className="space-y-6">
+          <Card title="Personal contact">
+            <dl className="space-y-2 text-sm">
+              <div>
+                <dt className="text-xs uppercase tracking-wider text-admin-muted">Home address</dt>
+                <dd>{person.address || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase tracking-wider text-admin-muted">Emergency contact</dt>
+                <dd>{person.emergencyContactName ? `${person.emergencyContactName} (${person.emergencyContactPhone || "no phone"})` : "—"}</dd>
+              </div>
+            </dl>
+          </Card>
+          <Card title="Reporting line">
+            <p className="text-sm">
+              {directReports.length} direct report{directReports.length === 1 ? "" : "s"}, {allReports.size} in total.
+            </p>
+            <ul className="mt-2 space-y-1 text-sm">
+              {directReports.map((e) => (
+                <li key={e.id}>
+                  <Link href={`/hrportal/hr/employees/${e.id}`} className="text-admin-primary hover:underline">
+                    {employeeName(e)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Card>
+          {has(p, "accounts.manage") && (
+            <Card title="Portal account">
+              {account ? (
+                <div className="space-y-1 text-sm">
+                  <p>{account.email}</p>
+                  <p>
+                    Role: <strong>{findRole(account.roleId, customRoles)?.name ?? "No valid role"}</strong>
+                  </p>
+                  <Badge status={!account.active ? "inactive" : account.passwordHash ? "active" : "invited"} />
+                  <p className="pt-2">
+                    <Link href={`/hrportal/hr/accounts#account-${account.id}`} className="font-semibold text-admin-primary hover:underline">
+                      Manage account
+                    </Link>
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm">
+                  No account.{" "}
+                  <Link href="/hrportal/hr/accounts" className="font-semibold text-admin-primary hover:underline">
+                    Create one
+                  </Link>
+                </p>
+              )}
+            </Card>
+          )}
+        </div>
+      </div>
+    </PortalShell>
+  );
+}

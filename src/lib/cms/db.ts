@@ -90,10 +90,14 @@ export async function dbUpdate<T, R>(name: string, fallback: () => T, mutate: (c
   }) as Promise<R | undefined>;
 }
 
-/** Every saved collection, for backups. */
+/** HR portal collections (hrAccounts, hrEmployees…): staff records, never in the website backup. */
+export const isHrCollection = (name: string) => /^hr[A-Z]/.test(name);
+
+/** Every saved website collection, for backups. HR portal data is left out. */
 export async function dbDumpAll(): Promise<{ name: string; data: unknown }[]> {
   await ensureTable();
-  return sql()<{ name: string; data: unknown }[]>`select name, data from cms_store order by name`;
+  const rows = await sql()<{ name: string; data: unknown }[]>`select name, data from cms_store order by name`;
+  return rows.filter((r) => !isHrCollection(r.name));
 }
 
 /* ---------------------------------------------------------------- Files */

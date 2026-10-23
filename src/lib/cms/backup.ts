@@ -44,7 +44,8 @@ async function* walk(dir: string): AsyncGenerator<string> {
   for (const entry of entries) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) yield* walk(full);
-    else if (entry.isFile() && !entry.name.endsWith(".tmp")) yield full;
+    // HR portal records (hrAccounts.json…) are staff data, not website content.
+    else if (entry.isFile() && !entry.name.endsWith(".tmp") && !/^hr[A-Z].*\.json$/.test(entry.name)) yield full;
   }
 }
 

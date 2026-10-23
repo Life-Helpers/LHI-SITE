@@ -43,6 +43,7 @@ import {
   seedTeam,
 } from "@/lib/cms/seed";
 import type { CollectionRecords } from "@/lib/cms/types";
+import type { HrAccount, HrAuditEntry, HrEmployee, HrLeaveRequest, HrRole, HrToken } from "@/lib/hr/types";
 
 /**
  * JSON content store. Each collection (posts, users, settings…) is one JSON document:
@@ -94,6 +95,13 @@ interface StoreShape extends CollectionRecords {
   resetTokens: ResetToken;
   unsubscribes: Unsubscribe;
   magazines: CmsMagazine;
+  // HR portal (/hrportal). Never part of the website backup or the CMS admin.
+  hrAccounts: HrAccount;
+  hrEmployees: HrEmployee;
+  hrRoles: HrRole;
+  hrLeave: HrLeaveRequest;
+  hrAudit: HrAuditEntry;
+  hrTokens: HrToken;
 }
 
 export type StoreName = keyof StoreShape;
@@ -132,6 +140,12 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   resetTokens: () => [],
   unsubscribes: () => [],
   magazines: () => [],
+  hrAccounts: () => [],
+  hrEmployees: () => [],
+  hrRoles: () => [],
+  hrLeave: () => [],
+  hrAudit: () => [],
+  hrTokens: () => [],
 };
 
 const cache = new Map<string, { mtimeMs: number; data: unknown }>();
