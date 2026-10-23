@@ -9,10 +9,12 @@ import {
   BUILT_IN_HR_ROLES,
   isHrPermission,
   type HrAccount,
+  type HrDepartment,
   type HrEmployee,
   type HrLeaveRequest,
   type HrPermission,
   type HrRole,
+  isCurrentStaff,
 } from "@/lib/hr/types";
 
 export function allRoles(customRoles: HrRole[]): HrRole[] {
@@ -31,12 +33,41 @@ export function effectivePermissions(
   account: HrAccount | undefined,
   customRoles: HrRole[],
   employee: HrEmployee | undefined,
+  departments: HrDepartment[] = [],
 ): HrPermission[] {
-  if (!account || !account.active || !employee || employee.status !== "active") return [];
+  if (!account || !account.active || !employee || !isCurrentStaff(employee)) return [];
   const role = findRole(account.roleId, customRoles);
   if (!role) return [];
   const granted = new Set<HrPermission>([...role.permissions, ...account.extraPermissions].filter(isHrPermission));
+  // Heads and approvers HR has named for a department look after that department's staff.
+  if (role.permissions.length && leadsDepartments(employee.id, departments).length) {
+    granted.add("team.view");
+    granted.add("team.leave.approve");
+  }
   return ALL_HR_PERMISSIONS.filter((p) => granted.has(p));
+}
+
+/** Active departments this employee heads or approves leave for. */
+export function leadsDepartments(employeeId: string, departments: HrDepartment[]): HrDepartment[] {
+  return departments.filter((d) => d.active && (d.headEmployeeId === employeeId || d.approverIds.includes(employeeId)));
+}
+
+/** Staff in the departments this employee heads or approves for (never themselves). */
+export function departmentStaffOf(employeeId: string, employees: HrEmployee[], departments: HrDepartment[]): Set<string> {
+  const ids = new Set(leadsDepartments(employeeId, departments).map((d) => d.id));
+  return new Set(employees.filter((e) => e.id !== employeeId && e.departmentId && ids.has(e.departmentId)).map((e) => e.id));
+}
+
+/** Everyone a manager or department head looks after: their reporting line plus their departments' staff. */
+export function teamOf(employeeId: string, employees: HrEmployee[], departments: HrDepartment[] = []): Set<string> {
+  return new Set([...reportsOf(employeeId, employees), ...departmentStaffOf(employeeId, employees, departments)]);
+}
+
+/** Who receives this person's leave requests: their line manager and their department's head and approvers. */
+export function approversFor(employee: HrEmployee, employees: HrEmployee[], departments: HrDepartment[]): HrEmployee[] {
+  const dept = departments.find((d) => d.active && d.id === employee.departmentId);
+  const ids = new Set([employee.managerId, dept?.headEmployeeId, ...(dept?.approverIds ?? [])].filter((id): id is string => Boolean(id) && id !== employee.id));
+  return employees.filter((e) => ids.has(e.id) && isCurrentStaff(e));
 }
 
 export type AccessProblem = "inactive" | "no-role" | "no-employee" | null;
@@ -44,7 +75,7 @@ export type AccessProblem = "inactive" | "no-role" | "no-employee" | null;
 /** Why an account has no access (shown to the person), or null when it has a valid role. */
 export function accessProblem(account: HrAccount, customRoles: HrRole[], employee: HrEmployee | undefined): AccessProblem {
   if (!account.active) return "inactive";
-  if (!employee || employee.status !== "active") return "no-employee";
+  if (!employee || !isCurrentStaff(employee)) return "no-employee";
   if (!findRole(account.roleId, customRoles)) return "no-role";
   return null;
 }
@@ -77,28 +108,28 @@ export interface Actor {
 }
 
 /** May the actor see this employee's record? Own record, their reporting line, or HR. */
-export function canViewEmployee(actor: Actor, employeeId: string, employees: HrEmployee[]): boolean {
+export function canViewEmployee(actor: Actor, employeeId: string, employees: HrEmployee[], departments: HrDepartment[] = []): boolean {
   if (employeeId === actor.employeeId) return has(actor.permissions, "self.view");
   if (has(actor.permissions, "employees.view") || has(actor.permissions, "employees.manage")) return true;
-  return has(actor.permissions, "team.view") && reportsOf(actor.employeeId, employees).has(employeeId);
+  return has(actor.permissions, "team.view") && teamOf(actor.employeeId, employees, departments).has(employeeId);
 }
 
 /** The employees whose leave the actor may see. */
-export function visibleLeaveEmployeeIds(actor: Actor, employees: HrEmployee[]): Set<string> | "all" {
+export function visibleLeaveEmployeeIds(actor: Actor, employees: HrEmployee[], departments: HrDepartment[] = []): Set<string> | "all" {
   if (has(actor.permissions, "leave.view_all") || has(actor.permissions, "leave.manage")) return "all";
   const ids = new Set<string>();
   if (has(actor.permissions, "self.view")) ids.add(actor.employeeId);
   if (has(actor.permissions, "team.view") || has(actor.permissions, "team.leave.approve")) {
-    for (const id of reportsOf(actor.employeeId, employees)) ids.add(id);
+    for (const id of teamOf(actor.employeeId, employees, departments)) ids.add(id);
   }
   return ids;
 }
 
 /** May the actor approve or reject this request? Never their own. */
-export function canDecideLeave(actor: Actor, leave: HrLeaveRequest, employees: HrEmployee[]): boolean {
+export function canDecideLeave(actor: Actor, leave: HrLeaveRequest, employees: HrEmployee[], departments: HrDepartment[] = []): boolean {
   if (leave.status !== "pending" || leave.employeeId === actor.employeeId) return false;
   if (has(actor.permissions, "leave.manage")) return true;
-  return has(actor.permissions, "team.leave.approve") && reportsOf(actor.employeeId, employees).has(leave.employeeId);
+  return has(actor.permissions, "team.leave.approve") && teamOf(actor.employeeId, employees, departments).has(leave.employeeId);
 }
 
 /**

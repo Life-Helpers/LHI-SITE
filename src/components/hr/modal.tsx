@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Plus, X } from "lucide-react";
+import { FileUp, Plus, X } from "lucide-react";
 
 /** A button that opens a native dialog with a form inside (e.g. "Add employee"). */
 export function Modal({
@@ -10,22 +10,32 @@ export function Modal({
   description,
   children,
   wide = false,
+  outline = false,
+  icon = "plus",
 }: {
   label: string;
   title: string;
   description?: string;
   children: React.ReactNode;
   wide?: boolean;
+  /** Secondary (outlined) button instead of the green one. */
+  outline?: boolean;
+  icon?: "plus" | "upload";
 }) {
+  const Icon = icon === "upload" ? FileUp : Plus;
   const ref = useRef<HTMLDialogElement>(null);
   return (
     <>
       <button
         type="button"
         onClick={() => ref.current?.showModal()}
-        className="inline-flex items-center justify-center gap-2 rounded-lg bg-admin-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90"
+        className={
+          outline
+            ? "inline-flex items-center justify-center gap-2 rounded-lg border border-admin-border bg-admin-card px-4 py-2 text-sm font-semibold text-admin-text hover:bg-admin-bg"
+            : "inline-flex items-center justify-center gap-2 rounded-lg bg-admin-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90"
+        }
       >
-        <Plus className="h-4 w-4" aria-hidden="true" /> {label}
+        <Icon className="h-4 w-4" aria-hidden="true" /> {label}
       </button>
       <dialog
         ref={ref}

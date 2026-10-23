@@ -12,7 +12,7 @@ import { Field, inputClass, outlineButtonClass, PageTitle, todayLagos } from "@/
 import { readStore } from "@/lib/cms/store";
 import { canDecideLeave, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
-import { employeeName } from "@/lib/hr/types";
+import { employeeName, isCurrentStaff } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Leave applications" };
@@ -24,7 +24,7 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
   const weekStart = mondayOf(isIsoDate(params.week) ? params.week : todayLagos());
   const canViewPeople = has(ctx.permissions, "employees.view") || has(ctx.permissions, "employees.manage");
   const viewHref = canViewPeople ? (id: string) => `/hrportal/hr/employees/${id}` : undefined;
-  const others = employees.filter((e) => e.status === "active" && e.id !== ctx.employee.id).sort((a, b) => employeeName(a).localeCompare(employeeName(b)));
+  const others = employees.filter((e) => isCurrentStaff(e) && e.id !== ctx.employee.id).sort((a, b) => employeeName(a).localeCompare(employeeName(b)));
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/hr/leave" crumbs={[{ label: "Leave Management" }, { label: "Leave Applications" }]}>
@@ -66,7 +66,7 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
       />
       <LeaveCalendar employees={employees} leave={leave} weekStart={weekStart} basePath="/hrportal/hr/leave" params={params} personHref={viewHref} />
       <div className="mt-6">
-        <LeaveListing rows={leave} employees={employees} basePath="/hrportal/hr/leave" params={params} canDecide={(l) => canDecideLeave(ctx.actor, l, employees)} viewHref={viewHref} />
+        <LeaveListing rows={leave} employees={employees} basePath="/hrportal/hr/leave" params={params} canDecide={(l) => canDecideLeave(ctx.actor, l, employees, ctx.departments)} viewHref={viewHref} />
       </div>
     </PortalShell>
   );

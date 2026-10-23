@@ -6,8 +6,9 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { isIsoDate, mondayOf } from "@/components/hr/query";
 import { Notice, PageTitle, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { canDecideLeave, has, reportsOf } from "@/lib/hr/access";
+import { canDecideLeave, has, teamOf } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
+import { isCurrentStaff } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "My team" };
@@ -17,7 +18,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
   const ctx = await requireHrPage("team.view");
   const params = (await searchParams) as LeaveParams;
   const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
-  const teamIds = reportsOf(ctx.employee.id, employees);
+  const teamIds = teamOf(ctx.employee.id, employees, ctx.departments);
   const team = employees.filter((e) => teamIds.has(e.id));
   const teamLeave = leave.filter((l) => teamIds.has(l.employeeId));
   const today = todayLagos();
@@ -29,9 +30,9 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
   return (
     <PortalShell ctx={ctx} current="/hrportal/team" crumbs={[{ label: "My team" }]}>
       {params.denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
-      <PageTitle title="My team" subtitle="Staff who report to you, directly or through others" />
+      <PageTitle title="My team" subtitle="Staff who report to you, and staff in departments you head or approve leave for" />
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <TintStat tint="blue" icon={UsersRound} label="Team members" value={team.filter((e) => e.status === "active").length} />
+        <TintStat tint="blue" icon={UsersRound} label="Team members" value={team.filter((e) => isCurrentStaff(e)).length} />
         <TintStat tint="amber" icon={CalendarClock} label="Leave awaiting decision" value={pending} note={has(ctx.permissions, "team.leave.approve") ? "You can approve or reject below" : undefined} />
         <TintStat tint="green" icon={CalendarCheck} label="On leave today" value={away} />
       </div>
@@ -42,7 +43,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
           employees={employees}
           basePath="/hrportal/team"
           params={params}
-          canDecide={(l) => has(ctx.permissions, "team.leave.approve") && canDecideLeave(ctx.actor, l, employees)}
+          canDecide={(l) => has(ctx.permissions, "team.leave.approve") && canDecideLeave(ctx.actor, l, employees, ctx.departments)}
           viewHref={memberHref}
         />
       </div>

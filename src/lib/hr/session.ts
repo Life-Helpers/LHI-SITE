@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { sessionKey, sign } from "@/lib/cms/auth";
 import { readStore } from "@/lib/cms/store";
 import { accessProblem, effectivePermissions, findRole, homePath, type AccessProblem, type Actor } from "@/lib/hr/access";
-import type { HrAccount, HrEmployee, HrPermission, HrRole } from "@/lib/hr/types";
+import type { HrAccount, HrDepartment, HrEmployee, HrPermission, HrRole } from "@/lib/hr/types";
 
 /**
  * HR portal sessions. The cookie only says which account signed in and which version of that
@@ -61,6 +61,8 @@ export interface HrContext {
   role: HrRole;
   permissions: HrPermission[];
   actor: Actor;
+  /** Every department (for routing leave to heads and approvers). */
+  departments: HrDepartment[];
   /** Shown in the portal header. */
   displayName: string;
 }
@@ -74,7 +76,12 @@ export type HrSessionState =
 export async function loadHrSession(): Promise<HrSessionState> {
   const claims = await readSessionClaims();
   if (!claims) return { status: "signed-out" };
-  const [accounts, employees, customRoles] = await Promise.all([readStore("hrAccounts"), readStore("hrEmployees"), readStore("hrRoles")]);
+  const [accounts, employees, customRoles, departments] = await Promise.all([
+    readStore("hrAccounts"),
+    readStore("hrEmployees"),
+    readStore("hrRoles"),
+    readStore("hrDepartments"),
+  ]);
   const account = accounts.find((a) => a.id === claims.aid);
   // Unknown account, or access changed since this session was issued: treat as signed out.
   if (!account || account.sessionVersion !== claims.v || !account.passwordHash) return { status: "signed-out" };
@@ -82,7 +89,7 @@ export async function loadHrSession(): Promise<HrSessionState> {
   const problem = accessProblem(account, customRoles, employee);
   if (problem) return { status: "problem", problem, account };
   const role = findRole(account.roleId, customRoles)!;
-  const permissions = effectivePermissions(account, customRoles, employee);
+  const permissions = effectivePermissions(account, customRoles, employee, departments);
   if (permissions.length === 0) return { status: "problem", problem: "no-role", account };
   return {
     status: "ok",
@@ -92,6 +99,7 @@ export async function loadHrSession(): Promise<HrSessionState> {
       role,
       permissions,
       actor: { accountId: account.id, employeeId: employee!.id, permissions },
+      departments,
       displayName: `${employee!.firstName} ${employee!.lastName}`.trim() || account.email,
     },
   };

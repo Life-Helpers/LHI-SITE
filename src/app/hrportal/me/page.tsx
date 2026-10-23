@@ -1,14 +1,14 @@
 import { CalendarCheck, CalendarClock, CalendarDays, Palmtree } from "lucide-react";
 
-import { requestLeaveAction, updateMyContactAction } from "@/app/hrportal/actions";
+import { requestLeaveAction, setMyDepartmentAction, updateMyContactAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { LeaveFields } from "@/components/hr/leave-form";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, TintStat } from "@/components/hr/ui";
+import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, Person, TintStat } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { annualLeaveUsed, has } from "@/lib/hr/access";
+import { annualLeaveUsed, approversFor, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName } from "@/lib/hr/types";
 
@@ -27,6 +27,9 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
   const used = annualLeaveUsed(me.id, year, leave);
   const left = Math.max(0, me.annualLeaveDays - used.approved - used.pending);
   const canRequest = has(ctx.permissions, "leave.request");
+  const openDepartments = ctx.departments.filter((d) => d.active).sort((a, b) => a.name.localeCompare(b.name));
+  const myDepartment = ctx.departments.find((d) => d.id === me.departmentId);
+  const approvers = approversFor(me, employees, ctx.departments);
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/me" crumbs={[{ label: "My record" }]}>
@@ -52,7 +55,51 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} progress={me.annualLeaveDays ? (left / me.annualLeaveDays) * 100 : 0} />
       </div>
 
+      {openDepartments.length > 0 && !myDepartment && has(ctx.permissions, "self.update") && (
+        <div className="mt-6">
+          <Notice>Choose your department below so your leave requests reach your director or head of department.</Notice>
+        </div>
+      )}
+
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Card title="My department" subtitle="Your leave requests go to your line manager and to your department's head and approvers.">
+          {openDepartments.length > 0 && has(ctx.permissions, "self.update") ? (
+            <ActionForm action={setMyDepartmentAction} submitLabel="Save department">
+              <Field label="Department">
+                <select name="departmentId" defaultValue={myDepartment?.id ?? ""} required className={inputClass}>
+                  <option value="" disabled>
+                    Choose your department…
+                  </option>
+                  {openDepartments.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </ActionForm>
+          ) : (
+            <p className="text-sm">{myDepartment?.name ?? me.department ?? "Not set"}</p>
+          )}
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-admin-muted">Who receives your leave requests</p>
+            {approvers.length ? (
+              <ul className="mt-2 space-y-2">
+                {approvers.map((a) => (
+                  <li key={a.id}>
+                    <Person
+                      name={employeeName(a)}
+                      sub={[a.id === me.managerId ? "Line manager" : "", myDepartment?.headEmployeeId === a.id ? `Head of ${myDepartment.name}` : "", myDepartment?.approverIds.includes(a.id) ? `${myDepartment.name} approver` : ""].filter(Boolean).join(" · ")}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-sm text-admin-muted">No line manager or department head is set yet, so the HR team will decide your requests.</p>
+            )}
+          </div>
+        </Card>
+
         <Card title="My details" subtitle="Something wrong here? Ask the HR team to correct it.">
           <div className="mb-5 flex items-center gap-4">
             <Avatar name={employeeName(me)} size="lg" />

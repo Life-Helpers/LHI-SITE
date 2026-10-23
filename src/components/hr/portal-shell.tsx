@@ -4,7 +4,8 @@ import Link from "next/link";
 import { hrSignOutAction } from "@/app/hrportal/actions";
 import { ShellFrame, type Crumb, type NavIcon, type ShellNavGroup } from "@/components/hr/shell-frame";
 import { initialsOf, toneFor } from "@/components/hr/ui";
-import { has, homePath } from "@/lib/hr/access";
+import { readStore } from "@/lib/cms/store";
+import { canDecideLeave, has, homePath } from "@/lib/hr/access";
 import type { HrContext } from "@/lib/hr/session";
 import type { HrPermission } from "@/lib/hr/types";
 
@@ -15,18 +16,25 @@ const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrP
   { group: "Me", href: "/hrportal/me", label: "My record", icon: "me", any: ["self.view"] },
   { group: "Me", href: "/hrportal/team", label: "My team", icon: "team", any: ["team.view"] },
   { group: "HR", href: "/hrportal/hr/employees", label: "Employees", icon: "employees", any: ["employees.view", "employees.manage"] },
+  { group: "HR", href: "/hrportal/hr/departments", label: "Departments", icon: "departments", any: ["employees.view", "employees.manage"] },
   { group: "HR", href: "/hrportal/hr/leave", label: "Leave applications", icon: "leave", any: ["leave.view_all", "leave.manage"] },
   { group: "Administration", href: "/hrportal/hr/accounts", label: "Accounts", icon: "accounts", any: ["accounts.manage"] },
   { group: "Administration", href: "/hrportal/hr/roles", label: "Roles & permissions", icon: "roles", any: ["roles.manage"] },
   { group: "Administration", href: "/hrportal/hr/audit", label: "Audit trail", icon: "audit", any: ["audit.view"] },
 ];
 
-export function PortalShell({ ctx, current, crumbs = [], children }: { ctx: HrContext; current: string; crumbs?: Crumb[]; children: React.ReactNode }) {
+export async function PortalShell({ ctx, current, crumbs = [], children }: { ctx: HrContext; current: string; crumbs?: Crumb[]; children: React.ReactNode }) {
+  // Requests waiting for this person (as line manager or department head/approver).
+  let waiting = 0;
+  if (has(ctx.permissions, "team.leave.approve")) {
+    const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
+    waiting = leave.filter((l) => l.status === "pending" && canDecideLeave(ctx.actor, l, employees, ctx.departments)).length;
+  }
   const groups: ShellNavGroup[] = [];
   for (const n of NAV.filter((item) => item.any.some((p) => has(ctx.permissions, p)))) {
     const active = current === n.href || (n.href !== "/hrportal/hr" && current.startsWith(`${n.href}/`));
     const group = groups.find((g) => g.label === n.group) ?? groups[groups.push({ label: n.group, items: [] }) - 1];
-    group.items.push({ href: n.href, label: n.label, icon: n.icon, active });
+    group.items.push({ href: n.href, label: n.label, icon: n.icon, active, ...(n.href === "/hrportal/team" && waiting ? { badge: waiting } : {}) });
   }
   return (
     <ShellFrame

@@ -22,17 +22,23 @@ import {
   homePath,
   workingDays,
 } from "@/lib/hr/access";
+import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
 import { consumeHrToken, createHrToken, hrAudit, peekHrToken } from "@/lib/hr/data";
 import { createHrSession, destroyHrSession, HrAccessError, requireHrAction, type HrContext } from "@/lib/hr/session";
 import {
   BUILT_IN_HR_ROLES,
   employeeName,
+  STANDARD_DEPARTMENTS,
+  isEmployeeStatus,
+  statusLabel,
   isHrPermission,
   LEAVE_TYPES,
   type HrAccount,
+  type HrDepartment,
   type HrEmployee,
   type HrPermission,
   type LeaveType,
+  isCurrentStaff,
 } from "@/lib/hr/types";
 
 export interface HrResult {
@@ -109,14 +115,14 @@ export async function hrSignInAction(_prev: HrResult | null, form: FormData): Pr
     failures.delete(address);
     if (!account.active) return fail("This account has been deactivated. If you think this is a mistake, contact the HR team.");
 
-    const [employees, customRoles] = await Promise.all([readStore("hrEmployees"), readStore("hrRoles")]);
+    const [employees, customRoles, departments] = await Promise.all([readStore("hrEmployees"), readStore("hrRoles"), readStore("hrDepartments")]);
     const employee = employees.find((e) => e.id === account.employeeId);
     await updateStore("hrAccounts", (items) => ({
       items: items.map((a) => (a.id === account.id ? { ...a, lastLoginAt: new Date().toISOString() } : a)),
     }));
     await createHrSession(account);
     if (accessProblem(account, customRoles, employee)) redirect("/hrportal/no-access");
-    redirect(homePath(effectivePermissions(account, customRoles, employee)));
+    redirect(homePath(effectivePermissions(account, customRoles, employee, departments)));
   } catch (err) {
     unstable_rethrow(err);
     console.error("HR sign-in failed:", err);
@@ -283,7 +289,7 @@ export async function recordLeaveAction(_prev: HrResult | null, form: FormData):
     const ctx = await requireHrAction("leave.manage");
     const employeeId = text(form, "employeeId", 64);
     if (employeeId === ctx.employee.id) return fail("Request your own leave from My record, so someone else approves it.");
-    const employee = (await readStore("hrEmployees")).find((e) => e.id === employeeId && e.status === "active");
+    const employee = (await readStore("hrEmployees")).find((e) => e.id === employeeId && isCurrentStaff(e));
     if (!employee) return fail("Choose an active employee.");
     const checked = await checkLeave(form, employee, "they");
     if ("error" in checked) return fail(checked.error!);
@@ -341,7 +347,7 @@ export async function decideLeaveAction(_prev: HrResult | null, form: FormData):
     const employees = await readStore("hrEmployees");
     const decided = await updateStore("hrLeave", (items) => {
       const found = items.find((l) => l.id === id);
-      if (!found || !canDecideLeave(ctx.actor, found, employees)) return { items, result: null };
+      if (!found || !canDecideLeave(ctx.actor, found, employees, ctx.departments)) return { items, result: null };
       const next = {
         ...found,
         status: decision === "approve" ? ("approved" as const) : ("rejected" as const),
@@ -362,8 +368,10 @@ export async function decideLeaveAction(_prev: HrResult | null, form: FormData):
 
 /* ------------------------------------------------------------------ Employee records */
 
-function employeeFields(form: FormData) {
+function employeeFields(form: FormData, departments: HrDepartment[]) {
   const annual = Number(text(form, "annualLeaveDays", 4));
+  const departmentId = text(form, "departmentId", 64);
+  const dept = departments.find((d) => d.id === departmentId && d.active);
   return {
     staffNumber: text(form, "staffNumber", 40),
     firstName: text(form, "firstName", 80),
@@ -371,7 +379,9 @@ function employeeFields(form: FormData) {
     email: email(form),
     phone: text(form, "phone", 40),
     jobTitle: text(form, "jobTitle", 120),
-    department: text(form, "department", 120),
+    // A department from the list; before HR sets up departments, free text is accepted.
+    department: dept ? dept.name : departmentId ? "" : text(form, "department", 120),
+    departmentId: dept?.id,
     location: text(form, "location", 120),
     managerId: text(form, "managerId", 64) || null,
     startDate: text(form, "startDate", 10),
@@ -380,15 +390,16 @@ function employeeFields(form: FormData) {
   };
 }
 
-function checkEmployee(fields: ReturnType<typeof employeeFields>, employees: HrEmployee[], selfId: string | null): string | null {
+function checkEmployee(fields: ReturnType<typeof employeeFields>, employees: HrEmployee[], selfId: string | null, form?: FormData): string | null {
   if (!fields.firstName || !fields.lastName) return "Enter a first and last name.";
+  if (form && text(form, "departmentId", 64) && !fields.departmentId) return "Choose an active department.";
   if (fields.email && !isEmail(fields.email)) return "Enter a valid work email, or leave it blank.";
   if (fields.email && employees.some((e) => e.email === fields.email && e.id !== selfId)) return "Another employee already has that email.";
   if (fields.startDate && !isDate(fields.startDate)) return "Enter a valid start date.";
   if (fields.dateOfBirth && (!isDate(fields.dateOfBirth) || fields.dateOfBirth > new Date().toISOString().slice(0, 10))) return "Enter a valid date of birth.";
   if (fields.managerId) {
     const manager = employees.find((e) => e.id === fields.managerId);
-    if (!manager || manager.status !== "active") return "Choose an active employee as the line manager.";
+    if (!manager || !isCurrentStaff(manager)) return "Choose an active employee as the line manager.";
     if (selfId && createsReportingLoop(selfId, fields.managerId, employees)) return "That would create a reporting loop (someone can't report to a person who reports to them).";
   }
   return null;
@@ -397,9 +408,9 @@ function checkEmployee(fields: ReturnType<typeof employeeFields>, employees: HrE
 export async function createEmployeeAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
     const ctx = await requireHrAction("employees.manage");
-    const fields = employeeFields(form);
-    const employees = await readStore("hrEmployees");
-    const problem = checkEmployee(fields, employees, null);
+    const [employees, departments] = await Promise.all([readStore("hrEmployees"), readStore("hrDepartments")]);
+    const fields = employeeFields(form, departments);
+    const problem = checkEmployee(fields, employees, null, form);
     if (problem) return fail(problem);
     const now = new Date().toISOString();
     const employee: HrEmployee = {
@@ -428,9 +439,10 @@ export async function updateEmployeeAction(_prev: HrResult | null, form: FormDat
     const employees = await readStore("hrEmployees");
     const current = employees.find((e) => e.id === id);
     if (!current) return fail("Employee not found.");
-    const fields = employeeFields(form);
-    const status = text(form, "status", 10) === "left" ? "left" : "active";
-    const problem = checkEmployee(fields, employees, id);
+    const fields = employeeFields(form, await readStore("hrDepartments"));
+    const rawStatus = text(form, "status", 12);
+    const status = isEmployeeStatus(rawStatus) ? rawStatus : current.status;
+    const problem = checkEmployee(fields, employees, id, form);
     if (problem) return fail(problem);
     const next: HrEmployee = { ...current, ...fields, status, updatedAt: new Date().toISOString() };
     await updateStore("hrEmployees", (items) => ({ items: items.map((e) => (e.id === id ? next : e)) }));
@@ -443,7 +455,7 @@ export async function updateEmployeeAction(_prev: HrResult | null, form: FormDat
       await hrAudit(ctx, "changed reporting line", employeeName(next), `Line manager: ${name(current.managerId)} → ${name(next.managerId)}`);
     }
     if (current.status !== next.status) {
-      await hrAudit(ctx, next.status === "left" ? "marked employee as left" : "marked employee as active", employeeName(next), "Portal access follows this status.");
+      await hrAudit(ctx, "changed employee status", employeeName(next), `${statusLabel(current.status)} → ${statusLabel(next.status)}. Portal access is only for active and probation staff.`);
     }
     if (other.length) await hrAudit(ctx, "updated employee record", employeeName(next), `Changed: ${other.join(", ")}`);
     refresh();
@@ -480,7 +492,7 @@ export async function createAccountAction(_prev: HrResult | null, form: FormData
     const extra = permsFrom(form);
     const [accounts, employees, customRoles] = await Promise.all([readStore("hrAccounts"), readStore("hrEmployees"), readStore("hrRoles")]);
     const employee = employees.find((e) => e.id === employeeId);
-    if (!employee || employee.status !== "active") return fail("Choose an active employee to link the account to.");
+    if (!employee || !isCurrentStaff(employee)) return fail("Choose an active employee to link the account to.");
     if (accounts.some((a) => a.employeeId === employeeId)) return fail(`${employeeName(employee)} already has a portal account.`);
     const address = email(form) || employee.email;
     if (!isEmail(address)) return fail("Enter the email they'll sign in with (or add a work email to their employee record).");
@@ -589,7 +601,7 @@ export async function relinkAccountAction(_prev: HrResult | null, form: FormData
     if (employeeId === target.employeeId) return done("No change.");
     const [accounts, employees] = await Promise.all([readStore("hrAccounts"), readStore("hrEmployees")]);
     const employee = employees.find((e) => e.id === employeeId);
-    if (!employee || employee.status !== "active") return fail("Choose an active employee.");
+    if (!employee || !isCurrentStaff(employee)) return fail("Choose an active employee.");
     if (employeeId === ctx.employee.id) return fail("That's your own employee record.");
     if (accounts.some((a) => a.employeeId === employeeId)) return fail(`${employeeName(employee)} already has a portal account.`);
     const before = employeeName(employees.find((e) => e.id === target.employeeId));
@@ -651,5 +663,180 @@ export async function deleteRoleAction(_prev: HrResult | null, form: FormData): 
     await hrAudit(ctx, "deleted role", `role ${role.name}`);
     refresh();
     return done(`${role.name} deleted.`);
+  });
+}
+
+/* ------------------------------------------------------------------ Departments */
+
+const deptSlug = (name: string) => `dept_${slug(name) || "department"}`;
+
+export async function saveDepartmentAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("employees.manage");
+    const existingId = text(form, "departmentId", 64);
+    const name = text(form, "name", 80);
+    const description = text(form, "description", 300);
+    const headEmployeeId = text(form, "headEmployeeId", 64) || null;
+    const approverIds = [...new Set(form.getAll("approverIds").map(String))].filter((id) => id && id !== headEmployeeId).slice(0, 10);
+    const active = existingId ? text(form, "active", 5) !== "false" : true;
+    if (!name) return fail("Give the department a name.");
+    const [departments, employees] = await Promise.all([readStore("hrDepartments"), readStore("hrEmployees")]);
+    const current = existingId ? departments.find((d) => d.id === existingId) : undefined;
+    if (existingId && !current) return fail("Department not found.");
+    if (departments.some((d) => d.name.toLowerCase() === name.toLowerCase() && d.id !== existingId)) return fail("There is already a department with that name.");
+    const activeIds = new Set(employees.filter((e) => isCurrentStaff(e)).map((e) => e.id));
+    if (headEmployeeId && !activeIds.has(headEmployeeId)) return fail("Choose an active employee as head of department.");
+    if (approverIds.some((id) => !activeIds.has(id))) return fail("Approvers must be active employees.");
+    const now = new Date().toISOString();
+    const dept: HrDepartment = {
+      id: current?.id ?? deptSlug(name) + (departments.some((d) => d.id === deptSlug(name)) ? `_${randomUUID().slice(0, 6)}` : ""),
+      name,
+      description,
+      headEmployeeId,
+      approverIds,
+      active,
+      createdAt: current?.createdAt ?? now,
+      updatedAt: now,
+    };
+    await updateStore("hrDepartments", (items) => ({ items: current ? items.map((d) => (d.id === dept.id ? dept : d)) : [...items, dept] }));
+    if (current && current.name !== name) {
+      await updateStore("hrEmployees", (items) => ({ items: items.map((e) => (e.departmentId === dept.id ? { ...e, department: name } : e)) }));
+    }
+    const who = (id: string | null) => (id ? employeeName(employees.find((e) => e.id === id)) : "nobody");
+    const list = (ids: string[]) => (ids.length ? ids.map(who).join(", ") : "none");
+    if (!current) {
+      await hrAudit(ctx, "created department", `department ${name}`, `Head: ${who(headEmployeeId)}. Approvers: ${list(approverIds)}`);
+    } else {
+      const changes = [
+        current.name !== name ? `Name: ${current.name} → ${name}` : "",
+        current.headEmployeeId !== headEmployeeId ? `Head: ${who(current.headEmployeeId)} → ${who(headEmployeeId)}` : "",
+        current.approverIds.join() !== approverIds.join() ? `Approvers: ${list(current.approverIds)} → ${list(approverIds)}` : "",
+        current.active !== active ? (active ? "Reopened" : "Closed") : "",
+      ].filter(Boolean);
+      if (changes.length) await hrAudit(ctx, "changed department", `department ${name}`, changes.join(". "));
+    }
+    refresh();
+    return done(current ? `${name} saved.` : `${name} created.`);
+  });
+}
+
+/** Add LHI's standard departments that don't exist yet, and link staff already recorded under those names. */
+export async function addStandardDepartmentsAction(): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("employees.manage");
+    const now = new Date().toISOString();
+    const added = await updateStore("hrDepartments", (items) => {
+      const missing = STANDARD_DEPARTMENTS.filter((n) => !items.some((d) => d.name.toLowerCase() === n.toLowerCase()));
+      const fresh = missing.map((name) => ({ id: deptSlug(name), name, description: "", headEmployeeId: null, approverIds: [], active: true, createdAt: now, updatedAt: now }));
+      return { items: [...items, ...fresh], result: fresh.map((d) => d.name) };
+    });
+    const departments = await readStore("hrDepartments");
+    await updateStore("hrEmployees", (items) => ({
+      items: items.map((e) => {
+        if (e.departmentId || !e.department) return e;
+        const match = departments.find((d) => d.name.toLowerCase() === e.department.toLowerCase());
+        return match ? { ...e, departmentId: match.id, department: match.name } : e;
+      }),
+    }));
+    if (added?.length) await hrAudit(ctx, "created departments", "departments", added.join(", "));
+    refresh();
+    return done(added?.length ? `Added ${added.length} department${added.length === 1 ? "" : "s"}.` : "All standard departments already exist.");
+  });
+}
+
+/** Staff choose their own department, which decides who receives their leave requests. */
+export async function setMyDepartmentAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("self.update");
+    const departmentId = text(form, "departmentId", 64);
+    const departments = await readStore("hrDepartments");
+    const dept = departments.find((d) => d.id === departmentId && d.active);
+    if (!dept) return fail("Choose your department.");
+    if (ctx.employee.departmentId === dept.id) return done("No change.");
+    const before = ctx.employee.department || "none";
+    // Always the signed-in person's own record.
+    await updateStore("hrEmployees", (items) => ({
+      items: items.map((e) => (e.id === ctx.employee.id ? { ...e, departmentId: dept.id, department: dept.name, updatedAt: new Date().toISOString() } : e)),
+    }));
+    await hrAudit(ctx, "changed own department", employeeName(ctx.employee), `${before} → ${dept.name}`);
+    refresh();
+    return done(`You're now in ${dept.name}. Leave requests go to its head and approvers, and to your line manager.`);
+  });
+}
+
+/* ------------------------------------------------------------------ Employee import */
+
+const MAX_IMPORT_BYTES = 1_000_000;
+const MAX_IMPORT_ROWS = 1000;
+
+/** Add employee records from a CSV file. Existing emails are skipped, never overwritten. */
+export async function importEmployeesAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("employees.manage");
+    const file = form.get("file");
+    if (!(file instanceof File) || file.size === 0) return fail("Choose a CSV file.");
+    if (file.size > MAX_IMPORT_BYTES) return fail("The file is too large (1 MB at most).");
+    if (!/\.csv$/i.test(file.name)) return fail("Upload a .csv file (in Excel: File → Save As → CSV).");
+    const { records, missingColumns } = mapEmployeeRows(parseCsv(await file.text()));
+    if (missingColumns.length) return fail(`The file needs these columns: ${missingColumns.join(", ")}.`);
+    if (!records.length) return fail("The file has no rows.");
+    if (records.length > MAX_IMPORT_ROWS) return fail(`Import at most ${MAX_IMPORT_ROWS} rows at a time.`);
+
+    const [employees, departments] = await Promise.all([readStore("hrEmployees"), readStore("hrDepartments")]);
+    const emails = new Set(employees.map((e) => e.email).filter(Boolean));
+    const now = new Date().toISOString();
+    const created: (HrEmployee & { managerEmail?: string })[] = [];
+    const skipped: string[] = [];
+    records.forEach((r, i) => {
+      const line = i + 2;
+      const firstName = (r.firstName ?? "").slice(0, 80);
+      const lastName = (r.lastName ?? "").slice(0, 80);
+      const mail = (r.email ?? "").toLowerCase().slice(0, 254);
+      if (!firstName || !lastName) return void skipped.push(`row ${line}: missing name`);
+      if (mail && !isEmail(mail)) return void skipped.push(`row ${line}: invalid email`);
+      if (mail && emails.has(mail)) return void skipped.push(`row ${line}: ${mail} already exists`);
+      const startDate = r.startDate && isDate(r.startDate) ? r.startDate : "";
+      const status = (r.status ?? "").toLowerCase();
+      const dept = departments.find((d) => d.name.toLowerCase() === (r.department ?? "").toLowerCase());
+      if (mail) emails.add(mail);
+      created.push({
+        id: randomUUID(),
+        staffNumber: (r.staffNumber ?? "").slice(0, 40),
+        firstName,
+        lastName,
+        email: mail,
+        phone: (r.phone ?? "").slice(0, 40),
+        jobTitle: (r.jobTitle ?? "").slice(0, 120),
+        department: dept?.name ?? (r.department ?? "").slice(0, 120),
+        ...(dept ? { departmentId: dept.id } : {}),
+        location: (r.location ?? "").slice(0, 120),
+        managerId: null,
+        startDate,
+        status: status === "terminated" || status === "left" ? "left" : isEmployeeStatus(status) ? status : "active",
+        annualLeaveDays: 20,
+        address: "",
+        emergencyContactName: "",
+        emergencyContactPhone: "",
+        createdAt: now,
+        updatedAt: now,
+        managerEmail: (r.managerEmail ?? "").toLowerCase(),
+      });
+    });
+    // Line managers by email, among existing staff and this file.
+    const everyone = [...employees, ...created];
+    const records2: HrEmployee[] = created.map(({ managerEmail, ...e }) => {
+      const manager = managerEmail ? everyone.find((m) => m.email === managerEmail && m.id !== e.id) : undefined;
+      return manager ? { ...e, managerId: manager.id } : e;
+    });
+    if (records2.length) {
+      await updateStore("hrEmployees", (items) => {
+        const taken = new Set(items.map((e) => e.email).filter(Boolean));
+        return { items: [...items, ...records2.filter((e) => !e.email || !taken.has(e.email))] };
+      });
+      await hrAudit(ctx, "imported employees", `${records2.length} employee records`, `From ${file.name.slice(0, 100)}. Skipped ${skipped.length}.`);
+    }
+    refresh();
+    const more = skipped.length > 5 ? ` and ${skipped.length - 5} more` : "";
+    return done(`Imported ${records2.length} employee${records2.length === 1 ? "" : "s"}.${skipped.length ? ` Skipped ${skipped.length}: ${skipped.slice(0, 5).join("; ")}${more}.` : ""}`);
   });
 }

@@ -43,7 +43,7 @@ import {
   seedTeam,
 } from "@/lib/cms/seed";
 import type { CollectionRecords } from "@/lib/cms/types";
-import type { HrAccount, HrAuditEntry, HrEmployee, HrLeaveRequest, HrRole, HrToken } from "@/lib/hr/types";
+import type { HrAccount, HrAuditEntry, HrDepartment, HrEmployee, HrLeaveRequest, HrRole, HrToken } from "@/lib/hr/types";
 
 /**
  * JSON content store. Each collection (posts, users, settings…) is one JSON document:
@@ -98,6 +98,7 @@ interface StoreShape extends CollectionRecords {
   // HR portal (/hrportal). Never part of the website backup or the CMS admin.
   hrAccounts: HrAccount;
   hrEmployees: HrEmployee;
+  hrDepartments: HrDepartment;
   hrRoles: HrRole;
   hrLeave: HrLeaveRequest;
   hrAudit: HrAuditEntry;
@@ -142,6 +143,7 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   magazines: () => [],
   hrAccounts: () => [],
   hrEmployees: () => [],
+  hrDepartments: () => [],
   hrRoles: () => [],
   hrLeave: () => [],
   hrAudit: () => [],

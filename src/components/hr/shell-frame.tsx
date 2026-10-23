@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   BarChart3,
+  Building2,
   CalendarDays,
   ChevronDown,
   ChevronRight,
@@ -27,6 +28,7 @@ const ICONS = {
   me: UserCircle,
   team: UsersRound,
   employees: Users,
+  departments: Building2,
   leave: CalendarDays,
   accounts: UserCog,
   roles: ShieldCheck,
@@ -37,7 +39,7 @@ export type NavIcon = keyof typeof ICONS;
 
 export interface ShellNavGroup {
   label: string;
-  items: { href: string; label: string; icon: NavIcon; active: boolean }[];
+  items: { href: string; label: string; icon: NavIcon; active: boolean; badge?: number }[];
 }
 
 export interface Crumb {
@@ -131,7 +133,12 @@ export function ShellFrame({
                         } ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
                       >
                         <Icon className="h-[18px] w-[18px] shrink-0" aria-hidden="true" />
-                        <span className={collapsed ? "lg:sr-only" : ""}>{item.label}</span>
+                        <span className={`flex-1 ${collapsed ? "lg:sr-only" : ""}`}>{item.label}</span>
+                        {item.badge ? (
+                          <span className={`rounded-full bg-admin-warning px-1.5 text-[11px] font-semibold text-white ${collapsed ? "lg:hidden" : ""}`} aria-label={`${item.badge} waiting for your decision`}>
+                            {item.badge}
+                          </span>
+                        ) : null}
                       </Link>
                     </li>
                   );

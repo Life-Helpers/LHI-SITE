@@ -158,12 +158,13 @@ const STATUS_TONE: Record<string, string> = {
   inactive: "border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-300",
   left: "border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-300",
   cancelled: "border-slate-300 bg-slate-50 text-slate-600 dark:border-slate-500/40 dark:bg-slate-500/10 dark:text-slate-300",
+  probation: "border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-500/40 dark:bg-sky-500/10 dark:text-sky-300",
   invited: "border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-500/40 dark:bg-sky-500/10 dark:text-sky-300",
 };
 
 export function Badge({ status, label }: { status: string; label?: string }) {
   return (
-    <span className={`inline-flex rounded-md border px-2 py-0.5 text-xs font-medium capitalize ${STATUS_TONE[status] ?? "border-admin-border bg-admin-bg text-admin-muted"}`}>
+    <span className={`inline-flex whitespace-nowrap rounded-md border px-2 py-0.5 text-xs font-medium capitalize ${STATUS_TONE[status] ?? "border-admin-border bg-admin-bg text-admin-muted"}`}>
       {label ?? status}
     </span>
   );

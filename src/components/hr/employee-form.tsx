@@ -1,22 +1,9 @@
 import { inputClass, Field } from "@/components/hr/ui";
-import { employeeName, type HrEmployee } from "@/lib/hr/types";
+import { employeeName, type HrDepartment, type HrEmployee, isCurrentStaff } from "@/lib/hr/types";
 
-const DEPARTMENTS = [
-  "Programmes",
-  "Health & Nutrition",
-  "Education",
-  "Livelihood & Agriculture",
-  "Protection & Gender",
-  "MEAL",
-  "Finance & Grants",
-  "Human Resources & Administration",
-  "Logistics & Procurement",
-  "Safeguarding & Accountability",
-  "Communications",
-];
 
 /** Employee record fields, shared by the create and edit forms. */
-export function EmployeeFields({ employee, managers }: { employee?: HrEmployee; managers: HrEmployee[] }) {
+export function EmployeeFields({ employee, managers, departments }: { employee?: HrEmployee; managers: HrEmployee[]; departments: HrDepartment[] }) {
   const e = employee;
   return (
     <div className="grid gap-3 sm:grid-cols-2">
@@ -38,14 +25,24 @@ export function EmployeeFields({ employee, managers }: { employee?: HrEmployee; 
       <Field label="Job title">
         <input name="jobTitle" defaultValue={e?.jobTitle} className={inputClass} />
       </Field>
-      <Field label="Department">
-        <select name="department" defaultValue={e?.department ?? ""} className={inputClass}>
-          <option value="">—</option>
-          {[...new Set([...DEPARTMENTS, ...(e?.department ? [e.department] : [])])].map((d) => (
-            <option key={d}>{d}</option>
-          ))}
-        </select>
-      </Field>
+      {departments.length > 0 ? (
+        <Field label="Department" hint="Its head and approvers receive this person's leave requests.">
+          <select name="departmentId" defaultValue={e?.departmentId ?? ""} className={inputClass}>
+            <option value="">— Not set —</option>
+            {departments
+              .filter((d) => d.active || d.id === e?.departmentId)
+              .map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+          </select>
+        </Field>
+      ) : (
+        <Field label="Department" hint="Set up departments under Departments to route leave to their heads.">
+          <input name="department" defaultValue={e?.department} className={inputClass} />
+        </Field>
+      )}
       <Field label="Duty station">
         <input name="location" defaultValue={e?.location} className={inputClass} />
       </Field>
@@ -53,7 +50,7 @@ export function EmployeeFields({ employee, managers }: { employee?: HrEmployee; 
         <select name="managerId" defaultValue={e?.managerId ?? ""} className={inputClass}>
           <option value="">No line manager</option>
           {managers
-            .filter((m) => m.id !== e?.id && m.status === "active")
+            .filter((m) => m.id !== e?.id && isCurrentStaff(m))
             .sort((a, b) => employeeName(a).localeCompare(employeeName(b)))
             .map((m) => (
               <option key={m.id} value={m.id}>

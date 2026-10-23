@@ -5,7 +5,7 @@ import { AutoSubmitSelect } from "@/components/hr/filters";
 import { LEAVE_STYLE, leaveLabel } from "@/components/hr/leave-style";
 import { addDays, hrefWith } from "@/components/hr/query";
 import { Card, inputClass, Person, todayLagos } from "@/components/hr/ui";
-import { employeeName, LEAVE_TYPES, type HrEmployee, type HrLeaveRequest } from "@/lib/hr/types";
+import { employeeName, LEAVE_TYPES, type HrEmployee, type HrLeaveRequest, isCurrentStaff } from "@/lib/hr/types";
 
 const DAY = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTH_FMT = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
@@ -35,7 +35,7 @@ export function LeaveCalendar({
   const weekEnd = days[6];
   const today = todayLagos();
   const selected = params.employee ?? "";
-  const active = employees.filter((e) => e.status === "active").sort((a, b) => employeeName(a).localeCompare(employeeName(b)));
+  const active = employees.filter((e) => isCurrentStaff(e)).sort((a, b) => employeeName(a).localeCompare(employeeName(b)));
   const inWeek = leave.filter((l) => (l.status === "approved" || l.status === "pending") && l.startDate <= weekEnd && l.endDate >= weekStart);
   const onLeave = new Set(inWeek.map((l) => l.employeeId));
   let rows = selected ? active.filter((e) => e.id === selected) : active;

@@ -10,7 +10,7 @@ import { Avatar, Badge, Card, Field, fmtDate, inputClass, Notice } from "@/compo
 import { readStore } from "@/lib/cms/store";
 import { canDecideLeave, findRole, has, reportsOf } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
-import { employeeName } from "@/lib/hr/types";
+import { EMPLOYEE_STATUSES, employeeName, isCurrentStaff, statusLabel } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Employee" };
@@ -26,7 +26,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
   const isSelf = person.id === ctx.employee.id;
   const canEdit = has(p, "employees.manage") && !isSelf;
   const account = accounts.find((a) => a.employeeId === person.id);
-  const directReports = employees.filter((e) => e.managerId === person.id && e.status === "active");
+  const directReports = employees.filter((e) => e.managerId === person.id && isCurrentStaff(e));
   const allReports = reportsOf(person.id, employees);
   const theirLeave = leave.filter((l) => l.employeeId === person.id);
   const showLeave = has(p, "leave.view_all") || has(p, "leave.manage");
@@ -39,21 +39,24 @@ export default async function EmployeePage({ params, searchParams }: { params: P
           <h1 className="text-2xl font-semibold tracking-tight">{employeeName(person)}</h1>
           <p className="text-sm text-admin-muted">{[person.jobTitle, person.department, person.location].filter(Boolean).join(" · ") || "No job details yet"}</p>
         </div>
-        <Badge status={person.status} />
+        <Badge status={person.status} label={statusLabel(person.status)} />
       </div>
       {isSelf && has(p, "employees.manage") && <Notice>This is your own record. Ask another HR colleague to change it; you can update your contact details under My record.</Notice>}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+        <div id="edit" className="scroll-mt-20 space-y-6 lg:col-span-2">
           {canEdit ? (
             <Card title="Employee record">
               <ActionForm action={updateEmployeeAction} submitLabel="Save record" className="space-y-4">
                 <input type="hidden" name="employeeId" value={person.id} />
-                <EmployeeFields employee={person} managers={employees} />
-                <Field label="Status" hint="Marking someone as left removes their portal access.">
+                <EmployeeFields employee={person} managers={employees} departments={ctx.departments} />
+                <Field label="Employee status" hint="Active and probation staff can use the portal; inactive and terminated staff can't.">
                   <select name="status" defaultValue={person.status} className={`${inputClass} sm:w-1/2`}>
-                    <option value="active">Active</option>
-                    <option value="left">Left LHI</option>
+                    {EMPLOYEE_STATUSES.map((st) => (
+                      <option key={st.id} value={st.id}>
+                        {st.label}
+                      </option>
+                    ))}
                   </select>
                 </Field>
               </ActionForm>
@@ -84,7 +87,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
               basePath={`/hrportal/hr/employees/${person.id}`}
               params={{ ...query, tab: query.tab ?? "all" }}
               showEmployee={false}
-              canDecide={(l) => canDecideLeave(ctx.actor, l, employees)}
+              canDecide={(l) => canDecideLeave(ctx.actor, l, employees, ctx.departments)}
             />
           )}
         </div>

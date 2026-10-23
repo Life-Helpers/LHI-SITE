@@ -4,7 +4,7 @@ import { CalendarCheck, CalendarClock, UserPlus, Users } from "lucide-react";
 import { Card, Notice, PageTitle, Table, TintStat } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { requireHrPage } from "@/lib/hr/session";
-import { LEAVE_TYPES } from "@/lib/hr/types";
+import { LEAVE_TYPES, isCurrentStaff } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Reports" };
@@ -20,7 +20,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   const ctx = await requireHrPage("reports.view");
   const { denied } = await searchParams;
   const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
-  const active = employees.filter((e) => e.status === "active");
+  const active = employees.filter((e) => isCurrentStaff(e));
   const year = new Date().getFullYear();
   const thisYear = leave.filter((l) => l.startDate.startsWith(String(year)));
   const approved = thisYear.filter((l) => l.status === "approved");

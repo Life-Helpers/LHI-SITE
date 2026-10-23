@@ -21,7 +21,7 @@ export default async function TeamMemberPage({ params, searchParams }: { params:
   const query = (await searchParams) as LeaveParams;
   const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
   const person = employees.find((e) => e.id === employeeId);
-  if (!person || person.id === ctx.employee.id || !canViewEmployee(ctx.actor, person.id, employees)) notFound();
+  if (!person || person.id === ctx.employee.id || !canViewEmployee(ctx.actor, person.id, employees, ctx.departments)) notFound();
   const manager = employees.find((e) => e.id === person.managerId);
   const theirLeave = leave.filter((l) => l.employeeId === person.id);
 
@@ -60,7 +60,7 @@ export default async function TeamMemberPage({ params, searchParams }: { params:
             basePath={`/hrportal/team/${person.id}`}
             params={{ ...query, tab: query.tab ?? "all" }}
             showEmployee={false}
-            canDecide={(l) => has(ctx.permissions, "team.leave.approve") && canDecideLeave(ctx.actor, l, employees)}
+            canDecide={(l) => has(ctx.permissions, "team.leave.approve") && canDecideLeave(ctx.actor, l, employees, ctx.departments)}
           />
         </div>
       </div>

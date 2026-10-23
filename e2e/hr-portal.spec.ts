@@ -309,6 +309,73 @@ test("HR records leave for others (never themselves) and only HR can export leav
   }
 });
 
+test("departments: heads receive their staff's leave requests, and staff choose their own department", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  await admin.goto("/hrportal/hr/departments");
+  await admin.getByRole("button", { name: "Add LHI's standard departments" }).click();
+  await expect(admin.getByRole("main").getByRole("status").first()).toContainText("Added 11 departments");
+  await admin.reload();
+  const programmes = admin.locator("section", { has: admin.getByRole("heading", { name: "Programmes", exact: true }) });
+  await programmes.getByText("Edit department").click();
+  await programmes.locator('select[name="headEmployeeId"]').selectOption({ label: `${people.outsider.first} ${people.outsider.last} — ${people.outsider.first}'s job` });
+  await programmes.getByRole("button", { name: "Save department" }).click();
+  await expect(programmes.getByRole("status")).toContainText("Programmes saved");
+
+  // The employee picks their department and sees who will receive their requests.
+  const staff = pages.staff;
+  await staff.goto("/hrportal/me");
+  await staff.locator('select[name="departmentId"]').selectOption({ label: "Programmes" });
+  await staff.getByRole("button", { name: "Save department" }).click();
+  await expect(staff.getByRole("main").getByRole("status").first()).toContainText("You're now in Programmes");
+  await staff.reload();
+  await expect(staff.getByText("Head of Programmes")).toBeVisible();
+  await expect(staff.locator("span", { hasText: /^Line manager$/ })).toBeVisible();
+  await staff.getByRole("button", { name: "Request Leave" }).click();
+  const form = staff.getByRole("dialog").locator("form");
+  await form.getByLabel("From", { exact: true }).fill("2027-01-04");
+  await form.getByLabel("To", { exact: true }).fill("2027-01-05");
+  await form.getByRole("button", { name: "Send request" }).click();
+  await expect(form.getByRole("status")).toContainText("2 working days");
+
+  // The head (an ordinary Employee account) now has a team view with the request waiting.
+  const head = pages.outsider;
+  await head.goto("/hrportal");
+  await expect(head).toHaveURL(/\/hrportal\/team$/);
+  await expect(head.getByRole("navigation", { name: "HR portal" }).getByRole("link", { name: /My team/ })).toContainText("1");
+  const approve = head.getByRole("button", { name: `Approve ${people.staff.first} ${people.staff.last}'s leave` });
+  await approve.click();
+  await expect(approve).toHaveCount(0);
+  // ...but only for their own department.
+  expect((await head.goto(`/hrportal/team/${employeeIds.boss}`))?.status()).toBe(404);
+  expect((await head.goto(`/hrportal/team/${employeeIds.staff}`))?.status()).toBe(200);
+
+  // Employee export is for HR only.
+  const csv = await admin.request.get("/hrportal/hr/employees/export");
+  expect(await csv.text()).toContain(people.staff.email);
+  for (const key of ["staff", "outsider", "boss"] as const) {
+    expect((await pages[key].request.get("/hrportal/hr/employees/export")).status()).toBe(404);
+  }
+});
+
+test("HR imports employees from CSV and manages their status", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  await admin.goto("/hrportal/hr/employees");
+  await admin.getByRole("button", { name: "Import", exact: true }).click();
+  const dialog = admin.getByRole("dialog", { name: "Import employees" });
+  await dialog.locator('input[type="file"]').setInputFiles({
+    name: "staff.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(`First name,Last name,Email,Designation,Department,Duty station,Status,Line manager email\nAmina,Bello,${mail("amina")},Nurse,Programmes,Sokoto,Probation,${people.manager.email}\nNo,Email,,,,,,\n,MissingFirst,,,,,,\nDup,Admin,${people.admin.email},,,,,\n`),
+  });
+  await dialog.getByRole("button", { name: "Import employees" }).click();
+  await expect(dialog.getByRole("status")).toContainText("Imported 2 employees. Skipped 2");
+  await admin.goto("/hrportal/hr/employees?tab=probation");
+  await expect(admin.getByRole("link", { name: "Amina Bello", exact: true })).toBeVisible();
+  await expect(admin.getByRole("row", { name: /Amina Bello/ }).getByText("Probation")).toBeVisible();
+});
+
 test("nobody can raise their own access, even by replaying an administrator's request", async () => {
   test.skip(!pages.staff, "setup did not run");
   const admin = pages.admin;

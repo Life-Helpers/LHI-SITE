@@ -14,7 +14,7 @@ import { Avatar, Badge, Field, fmtDateTime, inputClass, PageTitle } from "@/comp
 import { readStore } from "@/lib/cms/store";
 import { allRoles, canGrant, canManageAccount, findRole, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
-import { employeeName } from "@/lib/hr/types";
+import { employeeName, isCurrentStaff } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Accounts" };
@@ -28,7 +28,7 @@ export default async function AccountsPage() {
   const assignable = roles.filter((r) => canGrant(ctx.actor, r.permissions));
   const employeeOf = (id: string) => employees.find((e) => e.id === id);
   const unlinked = employees
-    .filter((e) => e.status === "active" && !accounts.some((a) => a.employeeId === e.id))
+    .filter((e) => isCurrentStaff(e) && !accounts.some((a) => a.employeeId === e.id))
     .sort((a, b) => employeeName(a).localeCompare(employeeName(b)));
   const sorted = [...accounts].sort((a, b) => employeeName(employeeOf(a.employeeId)).localeCompare(employeeName(employeeOf(b.employeeId))));
 

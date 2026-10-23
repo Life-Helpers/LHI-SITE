@@ -126,13 +126,17 @@ export interface HrEmployee {
   email: string;
   phone: string;
   jobTitle: string;
+  /** Department name, kept in step with the department record (`departmentId`). */
   department: string;
+  /** The department this person belongs to (chosen by them or by HR). */
+  departmentId?: string;
   /** Duty station. */
   location: string;
   /** The employee this person reports to. */
   managerId: string | null;
   startDate: string;
-  status: "active" | "left";
+  /** Active and probation are current staff (portal access); inactive and left (terminated) are not. */
+  status: EmployeeStatus;
   /** Annual leave entitlement in working days. */
   annualLeaveDays: number;
   /** Optional, for the birthdays panel (HR only; the year is never shown). */
@@ -143,6 +147,38 @@ export interface HrEmployee {
   createdAt: string;
   updatedAt: string;
 }
+
+/**
+ * A department. Its head (director) and any extra approvers receive leave requests from the
+ * department's staff, alongside each person's line manager.
+ */
+export interface HrDepartment {
+  id: string;
+  name: string;
+  description: string;
+  /** Director / head of department (an employee id). */
+  headEmployeeId: string | null;
+  /** Others who may approve this department's leave, e.g. a deputy. */
+  approverIds: string[];
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** LHI's departments as used on the website's vacancy forms; HR can add them in one step. */
+export const STANDARD_DEPARTMENTS = [
+  "Programmes",
+  "Health & Nutrition",
+  "Education",
+  "Livelihood & Agriculture",
+  "Protection & Gender",
+  "MEAL",
+  "Finance & Grants",
+  "Human Resources & Administration",
+  "Logistics & Procurement",
+  "Safeguarding & Accountability",
+  "Communications",
+] as const;
 
 export interface HrLeaveRequest {
   id: string;
@@ -181,6 +217,19 @@ export interface HrToken {
   expiresAt: string;
   usedAt?: string;
 }
+
+export const EMPLOYEE_STATUSES = [
+  { id: "active", label: "Active" },
+  { id: "probation", label: "Probation" },
+  { id: "inactive", label: "Inactive" },
+  { id: "left", label: "Terminated" },
+] as const;
+export type EmployeeStatus = (typeof EMPLOYEE_STATUSES)[number]["id"];
+export const isEmployeeStatus = (v: unknown): v is EmployeeStatus => EMPLOYEE_STATUSES.some((s) => s.id === v);
+export const statusLabel = (s: EmployeeStatus) => EMPLOYEE_STATUSES.find((x) => x.id === s)?.label ?? s;
+
+/** Current staff: active or on probation. Only they can use the portal or be chosen as managers and approvers. */
+export const isCurrentStaff = (e: Pick<HrEmployee, "status"> | undefined | null) => e?.status === "active" || e?.status === "probation";
 
 export const employeeName = (e: Pick<HrEmployee, "firstName" | "lastName"> | undefined | null) =>
   e ? `${e.firstName} ${e.lastName}`.trim() : "Unknown employee";

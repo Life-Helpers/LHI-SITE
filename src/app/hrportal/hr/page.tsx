@@ -9,7 +9,7 @@ import { Card, fmtDate, fmtDateTime, Notice, PageTitle, Person, TintStat, todayL
 import { readStore } from "@/lib/cms/store";
 import { canDecideLeave, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
-import { employeeName, type HrEmployee } from "@/lib/hr/types";
+import { employeeName, type HrEmployee, isCurrentStaff } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard" };
@@ -43,7 +43,7 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
   const today = todayLagos();
   const month = today.slice(0, 7);
 
-  const active = employees.filter((e) => e.status === "active");
+  const active = employees.filter((e) => isCurrentStaff(e));
   const joinedThisMonth = active.filter((e) => e.startDate.startsWith(month)).length;
   const departments = new Set(active.map((e) => e.department).filter(Boolean));
   const stations = new Set(active.map((e) => e.location).filter(Boolean));
@@ -187,7 +187,7 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
                         {leaveLabel(l.type)} · {fmtDate(l.startDate)} – {fmtDate(l.endDate)} · {l.days} day{l.days === 1 ? "" : "s"}
                       </span>
                     </span>
-                    {canDecideLeave(ctx.actor, l, employees) && (
+                    {canDecideLeave(ctx.actor, l, employees, ctx.departments) && (
                       <span className="flex shrink-0 gap-1">
                         <QuickAction action={decideLeaveAction} kind="approve" label={`Approve ${nameOf(l.employeeId)}'s leave`} fields={{ leaveId: l.id, decision: "approve" }} />
                         <QuickAction action={decideLeaveAction} kind="reject" label={`Reject ${nameOf(l.employeeId)}'s leave`} fields={{ leaveId: l.id, decision: "reject" }} askNote="Reason for rejecting (optional):" />
