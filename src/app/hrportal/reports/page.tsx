@@ -1,5 +1,7 @@
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Card, Notice, PageTitle, Stat, Table } from "@/components/hr/ui";
+import { CalendarCheck, CalendarClock, UserPlus, Users } from "lucide-react";
+
+import { Card, Notice, PageTitle, Table, TintStat } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { requireHrPage } from "@/lib/hr/session";
 import { LEAVE_TYPES } from "@/lib/hr/types";
@@ -27,14 +29,14 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   const startersThisYear = active.filter((e) => e.startDate.startsWith(String(year))).length;
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/reports">
+    <PortalShell ctx={ctx} current="/hrportal/reports" crumbs={[{ label: "Reports" }]}>
       {denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
       <PageTitle title="Reports" subtitle={`LHI-wide figures, ${year}. Totals only.`} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Active staff" value={active.length} />
-        <Stat label={`Started in ${year}`} value={startersThisYear} />
-        <Stat label="On leave today" value={onLeaveToday} />
-        <Stat label="Leave requests pending" value={leave.filter((l) => l.status === "pending").length} />
+        <TintStat tint="blue" icon={Users} label="Active staff" value={active.length} />
+        <TintStat tint="green" icon={UserPlus} label={`Started in ${year}`} value={startersThisYear} />
+        <TintStat tint="teal" icon={CalendarCheck} label="On leave today" value={onLeaveToday} />
+        <TintStat tint="amber" icon={CalendarClock} label="Leave requests pending" value={leave.filter((l) => l.status === "pending").length} />
       </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card title="Headcount by department">

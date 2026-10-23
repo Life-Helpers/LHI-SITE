@@ -66,6 +66,9 @@ export function EmployeeFields({ employee, managers }: { employee?: HrEmployee; 
       <Field label="Start date">
         <input name="startDate" type="date" defaultValue={e?.startDate} className={inputClass} />
       </Field>
+      <Field label="Date of birth (optional)" hint="Only HR sees it; used for birthday wishes.">
+        <input name="dateOfBirth" type="date" defaultValue={e?.dateOfBirth} className={inputClass} />
+      </Field>
       <Field label="Annual leave (days per year)">
         <input name="annualLeaveDays" type="number" min={0} max={365} defaultValue={e?.annualLeaveDays ?? 20} className={inputClass} />
       </Field>

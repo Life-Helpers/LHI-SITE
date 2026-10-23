@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { LeaveTable } from "@/components/hr/leave-parts";
+import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Card, fmtDate, PageTitle } from "@/components/hr/ui";
+import { Avatar, Card, fmtDate } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { canDecideLeave, canViewEmployee, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
@@ -16,22 +15,24 @@ export const metadata = { title: "Team member" };
  * One team member's work details and leave. Changing the id in the address doesn't help:
  * anyone outside the manager's reporting line is simply "not found".
  */
-export default async function TeamMemberPage({ params }: { params: Promise<{ employeeId: string }> }) {
+export default async function TeamMemberPage({ params, searchParams }: { params: Promise<{ employeeId: string }>; searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage("team.view");
   const { employeeId } = await params;
+  const query = (await searchParams) as LeaveParams;
   const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
   const person = employees.find((e) => e.id === employeeId);
   if (!person || person.id === ctx.employee.id || !canViewEmployee(ctx.actor, person.id, employees)) notFound();
   const manager = employees.find((e) => e.id === person.managerId);
-  const theirLeave = leave.filter((l) => l.employeeId === person.id).sort((a, b) => b.startDate.localeCompare(a.startDate));
+  const theirLeave = leave.filter((l) => l.employeeId === person.id);
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/team">
-      <Link href="/hrportal/team" className="text-sm text-admin-primary hover:underline">
-        ← My team
-      </Link>
-      <div className="mt-3">
-        <PageTitle title={employeeName(person)} subtitle={person.jobTitle} />
+    <PortalShell ctx={ctx} current="/hrportal/team" crumbs={[{ label: "My team", href: "/hrportal/team" }, { label: employeeName(person) }]}>
+      <div className="mb-6 flex items-center gap-4">
+        <Avatar name={employeeName(person)} size="lg" />
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">{employeeName(person)}</h1>
+          <p className="text-sm text-admin-muted">{person.jobTitle || "Team member"}</p>
+        </div>
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         <Card title="Work details">
@@ -53,9 +54,14 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ emp
           </dl>
         </Card>
         <div className="lg:col-span-2">
-          <Card title="Leave">
-            <LeaveTable rows={theirLeave} canDecide={(l) => has(ctx.permissions, "team.leave.approve") && canDecideLeave(ctx.actor, l, employees)} />
-          </Card>
+          <LeaveListing
+            rows={theirLeave}
+            employees={employees}
+            basePath={`/hrportal/team/${person.id}`}
+            params={{ ...query, tab: query.tab ?? "all" }}
+            showEmployee={false}
+            canDecide={(l) => has(ctx.permissions, "team.leave.approve") && canDecideLeave(ctx.actor, l, employees)}
+          />
         </div>
       </div>
     </PortalShell>

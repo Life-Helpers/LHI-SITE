@@ -233,26 +233,39 @@ export async function updateMyContactAction(_prev: HrResult | null, form: FormDa
   });
 }
 
+/** Validate a leave request for `employee`. Returns the details, or an error message. */
+async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "they") {
+  const type = text(form, "type", 40) as LeaveType;
+  const startDate = text(form, "startDate", 10);
+  const endDate = text(form, "endDate", 10);
+  const reason = text(form, "reason", 500);
+  if (!LEAVE_TYPES.includes(type)) return { error: "Choose a leave type." };
+  if (!isDate(startDate) || !isDate(endDate) || endDate < startDate) return { error: "Enter a valid start and end date." };
+  const days = workingDays(startDate, endDate);
+  if (days < 1) return { error: "The dates chosen don't include any working days." };
+  if (days > 130) return { error: "A single request can cover at most 130 working days." };
+  const leave = await readStore("hrLeave");
+  const booked = leave.filter((l) => l.employeeId === employee.id && (l.status === "pending" || l.status === "approved"));
+  if (booked.some((l) => l.startDate <= endDate && l.endDate >= startDate)) {
+    return { error: `${who === "you" ? "You already have" : "They already have"} leave booked or pending in those dates.` };
+  }
+  if (type === "Annual") {
+    const used = annualLeaveUsed(employee.id, Number(startDate.slice(0, 4)), leave);
+    const left = employee.annualLeaveDays - used.approved - used.pending;
+    if (days > left) {
+      return { error: `That's ${days} working days, but ${who === "you" ? "you have" : "they have"} ${Math.max(0, left)} annual leave days left this year (including pending requests).` };
+    }
+  }
+  return { type, startDate, endDate, reason, days };
+}
+
 export async function requestLeaveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
     const ctx = await requireHrAction("leave.request");
-    const type = text(form, "type", 40) as LeaveType;
-    const startDate = text(form, "startDate", 10);
-    const endDate = text(form, "endDate", 10);
-    const reason = text(form, "reason", 500);
-    if (!LEAVE_TYPES.includes(type)) return fail("Choose a leave type.");
-    if (!isDate(startDate) || !isDate(endDate) || endDate < startDate) return fail("Enter a valid start and end date.");
-    const days = workingDays(startDate, endDate);
-    if (days < 1) return fail("The dates you chose don't include any working days.");
-    if (days > 130) return fail("A single request can cover at most 130 working days.");
-    const leave = await readStore("hrLeave");
-    const mine = leave.filter((l) => l.employeeId === ctx.employee.id && (l.status === "pending" || l.status === "approved"));
-    if (mine.some((l) => l.startDate <= endDate && l.endDate >= startDate)) return fail("You already have leave booked or pending in those dates.");
-    if (type === "Annual") {
-      const used = annualLeaveUsed(ctx.employee.id, Number(startDate.slice(0, 4)), leave);
-      const left = ctx.employee.annualLeaveDays - used.approved - used.pending;
-      if (days > left) return fail(`That's ${days} working days, but you have ${Math.max(0, left)} annual leave days left this year (including pending requests).`);
-    }
+    // Always for the signed-in person: no employee id is taken from the form.
+    const checked = await checkLeave(form, ctx.employee, "you");
+    if ("error" in checked) return fail(checked.error!);
+    const { type, startDate, endDate, reason, days } = checked;
     await updateStore("hrLeave", (items) => ({
       items: [
         { id: randomUUID(), employeeId: ctx.employee.id, type, startDate, endDate, days, reason, status: "pending" as const, createdAt: new Date().toISOString() },
@@ -261,6 +274,42 @@ export async function requestLeaveAction(_prev: HrResult | null, form: FormData)
     }));
     refresh();
     return done(`Leave request sent: ${days} working day${days === 1 ? "" : "s"}.`);
+  });
+}
+
+/** HR records a leave application for an employee (e.g. from a paper form). Never for themselves. */
+export async function recordLeaveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("leave.manage");
+    const employeeId = text(form, "employeeId", 64);
+    if (employeeId === ctx.employee.id) return fail("Request your own leave from My record, so someone else approves it.");
+    const employee = (await readStore("hrEmployees")).find((e) => e.id === employeeId && e.status === "active");
+    if (!employee) return fail("Choose an active employee.");
+    const checked = await checkLeave(form, employee, "they");
+    if ("error" in checked) return fail(checked.error!);
+    const { type, startDate, endDate, reason, days } = checked;
+    const approved = text(form, "status", 10) === "approved";
+    const now = new Date().toISOString();
+    await updateStore("hrLeave", (items) => ({
+      items: [
+        {
+          id: randomUUID(),
+          employeeId,
+          type,
+          startDate,
+          endDate,
+          days,
+          reason,
+          status: approved ? ("approved" as const) : ("pending" as const),
+          createdAt: now,
+          ...(approved ? { decidedByAccountId: ctx.account.id, decidedByName: ctx.displayName, decidedAt: now, decisionNote: "Recorded by HR" } : {}),
+        },
+        ...items,
+      ],
+    }));
+    await hrAudit(ctx, approved ? "recorded approved leave" : "recorded leave application", `leave of ${employeeName(employee)}`, `${type}, ${startDate} to ${endDate} (${days} days)`);
+    refresh();
+    return done(`${type} leave recorded for ${employeeName(employee)} (${days} working day${days === 1 ? "" : "s"}, ${approved ? "approved" : "pending"}).`);
   });
 }
 
@@ -326,6 +375,7 @@ function employeeFields(form: FormData) {
     location: text(form, "location", 120),
     managerId: text(form, "managerId", 64) || null,
     startDate: text(form, "startDate", 10),
+    dateOfBirth: text(form, "dateOfBirth", 10),
     annualLeaveDays: Number.isFinite(annual) && annual >= 0 && annual <= 365 ? Math.round(annual) : 20,
   };
 }
@@ -335,6 +385,7 @@ function checkEmployee(fields: ReturnType<typeof employeeFields>, employees: HrE
   if (fields.email && !isEmail(fields.email)) return "Enter a valid work email, or leave it blank.";
   if (fields.email && employees.some((e) => e.email === fields.email && e.id !== selfId)) return "Another employee already has that email.";
   if (fields.startDate && !isDate(fields.startDate)) return "Enter a valid start date.";
+  if (fields.dateOfBirth && (!isDate(fields.dateOfBirth) || fields.dateOfBirth > new Date().toISOString().slice(0, 10))) return "Enter a valid date of birth.";
   if (fields.managerId) {
     const manager = employees.find((e) => e.id === fields.managerId);
     if (!manager || manager.status !== "active") return "Choose an active employee as the line manager.";

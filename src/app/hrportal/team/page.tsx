@@ -1,70 +1,50 @@
-import Link from "next/link";
+import { CalendarCheck, CalendarClock, UsersRound } from "lucide-react";
 
-import { LeaveTable } from "@/components/hr/leave-parts";
+import { LeaveCalendar } from "@/components/hr/leave-calendar";
+import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Card, Notice, PageTitle, Stat, Table } from "@/components/hr/ui";
+import { isIsoDate, mondayOf } from "@/components/hr/query";
+import { Notice, PageTitle, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { canDecideLeave, has, reportsOf } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
-import { employeeName } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "My team" };
 
 /** A manager's team: everyone who reports to them, directly or through others. */
-export default async function TeamPage({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
+export default async function TeamPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage("team.view");
-  const { denied } = await searchParams;
+  const params = (await searchParams) as LeaveParams;
   const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
   const teamIds = reportsOf(ctx.employee.id, employees);
-  const team = employees.filter((e) => teamIds.has(e.id) && e.status === "active").sort((a, b) => employeeName(a).localeCompare(employeeName(b)));
-  const nameOf = (id: string) => employeeName(employees.find((e) => e.id === id));
+  const team = employees.filter((e) => teamIds.has(e.id));
   const teamLeave = leave.filter((l) => teamIds.has(l.employeeId));
-  const pending = teamLeave.filter((l) => l.status === "pending");
-  const today = new Date().toISOString().slice(0, 10);
-  const away = teamLeave.filter((l) => l.status === "approved" && l.startDate <= today && l.endDate >= today);
+  const today = todayLagos();
+  const pending = teamLeave.filter((l) => l.status === "pending").length;
+  const away = new Set(teamLeave.filter((l) => l.status === "approved" && l.startDate <= today && l.endDate >= today).map((l) => l.employeeId)).size;
+  const weekStart = mondayOf(isIsoDate(params.week) ? params.week : today);
+  const memberHref = (id: string) => `/hrportal/team/${id}`;
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/team">
-      {denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
+    <PortalShell ctx={ctx} current="/hrportal/team" crumbs={[{ label: "My team" }]}>
+      {params.denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
       <PageTitle title="My team" subtitle="Staff who report to you, directly or through others" />
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Team members" value={team.length} />
-        <Stat label="Leave awaiting decision" value={pending.length} />
-        <Stat label="On leave today" value={away.length} />
+      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+        <TintStat tint="blue" icon={UsersRound} label="Team members" value={team.filter((e) => e.status === "active").length} />
+        <TintStat tint="amber" icon={CalendarClock} label="Leave awaiting decision" value={pending} note={has(ctx.permissions, "team.leave.approve") ? "You can approve or reject below" : undefined} />
+        <TintStat tint="green" icon={CalendarCheck} label="On leave today" value={away} />
       </div>
-
-      {has(ctx.permissions, "team.leave.approve") && (
-        <div className="mt-6">
-          <Card title="Leave awaiting your decision">
-            <LeaveTable rows={pending} who={nameOf} canDecide={(l) => canDecideLeave(ctx.actor, l, employees)} empty="Nothing waiting for you." />
-          </Card>
-        </div>
-      )}
-
+      <LeaveCalendar employees={team} leave={teamLeave} weekStart={weekStart} basePath="/hrportal/team" params={params} personHref={memberHref} />
       <div className="mt-6">
-        <Card title="Team members">
-          <Table head={["Name", "Job title", "Duty station", "Reports to"]} empty={team.length === 0 && "Nobody reports to you in the HR records yet."}>
-            {team.map((e) => (
-              <tr key={e.id}>
-                <td className="px-3 py-3 font-medium">
-                  <Link href={`/hrportal/team/${e.id}`} className="text-admin-primary hover:underline">
-                    {employeeName(e)}
-                  </Link>
-                </td>
-                <td className="px-3 py-3">{e.jobTitle || "—"}</td>
-                <td className="px-3 py-3">{e.location || "—"}</td>
-                <td className="px-3 py-3">{e.managerId === ctx.employee.id ? "You" : nameOf(e.managerId ?? "")}</td>
-              </tr>
-            ))}
-          </Table>
-        </Card>
-      </div>
-
-      <div className="mt-6">
-        <Card title="Team leave history">
-          <LeaveTable rows={teamLeave.filter((l) => l.status !== "pending").slice(0, 50)} who={nameOf} empty="No decided leave yet." />
-        </Card>
+        <LeaveListing
+          rows={teamLeave}
+          employees={employees}
+          basePath="/hrportal/team"
+          params={params}
+          canDecide={(l) => has(ctx.permissions, "team.leave.approve") && canDecideLeave(ctx.actor, l, employees)}
+          viewHref={memberHref}
+        />
       </div>
     </PortalShell>
   );

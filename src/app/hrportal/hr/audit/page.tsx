@@ -13,7 +13,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
     .filter((e) => !q || [e.actorName, e.action, e.target, e.details].some((v) => v.toLowerCase().includes(q)))
     .slice(0, 500);
   return (
-    <PortalShell ctx={ctx} current="/hrportal/hr/audit">
+    <PortalShell ctx={ctx} current="/hrportal/hr/audit" crumbs={[{ label: "Administration" }, { label: "Audit trail" }]}>
       <PageTitle title="Audit trail" subtitle="Account, role, permission, reporting-line and leave decisions, newest first" />
       <form className="mb-4 flex gap-2" role="search">
         <input name="q" defaultValue={q} placeholder="Search who, what or details…" aria-label="Search the audit trail" className={`${inputClass} mt-0 max-w-sm`} />

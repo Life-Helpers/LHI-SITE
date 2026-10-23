@@ -135,6 +135,8 @@ export interface HrEmployee {
   status: "active" | "left";
   /** Annual leave entitlement in working days. */
   annualLeaveDays: number;
+  /** Optional, for the birthdays panel (HR only; the year is never shown). */
+  dateOfBirth?: string;
   address: string;
   emergencyContactName: string;
   emergencyContactPhone: string;

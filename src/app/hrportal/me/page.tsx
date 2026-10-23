@@ -1,50 +1,74 @@
+import { CalendarCheck, CalendarClock, CalendarDays, Palmtree } from "lucide-react";
+
 import { requestLeaveAction, updateMyContactAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
-import { LeaveTable } from "@/components/hr/leave-parts";
+import { LeaveFields } from "@/components/hr/leave-form";
+import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
+import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Card, Field, fmtDate, inputClass, Notice, PageTitle, Stat } from "@/components/hr/ui";
+import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, TintStat } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { annualLeaveUsed, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
-import { employeeName, LEAVE_TYPES } from "@/lib/hr/types";
+import { employeeName } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "My record" };
 
 /** Employee self-service: only ever the signed-in person's own record. */
-export default async function MyRecordPage({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
+export default async function MyRecordPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage("self.view");
-  const { denied } = await searchParams;
+  const params = (await searchParams) as LeaveParams;
   const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
   const me = ctx.employee;
   const manager = employees.find((e) => e.id === me.managerId);
-  const mine = leave.filter((l) => l.employeeId === me.id).sort((a, b) => b.startDate.localeCompare(a.startDate));
+  const mine = leave.filter((l) => l.employeeId === me.id);
   const year = new Date().getFullYear();
   const used = annualLeaveUsed(me.id, year, leave);
+  const left = Math.max(0, me.annualLeaveDays - used.approved - used.pending);
+  const canRequest = has(ctx.permissions, "leave.request");
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/me">
-      {denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
-      <PageTitle title={`Welcome, ${me.firstName}`} subtitle="Your employee record and leave" />
+    <PortalShell ctx={ctx} current="/hrportal/me" crumbs={[{ label: "My record" }]}>
+      {params.denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
+      <PageTitle
+        title={`Welcome, ${me.firstName}`}
+        subtitle="Your employee record and leave"
+        actions={
+          canRequest && (
+            <Modal label="Request Leave" title="Request leave" description={`You have ${left} annual leave days left this year.`}>
+              <ActionForm action={requestLeaveAction} submitLabel="Send request" resetOnSuccess className="space-y-4">
+                <LeaveFields />
+              </ActionForm>
+            </Modal>
+          )
+        }
+      />
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Stat label={`Annual leave ${year}`} value={`${me.annualLeaveDays} days`} />
-        <Stat label="Taken or approved" value={used.approved} />
-        <Stat label="Left (after pending)" value={Math.max(0, me.annualLeaveDays - used.approved - used.pending)} />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <TintStat tint="teal" icon={CalendarDays} label={`Annual leave ${year}`} value={`${me.annualLeaveDays} days`} />
+        <TintStat tint="green" icon={CalendarCheck} label="Taken or approved" value={used.approved} note="Annual leave, this year" />
+        <TintStat tint="amber" icon={CalendarClock} label="Awaiting approval" value={used.pending} note="Annual leave days" />
+        <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} progress={me.annualLeaveDays ? (left / me.annualLeaveDays) * 100 : 0} />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <Card title="My details">
+        <Card title="My details" subtitle="Something wrong here? Ask the HR team to correct it.">
+          <div className="mb-5 flex items-center gap-4">
+            <Avatar name={employeeName(me)} size="lg" />
+            <div>
+              <p className="text-lg font-semibold">{employeeName(me)}</p>
+              <p className="text-sm text-admin-muted">{[me.jobTitle, me.department].filter(Boolean).join(" · ") || ctx.role.name}</p>
+            </div>
+          </div>
           <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
             {[
-              ["Name", employeeName(me)],
               ["Staff number", me.staffNumber || "—"],
-              ["Job title", me.jobTitle || "—"],
-              ["Department", me.department || "—"],
               ["Duty station", me.location || "—"],
               ["Line manager", manager ? employeeName(manager) : "—"],
               ["Work email", me.email || "—"],
               ["Start date", fmtDate(me.startDate)],
+              ["Portal role", ctx.role.name],
             ].map(([k, v]) => (
               <div key={k}>
                 <dt className="text-xs uppercase tracking-wider text-admin-muted">{k}</dt>
@@ -52,11 +76,10 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
               </div>
             ))}
           </dl>
-          <p className="mt-4 text-xs text-admin-muted">Something wrong here? Ask the HR team to correct it.</p>
         </Card>
 
         {has(ctx.permissions, "self.update") && (
-          <Card title="Contact details">
+          <Card title="Contact details" subtitle="Keep these up to date so HR can reach you or your family in an emergency.">
             <ActionForm action={updateMyContactAction} submitLabel="Save contact details">
               <Field label="Phone">
                 <input name="phone" defaultValue={me.phone} className={inputClass} />
@@ -77,39 +100,16 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         )}
       </div>
 
-      {has(ctx.permissions, "leave.request") && (
-        <div className="mt-6">
-          <Card title="Request leave">
-            <ActionForm action={requestLeaveAction} submitLabel="Send request" resetOnSuccess className="grid gap-3 sm:grid-cols-2">
-              <Field label="Type">
-                <select name="type" className={inputClass} defaultValue="Annual">
-                  {LEAVE_TYPES.map((t) => (
-                    <option key={t}>{t}</option>
-                  ))}
-                </select>
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="From">
-                  <input name="startDate" type="date" required className={inputClass} />
-                </Field>
-                <Field label="To">
-                  <input name="endDate" type="date" required className={inputClass} />
-                </Field>
-              </div>
-              <div className="sm:col-span-2">
-                <Field label="Reason (optional)">
-                  <input name="reason" maxLength={500} className={inputClass} />
-                </Field>
-              </div>
-            </ActionForm>
-          </Card>
-        </div>
-      )}
-
       <div className="mt-6">
-        <Card title="My leave requests">
-          <LeaveTable rows={mine} canCancel={(l) => has(ctx.permissions, "leave.request") && l.status === "pending"} empty="You haven't requested any leave yet." />
-        </Card>
+        <h2 className="mb-3 text-lg font-semibold">My leave applications</h2>
+        <LeaveListing
+          rows={mine}
+          employees={employees}
+          basePath="/hrportal/me"
+          params={{ ...params, tab: params.tab ?? "all" }}
+          showEmployee={false}
+          canCancel={(l) => canRequest && l.status === "pending"}
+        />
       </div>
     </PortalShell>
   );

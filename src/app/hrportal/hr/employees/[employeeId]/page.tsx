@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import { updateEmployeeAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { EmployeeFields } from "@/components/hr/employee-form";
-import { LeaveTable } from "@/components/hr/leave-parts";
+import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Badge, Card, Field, fmtDate, inputClass, Notice, PageTitle } from "@/components/hr/ui";
+import { Avatar, Badge, Card, Field, fmtDate, inputClass, Notice } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { canDecideLeave, findRole, has, reportsOf } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
@@ -15,9 +15,10 @@ import { employeeName } from "@/lib/hr/types";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Employee" };
 
-export default async function EmployeePage({ params }: { params: Promise<{ employeeId: string }> }) {
+export default async function EmployeePage({ params, searchParams }: { params: Promise<{ employeeId: string }>; searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage(["employees.view", "employees.manage"]);
   const { employeeId } = await params;
+  const query = (await searchParams) as LeaveParams;
   const [employees, accounts, leave, customRoles] = await Promise.all([readStore("hrEmployees"), readStore("hrAccounts"), readStore("hrLeave"), readStore("hrRoles")]);
   const person = employees.find((e) => e.id === employeeId);
   if (!person) notFound();
@@ -27,16 +28,17 @@ export default async function EmployeePage({ params }: { params: Promise<{ emplo
   const account = accounts.find((a) => a.employeeId === person.id);
   const directReports = employees.filter((e) => e.managerId === person.id && e.status === "active");
   const allReports = reportsOf(person.id, employees);
-  const theirLeave = leave.filter((l) => l.employeeId === person.id).sort((a, b) => b.startDate.localeCompare(a.startDate));
+  const theirLeave = leave.filter((l) => l.employeeId === person.id);
   const showLeave = has(p, "leave.view_all") || has(p, "leave.manage");
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/hr/employees">
-      <Link href="/hrportal/hr/employees" className="text-sm text-admin-primary hover:underline">
-        ← Employees
-      </Link>
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <PageTitle title={employeeName(person)} subtitle={[person.jobTitle, person.department, person.location].filter(Boolean).join(" · ")} />
+    <PortalShell ctx={ctx} current="/hrportal/hr/employees" crumbs={[{ label: "Employees", href: "/hrportal/hr/employees" }, { label: employeeName(person) }]}>
+      <div className="mb-6 flex flex-wrap items-center gap-4">
+        <Avatar name={employeeName(person)} size="lg" />
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight">{employeeName(person)}</h1>
+          <p className="text-sm text-admin-muted">{[person.jobTitle, person.department, person.location].filter(Boolean).join(" · ") || "No job details yet"}</p>
+        </div>
         <Badge status={person.status} />
       </div>
       {isSelf && has(p, "employees.manage") && <Notice>This is your own record. Ask another HR colleague to change it; you can update your contact details under My record.</Notice>}
@@ -76,9 +78,14 @@ export default async function EmployeePage({ params }: { params: Promise<{ emplo
             </Card>
           )}
           {showLeave && (
-            <Card title="Leave">
-              <LeaveTable rows={theirLeave} canDecide={(l) => canDecideLeave(ctx.actor, l, employees)} />
-            </Card>
+            <LeaveListing
+              rows={theirLeave}
+              employees={employees}
+              basePath={`/hrportal/hr/employees/${person.id}`}
+              params={{ ...query, tab: query.tab ?? "all" }}
+              showEmployee={false}
+              canDecide={(l) => canDecideLeave(ctx.actor, l, employees)}
+            />
           )}
         </div>
         <div className="space-y-6">

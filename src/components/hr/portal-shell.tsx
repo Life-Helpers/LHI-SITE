@@ -1,72 +1,42 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LogOut } from "lucide-react";
 
 import { hrSignOutAction } from "@/app/hrportal/actions";
-import { has } from "@/lib/hr/access";
+import { ShellFrame, type Crumb, type NavIcon, type ShellNavGroup } from "@/components/hr/shell-frame";
+import { initialsOf, toneFor } from "@/components/hr/ui";
+import { has, homePath } from "@/lib/hr/access";
 import type { HrContext } from "@/lib/hr/session";
 import type { HrPermission } from "@/lib/hr/types";
 
-/** Navigation built from the signed-in person's permissions (display only: pages check again). */
-const NAV: { href: string; label: string; any: HrPermission[] }[] = [
-  { href: "/hrportal/me", label: "My record", any: ["self.view"] },
-  { href: "/hrportal/team", label: "My team", any: ["team.view"] },
-  { href: "/hrportal/hr", label: "HR overview", any: ["employees.view", "employees.manage", "accounts.manage"] },
-  { href: "/hrportal/hr/employees", label: "Employees", any: ["employees.view", "employees.manage"] },
-  { href: "/hrportal/hr/leave", label: "Leave", any: ["leave.view_all", "leave.manage"] },
-  { href: "/hrportal/hr/accounts", label: "Accounts", any: ["accounts.manage"] },
-  { href: "/hrportal/hr/roles", label: "Roles", any: ["roles.manage"] },
-  { href: "/hrportal/hr/audit", label: "Audit trail", any: ["audit.view"] },
-  { href: "/hrportal/reports", label: "Reports", any: ["reports.view"] },
+/** Menu built from the signed-in person's permissions (display only: every page checks again). */
+const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrPermission[] }[] = [
+  { group: "Overview", href: "/hrportal/hr", label: "Dashboard", icon: "dashboard", any: ["employees.view", "employees.manage", "accounts.manage"] },
+  { group: "Overview", href: "/hrportal/reports", label: "Reports", icon: "reports", any: ["reports.view"] },
+  { group: "Me", href: "/hrportal/me", label: "My record", icon: "me", any: ["self.view"] },
+  { group: "Me", href: "/hrportal/team", label: "My team", icon: "team", any: ["team.view"] },
+  { group: "HR", href: "/hrportal/hr/employees", label: "Employees", icon: "employees", any: ["employees.view", "employees.manage"] },
+  { group: "HR", href: "/hrportal/hr/leave", label: "Leave applications", icon: "leave", any: ["leave.view_all", "leave.manage"] },
+  { group: "Administration", href: "/hrportal/hr/accounts", label: "Accounts", icon: "accounts", any: ["accounts.manage"] },
+  { group: "Administration", href: "/hrportal/hr/roles", label: "Roles & permissions", icon: "roles", any: ["roles.manage"] },
+  { group: "Administration", href: "/hrportal/hr/audit", label: "Audit trail", icon: "audit", any: ["audit.view"] },
 ];
 
-export function PortalShell({ ctx, current, children }: { ctx: HrContext; current: string; children: React.ReactNode }) {
-  const links = NAV.filter((n) => n.any.some((p) => has(ctx.permissions, p)));
+export function PortalShell({ ctx, current, crumbs = [], children }: { ctx: HrContext; current: string; crumbs?: Crumb[]; children: React.ReactNode }) {
+  const groups: ShellNavGroup[] = [];
+  for (const n of NAV.filter((item) => item.any.some((p) => has(ctx.permissions, p)))) {
+    const active = current === n.href || (n.href !== "/hrportal/hr" && current.startsWith(`${n.href}/`));
+    const group = groups.find((g) => g.label === n.group) ?? groups[groups.push({ label: n.group, items: [] }) - 1];
+    group.items.push({ href: n.href, label: n.label, icon: n.icon, active });
+  }
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b border-admin-border bg-admin-card">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <Link href="/hrportal" className="flex items-center gap-3">
-            <Image src="/logo.png" alt="Life Helpers Initiative" width={130} height={38} className="h-8 w-auto" />
-            <span className="text-sm font-semibold text-admin-text">HR Portal</span>
-          </Link>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="hidden text-right sm:block">
-              <span className="block font-semibold text-admin-text">{ctx.displayName}</span>
-              <span className="block text-xs text-admin-muted">{ctx.role.name}</span>
-            </span>
-            <form action={hrSignOutAction}>
-              <button type="submit" className="inline-flex items-center gap-1.5 rounded-lg border border-admin-border px-3 py-1.5 text-xs font-semibold text-admin-text hover:bg-admin-bg">
-                <LogOut className="h-3.5 w-3.5" aria-hidden="true" /> Sign out
-              </button>
-            </form>
-          </div>
-        </div>
-        <nav aria-label="HR portal" className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6">
-          <ul className="flex gap-1">
-            {links.map((l) => {
-              const active = current === l.href || (l.href !== "/hrportal/hr" && current.startsWith(`${l.href}/`));
-              return (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    aria-current={active ? "page" : undefined}
-                    className={`block whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium ${
-                      active ? "border-admin-primary text-admin-primary" : "border-transparent text-admin-muted hover:text-admin-text"
-                    }`}
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      </header>
-      <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
-        {children}
-      </main>
-    </div>
+    <ShellFrame
+      nav={groups}
+      crumbs={[{ label: "Dashboard", href: homePath(ctx.permissions) }, ...crumbs]}
+      user={{ name: ctx.displayName, email: ctx.account.email, role: ctx.role.name, initials: initialsOf(ctx.displayName), tone: toneFor(ctx.displayName) }}
+      signOutAction={hrSignOutAction}
+    >
+      {children}
+    </ShellFrame>
   );
 }
 

@@ -1,43 +1,73 @@
-import { LeaveTable } from "@/components/hr/leave-parts";
+import { FileDown } from "lucide-react";
+
+import { recordLeaveAction } from "@/app/hrportal/actions";
+import { ActionForm } from "@/components/hr/action-form";
+import { LeaveCalendar } from "@/components/hr/leave-calendar";
+import { LeaveFields } from "@/components/hr/leave-form";
+import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
+import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Card, inputClass, PageTitle } from "@/components/hr/ui";
+import { hrefWith, isIsoDate, mondayOf } from "@/components/hr/query";
+import { Field, inputClass, outlineButtonClass, PageTitle, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { canDecideLeave } from "@/lib/hr/access";
+import { canDecideLeave, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Leave" };
+export const metadata = { title: "Leave applications" };
 
-const STATUSES = ["pending", "approved", "rejected", "cancelled", "all"] as const;
-
-export default async function AllLeavePage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+export default async function LeaveApplicationsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage(["leave.view_all", "leave.manage"]);
-  const raw = (await searchParams).status ?? "pending";
-  const status = (STATUSES as readonly string[]).includes(raw) ? raw : "pending";
+  const params = (await searchParams) as LeaveParams;
   const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
-  const rows = leave
-    .filter((l) => status === "all" || l.status === status)
-    .sort((a, b) => (status === "pending" ? a.startDate.localeCompare(b.startDate) : b.startDate.localeCompare(a.startDate)))
-    .slice(0, 300);
-  const nameOf = (id: string) => employeeName(employees.find((e) => e.id === id));
+  const weekStart = mondayOf(isIsoDate(params.week) ? params.week : todayLagos());
+  const canViewPeople = has(ctx.permissions, "employees.view") || has(ctx.permissions, "employees.manage");
+  const viewHref = canViewPeople ? (id: string) => `/hrportal/hr/employees/${id}` : undefined;
+  const others = employees.filter((e) => e.status === "active" && e.id !== ctx.employee.id).sort((a, b) => employeeName(a).localeCompare(employeeName(b)));
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/hr/leave">
-      <PageTitle title="Leave" subtitle="Leave requests across LHI" />
-      <form className="mb-4 flex gap-2">
-        <select name="status" defaultValue={status} aria-label="Status" className={`${inputClass} mt-0 w-auto capitalize`}>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <button className="rounded-lg border border-admin-border px-4 py-2 text-sm font-semibold">Show</button>
-      </form>
-      <Card>
-        <LeaveTable rows={rows} who={nameOf} canDecide={(l) => canDecideLeave(ctx.actor, l, employees)} empty="No requests." />
-      </Card>
+    <PortalShell ctx={ctx} current="/hrportal/hr/leave" crumbs={[{ label: "Leave Management" }, { label: "Leave Applications" }]}>
+      <PageTitle
+        title="Leave Applications"
+        subtitle="View and manage leave applications."
+        actions={
+          <>
+            <a href={hrefWith("/hrportal/hr/leave/export", { tab: params.tab, q: params.q, emp: params.emp, type: params.type })} className={outlineButtonClass}>
+              <FileDown className="h-4 w-4" aria-hidden="true" /> Export
+            </a>
+            {has(ctx.permissions, "leave.manage") && (
+              <Modal label="Add Leave Application" title="Add leave application" description="Record leave for an employee, for example from a paper form.">
+                <ActionForm action={recordLeaveAction} submitLabel="Save leave application" resetOnSuccess className="space-y-4">
+                  <Field label="Employee">
+                    <select name="employeeId" required defaultValue="" className={inputClass}>
+                      <option value="" disabled>
+                        Choose…
+                      </option>
+                      {others.map((e) => (
+                        <option key={e.id} value={e.id}>
+                          {employeeName(e)}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <LeaveFields />
+                  <Field label="Status">
+                    <select name="status" defaultValue="pending" className={inputClass}>
+                      <option value="pending">Pending (needs a decision)</option>
+                      <option value="approved">Already approved</option>
+                    </select>
+                  </Field>
+                </ActionForm>
+              </Modal>
+            )}
+          </>
+        }
+      />
+      <LeaveCalendar employees={employees} leave={leave} weekStart={weekStart} basePath="/hrportal/hr/leave" params={params} personHref={viewHref} />
+      <div className="mt-6">
+        <LeaveListing rows={leave} employees={employees} basePath="/hrportal/hr/leave" params={params} canDecide={(l) => canDecideLeave(ctx.actor, l, employees)} viewHref={viewHref} />
+      </div>
     </PortalShell>
   );
 }

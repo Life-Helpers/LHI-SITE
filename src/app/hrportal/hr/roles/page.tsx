@@ -16,7 +16,7 @@ export default async function RolesPage() {
   const count = (id: string) => accounts.filter((a) => a.roleId === id).length;
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/hr/roles">
+    <PortalShell ctx={ctx} current="/hrportal/hr/roles" crumbs={[{ label: "Administration" }, { label: "Roles & permissions" }]}>
       <PageTitle title="Roles & permissions" subtitle="Give each person the smallest role that lets them do their job; add single extra permissions on their account if needed." />
 
       <Card title="Built-in roles">

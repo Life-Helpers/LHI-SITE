@@ -125,7 +125,7 @@ test("the portal is protected and set up by a website administrator", async ({ p
   pages.admin = await freshPage();
   await activate(pages.admin, link);
   await expect(pages.admin).toHaveURL(/\/hrportal\/hr$/);
-  await expect(pages.admin.getByRole("heading", { name: "HR overview" })).toBeVisible();
+  await expect(pages.admin.getByRole("heading", { name: `Good day, ${people.admin.first}` })).toBeVisible();
 
   // Setup closes once an account exists.
   await page.goto("/hrportal/setup");
@@ -138,7 +138,8 @@ test("an HR administrator creates employee records, reporting lines and accounts
   const add = async (key: Key, managerKey?: Key) => {
     const p = people[key];
     await admin.goto("/hrportal/hr/employees");
-    const form = admin.locator("form", { has: admin.getByRole("button", { name: "Add employee" }) });
+    await admin.getByRole("button", { name: "Add Employee" }).click();
+    const form = admin.getByRole("dialog").locator("form");
     await form.getByLabel("First name").fill(p.first);
     await form.getByLabel("Last name").fill(p.last);
     await form.getByLabel("Work email").fill(p.email);
@@ -165,7 +166,8 @@ test("an HR administrator creates employee records, reporting lines and accounts
   for (const key of ["officer", "boss", "manager", "staff", "outsider"] as const) {
     const p = people[key];
     await admin.goto("/hrportal/hr/accounts");
-    const form = admin.locator("form", { has: admin.getByRole("button", { name: /Create account/ }) });
+    await admin.getByRole("button", { name: "Create Account" }).click();
+    const form = admin.getByRole("dialog").locator("form");
     await form.locator('select[name="employeeId"]').selectOption({ label: `${p.first} ${p.last} — ${p.first}'s job` });
     await form.locator('select[name="roleId"]').selectOption({ label: p.role });
     await form.getByRole("button", { name: /Create account/ }).click();
@@ -175,10 +177,10 @@ test("an HR administrator creates employee records, reporting lines and accounts
   }
   await admin.goto("/hrportal/hr/accounts");
   for (const key of ["officer", "boss", "manager", "staff", "outsider"] as const) {
-    const id = await admin.locator("details", { has: admin.locator("summary", { hasText: people[key].email }) }).getAttribute("id");
+    const id = await admin.locator('details[id^="account-"]', { has: admin.locator("summary", { hasText: people[key].email }) }).getAttribute("id");
     accountIds[key] = id!.replace("account-", "");
   }
-  const adminId = await admin.locator("details", { has: admin.locator("summary", { hasText: people.admin.email }) }).getAttribute("id");
+  const adminId = await admin.locator('details[id^="account-"]', { has: admin.locator("summary", { hasText: people.admin.email }) }).getAttribute("id");
   accountIds.admin = adminId!.replace("account-", "");
 });
 
@@ -196,7 +198,7 @@ test("each role lands on its own dashboard and sees only its own navigation", as
   const nav = (p: Page) => p.getByRole("navigation", { name: "HR portal" });
   await expect(nav(pages.staff).getByRole("link")).toHaveText(["My record"]);
   await expect(nav(pages.manager).getByRole("link")).toHaveText(["My record", "My team"]);
-  await expect(nav(pages.boss).getByRole("link")).toHaveText(["My record", "My team", "Reports"]);
+  await expect(nav(pages.boss).getByRole("link")).toHaveText(["Reports", "My record", "My team"]);
   await expect(nav(pages.officer).getByRole("link", { name: "Accounts" })).toHaveCount(0);
   await expect(nav(pages.admin).getByRole("link", { name: "Accounts" })).toHaveCount(1);
 });
@@ -248,26 +250,28 @@ test("leave goes from employee to manager, and nobody can approve their own", as
   test.skip(!pages.staff, "setup did not run");
   const staff = pages.staff;
   await staff.goto("/hrportal/me");
-  const form = staff.locator("form", { has: staff.getByRole("button", { name: "Send request" }) });
-  await form.getByLabel("From").fill("2026-12-07");
-  await form.getByLabel("To").fill("2026-12-11");
+  await staff.getByRole("button", { name: "Request Leave" }).click();
+  const form = staff.getByRole("dialog").locator("form");
+  await form.getByLabel("From", { exact: true }).fill("2026-12-07");
+  await form.getByLabel("To", { exact: true }).fill("2026-12-11");
   await form.getByRole("button", { name: "Send request" }).click();
   await expect(form.getByRole("status")).toContainText("5 working days");
 
   // The manager approves it, and we keep a copy of that request to replay later.
   const manager = pages.manager;
   await manager.goto("/hrportal/team");
-  const decision = manager.locator("form", { has: manager.getByRole("button", { name: "Save" }) }).first();
-  const firstLeaveId = await decision.locator('input[name="leaveId"]').inputValue();
-  const captured = await captureAction(manager, () => decision.getByRole("button", { name: "Save" }).click());
-  // Decided requests move from "awaiting your decision" to the team's leave history.
-  await expect(manager.getByText("approved by Musa Manager")).toBeVisible();
+  const approve = manager.getByRole("button", { name: `Approve ${people.staff.first} ${people.staff.last}'s leave` });
+  const firstLeaveId = await manager.locator("form", { has: approve }).locator('input[name="leaveId"]').inputValue();
+  const captured = await captureAction(manager, () => approve.click());
+  // Decided requests leave the Pending tab.
+  await expect(approve).toHaveCount(0);
   await staff.reload();
-  await expect(staff.getByText("approved by Musa Manager")).toBeVisible();
+  await expect(staff.getByText("by Musa Manager")).toBeVisible();
 
   // A second request: the employee replays the manager's approval against it from their own session.
-  await form.getByLabel("From").fill("2026-12-14");
-  await form.getByLabel("To").fill("2026-12-15");
+  await staff.getByRole("button", { name: "Request Leave" }).click();
+  await form.getByLabel("From", { exact: true }).fill("2026-12-14");
+  await form.getByLabel("To", { exact: true }).fill("2026-12-15");
   await form.getByRole("button", { name: "Send request" }).click();
   await expect(form.getByRole("status")).toContainText("2 working days");
   await staff.reload();
@@ -280,6 +284,29 @@ test("leave goes from employee to manager, and nobody can approve their own", as
   await expect(staff.getByRole("cell", { name: "pending" })).toBeVisible();
   // Control: the same replay from the manager's own session does go through.
   expect(await replay(manager, captured, [[firstLeaveId, ownLeaveId]])).toContain("Leave approved for Esther Staff");
+});
+
+test("HR records leave for others (never themselves) and only HR can export leave", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  await admin.goto("/hrportal/hr/leave");
+  await admin.getByRole("button", { name: "Add Leave Application" }).click();
+  const form = admin.getByRole("dialog").locator("form");
+  await expect(form.locator('select[name="employeeId"] option', { hasText: `${people.admin.first} ${people.admin.last}` })).toHaveCount(0);
+  await form.locator('select[name="employeeId"]').selectOption({ label: `${people.manager.first} ${people.manager.last}` });
+  await form.locator('select[name="type"]').selectOption("Study");
+  await form.getByLabel("From", { exact: true }).fill("2026-11-16");
+  await form.getByLabel("To", { exact: true }).fill("2026-11-17");
+  await form.locator('select[name="status"]').selectOption("approved");
+  await form.getByRole("button", { name: "Save leave application" }).click();
+  await expect(form.getByRole("status")).toContainText("Study leave recorded");
+
+  const csv = await admin.request.get("/hrportal/hr/leave/export?tab=all");
+  expect(csv.headers()["content-type"]).toContain("text/csv");
+  expect(await csv.text()).toContain(`${people.staff.first} ${people.staff.last}`);
+  for (const key of ["staff", "manager", "boss"] as const) {
+    expect((await pages[key].request.get("/hrportal/hr/leave/export?tab=all")).status()).toBe(404);
+  }
 });
 
 test("nobody can raise their own access, even by replaying an administrator's request", async () => {

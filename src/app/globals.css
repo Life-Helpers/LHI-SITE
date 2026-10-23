@@ -46,6 +46,44 @@
   --a-danger-soft: rgba(237, 32, 0, 0.16);
 }
 
+/* HR portal (/hrportal): light HRM look with a green accent. Same token names as the admin. */
+.hr-root {
+  --a-bg: #f6f7f9;
+  --a-card: #ffffff;
+  --a-border: #e7e9ee;
+  --a-text: #1d2433;
+  --a-muted: #6b7280;
+  --a-primary: #10a874;
+  --a-primary-soft: #e6f7f0;
+  --a-nav: #ffffff;
+  --a-nav-hover: #f1f5f3;
+  --a-nav-text: #4b5563;
+  --a-success: #0e9f6e;
+  --a-success-soft: #e3f7ee;
+  --a-warning: #c27803;
+  --a-warning-soft: #fff6e0;
+  --a-danger: #e02424;
+  --a-danger-soft: #fdecec;
+}
+.dark .hr-root {
+  --a-bg: #0e1116;
+  --a-card: #151a21;
+  --a-border: #2a313c;
+  --a-text: #eef1f5;
+  --a-muted: #9aa3b2;
+  --a-primary: #34d399;
+  --a-primary-soft: rgba(16, 168, 116, 0.16);
+  --a-nav: #11151b;
+  --a-nav-hover: #1b222b;
+  --a-nav-text: #aab3c0;
+  --a-success: #34d399;
+  --a-success-soft: rgba(16, 168, 116, 0.16);
+  --a-warning: #fbbf24;
+  --a-warning-soft: rgba(251, 191, 36, 0.14);
+  --a-danger: #f87171;
+  --a-danger-soft: rgba(248, 113, 113, 0.14);
+}
+
 :root {
   --radius: 0.625rem;
 
