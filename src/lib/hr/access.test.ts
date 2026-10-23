@@ -103,7 +103,9 @@ describe("effective permissions", () => {
     expect(perms.management).toContain("reports.view");
     expect(perms.management).not.toContain("employees.view");
     expect(perms.hr_officer).not.toContain("accounts.manage");
-    expect(perms.hr_admin).toEqual(ALL_HR_PERMISSIONS);
+    // HR Administrators hold everything except the IT team's audit trail access.
+    expect(perms.hr_admin).toEqual(ALL_HR_PERMISSIONS.filter((p) => p !== "audit.view"));
+    for (const role of BUILT_IN_HR_ROLES) expect(role.permissions).not.toContain("audit.view");
   });
 });
 
@@ -183,7 +185,8 @@ describe("no self-escalation", () => {
     expect(canGrant(hrOfficer, ["employees.manage"])).toBe(true);
     expect(canGrant(hrOfficer, ["accounts.manage"])).toBe(false);
     expect(canGrant(manager, ["reports.view"])).toBe(false);
-    expect(canGrant(hrAdmin, ALL_HR_PERMISSIONS)).toBe(true);
+    expect(canGrant(hrAdmin, ALL_HR_PERMISSIONS.filter((p) => p !== "audit.view"))).toBe(true);
+    expect(canGrant(hrAdmin, ["audit.view"])).toBe(false);
   });
 });
 
