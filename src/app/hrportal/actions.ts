@@ -15,6 +15,7 @@ import {
   canDecideLeave,
   canGrant,
   canManageAccount,
+  canManageApprovedLeave,
   createsReportingLoop,
   effectivePermissions,
   exceptWebsiteAdminOnly,
@@ -22,6 +23,7 @@ import {
   has,
   homePath,
   relieverOptions,
+  shortenLeave,
   workingDays,
 } from "@/lib/hr/access";
 import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
@@ -420,19 +422,127 @@ export async function recordLeaveAction(_prev: HrResult | null, form: FormData):
   });
 }
 
+const lagosToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(new Date());
+
+/**
+ * The person cancels their own request: a pending one, or an approved one that hasn't started yet
+ * (every day goes back to their balance and the reliever is released). No approval is needed.
+ */
 export async function cancelMyLeaveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
     const ctx = await requireHrAction("leave.request");
     const id = text(form, "leaveId", 64);
-    const ok = await updateStore("hrLeave", (items) => {
+    const reason = text(form, "note", 300);
+    const today = lagosToday();
+    const now = new Date().toISOString();
+    const cancelled = await updateStore<"hrLeave", HrLeaveRequest | null>("hrLeave", (items) => {
       const found = items.find((l) => l.id === id);
-      // Only the person's own, still-pending requests.
-      if (!found || found.employeeId !== ctx.employee.id || found.status !== "pending") return { items, result: false };
-      return { items: items.map((l) => (l.id === id ? { ...l, status: "cancelled" as const } : l)), result: true };
+      // Only the person's own requests: pending, or approved and not started.
+      if (!found || found.employeeId !== ctx.employee.id) return { items, result: null };
+      if (!(found.status === "pending" || (found.status === "approved" && found.startDate > today))) return { items, result: null };
+      const next = { ...found, status: "cancelled" as const, cancelledAt: now, cancelledByName: ctx.displayName, cancelReason: reason, returnRequest: undefined };
+      return { items: items.map((l) => (l.id === id ? next : l)), result: found };
     });
-    if (!ok) return fail("That request can't be cancelled.");
+    if (!cancelled) return fail("That leave can't be cancelled (it may have started already). Ask your manager or HR if your plans have changed.");
+    if (cancelled.status === "approved") {
+      await hrAudit(ctx, "cancelled approved leave", `leave of ${employeeName(ctx.employee)}`, `${cancelled.startDate} to ${cancelled.endDate} (${cancelled.days} days returned)${reason ? `. Reason: ${reason}` : ""}`);
+    }
     refresh();
-    return done("Request cancelled.");
+    return done(cancelled.status === "approved" ? `Leave cancelled. ${cancelled.days} day${cancelled.days === 1 ? " is" : "s are"} back in your balance.` : "Request cancelled.");
+  });
+}
+
+/** While on approved leave, the person says they came back early. Their approver confirms the date. */
+export async function requestEarlyReturnAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("leave.request");
+    const id = text(form, "leaveId", 64);
+    const resumeDate = text(form, "resumeDate", 10);
+    const reason = text(form, "reason", 300);
+    const today = lagosToday();
+    if (!isDate(resumeDate)) return fail("Enter the date you were back at work.");
+    if (resumeDate > today) return fail("Record your return once you're back (the date can't be in the future).");
+    const saved = await updateStore<"hrLeave", HrLeaveRequest | "dates" | null>("hrLeave", (items) => {
+      const found = items.find((l) => l.id === id);
+      if (!found || found.employeeId !== ctx.employee.id || found.status !== "approved" || found.startDate > today) return { items, result: null };
+      if (resumeDate <= found.startDate || resumeDate > found.endDate) return { items, result: "dates" as const };
+      const next = { ...found, returnRequest: { resumeDate, reason, at: new Date().toISOString() } };
+      return { items: items.map((l) => (l.id === id ? next : l)), result: next };
+    });
+    if (saved === "dates") return fail("The date you were back must be after your leave started and no later than its last day.");
+    if (!saved) return fail("You can only record an early return on your own approved leave that has started.");
+    await hrAudit(ctx, "reported early return", `leave of ${employeeName(ctx.employee)}`, `Back on ${resumeDate} (leave was until ${saved.endDate})${reason ? `. ${reason}` : ""}`);
+    refresh();
+    return done("Thanks. Your approver will confirm the date, and the unused days will go back to your balance.");
+  });
+}
+
+/** Apply a return or recall: the leave ends the day before `resumeDate`, and unused days go back. */
+function endEarly(l: HrLeaveRequest, resumeDate: string, kind: "returned" | "recalled", reason: string, byName: string): HrLeaveRequest {
+  const now = new Date().toISOString();
+  const endedEarly = { kind, resumeDate, reason, byName, at: now };
+  const shorter = shortenLeave(l, resumeDate);
+  if (!shorter) return { ...l, status: "cancelled", cancelledAt: now, cancelledByName: byName, cancelReason: reason, endedEarly, returnRequest: undefined };
+  return { ...l, originalEndDate: l.originalEndDate ?? l.endDate, originalDays: l.originalDays ?? l.days, endDate: shorter.endDate, days: shorter.days, endedEarly, returnRequest: undefined };
+}
+
+/** The approver (or HR) confirms or declines a reported early return. */
+export async function confirmEarlyReturnAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction(["team.leave.approve", "leave.manage"]);
+    const id = text(form, "leaveId", 64);
+    const answer = text(form, "answer", 10);
+    const note = text(form, "note", 300);
+    if (answer !== "confirm" && answer !== "decline") return fail("Choose confirm or decline.");
+    const employees = await readStore("hrEmployees");
+    const updated = await updateStore<"hrLeave", HrLeaveRequest | null>("hrLeave", (items) => {
+      const found = items.find((l) => l.id === id);
+      if (!found?.returnRequest || !canManageApprovedLeave(ctx.actor, found, employees, ctx.departments)) return { items, result: null };
+      const next = answer === "confirm" ? endEarly(found, found.returnRequest.resumeDate, "returned", found.returnRequest.reason, ctx.displayName) : { ...found, returnRequest: undefined };
+      return { items: items.map((l) => (l.id === id ? next : l)), result: next };
+    });
+    if (!updated) return fail("You can't confirm this return (it may already be handled, be your own, or be outside your team).");
+    const who = employeeName(employees.find((e) => e.id === updated.employeeId));
+    if (answer === "confirm") {
+      await hrAudit(ctx, "confirmed early return", `leave of ${who}`, `Back on ${updated.endedEarly?.resumeDate}; ${updated.originalDays !== undefined ? `${updated.originalDays - updated.days} day(s) returned` : "leave cancelled"}`);
+    } else {
+      await hrAudit(ctx, "declined early return", `leave of ${who}`, note || "No reason given");
+    }
+    refresh();
+    return done(answer === "confirm" ? `Early return confirmed. ${who}'s unused days are back in their balance.` : `Early return declined; ${who}'s leave stays as approved.`);
+  });
+}
+
+/** The approver or HR calls someone back from approved leave (before or during it), with a reason. */
+export async function recallLeaveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction(["team.leave.approve", "leave.manage"]);
+    const id = text(form, "leaveId", 64);
+    const resumeDate = text(form, "resumeDate", 10);
+    const reason = text(form, "reason", 300);
+    const today = lagosToday();
+    if (!isDate(resumeDate)) return fail("Enter the date they should be back at work.");
+    if (!reason) return fail("Give the reason for the recall (it's kept on their record).");
+    if (resumeDate < today) return fail("The return date can't be in the past.");
+    const employees = await readStore("hrEmployees");
+    const updated = await updateStore<"hrLeave", HrLeaveRequest | "dates" | null>("hrLeave", (items) => {
+      const found = items.find((l) => l.id === id);
+      if (!found || !canManageApprovedLeave(ctx.actor, found, employees, ctx.departments) || found.endDate < today) return { items, result: null };
+      if (resumeDate > found.endDate) return { items, result: "dates" as const };
+      const next = endEarly(found, resumeDate, "recalled", reason, ctx.displayName);
+      return { items: items.map((l) => (l.id === id ? next : l)), result: next };
+    });
+    if (updated === "dates") return fail("The return date is after the leave ends, so there's nothing to recall.");
+    if (!updated) return fail("You can't recall this leave (it may have ended, be your own, or be outside your team).");
+    const who = employeeName(employees.find((e) => e.id === updated.employeeId));
+    const returned = updated.status === "cancelled" ? updated.days : (updated.originalDays ?? updated.days) - updated.days;
+    await hrAudit(ctx, "recalled from leave", `leave of ${who}`, `Back on ${resumeDate}. ${returned} day(s) returned. Reason: ${reason}`);
+    refresh();
+    return done(
+      updated.status === "cancelled"
+        ? `${who}'s leave is called off before it started; all ${updated.days} day${updated.days === 1 ? "" : "s"} are back in their balance.`
+        : `${who} is recalled from ${resumeDate}. Their leave now ends on ${updated.endDate}, and ${returned} unused day${returned === 1 ? "" : "s"} are back in their balance.`,
+    );
   });
 }
 

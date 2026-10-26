@@ -132,6 +132,31 @@ export function canDecideLeave(actor: Actor, leave: HrLeaveRequest, employees: H
   return has(actor.permissions, "team.leave.approve") && teamOf(actor.employeeId, employees, departments).has(leave.employeeId);
 }
 
+/**
+ * May the actor change someone's approved leave (recall them, confirm an early return)? The same
+ * people who could approve it: HR with "Decide any leave", or their approvers. Never their own.
+ */
+export function canManageApprovedLeave(actor: Actor, leave: HrLeaveRequest, employees: HrEmployee[], departments: HrDepartment[] = []): boolean {
+  if (leave.status !== "approved" || leave.employeeId === actor.employeeId) return false;
+  if (has(actor.permissions, "leave.manage")) return true;
+  return has(actor.permissions, "team.leave.approve") && teamOf(actor.employeeId, employees, departments).has(leave.employeeId);
+}
+
+/** The calendar day before `iso`. */
+export const dayBefore = (iso: string) => new Date(Date.parse(`${iso}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+
+/**
+ * Leave cut short by a return or recall on `resumeDate`: it now ends the day before, with the
+ * working days recounted. Returns null when nothing of it is left (the leave becomes cancelled).
+ */
+export function shortenLeave(leave: Pick<HrLeaveRequest, "startDate" | "endDate" | "days">, resumeDate: string) {
+  if (resumeDate > leave.endDate) return { endDate: leave.endDate, days: leave.days };
+  const endDate = dayBefore(resumeDate);
+  if (endDate < leave.startDate) return null;
+  const days = workingDays(leave.startDate, endDate);
+  return days > 0 ? { endDate, days } : null;
+}
+
 /** A named reliever hasn't accepted yet, so the leave can't be approved (it can still be rejected). */
 export const awaitingReliever = (leave: Pick<HrLeaveRequest, "relieverId" | "relieverStatus">) => Boolean(leave.relieverId) && leave.relieverStatus !== "accepted";
 

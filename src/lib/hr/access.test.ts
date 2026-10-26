@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  canManageApprovedLeave,
+  shortenLeave,
   accessProblem,
   canDecideLeave,
   canGrant,
@@ -207,3 +209,24 @@ describe("working days", () => {
     expect(workingDays("2026-11-09", "2026-11-02")).toBe(0);
   });
 });
+
+describe("leave that ends early", () => {
+  it("can be recalled or shortened only by the person's approvers or HR, never by themselves", () => {
+    expect(canManageApprovedLeave(manager, leaveOf("1", "staff1", "approved"), employees)).toBe(true);
+    expect(canManageApprovedLeave(manager, leaveOf("2", "staff1", "pending"), employees)).toBe(false);
+    expect(canManageApprovedLeave(manager, leaveOf("3", "other", "approved"), employees)).toBe(false);
+    expect(canManageApprovedLeave(manager, leaveOf("4", "manager", "approved"), employees)).toBe(false);
+    expect(canManageApprovedLeave(employee, leaveOf("5", "staff2", "approved"), employees)).toBe(false);
+    expect(canManageApprovedLeave(hrOfficer, leaveOf("6", "director", "approved"), employees)).toBe(true);
+  });
+
+  it("ends the day before the return date and recounts working days", () => {
+    // Mon 9 Nov to Fri 13 Nov 2026 (5 days); back on Thu 12 Nov: 3 days taken.
+    expect(shortenLeave({ startDate: "2026-11-09", endDate: "2026-11-13", days: 5 }, "2026-11-12")).toEqual({ endDate: "2026-11-11", days: 3 });
+    // Back on the first day: nothing taken, so the leave is called off.
+    expect(shortenLeave({ startDate: "2026-11-09", endDate: "2026-11-13", days: 5 }, "2026-11-09")).toBeNull();
+    // Back on a Monday after a weekend: the weekend isn't counted.
+    expect(shortenLeave({ startDate: "2026-11-06", endDate: "2026-11-13", days: 6 }, "2026-11-09")).toEqual({ endDate: "2026-11-08", days: 1 });
+  });
+});
+

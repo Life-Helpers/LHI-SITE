@@ -297,6 +297,17 @@ export interface HrLeaveRequest {
   decidedByName?: string;
   decidedAt?: string;
   decisionNote?: string;
+  /** Approved leave cancelled before it started, or called off by a recall before it started. */
+  cancelledAt?: string;
+  cancelledByName?: string;
+  cancelReason?: string;
+  /** Set when the leave was cut short; the dates and days above are then the leave actually taken. */
+  originalEndDate?: string;
+  originalDays?: number;
+  /** How the leave ended early: the person came back early, or was recalled. */
+  endedEarly?: { kind: "returned" | "recalled"; resumeDate: string; reason: string; byName: string; at: string };
+  /** The person says they came back early; waits for their approver to confirm. */
+  returnRequest?: { resumeDate: string; reason: string; at: string };
   /** The colleague covering this person's work while they're away. */
   relieverId?: string;
   /** The reliever's answer; the leave can only be approved once they've accepted. */

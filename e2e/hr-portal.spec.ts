@@ -391,6 +391,70 @@ test("relievers: chosen by the applicant, only they can answer, and a decline me
   await expect(manager.getByText("Reliever accepted").first()).toBeVisible();
 });
 
+test("approved leave can be cancelled before it starts, cut short by an early return, or recalled", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  const outsider = pages.outsider;
+  const who = `${people.outsider.first} ${people.outsider.last}`;
+  const lagos = (offset: number) => {
+    const d = new Date(`${new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(new Date())}T12:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + offset);
+    return d.toISOString().slice(0, 10);
+  };
+  const record = async (from: string, to: string) => {
+    await admin.goto("/hrportal/hr/leave");
+    await admin.getByRole("button", { name: "Add Leave Application" }).click();
+    const form = admin.getByRole("dialog").locator("form");
+    await form.locator('select[name="employeeId"]').selectOption({ label: who });
+    await form.locator('select[name="type"]').selectOption("Annual");
+    await form.getByLabel("From", { exact: true }).fill(from);
+    await form.getByLabel("To", { exact: true }).fill(to);
+    await form.locator('select[name="status"]').selectOption("approved");
+    await form.getByRole("button", { name: "Save leave application" }).click();
+    await expect(form.getByRole("status")).toContainText("recorded");
+  };
+  const row = (page: Page, start: string) => page.getByRole("row").filter({ hasText: start });
+
+  // 1. Leave already under way: the employee reports being back early; HR (their approver) confirms.
+  await record(lagos(-3), lagos(7));
+  await outsider.goto("/hrportal/me?tab=approved");
+  await row(outsider, lagos(-3)).getByRole("button", { name: "Back early from leave" }).click();
+  let form = outsider.getByRole("dialog", { name: "Back early from leave" }).locator("form");
+  await form.getByRole("button", { name: "Send to my approver" }).click();
+  await expect(form.getByRole("status")).toContainText("Your approver will confirm");
+  await admin.goto(`/hrportal/hr/leave?tab=approved&emp=${employeeIds.outsider}`);
+  await expect(row(admin, lagos(-3))).toContainText("awaiting confirmation");
+  await row(admin, lagos(-3)).getByRole("button", { name: `Confirm ${who}'s early return` }).click();
+  await expect(row(admin, lagos(-3))).toContainText("Returned early");
+  await expect(row(admin, lagos(-3))).toContainText(`planned until`);
+
+  // 2. Approved leave that hasn't started: the employee cancels it themselves; the days come back.
+  await record(lagos(20), lagos(22));
+  await outsider.goto("/hrportal/me?tab=approved");
+  outsider.once("dialog", (d) => void d.accept("Plans changed"));
+  await row(outsider, lagos(20)).getByRole("button", { name: "Cancel this leave" }).click();
+  await expect(row(outsider, lagos(20))).toHaveCount(0);
+  await outsider.goto("/hrportal/me?tab=cancelled");
+  await expect(row(outsider, lagos(20))).toContainText("Plans changed");
+
+  // 3. Recall: HR calls them back two days in; the rest of the days come back.
+  await record(lagos(30), lagos(36));
+  await admin.goto(`/hrportal/hr/leave?tab=approved&emp=${employeeIds.outsider}`);
+  await row(admin, lagos(30)).getByRole("button", { name: `Recall ${who} from leave` }).click();
+  form = admin.getByRole("dialog", { name: `Recall ${who} from leave` }).locator("form");
+  await form.locator('input[name="resumeDate"]').fill(lagos(32));
+  // A reason is required.
+  await form.locator('input[name="reason"]').fill("Emergency response in Sokoto");
+  const captured = await captureAction(admin, () => form.getByRole("button", { name: "Recall" }).click());
+  await expect(form.getByRole("status")).toContainText(`is recalled from ${lagos(32)}`);
+  await admin.reload();
+  await expect(row(admin, lagos(30))).toContainText(`Recalled by ${people.admin.first} ${people.admin.last}`);
+  await outsider.goto("/hrportal/me");
+  await expect(outsider.getByText("You've been recalled from leave")).toBeVisible();
+  // An employee replaying HR's recall gets nowhere.
+  expect(await replay(pages.staff, captured)).toContain("You don't have permission to do that.");
+});
+
 test("HR records leave for others (never themselves) and only HR can export leave", async () => {
   test.skip(!pages.admin, "setup did not run");
   const admin = pages.admin;

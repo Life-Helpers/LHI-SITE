@@ -44,6 +44,9 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
   const myDepartment = ctx.departments.find((d) => d.id === me.departmentId);
   const approvers = approversFor(me, employees, ctx.departments);
   const relievers = relieverOptions(me, employees, accounts);
+  const today = todayLagos();
+  // Recalls in the last fortnight, so the person sees they've been called back.
+  const recalls = mine.filter((l) => l.endedEarly?.kind === "recalled" && Date.now() - Date.parse(l.endedEarly.at) < 14 * 86_400_000);
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/me" crumbs={[{ label: "My record" }]}>
@@ -68,6 +71,15 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         <TintStat tint="amber" icon={CalendarClock} label="Awaiting approval" value={annual?.pending ?? 0} note="Days in pending requests" />
         <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} progress={total ? (left / total) * 100 : 0} />
       </div>
+
+      {recalls.map((l) => (
+        <div key={l.id} className="mt-6">
+          <Notice>
+            You&apos;ve been recalled from leave by {l.endedEarly!.byName}: please be back at work on {fmtDate(l.endedEarly!.resumeDate)}.
+            {l.endedEarly!.reason ? ` Reason: ${l.endedEarly!.reason}.` : ""} Your unused days are back in your balance.
+          </Notice>
+        </div>
+      ))}
 
       <ReliefPanel me={me} leave={leave} employees={employees} options={relievers} />
 
@@ -169,7 +181,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         </Card>
       </div>
 
-      <MyAnalytics leave={mine} types={ctx.leaveTypes} balances={balances} today={todayLagos()} />
+      <MyAnalytics leave={mine} types={ctx.leaveTypes} balances={balances} today={today} />
 
       <div className="mt-6">
         <BankingCard person={me} editable={has(ctx.permissions, "self.update")} />
@@ -183,7 +195,9 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
           basePath="/hrportal/me"
           params={{ ...params, tab: params.tab ?? "all" }}
           showEmployee={false}
-          canCancel={(l) => canRequest && l.status === "pending"}
+          canCancel={(l) => canRequest && (l.status === "pending" || (l.status === "approved" && l.startDate > today))}
+          own
+          today={today}
         />
       </div>
     </PortalShell>

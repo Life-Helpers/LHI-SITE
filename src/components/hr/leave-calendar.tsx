@@ -105,7 +105,16 @@ export function LeaveCalendar({
                 <span className={`h-2 w-2 rounded-full ${LEAVE_COLOR_STYLE[t.color].dot}`} aria-hidden="true" /> {t.name}
               </span>
             ))}
-          <span className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-admin-border px-2 py-1 text-admin-muted">Dashed = pending</span>
+          <span className="ml-1 inline-flex items-center gap-3 border-l border-admin-border pl-3 text-admin-text">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-3.5 w-7 rounded border-2 border-admin-muted bg-admin-bg" aria-hidden="true" />
+              Approved
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-3.5 w-7 rounded border-2 border-dashed border-admin-muted bg-admin-bg" aria-hidden="true" />
+              Pending approval
+            </span>
+          </span>
         </div>
       </Card>
 

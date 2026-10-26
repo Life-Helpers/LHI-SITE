@@ -7,7 +7,7 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { isIsoDate, mondayOf } from "@/components/hr/query";
 import { Notice, PageTitle, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { canDecideLeave, has, teamOf } from "@/lib/hr/access";
+import { canDecideLeave, canManageApprovedLeave, has, teamOf } from "@/lib/hr/access";
 import { balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
 import { isCurrentStaff } from "@/lib/hr/types";
@@ -52,6 +52,8 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
           basePath="/hrportal/team"
           params={params}
           canDecide={(l) => has(ctx.permissions, "team.leave.approve") && canDecideLeave(ctx.actor, l, employees, ctx.departments)}
+          canManage={(l) => has(ctx.permissions, "team.leave.approve") && canManageApprovedLeave(ctx.actor, l, employees, ctx.departments)}
+          today={today}
           viewHref={memberHref}
         />
       </div>

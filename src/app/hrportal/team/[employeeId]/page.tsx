@@ -4,7 +4,8 @@ import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { Avatar, Card, fmtDate } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { canDecideLeave, canViewEmployee, has } from "@/lib/hr/access";
+import { canDecideLeave, canManageApprovedLeave, canViewEmployee, has } from "@/lib/hr/access";
+import { todayLagos } from "@/components/hr/ui";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName } from "@/lib/hr/types";
 
@@ -60,6 +61,8 @@ export default async function TeamMemberPage({ params, searchParams }: { params:
             params={{ ...query, tab: query.tab ?? "all" }}
             showEmployee={false}
             canDecide={(l) => has(ctx.permissions, "team.leave.approve") && canDecideLeave(ctx.actor, l, employees, ctx.departments)}
+            canManage={(l) => has(ctx.permissions, "team.leave.approve") && canManageApprovedLeave(ctx.actor, l, employees, ctx.departments)}
+            today={todayLagos()}
           />
         </div>
       </div>

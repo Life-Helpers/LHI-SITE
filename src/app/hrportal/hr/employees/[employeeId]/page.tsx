@@ -10,9 +10,9 @@ import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { ChangePasswordModal } from "@/components/hr/password-panel";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { hrefWith } from "@/components/hr/query";
-import { Badge, Card, Field, fmtDate, fmtDateTime, initialsOf, inputClass, Notice, outlineButtonClass, toneFor } from "@/components/hr/ui";
+import { Badge, Card, Field, fmtDate, fmtDateTime, initialsOf, inputClass, Notice, outlineButtonClass, todayLagos, toneFor } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { approversFor, canDecideLeave, canManageAccount, findRole, has, reportsOf } from "@/lib/hr/access";
+import { approversFor, canDecideLeave, canManageAccount, canManageApprovedLeave, findRole, has, reportsOf } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 import { EMPLOYEE_STATUSES, employeeName, isCurrentStaff, statusLabel } from "@/lib/hr/types";
 
@@ -196,6 +196,8 @@ export default async function EmployeePage({ params, searchParams }: { params: P
                 statusParam="leave"
                 showEmployee={false}
                 canDecide={(l) => canDecideLeave(ctx.actor, l, employees, ctx.departments)}
+                canManage={(l) => canManageApprovedLeave(ctx.actor, l, employees, ctx.departments)}
+                today={todayLagos()}
               />
             )}
 

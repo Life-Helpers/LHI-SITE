@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { ChevronsUpDown, ChevronDown, ChevronUp, Eye, Search } from "lucide-react";
 
-import { cancelMyLeaveAction, decideLeaveAction } from "@/app/hrportal/actions";
+import { cancelMyLeaveAction, confirmEarlyReturnAction, decideLeaveAction, recallLeaveAction, requestEarlyReturnAction } from "@/app/hrportal/actions";
+import { ActionForm } from "@/components/hr/action-form";
+import { Modal } from "@/components/hr/modal";
 import { AutoSubmitSelect } from "@/components/hr/filters";
 import { leaveName, leaveStyle } from "@/components/hr/leave-style";
 import { hrefWith } from "@/components/hr/query";
 import { QuickAction } from "@/components/hr/quick-action";
-import { Badge, fmtDate, inputClass, Person } from "@/components/hr/ui";
+import { Badge, Field, fmtDate, inputClass, Person } from "@/components/hr/ui";
 import { awaitingReliever } from "@/lib/hr/access";
 import { employeeName, type HrEmployee, type HrLeaveRequest, type HrLeaveType } from "@/lib/hr/types";
 
@@ -35,6 +37,9 @@ export function LeaveListing({
   showEmployee = true,
   canDecide,
   canCancel,
+  canManage,
+  own = false,
+  today,
   viewHref,
   statusParam = "tab",
   leaveTypes,
@@ -47,6 +52,12 @@ export function LeaveListing({
   showEmployee?: boolean;
   canDecide?: (l: HrLeaveRequest) => boolean;
   canCancel?: (l: HrLeaveRequest) => boolean;
+  /** May the viewer recall this person or confirm their early return (see canManageApprovedLeave)? */
+  canManage?: (l: HrLeaveRequest) => boolean;
+  /** The rows are the viewer's own leave (offers "I'm back early" during approved leave). */
+  own?: boolean;
+  /** Today in Lagos, for what can still be changed. */
+  today?: string;
   viewHref?: (employeeId: string) => string | undefined;
   /** Query parameter for the status tabs (when the page already uses `tab`). */
   statusParam?: string;
@@ -183,9 +194,22 @@ export function LeaveListing({
                   <td className="px-4 py-3">{l.days}</td>
                   <td className="px-4 py-3">
                     <Badge status={l.status} />
-                    {l.decidedByName && (
+                    {l.endedEarly ? (
+                      <span className="mt-0.5 block max-w-[220px] text-[11px] text-admin-warning" title={l.endedEarly.reason || undefined}>
+                        {l.endedEarly.kind === "recalled" ? `Recalled by ${l.endedEarly.byName}` : "Returned early"}: back {fmtDate(l.endedEarly.resumeDate)}
+                        {l.originalEndDate ? ` (planned until ${fmtDate(l.originalEndDate)})` : ""}
+                      </span>
+                    ) : l.returnRequest ? (
+                      <span className="mt-0.5 block max-w-[220px] text-[11px] text-admin-warning">Back early on {fmtDate(l.returnRequest.resumeDate)}: awaiting confirmation</span>
+                    ) : l.status === "cancelled" && l.cancelledByName ? (
+                      <span className="mt-0.5 block max-w-[220px] truncate text-[11px] text-admin-muted" title={l.cancelReason || undefined}>
+                        by {l.cancelledByName}
+                        {l.cancelReason ? `: ${l.cancelReason}` : ""}
+                      </span>
+                    ) : null}
+                    {l.decidedByName && !l.endedEarly && l.status !== "cancelled" && (
                       <span className="mt-0.5 block text-[11px] text-admin-muted" title={l.decisionNote || undefined}>
-                        by {l.decidedByName}
+                        {l.decidedByAccountId === "policy" ? l.decidedByName : `by ${l.decidedByName}`}
                       </span>
                     )}
                   </td>
@@ -209,7 +233,49 @@ export function LeaveListing({
                           <QuickAction action={decideLeaveAction} kind="reject" label={`Reject ${employeeName(e)}'s leave`} fields={{ leaveId: l.id, decision: "reject" }} askNote="Reason for rejecting (optional):" />
                         </>
                       )}
-                      {canCancel?.(l) && <QuickAction action={cancelMyLeaveAction} kind="cancel" label="Cancel this request" fields={{ leaveId: l.id }} confirmText="Cancel this leave request?" />}
+                      {canManage?.(l) && l.returnRequest && (
+                        <>
+                          <QuickAction action={confirmEarlyReturnAction} kind="approve" label={`Confirm ${employeeName(e)}'s early return`} tip="Confirm early return" fields={{ leaveId: l.id, answer: "confirm" }} />
+                          <QuickAction action={confirmEarlyReturnAction} kind="reject" label={`Decline ${employeeName(e)}'s early return`} tip="Decline early return" fields={{ leaveId: l.id, answer: "decline" }} askNote="Reason for declining (optional):" />
+                        </>
+                      )}
+                      {canManage?.(l) && !l.returnRequest && today && l.endDate >= today && (
+                        <Modal label="Recall from leave" iconOnly icon="recall" title={`Recall ${employeeName(e)} from leave`} description={`Approved ${leaveName(l.type, leaveTypes)}, ${fmtDate(l.startDate)} – ${fmtDate(l.endDate)}. Unused days go back to their balance.`}>
+                          <ActionForm action={recallLeaveAction} submitLabel="Recall" className="space-y-4 text-left">
+                            <input type="hidden" name="leaveId" value={l.id} />
+                            <Field label="Back at work on" hint="If this is on or before the first day of leave, the leave is called off completely.">
+                              <input name="resumeDate" type="date" required min={today} max={l.endDate} defaultValue={today > l.startDate ? today : undefined} className={inputClass} />
+                            </Field>
+                            <Field label="Reason" hint="Kept on their leave record.">
+                              <input name="reason" required maxLength={300} placeholder="e.g. Emergency response in Sokoto" className={inputClass} />
+                            </Field>
+                          </ActionForm>
+                        </Modal>
+                      )}
+                      {/* Stays available after sending, so the person can correct the date until it's confirmed. */}
+                      {own && today && l.status === "approved" && l.startDate < today && l.endDate >= today && (
+                        <Modal label="I'm back early" iconOnly icon="return" title="Back early from leave" description={`Your ${leaveName(l.type, leaveTypes)} runs until ${fmtDate(l.endDate)}. Once your approver confirms, the unused days go back to your balance.`}>
+                          <ActionForm action={requestEarlyReturnAction} submitLabel="Send to my approver" className="space-y-4 text-left">
+                            <input type="hidden" name="leaveId" value={l.id} />
+                            <Field label="I was back at work on">
+                              <input name="resumeDate" type="date" required min={l.startDate} max={today} defaultValue={today} className={inputClass} />
+                            </Field>
+                            <Field label="Note (optional)">
+                              <input name="reason" maxLength={300} className={inputClass} />
+                            </Field>
+                          </ActionForm>
+                        </Modal>
+                      )}
+                      {canCancel?.(l) && (
+                        <QuickAction
+                          action={cancelMyLeaveAction}
+                          kind="cancel"
+                          label={l.status === "approved" ? "Cancel this leave" : "Cancel this request"}
+                          tip={l.status === "approved" ? "Cancel this leave (days go back to your balance)" : "Cancel this request"}
+                          fields={{ leaveId: l.id }}
+                          {...(l.status === "approved" ? { askNote: "Cancel this approved leave? Reason (optional):" } : { confirmText: "Cancel this leave request?" })}
+                        />
+                      )}
                     </span>
                   </td>
                 </tr>

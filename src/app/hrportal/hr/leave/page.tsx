@@ -11,7 +11,7 @@ import { relieverLabel } from "@/components/hr/relief-panel";
 import { hrefWith, isIsoDate, mondayOf } from "@/components/hr/query";
 import { Field, inputClass, outlineButtonClass, PageTitle, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { canDecideLeave, has, relieverOptions } from "@/lib/hr/access";
+import { canDecideLeave, canManageApprovedLeave, has, relieverOptions } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName, isCurrentStaff } from "@/lib/hr/types";
 
@@ -67,7 +67,7 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
       />
       <LeaveCalendar leaveTypes={ctx.leaveTypes} employees={employees} leave={leave} weekStart={weekStart} basePath="/hrportal/hr/leave" params={params} personHref={viewHref} />
       <div className="mt-6">
-        <LeaveListing leaveTypes={ctx.leaveTypes} rows={leave} employees={employees} basePath="/hrportal/hr/leave" params={params} canDecide={(l) => canDecideLeave(ctx.actor, l, employees, ctx.departments)} viewHref={viewHref} />
+        <LeaveListing leaveTypes={ctx.leaveTypes} rows={leave} employees={employees} basePath="/hrportal/hr/leave" params={params} canDecide={(l) => canDecideLeave(ctx.actor, l, employees, ctx.departments)} canManage={(l) => canManageApprovedLeave(ctx.actor, l, employees, ctx.departments)} today={todayLagos()} viewHref={viewHref} />
       </div>
     </PortalShell>
   );
