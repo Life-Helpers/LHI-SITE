@@ -10,7 +10,7 @@ import type { HrContext } from "@/lib/hr/session";
 import type { HrPermission } from "@/lib/hr/types";
 
 /** Menu built from the signed-in person's permissions (display only: every page checks again). */
-const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrPermission[]; children?: { href: string; label: string }[] }[] = [
+const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrPermission[]; children?: { href: string; label: string; any?: HrPermission[] }[] }[] = [
   { group: "Overview", href: "/hrportal/hr", label: "Dashboard", icon: "dashboard", any: ["employees.view", "employees.manage", "accounts.manage"] },
   { group: "Overview", href: "/hrportal/reports", label: "Reports", icon: "reports", any: ["reports.view"] },
   { group: "Me", href: "/hrportal/me", label: "My record", icon: "me", any: ["self.view"] },
@@ -34,15 +34,16 @@ const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrP
   },
   {
     group: "Finance",
-    href: "/hrportal/payroll/runs",
+    href: "/hrportal/payroll",
     label: "Payroll Management",
     icon: "payroll",
-    any: ["payroll.manage"],
+    any: ["payroll.salaries.view", "payroll.components.manage", "payroll.runs", "payroll.payslips.view"],
+    // Each page shows only to those whose access covers it.
     children: [
-      { href: "/hrportal/payroll/payslips", label: "Payslips" },
-      { href: "/hrportal/payroll/runs", label: "Payroll Runs" },
-      { href: "/hrportal/payroll/salaries", label: "Employee Salaries" },
-      { href: "/hrportal/payroll/components", label: "Salary Components" },
+      { href: "/hrportal/payroll/payslips", label: "Payslips", any: ["payroll.payslips.view"] },
+      { href: "/hrportal/payroll/runs", label: "Payroll Runs", any: ["payroll.runs", "payroll.payslips.view"] },
+      { href: "/hrportal/payroll/salaries", label: "Employee Salaries", any: ["payroll.salaries.view"] },
+      { href: "/hrportal/payroll/components", label: "Salary Components", any: ["payroll.components.manage"] },
     ],
   },
   { group: "Administration", href: "/hrportal/hr/accounts", label: "Accounts", icon: "accounts", any: ["accounts.manage"] },
@@ -61,7 +62,9 @@ export async function PortalShell({ ctx, current, crumbs = [], children }: { ctx
   // Relief requests waiting for this person's answer.
   const reliefAsks = leave.filter((l) => l.relieverId === ctx.employee.id && l.status === "pending" && l.relieverStatus === "pending").length;
   const groups: ShellNavGroup[] = [];
-  for (const n of NAV.filter((item) => item.any.some((p) => has(ctx.permissions, p)))) {
+  for (const item of NAV.filter((i) => i.any.some((p) => has(ctx.permissions, p)))) {
+    const children = item.children?.filter((c) => !c.any || c.any.some((p) => has(ctx.permissions, p)));
+    const n = { ...item, children, href: children?.length && !children.some((c) => c.href === item.href) ? children[0].href : item.href };
     const active = current === n.href || (n.href !== "/hrportal/hr" && current.startsWith(`${n.href}/`)) || Boolean(n.children?.some((c) => c.href === current));
     const group = groups.find((g) => g.label === n.group) ?? groups[groups.push({ label: n.group, items: [] }) - 1];
     group.items.push({
@@ -71,7 +74,7 @@ export async function PortalShell({ ctx, current, crumbs = [], children }: { ctx
       active,
       ...(n.href === "/hrportal/team" && waiting ? { badge: waiting } : {}),
       ...(n.href === "/hrportal/me" && reliefAsks ? { badge: reliefAsks } : {}),
-      ...(n.children ? { children: n.children.map((c) => ({ ...c, active: current === c.href })) } : {}),
+      ...(n.children ? { children: n.children.map((c) => ({ href: c.href, label: c.label, active: current === c.href })) } : {}),
     });
   }
   return (

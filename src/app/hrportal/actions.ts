@@ -1510,7 +1510,7 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
     await updateStore("hrEmployees", (items) => ({ items: [...items, ...people] }));
     await updateStore("hrLeave", (items) => ({ items: [...leave, ...items] }));
     // Salaries only for someone who may set them (HR Administrators can).
-    const salaries: HrSalary[] = has(ctx.permissions, "payroll.manage")
+    const salaries: HrSalary[] = has(ctx.permissions, "payroll.salaries.manage")
       ? people.map((e, i) => {
           const { basic, housing, transport, allowances, deductions } = SAMPLE_PAY[i];
           return { employeeId: e.id, basic, housing, transport, allowances, deductions, updatedAt: now, updatedByName: `${ctx.displayName} (sample)` };
@@ -1745,7 +1745,7 @@ const payLines = (form: FormData, prefix: string) => {
 /** HR or Finance sets someone's monthly salary. Nobody sets their own. */
 export async function saveSalaryAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("payroll.manage");
+    const ctx = await requireHrAction("payroll.salaries.manage");
     const employeeId = text(form, "employeeId", 64);
     if (employeeId === ctx.employee.id) return fail("Ask a colleague in HR or Finance to set your own salary.");
     const person = (await readStore("hrEmployees")).find((e) => e.id === employeeId);
@@ -1785,7 +1785,7 @@ const PAY_BASES = ["basic", "basic_housing_transport", "gross", "taxable"] as co
 /** HR or Finance adds or edits a tax or statutory deduction (e.g. a new levy, or new PAYE bands). */
 export async function savePayrollRuleAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("payroll.manage");
+    const ctx = await requireHrAction("payroll.components.manage");
     const existingId = text(form, "ruleId", 64);
     const name = text(form, "name", 60);
     const method = text(form, "method", 10) as PayrollRule["method"];
@@ -1841,7 +1841,7 @@ export async function savePayrollRuleAction(_prev: HrResult | null, form: FormDa
 
 export async function deletePayrollRuleAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("payroll.manage");
+    const ctx = await requireHrAction("payroll.components.manage");
     const id = text(form, "ruleId", 64);
     const rules = payrollRules((await readStore("hrPayrollSettings"))[0]);
     const rule = rules.find((r) => r.id === id);
@@ -1856,7 +1856,7 @@ export async function deletePayrollRuleAction(_prev: HrResult | null, form: Form
 /** Prepare draft payslips for a month for every current employee with a salary (published ones stay). */
 export async function preparePayslipsAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("payroll.manage");
+    const ctx = await requireHrAction("payroll.runs");
     const month = text(form, "month", 7);
     if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return fail("Choose a month.");
     const [employees, salaries, settingsList, departments, events] = await Promise.all([
@@ -1920,7 +1920,7 @@ export async function preparePayslipsAction(_prev: HrResult | null, form: FormDa
 /** Publish a month's drafts: staff can then see and print them. Published payslips can't be changed. */
 export async function publishPayslipsAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("payroll.manage");
+    const ctx = await requireHrAction("payroll.runs");
     const month = text(form, "month", 7);
     const now = new Date().toISOString();
     const n = await updateStore<"hrPayslips", number>("hrPayslips", (items) => {
@@ -1937,7 +1937,7 @@ export async function publishPayslipsAction(_prev: HrResult | null, form: FormDa
 
 export async function discardPayslipDraftsAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("payroll.manage");
+    const ctx = await requireHrAction("payroll.runs");
     const month = text(form, "month", 7);
     const n = await updateStore<"hrPayslips", number>("hrPayslips", (items) => {
       const keep = items.filter((p) => !(p.month === month && p.status === "draft"));
@@ -1953,7 +1953,7 @@ export async function discardPayslipDraftsAction(_prev: HrResult | null, form: F
 /** Remove someone's salary (e.g. set by mistake). Their published payslips stay. */
 export async function removeSalaryAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("payroll.manage");
+    const ctx = await requireHrAction("payroll.salaries.manage");
     const employeeId = text(form, "employeeId", 64);
     if (employeeId === ctx.employee.id) return fail("Ask a colleague in HR or Finance to change your own salary.");
     const person = (await readStore("hrEmployees")).find((e) => e.id === employeeId);
@@ -1969,7 +1969,7 @@ export async function removeSalaryAction(_prev: HrResult | null, form: FormData)
 /** Switch a tax or deduction on or off without removing it. */
 export async function setPayrollRuleActiveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("payroll.manage");
+    const ctx = await requireHrAction("payroll.components.manage");
     const id = text(form, "ruleId", 64);
     const active = text(form, "active", 5) === "true";
     const rules = payrollRules((await readStore("hrPayrollSettings"))[0]);

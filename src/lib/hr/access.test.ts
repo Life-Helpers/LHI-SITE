@@ -11,12 +11,13 @@ import {
   createsReportingLoop,
   effectivePermissions,
   homePath,
+  payrollHome,
   reportsOf,
   visibleLeaveEmployeeIds,
   workingDays,
   type Actor,
 } from "@/lib/hr/access";
-import { ALL_HR_PERMISSIONS, BUILT_IN_HR_ROLES, type HrAccount, type HrEmployee, type HrLeaveRequest, type HrPermission } from "@/lib/hr/types";
+import { ALL_HR_PERMISSIONS, BUILT_IN_HR_ROLES, PAYROLL_PERMISSIONS, upgradePermissions, type HrAccount, type HrEmployee, type HrLeaveRequest, type HrPermission } from "@/lib/hr/types";
 
 const emp = (id: string, managerId: string | null = null, status: HrEmployee["status"] = "active"): HrEmployee => ({
   id,
@@ -231,13 +232,25 @@ describe("leave that ends early", () => {
 });
 
 describe("payroll access", () => {
-  it("Finance Officers land on Payroll; HR administrators also manage payroll; nobody else does", () => {
-    const finance = BUILT_IN_HR_ROLES.find((r) => r.id === "finance_officer")!;
-    expect(homePath(finance.permissions)).toBe("/hrportal/payroll/runs");
-    expect(BUILT_IN_HR_ROLES.find((r) => r.id === "hr_admin")!.permissions).toContain("payroll.manage");
+  const role = (id: string) => BUILT_IN_HR_ROLES.find((r) => r.id === id)!;
+
+  it("Finance Officers and HR administrators get every payroll permission; nobody else gets any", () => {
+    expect(homePath(role("finance_officer").permissions)).toBe("/hrportal/payroll/runs");
+    for (const id of ["finance_officer", "hr_admin"]) expect(role(id).permissions).toEqual(expect.arrayContaining([...PAYROLL_PERMISSIONS]));
     for (const id of ["employee", "manager", "management", "hr_officer"]) {
-      expect(BUILT_IN_HR_ROLES.find((r) => r.id === id)!.permissions).not.toContain("payroll.manage");
+      expect(role(id).permissions.filter((p) => p.startsWith("payroll."))).toEqual([]);
     }
   });
-});
 
+  it("can be given piece by piece, and each piece opens only its own page", () => {
+    expect(payrollHome(["payroll.salaries.view"])).toBe("/hrportal/payroll/salaries");
+    expect(payrollHome(["payroll.payslips.view"])).toBe("/hrportal/payroll/payslips");
+    expect(payrollHome(["payroll.components.manage"])).toBe("/hrportal/payroll/components");
+    expect(payrollHome(["self.view"])).toBeNull();
+  });
+
+  it("reads the old single payroll permission as all of them, and setting salaries includes seeing them", () => {
+    expect(upgradePermissions(["self.view", "payroll.manage", "nonsense"])).toEqual(["self.view", ...PAYROLL_PERMISSIONS]);
+    expect(upgradePermissions(["payroll.salaries.manage"])).toEqual(["payroll.salaries.view", "payroll.salaries.manage"]);
+  });
+});

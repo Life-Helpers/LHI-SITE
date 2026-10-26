@@ -5,7 +5,7 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { Card, Field, inputClass, PageTitle } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { requireHrPage } from "@/lib/hr/session";
-import { BUILT_IN_HR_ROLES } from "@/lib/hr/types";
+import { BUILT_IN_HR_ROLES, upgradePermissions } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Roles" };
@@ -33,7 +33,7 @@ export default async function RolesPage() {
         </ul>
       </Card>
 
-      {customRoles.map((r) => (
+      {customRoles.map((r) => ({ ...r, permissions: upgradePermissions(r.permissions) })).map((r) => (
         <div key={r.id} className="mt-6">
           <Card title={`${r.name} · ${count(r.id)} account${count(r.id) === 1 ? "" : "s"}`}>
             <ActionForm action={saveRoleAction} submitLabel="Save role" className="space-y-4">

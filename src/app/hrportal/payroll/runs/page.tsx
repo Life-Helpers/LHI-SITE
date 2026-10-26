@@ -10,7 +10,7 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { Badge, Field, inputClass, PageTitle, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { naira, payMonthLabel } from "@/lib/hr/payroll";
-import { holidayDates } from "@/lib/hr/access";
+import { has, holidayDates } from "@/lib/hr/access";
 import { payrollInsights } from "@/lib/hr/insights";
 import { requireHrPage } from "@/lib/hr/session";
 
@@ -26,13 +26,22 @@ const TABS = [
 
 /** One run per month: prepare drafts, check them, publish. */
 export default async function PayrollRunsPage({ searchParams }: { searchParams: Promise<Params> }) {
-  const ctx = await requireHrPage("payroll.manage");
+  const ctx = await requireHrPage(["payroll.runs", "payroll.payslips.view"]);
   const params = await searchParams;
   const today = todayLagos();
   const year = /^\d{4}$/.test(params.year ?? "") ? Number(params.year) : Number(today.slice(0, 4));
   const month = /^\d{4}-\d{2}$/.test(params.month ?? "") && params.month!.startsWith(String(year)) ? params.month : undefined;
   const [slips, employees, salaries, events] = await Promise.all([readStore("hrPayslips"), readStore("hrEmployees"), readStore("hrSalaries"), readStore("hrEvents")]);
-  const insights = payrollInsights({ employees, salaries, payslips: slips, today, holidays: holidayDates(events, Number(today.slice(0, 4))) });
+  const canRun = has(ctx.permissions, "payroll.runs");
+  const canSeeSlips = has(ctx.permissions, "payroll.payslips.view");
+  const insights = payrollInsights({
+    employees,
+    salaries,
+    payslips: slips,
+    today,
+    holidays: holidayDates(events, Number(today.slice(0, 4))),
+    can: { salaries: has(ctx.permissions, "payroll.salaries.view"), runs: canRun },
+  });
   const runs = [...new Set(slips.map((p) => p.month))].sort().reverse().map((m) => {
     const inRun = slips.filter((p) => p.month === m);
     const drafts = inRun.filter((p) => p.status === "draft").length;
@@ -64,16 +73,18 @@ export default async function PayrollRunsPage({ searchParams }: { searchParams: 
         title="Payroll Runs"
         subtitle="Process and manage payroll runs for each pay period."
         actions={
-          <Modal label="Add Payroll Run" title="Add a payroll run" description="Draft payslips are made for every current employee with a salary. Check them, then publish.">
-            <ActionForm action={preparePayslipsAction} submitLabel="Prepare payslips" className="space-y-4">
-              <Field label="Month">
-                <input name="month" type="month" required defaultValue={today.slice(0, 7)} className={inputClass} />
-              </Field>
-              <Field label="Pay date (optional)" hint="Leave blank for the month's last working day.">
-                <input name="payDate" type="date" className={inputClass} />
-              </Field>
-            </ActionForm>
-          </Modal>
+          canRun && (
+            <Modal label="Add Payroll Run" title="Add a payroll run" description="Draft payslips are made for every current employee with a salary. Check them, then publish.">
+              <ActionForm action={preparePayslipsAction} submitLabel="Prepare payslips" className="space-y-4">
+                <Field label="Month">
+                  <input name="month" type="month" required defaultValue={today.slice(0, 7)} className={inputClass} />
+                </Field>
+                <Field label="Pay date (optional)" hint="Leave blank for the month's last working day.">
+                  <input name="payDate" type="date" className={inputClass} />
+                </Field>
+              </ActionForm>
+            </Modal>
+          )
         }
       />
       {insights.length > 0 && (
@@ -134,9 +145,11 @@ export default async function PayrollRunsPage({ searchParams }: { searchParams: 
                       <Link href={`${base}/${r.month}`} aria-label={`View ${r.title}`} title="View" className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
                         <Eye className="h-[18px] w-[18px]" aria-hidden="true" />
                       </Link>
-                      <a href={`${base}/${r.month}/export`} aria-label={`Export ${r.title}`} title="Export (CSV)" className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
-                        <FileDown className="h-[18px] w-[18px]" aria-hidden="true" />
-                      </a>
+                      {canSeeSlips && (
+                        <a href={`${base}/${r.month}/export`} aria-label={`Export ${r.title}`} title="Export (CSV)" className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
+                          <FileDown className="h-[18px] w-[18px]" aria-hidden="true" />
+                        </a>
+                      )}
                     </span>
                   </td>
                 </tr>
@@ -144,12 +157,8 @@ export default async function PayrollRunsPage({ searchParams }: { searchParams: 
             </tbody>
           </table>
         </div>
-        {rows.length === 0 && <p className="px-5 py-10 text-center text-sm text-admin-muted">No payroll runs here yet. Use Add Payroll Run to prepare one.</p>}
+        {rows.length === 0 && <p className="px-5 py-10 text-center text-sm text-admin-muted">No payroll runs here yet.{canRun ? " Use Add Payroll Run to prepare one." : ""}</p>}
       </section>
-      <p className="mt-3 text-xs text-admin-muted">
-        Set salaries under <Link href="/hrportal/payroll/salaries" className="font-medium text-admin-primary hover:underline">Employee Salaries</Link> and taxes under{" "}
-        <Link href="/hrportal/payroll/components" className="font-medium text-admin-primary hover:underline">Salary Components</Link> first.
-      </p>
     </PortalShell>
   );
 }

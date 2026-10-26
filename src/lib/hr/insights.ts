@@ -135,13 +135,30 @@ export function accountInsights({ employees, accounts, today }: { employees: HrE
   return out;
 }
 
-/** Salaries missing and this month's payroll run. */
-export function payrollInsights({ employees, salaries, payslips, today, holidays }: { employees: HrEmployee[]; salaries: HrSalary[]; payslips: HrPayslip[]; today: string; holidays?: ReadonlySet<string> }): Insight[] {
+/**
+ * Salaries missing and this month's payroll run. `can` limits it to what the person's payroll
+ * access covers: salaries (who has none) and runs (preparing and publishing). Never anyone's pay.
+ */
+export function payrollInsights({
+  employees,
+  salaries,
+  payslips,
+  today,
+  holidays,
+  can = { salaries: true, runs: true },
+}: {
+  employees: HrEmployee[];
+  salaries: HrSalary[];
+  payslips: HrPayslip[];
+  today: string;
+  holidays?: ReadonlySet<string>;
+  can?: { salaries: boolean; runs: boolean };
+}): Insight[] {
   const out: Insight[] = [];
   const staff = employees.filter((e) => isCurrentStaff(e));
   const paid = new Set(salaries.map((s) => s.employeeId));
   const noSalary = staff.filter((e) => !paid.has(e.id));
-  if (noSalary.length) out.push({ id: "payroll-salary", tone: "warning", title: `${plural(noSalary.length, "employee")} with no salary set`, detail: "They won't get a payslip.", href: "/hrportal/payroll/salaries?tab=unset", action: "Set" });
+  if (can.salaries && noSalary.length) out.push({ id: "payroll-salary", tone: "warning", title: `${plural(noSalary.length, "employee")} with no salary set`, detail: "They won't get a payslip.", href: "/hrportal/payroll/salaries?tab=unset", action: "Set" });
   const month = today.slice(0, 7);
   const run = payslips.filter((p) => p.month === month);
   const drafts = run.filter((p) => p.status === "draft");
@@ -151,6 +168,7 @@ export function payrollInsights({ employees, salaries, payslips, today, holidays
   const payDate = run.find((p) => p.payDate)?.payDate ?? payDay;
   const daysToPay = Math.round((at(payDate) - at(today)) / DAY);
   const label = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${month}-15T12:00:00Z`));
+  if (!can.runs) return out;
   if (!run.length && daysToPay <= 10) {
     out.push({ id: "payroll-run", tone: daysToPay <= 3 ? "critical" : "warning", title: `${label} payroll hasn't been prepared`, detail: daysToPay >= 0 ? `Pay day is ${short(payDate)}, in ${plural(daysToPay, "day")}.` : `Pay day was ${short(payDate)}.`, href: "/hrportal/payroll/runs", action: "Prepare" });
   } else if (drafts.length) {

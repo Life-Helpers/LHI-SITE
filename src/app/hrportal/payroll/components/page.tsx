@@ -14,7 +14,7 @@ export const metadata = { title: "Salary components" };
 
 /** Taxes and deductions taken from pay: add, edit, switch off or remove. */
 export default async function ComponentsPage() {
-  const ctx = await requireHrPage("payroll.manage");
+  const ctx = await requireHrPage("payroll.components.manage");
   const settings = (await readStore("hrPayrollSettings"))[0];
   const rules = payrollRules(settings);
 

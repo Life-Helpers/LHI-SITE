@@ -8,7 +8,6 @@ import {
   ALL_HR_PERMISSIONS,
   FIXED_PUBLIC_HOLIDAYS,
   BUILT_IN_HR_ROLES,
-  isHrPermission,
   type HrAccount,
   type HrCalendarEvent,
   type HrDepartment,
@@ -17,10 +16,12 @@ import {
   type HrPermission,
   type HrRole,
   isCurrentStaff,
+  upgradePermissions,
 } from "@/lib/hr/types";
 
 export function allRoles(customRoles: HrRole[]): HrRole[] {
-  return [...BUILT_IN_HR_ROLES, ...customRoles.filter((r) => !BUILT_IN_HR_ROLES.some((b) => b.id === r.id))];
+  const custom = customRoles.filter((r) => !BUILT_IN_HR_ROLES.some((b) => b.id === r.id)).map((r) => ({ ...r, permissions: upgradePermissions(r.permissions) }));
+  return [...BUILT_IN_HR_ROLES, ...custom];
 }
 
 export function findRole(roleId: string, customRoles: HrRole[]): HrRole | undefined {
@@ -40,7 +41,7 @@ export function effectivePermissions(
   if (!account || !account.active || !employee || !isCurrentStaff(employee)) return [];
   const role = findRole(account.roleId, customRoles);
   if (!role) return [];
-  const granted = new Set<HrPermission>([...role.permissions, ...account.extraPermissions].filter(isHrPermission));
+  const granted = new Set<HrPermission>(upgradePermissions([...role.permissions, ...account.extraPermissions]));
   // Heads and approvers HR has named for a department look after that department's staff.
   if (role.permissions.length && leadsDepartments(employee.id, departments).length) {
     granted.add("team.view");
@@ -204,12 +205,22 @@ export function createsReportingLoop(employeeId: string, managerId: string | nul
   return reportsOf(employeeId, employees).has(managerId);
 }
 
+/** The first payroll page these permissions open, if any. */
+export function payrollHome(perms: readonly HrPermission[]): string | null {
+  if (has(perms, "payroll.runs")) return "/hrportal/payroll/runs";
+  if (has(perms, "payroll.payslips.view")) return "/hrportal/payroll/payslips";
+  if (has(perms, "payroll.salaries.view")) return "/hrportal/payroll/salaries";
+  if (has(perms, "payroll.components.manage")) return "/hrportal/payroll/components";
+  return null;
+}
+
 /** Where a signed-in person lands: the most senior dashboard their permissions allow. */
 export function homePath(perms: readonly HrPermission[]): string {
   if (has(perms, "accounts.manage") || has(perms, "employees.manage") || has(perms, "employees.view")) return "/hrportal/hr";
   if (has(perms, "reports.view")) return "/hrportal/reports";
   if (has(perms, "team.view")) return "/hrportal/team";
-  if (has(perms, "payroll.manage")) return "/hrportal/payroll/runs";
+  const payroll = payrollHome(perms);
+  if (payroll) return payroll;
   if (has(perms, "self.view")) return "/hrportal/me";
   return "/hrportal/no-access";
 }

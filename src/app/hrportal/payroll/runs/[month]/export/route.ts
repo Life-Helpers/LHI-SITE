@@ -7,10 +7,10 @@ const cell = (v: unknown) => {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 
-/** A run's payslips as CSV, for HR and Finance only (everyone else gets "not found"). */
+/** A run's payslips as CSV, for those who may see everyone's payslips (everyone else gets "not found"). */
 export async function GET(_req: Request, { params }: { params: Promise<{ month: string }> }) {
   const state = await loadHrSession();
-  if (state.status !== "ok" || !has(state.ctx.permissions, "payroll.manage")) return new Response("Not found", { status: 404 });
+  if (state.status !== "ok" || !has(state.ctx.permissions, "payroll.payslips.view")) return new Response("Not found", { status: 404 });
   const { month } = await params;
   if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return new Response("Not found", { status: 404 });
   const slips = (await readStore("hrPayslips")).filter((p) => p.month === month).sort((a, b) => a.employee.name.localeCompare(b.employee.name));

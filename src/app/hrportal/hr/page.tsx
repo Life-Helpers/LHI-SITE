@@ -77,8 +77,15 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
     ...(seesLeave ? leaveInsights({ leave, employees, today, holidays, href: "/hrportal/hr/leave", groupOf: deptName }) : []),
     ...(seesPeople ? peopleInsights({ employees, today }) : []),
     ...(has(p, "accounts.manage") ? accountInsights({ employees, accounts, today }) : []),
-    ...(has(p, "payroll.manage")
-      ? payrollInsights({ employees, salaries: await readStore("hrSalaries"), payslips: await readStore("hrPayslips"), today, holidays })
+    ...(has(p, "payroll.salaries.view") || has(p, "payroll.runs")
+      ? payrollInsights({
+          employees,
+          salaries: await readStore("hrSalaries"),
+          payslips: await readStore("hrPayslips"),
+          today,
+          holidays,
+          can: { salaries: has(p, "payroll.salaries.view"), runs: has(p, "payroll.runs") },
+        })
       : []),
   ];
   const closingSoon = openJobs.filter((j) => j.deadline <= weekAhead);

@@ -11,6 +11,7 @@ import { QuickAction } from "@/components/hr/quick-action";
 import { Badge, inputClass, PageTitle, Person } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { monthlyPay, naira, payrollRules } from "@/lib/hr/payroll";
+import { has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName, isCurrentStaff } from "@/lib/hr/types";
 
@@ -26,7 +27,7 @@ const TABS = [
 
 /** Every current employee's monthly salary; HR and Finance only. */
 export default async function SalariesPage({ searchParams }: { searchParams: Promise<Params> }) {
-  const ctx = await requireHrPage("payroll.manage");
+  const ctx = await requireHrPage("payroll.salaries.view");
   const params = await searchParams;
   const [employees, salaries, settingsList] = await Promise.all([readStore("hrEmployees"), readStore("hrSalaries"), readStore("hrPayrollSettings")]);
   const rules = payrollRules(settingsList[0]);
@@ -41,10 +42,12 @@ export default async function SalariesPage({ searchParams }: { searchParams: Pro
   const counts = { all: filtered.length, active: filtered.filter((r) => r.salary).length, unset: filtered.filter((r) => !r.salary).length };
   const rows = filtered.filter((r) => tab === "all" || (tab === "active" ? r.salary : !r.salary));
   const base = "/hrportal/payroll/salaries";
+  const canSet = has(ctx.permissions, "payroll.salaries.manage");
+  const canSeeSlips = has(ctx.permissions, "payroll.payslips.view");
 
   return (
     <PortalShell ctx={ctx} current={base} crumbs={[{ label: "Payroll Management" }, { label: "Employee Salaries" }]}>
-      <PageTitle title="Employee Salaries" subtitle="Monthly pay for each current employee. Changes apply to payslips prepared afterwards." />
+      <PageTitle title="Employee Salaries" subtitle={`Monthly pay for each current employee. ${canSet ? "Changes apply to payslips prepared afterwards." : "Your access is read only."}`} />
       <section className="hr-card mb-5">
         <form method="get" action={base} className="flex flex-wrap items-center gap-3 px-4 pb-3 pt-4">
           {params.tab && <input type="hidden" name="tab" value={params.tab} />}
@@ -111,7 +114,7 @@ export default async function SalariesPage({ searchParams }: { searchParams: Pro
                           </dl>
                         </Modal>
                       )}
-                      {e.id === ctx.employee.id ? (
+                      {!canSet ? null : e.id === ctx.employee.id ? (
                         <span className="px-1 text-xs text-admin-muted">Set by a colleague</span>
                       ) : (
                         <>
@@ -124,9 +127,11 @@ export default async function SalariesPage({ searchParams }: { searchParams: Pro
                           {salary && <QuickAction action={removeSalaryAction} fields={{ employeeId: e.id }} kind="delete" label={`Remove ${employeeName(e)}'s salary`} tip="Remove" confirmText={`Remove ${employeeName(e)}'s salary? Their published payslips stay.`} />}
                         </>
                       )}
-                      <Link href={`/hrportal/payroll/payslips?employee=${e.id}`} aria-label={`${employeeName(e)}'s payslips`} title="Payslips" className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
-                        <ReceiptText className="h-[18px] w-[18px]" aria-hidden="true" />
-                      </Link>
+                      {canSeeSlips && (
+                        <Link href={`/hrportal/payroll/payslips?employee=${e.id}`} aria-label={`${employeeName(e)}'s payslips`} title="Payslips" className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
+                          <ReceiptText className="h-[18px] w-[18px]" aria-hidden="true" />
+                        </Link>
+                      )}
                     </span>
                   </td>
                 </tr>

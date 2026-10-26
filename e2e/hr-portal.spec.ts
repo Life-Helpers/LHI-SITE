@@ -715,6 +715,52 @@ test("HR and Finance set salaries and publish payslips; each person sees only th
   await expect(admin.getByRole("row", { name: new RegExp(staffName) })).toContainText("Viewed");
 });
 
+test("payroll access can be given piece by piece: seeing salaries doesn't show payslips or runs", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  const officer = pages.officer;
+  const staffName = `${people.staff.first} ${people.staff.last}`;
+  await admin.goto("/hrportal/payroll/payslips?year=2026");
+  const slipUrl = (await admin.getByRole("link", { name: `View ${staffName}'s payslip` }).getAttribute("href"))!;
+
+  // An HR Officer is given "See salaries" only.
+  const setExtra = async (on: boolean) => {
+    await admin.goto("/hrportal/hr/accounts");
+    const row = admin.locator(`details#account-${accountIds.officer}`);
+    await row.locator("summary").click();
+    const form = row.locator("form").filter({ has: admin.getByRole("button", { name: "Save extra permissions" }) });
+    await form.locator('input[value="payroll.salaries.view"]').setChecked(on);
+    await form.getByRole("button", { name: "Save extra permissions" }).click();
+    await expect(form.getByRole("status")).toBeVisible();
+  };
+  await setExtra(true);
+  await signIn(officer, people.officer.email);
+  await expect(officer).toHaveURL(/\/hrportal\/hr$/);
+
+  const menu = officer.getByRole("navigation", { name: "HR portal" });
+  await officer.goto("/hrportal/payroll");
+  await expect(officer).toHaveURL(/\/hrportal\/payroll\/salaries$/);
+  await expect(menu.getByRole("link", { name: "Employee Salaries" })).toBeVisible();
+  for (const hidden of ["Payslips", "Payroll Runs", "Salary Components"]) await expect(menu.getByRole("link", { name: hidden, exact: true })).toHaveCount(0);
+  // Read only: amounts but no edit or remove, and no link to anyone's payslips.
+  await expect(officer.getByRole("row", { name: new RegExp(staffName) })).toContainText("500,000.00");
+  await expect(officer.getByRole("button", { name: `Salary: ${staffName}` })).toHaveCount(0);
+  await expect(officer.getByRole("link", { name: `${staffName}'s payslips` })).toHaveCount(0);
+  // Everything else is closed, typed URL or not.
+  for (const url of ["/hrportal/payroll/runs", "/hrportal/payroll/runs/2026-10", "/hrportal/payroll/payslips", "/hrportal/payroll/components"]) {
+    await officer.goto(url);
+    await expect(officer).toHaveURL(/denied=1$/);
+  }
+  expect((await officer.goto(slipUrl))?.status()).toBe(404);
+  expect((await officer.request.get("/hrportal/payroll/runs/2026-10/export")).status()).toBe(404);
+
+  // Taking it away ends their session too; sign back in for the tests that follow.
+  await setExtra(false);
+  await signIn(officer, people.officer.email);
+  await expect(officer).toHaveURL(/\/hrportal\/hr$/);
+  await expect(officer.getByRole("navigation", { name: "HR portal" }).getByRole("link", { name: "Payroll Management" })).toHaveCount(0);
+});
+
 test("HR imports employees from CSV and manages their status", async () => {
   test.skip(!pages.admin, "setup did not run");
   const admin = pages.admin;

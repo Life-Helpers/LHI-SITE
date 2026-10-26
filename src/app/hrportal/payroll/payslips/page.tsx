@@ -22,7 +22,7 @@ const TABS = [
 
 /** Every payslip, for HR and Finance. */
 export default async function AdminPayslipsPage({ searchParams }: { searchParams: Promise<Params> }) {
-  const ctx = await requireHrPage("payroll.manage");
+  const ctx = await requireHrPage("payroll.payslips.view");
   const params = await searchParams;
   const year = /^\d{4}$/.test(params.year ?? "") ? Number(params.year) : Number(todayLagos().slice(0, 4));
   const month = /^\d{4}-\d{2}$/.test(params.month ?? "") && params.month!.startsWith(String(year)) ? params.month : undefined;

@@ -44,7 +44,13 @@ export const HR_PERMISSION_GROUPS = [
   },
   {
     label: "Payroll",
-    items: [{ id: "payroll.manage", label: "Manage salaries & payslips", help: "Set every employee's salary, prepare and publish monthly payslips, and see all payslips." }],
+    items: [
+      { id: "payroll.salaries.view", label: "See salaries", help: "See every employee's salary and pay breakdown (Employee Salaries). Read only." },
+      { id: "payroll.salaries.manage", label: "Set salaries", help: "Add, change and remove employees' salaries. Includes seeing them. Nobody can set their own." },
+      { id: "payroll.components.manage", label: "Taxes & deductions", help: "Add, change, switch off and remove the taxes and deductions worked out on payslips." },
+      { id: "payroll.runs", label: "Run payroll", help: "Prepare, publish and discard monthly payroll runs. Shows each run's totals only, not what each person is paid." },
+      { id: "payroll.payslips.view", label: "See everyone's payslips", help: "Open any employee's payslip, see each person's pay in a run, and export runs. Everyone always sees their own." },
+    ],
   },
 ] as const;
 
@@ -54,6 +60,20 @@ export const ALL_HR_PERMISSIONS: HrPermission[] = HR_PERMISSION_GROUPS.flatMap((
 
 export const isHrPermission = (value: unknown): value is HrPermission =>
   typeof value === "string" && (ALL_HR_PERMISSIONS as string[]).includes(value);
+
+/** Every payroll permission; the old single "payroll.manage" (still on some saved roles) means all of these. */
+export const PAYROLL_PERMISSIONS = ["payroll.salaries.view", "payroll.salaries.manage", "payroll.components.manage", "payroll.runs", "payroll.payslips.view"] as const satisfies readonly HrPermission[];
+
+/** Read saved permission lists: expand retired ids, drop unknown ones, and add what a permission includes. */
+export function upgradePermissions(list: readonly string[]): HrPermission[] {
+  const out = new Set<HrPermission>();
+  for (const p of list) {
+    if (p === "payroll.manage") PAYROLL_PERMISSIONS.forEach((x) => out.add(x));
+    else if (isHrPermission(p)) out.add(p);
+  }
+  if (out.has("payroll.salaries.manage")) out.add("payroll.salaries.view");
+  return ALL_HR_PERMISSIONS.filter((p) => out.has(p));
+}
 
 export interface HrRole {
   id: string;
@@ -92,8 +112,8 @@ export const BUILT_IN_HR_ROLES: HrRole[] = [
   {
     id: "finance_officer",
     name: "Finance Officer",
-    description: "Self-service plus salaries and monthly payslips for all staff.",
-    permissions: [...SELF, "payroll.manage"],
+    description: "Self-service plus salaries, taxes and monthly payslips for all staff.",
+    permissions: [...SELF, "payroll.salaries.view", "payroll.salaries.manage", "payroll.components.manage", "payroll.runs", "payroll.payslips.view"],
     builtIn: true,
   },
   {
