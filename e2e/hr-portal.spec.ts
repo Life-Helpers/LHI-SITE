@@ -1019,6 +1019,13 @@ test("HR loads sample records for testing and removes them in one go", async () 
   await expect(admin.getByRole("main").getByRole("status")).toContainText("Loaded 5 sample employees");
   await admin.goto("/hrportal/hr/employees?q=SAMPLE");
   await expect(admin.getByText("SAMPLE-005")).toBeVisible();
+  // Sample salaries, ready to try a payroll run with.
+  await admin.goto("/hrportal/payroll/salaries?q=SAMPLE");
+  await expect(admin.getByRole("row", { name: /Grace Danjuma/ })).toContainText("650,000.00");
+  await expect(admin.getByRole("row", { name: /Ibrahim Musa/ })).toContainText("Active");
+  // HR can apply for their own leave from the dashboard (it goes to their approvers).
+  await admin.goto("/hrportal/hr");
+  await expect(admin.getByRole("button", { name: "Request my leave" })).toBeVisible();
 
   // A sample login works with its role's limits.
   const sample = await freshPage();
@@ -1031,6 +1038,8 @@ test("HR loads sample records for testing and removes them in one go", async () 
   admin.once("dialog", (d) => void d.accept());
   await admin.getByRole("button", { name: "Remove sample data" }).click();
   await expect(admin.getByRole("main").getByRole("status")).toContainText("Removed 5 sample employees");
+  await admin.goto("/hrportal/payroll/salaries?q=SAMPLE");
+  await expect(admin.getByText("No employees match.")).toBeVisible();
   await admin.goto("/hrportal/hr/employees?q=SAMPLE");
   await expect(admin.getByText("SAMPLE-001")).toHaveCount(0);
   await sample.goto("/hrportal/me");

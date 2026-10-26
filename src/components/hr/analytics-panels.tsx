@@ -218,7 +218,7 @@ export function TeamAnalytics({
               rows={balances
                 .map(({ employee, rows }) => {
                   const r = rows.find((x) => x.type.id === annual.id);
-                  return { label: employeeName(employee), value: r?.used ?? 0, note: r?.total === null || r?.total === undefined ? "no limit" : `${r.available ?? 0} of ${r.total} left` };
+                  return { label: employeeName(employee), value: r?.used ?? 0, note: r?.total === null || r?.total === undefined ? "no limit" : (r.available ?? 0) < 0 ? `0 of ${r.total} left, ${-(r.available ?? 0)} over` : `${r.available ?? 0} of ${r.total} left` };
                 })
                 .sort((a, b) => b.value - a.value)}
               unit="days"

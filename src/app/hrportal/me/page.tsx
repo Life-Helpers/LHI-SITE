@@ -1,21 +1,20 @@
 import { CalendarCheck, CalendarClock, CalendarDays, Palmtree } from "lucide-react";
 
-import { requestLeaveAction, setMyDepartmentAction, updateMyContactAction } from "@/app/hrportal/actions";
+import { setMyDepartmentAction, updateMyContactAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { MyAnalytics } from "@/components/hr/analytics-panels";
 import { InsightsPanel } from "@/components/hr/insights-panel";
 import { BankingCard } from "@/components/hr/banking-card";
 import { BalanceTable } from "@/components/hr/balance-table";
-import { LeaveFields } from "@/components/hr/leave-form";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
-import { Modal } from "@/components/hr/modal";
+import { MyLeaveButton } from "@/components/hr/my-leave-button";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { ReliefPanel, relieverLabel } from "@/components/hr/relief-panel";
+import { ReliefPanel } from "@/components/hr/relief-panel";
 import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { myInsights } from "@/lib/hr/insights";
-import { approversFor, has, holidayDates, relieverOptions } from "@/lib/hr/access";
-import { availableByType, balanceFor } from "@/lib/hr/leave-balance";
+import { approversFor, has, relieverOptions } from "@/lib/hr/access";
+import { balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName } from "@/lib/hr/types";
 
@@ -50,7 +49,6 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
   // Recalls in the last fortnight, so the person sees they've been called back.
   const recalls = mine.filter((l) => l.endedEarly?.kind === "recalled" && Date.now() - Date.parse(l.endedEarly.at) < 14 * 86_400_000);
 
-  const holidayList = [...holidayDates(await readStore("hrEvents"), new Date().getFullYear(), new Date().getFullYear() + 1)];
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/me" crumbs={[{ label: "My record" }]}>
@@ -59,13 +57,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         title={`Welcome, ${me.firstName}`}
         subtitle="Your employee record and leave"
         actions={
-          canRequest && (
-            <Modal label="Request Leave" title="Request leave" description={annual ? `You have ${left} ${annual.type.name.toLowerCase()} days left this year.` : undefined}>
-              <ActionForm action={requestLeaveAction} submitLabel="Send request" resetOnSuccess className="space-y-4">
-                <LeaveFields types={ctx.leaveTypes} holidays={holidayList} relievers={relievers.map((e) => ({ id: e.id, label: relieverLabel(e) }))} relieverRequired available={availableByType(balances)} year={year} />
-              </ActionForm>
-            </Modal>
-          )
+          <MyLeaveButton ctx={ctx} />
         }
       />
 
@@ -73,7 +65,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         <TintStat tint="teal" icon={CalendarDays} label={`${annual?.type.name ?? "Leave"} ${year}`} value={annual?.total === null || !annual ? "No limit" : `${total} days`} />
         <TintStat tint="green" icon={CalendarCheck} label="Taken or approved" value={annual?.used ?? 0} note={`${annual?.type.name ?? "Leave"}, this year`} />
         <TintStat tint="amber" icon={CalendarClock} label="Awaiting approval" value={annual?.pending ?? 0} note="Days in pending requests" />
-        <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} progress={total ? (left / total) * 100 : 0} />
+        <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} note={(annual?.available ?? 0) < 0 ? `${-(annual?.available ?? 0)} over the allowance` : undefined} progress={total ? (left / total) * 100 : 0} />
       </div>
 
       {(() => {

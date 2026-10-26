@@ -6,6 +6,7 @@ import { LeaveCalendar } from "@/components/hr/leave-calendar";
 import { LeaveFields } from "@/components/hr/leave-form";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { Modal } from "@/components/hr/modal";
+import { MyLeaveButton } from "@/components/hr/my-leave-button";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { relieverLabel } from "@/components/hr/relief-panel";
 import { hrefWith, isIsoDate, mondayOf } from "@/components/hr/query";
@@ -39,6 +40,7 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
             <a href={hrefWith("/hrportal/hr/leave/export", { tab: params.tab, q: params.q, emp: params.emp, type: params.type })} className={outlineButtonClass}>
               <FileDown className="h-4 w-4" aria-hidden="true" /> Export
             </a>
+            <MyLeaveButton ctx={ctx} label="Request my leave" outline />
             {has(ctx.permissions, "leave.manage") && (
               <Modal label="Add Leave Application" title="Add leave application" description="Record leave for an employee, for example from a paper form.">
                 <ActionForm action={recordLeaveAction} submitLabel="Save leave application" resetOnSuccess className="space-y-4">

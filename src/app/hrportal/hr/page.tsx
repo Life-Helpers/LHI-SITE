@@ -6,6 +6,7 @@ import { ActionForm } from "@/components/hr/action-form";
 import { OrgAnalytics } from "@/components/hr/analytics-panels";
 import { InsightsPanel } from "@/components/hr/insights-panel";
 import { leaveName, leaveStyle } from "@/components/hr/leave-style";
+import { MyLeaveButton } from "@/components/hr/my-leave-button";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { QuickAction } from "@/components/hr/quick-action";
 import { Card, Field, fmtDate, fmtDateTime, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
@@ -86,7 +87,7 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
   return (
     <PortalShell ctx={ctx} current="/hrportal/hr" crumbs={[{ label: "HR overview" }]}>
       {denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
-      <PageTitle title={`Good day, ${ctx.employee.firstName}`} subtitle={`HR overview for Life Helpers Initiative · ${fmtDate(today)}`} />
+      <PageTitle title={`Good day, ${ctx.employee.firstName}`} subtitle={`HR overview for Life Helpers Initiative · ${fmtDate(today)}`} actions={<MyLeaveButton ctx={ctx} label="Request my leave" />} />
 
       {/* One figure per tile, each with its trend or context; the detail lives in the charts below. */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">

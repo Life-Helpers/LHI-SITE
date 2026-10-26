@@ -51,17 +51,21 @@ export default async function AdminPayslipsPage({ searchParams }: { searchParams
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-admin-muted" aria-hidden="true" />
             <input name="q" defaultValue={params.q ?? ""} placeholder="Search..." aria-label="Search payslips" className={`${inputClass} mt-0 pl-9`} />
           </div>
-          <select name="year" defaultValue={year} aria-label="Year" className={`${inputClass} mt-0 w-auto`}>
-            {Array.from({ length: 6 }, (_, i) => Number(todayLagos().slice(0, 4)) + 1 - i).map((y) => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-          <select name="employee" defaultValue={params.employee ?? ""} aria-label="Employee" className={`${inputClass} mt-0 w-auto`}>
-            <option value="">All Employees</option>
-            {people.map((e) => (
-              <option key={e.id} value={e.id}>{employeeName(e)}</option>
-            ))}
-          </select>
+          <div className="w-full sm:w-56">
+            <select name="year" defaultValue={year} aria-label="Year" className={`${inputClass} mt-0`}>
+              {Array.from({ length: 6 }, (_, i) => Number(todayLagos().slice(0, 4)) + 1 - i).map((y) => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
+          <div className="w-full sm:w-56">
+            <select name="employee" defaultValue={params.employee ?? ""} aria-label="Employee" className={`${inputClass} mt-0`}>
+              <option value="">All Employees</option>
+              {people.map((e) => (
+                <option key={e.id} value={e.id}>{employeeName(e)}</option>
+              ))}
+            </select>
+          </div>
           <button type="submit" className="rounded-lg border border-admin-border px-3 py-2 text-sm font-medium hover:bg-admin-bg">Filter</button>
         </form>
         <CountTabs base={base} params={p} tabs={TABS} current={tab} counts={counts} />

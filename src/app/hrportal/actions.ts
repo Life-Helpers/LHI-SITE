@@ -49,6 +49,8 @@ import {
   type HrEmployee,
   type HrLeavePolicy,
   type PayrollRule,
+  type HrSalary,
+  type PayLine,
   type HrLeaveRequest,
   type HrLeaveType,
   LEAVE_COLORS,
@@ -1415,9 +1417,18 @@ const SAMPLE_PEOPLE = [
   { first: "Aisha", last: "Bello", title: "Programme Manager", dept: "Programmes", station: "Sokoto", type: "Full-time", role: "manager", status: "active", manager: null },
   { first: "Ibrahim", last: "Musa", title: "Field Officer", dept: "Programmes", station: "Sokoto", type: "Full-time", role: "employee", status: "active", manager: 0 },
   { first: "Fatima", last: "Abubakar", title: "Nutrition Officer", dept: "Health & Nutrition", station: "Maiduguri", type: "Fixed-term contract", role: "employee", status: "probation", manager: 0 },
-  { first: "Chinedu", last: "Okafor", title: "Finance Officer", dept: "Finance & Grants", station: "Abuja", type: "Full-time", role: "employee", status: "active", manager: null },
+  { first: "Chinedu", last: "Okafor", title: "Finance Officer", dept: "Finance & Grants", station: "Abuja", type: "Full-time", role: "finance_officer", status: "active", manager: null },
   { first: "Grace", last: "Danjuma", title: "Deputy Director", dept: "Human Resources & Administration", station: "Sokoto", type: "Full-time", role: "management", status: "active", manager: null },
 ] as const;
+
+/** Made-up monthly pay for each sample person (same order), to try payroll with. */
+const SAMPLE_PAY: { basic: number; housing: number; transport: number; allowances: PayLine[]; deductions: PayLine[]; bank: string }[] = [
+  { basic: 450_000, housing: 180_000, transport: 70_000, allowances: [{ name: "Field allowance", amount: 40_000 }], deductions: [], bank: "First Bank" },
+  { basic: 220_000, housing: 90_000, transport: 40_000, allowances: [{ name: "Field allowance", amount: 25_000 }], deductions: [{ name: "Staff loan repayment", amount: 15_000 }], bank: "Access Bank" },
+  { basic: 260_000, housing: 100_000, transport: 45_000, allowances: [], deductions: [], bank: "Zenith Bank" },
+  { basic: 300_000, housing: 120_000, transport: 50_000, allowances: [], deductions: [{ name: "Cooperative savings", amount: 10_000 }], bank: "GTBank" },
+  { basic: 650_000, housing: 260_000, transport: 90_000, allowances: [{ name: "Responsibility allowance", amount: 60_000 }], deductions: [], bank: "UBA" },
+];
 
 const sampleEmail = (first: string, last: string) => `${first}.${last}.sample@example.test`.toLowerCase();
 
@@ -1462,6 +1473,9 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
         address: "",
         emergencyContactName: "",
         emergencyContactPhone: "",
+        bankName: SAMPLE_PAY[i].bank,
+        bankAccountName: `${p.first} ${p.last}`,
+        bankAccountNumber: `00000000${i + 1}${i + 1}`.slice(-10),
         createdAt: now,
         updatedAt: now,
         sample: true,
@@ -1495,6 +1509,14 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
 
     await updateStore("hrEmployees", (items) => ({ items: [...items, ...people] }));
     await updateStore("hrLeave", (items) => ({ items: [...leave, ...items] }));
+    // Salaries only for someone who may set them (HR Administrators can).
+    const salaries: HrSalary[] = has(ctx.permissions, "payroll.manage")
+      ? people.map((e, i) => {
+          const { basic, housing, transport, allowances, deductions } = SAMPLE_PAY[i];
+          return { employeeId: e.id, basic, housing, transport, allowances, deductions, updatedAt: now, updatedByName: `${ctx.displayName} (sample)` };
+        })
+      : [];
+    if (salaries.length) await updateStore("hrSalaries", (items) => ({ items: [...items, ...salaries] }));
 
     let logins = 0;
     if (password) {
@@ -1519,10 +1541,10 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
         return { items: [...items, ...fresh] };
       });
     }
-    await hrAudit(ctx, "loaded sample data", "sample records", `${people.length} sample employees, ${leave.length} leave requests, ${logins} sample logins`);
+    await hrAudit(ctx, "loaded sample data", "sample records", `${people.length} sample employees, ${leave.length} leave requests, ${salaries.length} salaries, ${logins} sample logins`);
     refresh();
     return done(
-      `Loaded ${people.length} sample employees and ${leave.length} leave requests${logins ? `, with ${logins} sample logins (e.g. ${people[0].email} as Manager)` : ""}. Remove them any time with "Remove sample data".`,
+      `Loaded ${people.length} sample employees, ${leave.length} leave requests${salaries.length ? ` and ${salaries.length} salaries (try Payroll Runs)` : ""}${logins ? `, with ${logins} sample logins (e.g. ${people[0].email} as Manager, ${people[3].email} as Finance Officer)` : ""}. Remove them any time with "Remove sample data".`,
     );
   });
 }
@@ -1541,12 +1563,14 @@ export async function removeSampleDataAction(): Promise<HrResult> {
     await updateStore("hrTokens", (items) => ({ items: items.filter((t) => !accountIds.has(t.accountId)) }));
     await updateStore("hrLeave", (items) => ({ items: items.filter((l) => !l.sample && !ids.has(l.employeeId)) }));
     await updateStore("hrLeaveAdjustments", (items) => ({ items: items.filter((a) => !ids.has(a.employeeId)) }));
+    await updateStore("hrSalaries", (items) => ({ items: items.filter((x) => !ids.has(x.employeeId)) }));
+    await updateStore("hrPayslips", (items) => ({ items: items.filter((x) => !ids.has(x.employeeId)) }));
     await updateStore("hrDepartments", (items) => ({
       items: items.map((d) => ({ ...d, headEmployeeId: d.headEmployeeId && ids.has(d.headEmployeeId) ? null : d.headEmployeeId, approverIds: d.approverIds.filter((x) => !ids.has(x)) })),
     }));
     await hrAudit(ctx, "removed sample data", "sample records", `${ids.size} sample employees and ${accountIds.size} sample logins removed`);
     refresh();
-    return done(`Removed ${ids.size} sample employees, their leave and ${accountIds.size} sample logins.`);
+    return done(`Removed ${ids.size} sample employees, their leave, salaries and payslips, and ${accountIds.size} sample logins.`);
   });
 }
 

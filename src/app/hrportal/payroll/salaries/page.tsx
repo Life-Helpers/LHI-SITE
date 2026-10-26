@@ -52,12 +52,14 @@ export default async function SalariesPage({ searchParams }: { searchParams: Pro
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-admin-muted" aria-hidden="true" />
             <input name="q" defaultValue={params.q ?? ""} placeholder="Search..." aria-label="Search employees" className={`${inputClass} mt-0 pl-9`} />
           </div>
-          <select name="employee" defaultValue={params.employee ?? ""} aria-label="Employee" className={`${inputClass} mt-0 w-auto`}>
-            <option value="">All Employees</option>
-            {staff.map((e) => (
-              <option key={e.id} value={e.id}>{employeeName(e)}</option>
-            ))}
-          </select>
+          <div className="w-full sm:w-56">
+            <select name="employee" defaultValue={params.employee ?? ""} aria-label="Employee" className={`${inputClass} mt-0`}>
+              <option value="">All Employees</option>
+              {staff.map((e) => (
+                <option key={e.id} value={e.id}>{employeeName(e)}</option>
+              ))}
+            </select>
+          </div>
           <button type="submit" className="rounded-lg border border-admin-border px-3 py-2 text-sm font-medium hover:bg-admin-bg">Filter</button>
         </form>
         <CountTabs base={base} params={params} tabs={TABS} current={tab} counts={counts} />
