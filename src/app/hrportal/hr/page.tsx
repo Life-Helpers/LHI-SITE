@@ -1,15 +1,18 @@
 import Link from "next/link";
-import { Briefcase, Building2, CalendarCheck, CalendarClock, CalendarDays, ClipboardList, Gift, PartyPopper, UserCheck, Users } from "lucide-react";
+import { Activity, Briefcase, CalendarCheck, ClipboardList, Gift, PartyPopper, Repeat, UserCheck, Users } from "lucide-react";
 
 import { decideLeaveAction, loadSampleDataAction, removeSampleDataAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { OrgAnalytics } from "@/components/hr/analytics-panels";
+import { InsightsPanel } from "@/components/hr/insights-panel";
 import { leaveName, leaveStyle } from "@/components/hr/leave-style";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { QuickAction } from "@/components/hr/quick-action";
 import { Card, Field, fmtDate, fmtDateTime, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { awaitingReliever, canDecideLeave, has, holidayDates } from "@/lib/hr/access";
+import { absenceRate, headcountByMonth, lastMonths, pct, turnoverRate } from "@/lib/hr/analytics";
+import { accountInsights, leaveInsights, payrollInsights, peopleInsights, type Insight } from "@/lib/hr/insights";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName, type HrEmployee, isCurrentStaff } from "@/lib/hr/types";
 
@@ -43,20 +46,19 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
   const seesPeople = has(p, "employees.view") || has(p, "employees.manage");
   const seesLeave = has(p, "leave.view_all") || has(p, "leave.manage");
   const today = todayLagos();
-  const month = today.slice(0, 7);
 
   const active = employees.filter((e) => isCurrentStaff(e));
-  const joinedThisMonth = active.filter((e) => e.startDate.startsWith(month)).length;
-  const departments = new Set(active.map((e) => e.department).filter(Boolean));
-  const stations = new Set(active.map((e) => e.location).filter(Boolean));
-  const activated = accounts.filter((a) => a.active && a.passwordHash).length;
-  const invitesOpen = accounts.filter((a) => a.active && !a.passwordHash).length;
   const pending = leave.filter((l) => l.status === "pending");
   const onLeaveToday = leave.filter((l) => l.status === "approved" && l.startDate <= today && l.endDate >= today);
-  const approvedDaysThisMonth = leave.filter((l) => l.status === "approved" && l.startDate.startsWith(month)).reduce((n, l) => n + l.days, 0);
   const openJobs = jobs.filter((j) => j.status === "open" && j.deadline >= today);
   const weekAhead = new Date(Date.parse(`${today}T12:00:00Z`) + 7 * 86_400_000).toISOString().slice(0, 10);
-
+  const awayThisWeek = new Set(leave.filter((l) => l.status === "approved" && l.startDate <= weekAhead && l.endDate > today).map((l) => l.employeeId)).size;
+  const months = lastMonths(today, 12);
+  const yearAgo = headcountByMonth(employees, months)[0];
+  const change = active.length - yearAgo;
+  const probation = active.filter((e) => e.status === "probation").length;
+  const activated = accounts.filter((a) => a.active && a.passwordHash).length;
+  const invitesOpen = accounts.filter((a) => a.active && !a.passwordHash).length;
   const birthdays = active
     .filter((e): e is HrEmployee & { dateOfBirth: string } => Boolean(e.dateOfBirth))
     .map((e) => ({ e, inDays: daysToBirthday(e.dateOfBirth, today) }))
@@ -69,36 +71,45 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
   const personHref = (id: string) => (seesPeople ? `/hrportal/hr/employees/${id}` : undefined);
 
   const holidays = holidayDates(await readStore("hrEvents"), Number(today.slice(0, 4)) - 1, Number(today.slice(0, 4)) + 1);
+  const deptName = (e: HrEmployee) => ctx.departments.find((d) => d.id === e.departmentId)?.name ?? e.department;
+  const insights: Insight[] = [
+    ...(seesLeave ? leaveInsights({ leave, employees, today, holidays, href: "/hrportal/hr/leave", groupOf: deptName }) : []),
+    ...(seesPeople ? peopleInsights({ employees, today }) : []),
+    ...(has(p, "accounts.manage") ? accountInsights({ employees, accounts, today }) : []),
+    ...(has(p, "payroll.manage")
+      ? payrollInsights({ employees, salaries: await readStore("hrSalaries"), payslips: await readStore("hrPayslips"), today, holidays })
+      : []),
+  ];
+  const closingSoon = openJobs.filter((j) => j.deadline <= weekAhead);
+  if (closingSoon.length) insights.push({ id: "jobs-closing", tone: "info", title: `${closingSoon.length} job advert${closingSoon.length === 1 ? "" : "s"} close this week`, detail: closingSoon.map((j) => j.title).join(", "), href: "/careers", action: "View" });
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/hr" crumbs={[{ label: "HR overview" }]}>
       {denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
       <PageTitle title={`Good day, ${ctx.employee.firstName}`} subtitle={`HR overview for Life Helpers Initiative · ${fmtDate(today)}`} />
 
+      {/* One figure per tile, each with its trend or context; the detail lives in the charts below. */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
-        <TintStat tint="blue" icon={Users} label="Total Employees" value={active.length} note={`${joinedThisMonth} joined this month`} href={seesPeople ? "/hrportal/hr/employees" : undefined} />
-        <TintStat tint="green" icon={Building2} label="Departments" value={departments.size} note={`${stations.size} duty station${stations.size === 1 ? "" : "s"}`} />
+        <TintStat tint="blue" icon={Users} label="Current staff" value={active.length} note={`${change >= 0 ? "+" : ""}${change} in 12 months${probation ? ` · ${probation} on probation` : ""}`} href={seesPeople ? "/hrportal/hr/employees" : undefined} />
+        {seesPeople && <TintStat tint="rose" icon={Repeat} label="Turnover, 12 months" value={pct(turnoverRate(employees, months))} note="Leavers ÷ average headcount" />}
+        {seesLeave && (
+          <TintStat tint="amber" icon={CalendarCheck} label="On leave today" value={new Set(onLeaveToday.map((l) => l.employeeId)).size} note={`${awayThisWeek} away in the next 7 days`} href="/hrportal/calendar" />
+        )}
+        {seesLeave && <TintStat tint="teal" icon={Activity} label={`Absence rate, ${today.slice(0, 4)}`} value={pct(absenceRate(leave, active, today, holidays))} note="Leave days ÷ working days" />}
         <TintStat
           tint="violet"
           icon={UserCheck}
-          label="Portal accounts"
-          value={activated}
+          label="Portal logins"
+          value={`${activated} of ${active.length}`}
           progress={active.length ? (activated / active.length) * 100 : 0}
-          note={`${invitesOpen} invite${invitesOpen === 1 ? "" : "s"} not yet used`}
+          note={invitesOpen ? `${invitesOpen} invite${invitesOpen === 1 ? "" : "s"} not yet used` : "Every invite used"}
           href={has(p, "accounts.manage") ? "/hrportal/hr/accounts" : undefined}
         />
-        {seesLeave && (
-          <TintStat tint="amber" icon={CalendarClock} label="Pending Leaves" value={pending.length} note={`${onLeaveToday.length} on leave today`} href="/hrportal/hr/leave" />
-        )}
-        {seesLeave && <TintStat tint="teal" icon={CalendarDays} label="Leave days this month" value={approvedDaysThisMonth} note="Approved, starting this month" />}
-        <TintStat
-          tint="orange"
-          icon={Briefcase}
-          label="Active Jobs"
-          value={openJobs.length}
-          note={`${openJobs.filter((j) => j.deadline <= weekAhead).length} closing this week`}
-          href="/careers"
-        />
+        <TintStat tint="orange" icon={Briefcase} label="Open jobs" value={openJobs.length} note={`${closingSoon.length} closing this week`} href="/careers" />
+      </div>
+
+      <div className="mt-6">
+        <InsightsPanel items={insights} />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -167,7 +178,7 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
 
         {seesLeave && (
           <Card
-            title="Awaiting approval"
+            title={`Awaiting approval (${pending.length})`}
             subtitle="Oldest first"
             flush
             actions={
@@ -237,7 +248,7 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
           </Card>
         )}
       </div>
-      <OrgAnalytics holidays={holidays} employees={employees} leave={leave} types={ctx.leaveTypes} departments={ctx.departments} today={today} showPeople={seesPeople} showLeave={seesLeave} />
+      <OrgAnalytics kpis={false} holidays={holidays} employees={employees} leave={leave} types={ctx.leaveTypes} departments={ctx.departments} today={today} showPeople={seesPeople} showLeave={seesLeave} />
       {has(p, "accounts.manage") && has(p, "employees.manage") && (
         <div className="mt-6">
           <Card title="Sample data for testing" subtitle="Five made-up staff (staff numbers SAMPLE-001 to SAMPLE-005) with leave requests, to try the portal safely">

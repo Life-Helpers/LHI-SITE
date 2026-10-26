@@ -1,6 +1,7 @@
 import { CalendarCheck, CalendarClock, UsersRound } from "lucide-react";
 
 import { TeamAnalytics } from "@/components/hr/analytics-panels";
+import { InsightsPanel } from "@/components/hr/insights-panel";
 import { LeaveCalendar } from "@/components/hr/leave-calendar";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { PortalShell } from "@/components/hr/portal-shell";
@@ -8,6 +9,7 @@ import { isIsoDate, mondayOf } from "@/components/hr/query";
 import { Notice, PageTitle, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { canDecideLeave, canManageApprovedLeave, has, holidayDates, teamOf } from "@/lib/hr/access";
+import { leaveInsights } from "@/lib/hr/insights";
 import { balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
 import { isCurrentStaff } from "@/lib/hr/types";
@@ -45,6 +47,9 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
         <TintStat tint="blue" icon={UsersRound} label="Team members" value={team.filter((e) => isCurrentStaff(e)).length} />
         <TintStat tint="amber" icon={CalendarClock} label="Leave awaiting decision" value={pending} note={has(ctx.permissions, "team.leave.approve") ? "You can approve or reject below" : undefined} />
         <TintStat tint="green" icon={CalendarCheck} label="On leave today" value={away} />
+      </div>
+      <div className="mb-6">
+        <InsightsPanel items={leaveInsights({ leave: teamLeave, employees: team, today, holidays, href: "/hrportal/team" })} empty="Nothing in your team needs attention right now." />
       </div>
       <LeaveCalendar leaveTypes={ctx.leaveTypes} employees={team} leave={teamLeave} weekStart={weekStart} basePath="/hrportal/team" params={params} personHref={memberHref} />
       <div className="mt-6">

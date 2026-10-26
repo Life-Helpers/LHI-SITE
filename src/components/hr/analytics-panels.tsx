@@ -58,6 +58,7 @@ export function OrgAnalytics({
   showPeople,
   showLeave,
   holidays,
+  kpis = true,
 }: {
   employees: HrEmployee[];
   leave: HrLeaveRequest[];
@@ -68,6 +69,8 @@ export function OrgAnalytics({
   showLeave: boolean;
   /** Public holidays (they aren't working days). */
   holidays?: ReadonlySet<string>;
+  /** The headline figures; off where the page already shows them in its own tiles. */
+  kpis?: boolean;
 }) {
   const months = lastMonths(today, 12);
   const labels = months.map(monthLabel);
@@ -84,19 +87,22 @@ export function OrgAnalytics({
   };
   const forecast = absenceForecast(leave.filter((l) => activeIds.has(l.employeeId)), today, 10, holidays);
   const avgTenure = active.length ? active.reduce((n, e) => n + tenureYears(e, today), 0) / active.length : null;
+  const change = active.length - heads[0];
 
   return (
     <>
       {showPeople && (
         <section aria-labelledby="workforce-analytics">
           <SectionTitle title="Workforce analytics" subtitle="Headcount, joiners, leavers and how the team is made up, over the last 12 months." />
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <Kpi label="Current staff" value={String(active.length)} hint={`${employees.filter((e) => e.status === "probation").length} on probation`} />
-            <Kpi label="Net change, 12 months" value={`${active.length - heads[0] >= 0 ? "+" : ""}${active.length - heads[0]}`} hint={`From ${heads[0]} at the end of ${full[0]}`} />
-            <Kpi label="Turnover, 12 months" value={pct(turnoverRate(employees, months))} hint="Leavers ÷ average headcount" />
-            <Kpi label="Average length of service" value={avgTenure === null ? "—" : `${num(avgTenure)} yrs`} hint="Current staff, from start date" />
-          </div>
-          <div className="mt-4 grid gap-6 lg:grid-cols-2">
+          {kpis && (
+            <div className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <Kpi label="Current staff" value={String(active.length)} hint={`${change >= 0 ? "+" : ""}${change} since ${full[0]} · ${employees.filter((e) => e.status === "probation").length} on probation`} />
+              <Kpi label="Turnover, 12 months" value={pct(turnoverRate(employees, months))} hint="Leavers ÷ average headcount" />
+              <Kpi label="Average length of service" value={avgTenure === null ? "—" : `${num(avgTenure)} yrs`} hint="Current staff, from start date" />
+              <Kpi label="Started this year" value={String(active.filter((e) => e.startDate.startsWith(year)).length)} hint="Current staff with a start date this year" />
+            </div>
+          )}
+          <div className="grid gap-6 lg:grid-cols-2">
             <Card title="Headcount" subtitle="Staff on record at the end of each month">
               <ColumnChart labels={labels} fullLabels={full} series={[{ name: "Headcount", values: heads }]} unit="staff" />
             </Card>
@@ -135,13 +141,13 @@ export function OrgAnalytics({
       {showLeave && (
         <section aria-labelledby="leave-analytics">
           <SectionTitle title="Leave analytics" subtitle={`Leave taken, requests and decisions. Leave is counted in the month it starts.`} />
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <Kpi label={`Leave days taken, ${year}`} value={String(days(ytd))} hint={`${ytd.length} approved request${ytd.length === 1 ? "" : "s"} so far`} />
-            <Kpi label={`Absence rate, ${year}`} value={pct(absenceRate(leave, active, today, holidays))} hint="Leave days ÷ working days available" />
+          <div className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {kpis && <Kpi label={`Leave days taken, ${year}`} value={String(days(ytd))} hint={`${ytd.length} approved request${ytd.length === 1 ? "" : "s"} so far`} />}
+            {kpis && <Kpi label={`Absence rate, ${year}`} value={pct(absenceRate(leave, active, today, holidays))} hint="Leave days ÷ working days available" />}
             <Kpi label="Approval rate, 12 months" value={pct(approvalRate(inWindow), 0)} hint="Approved ÷ decided requests" />
             <Kpi label="Average time to decide" value={(() => { const d = averageDecisionDays(inWindow); return d === null ? "—" : `${num(d)} days`; })()} hint="From request to approval or rejection" />
           </div>
-          <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <Card title="Leave days by month and type" subtitle="Approved working days, last 12 months">
               <ColumnChart labels={labels} fullLabels={full} series={leaveSeries(leave, months, types)} unit="days" height={220} />
             </Card>
@@ -149,12 +155,9 @@ export function OrgAnalytics({
               <ColumnChart labels={forecast.map((f) => DAY_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} fullLabels={forecast.map((f) => DATE_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} series={[{ name: "Staff off", values: forecast.map((f) => f.value) }]} unit="staff off" height={200} />
             </Card>
           </div>
-          <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
             <Card title="Requests by status" subtitle="Requests starting in the last 12 months">
               <SplitBar parts={statusCounts(inWindow).map((s) => ({ key: s.status, label: STATUS_LABEL[s.status], value: s.value }))} unit="requests" />
-            </Card>
-            <Card title={`Leave days by type, ${year}`} subtitle="Approved, taken so far">
-              <BarList rows={types.map((t) => ({ label: t.name, value: days(ytd.filter((l) => l.type === t.id)) })).filter((r) => r.value > 0).sort((a, b) => b.value - a.value)} unit="days" empty="No leave taken yet this year." />
             </Card>
             <Card title={`Leave days by department, ${year}`} subtitle="Approved, taken so far">
               <BarList rows={foldOther(Object.entries(ytd.reduce<Record<string, number>>((m, l) => ({ ...m, [deptOf(l.employeeId) || "Not recorded"]: (m[deptOf(l.employeeId) || "Not recorded"] ?? 0) + l.days }), {})).map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value))} unit="days" empty="No leave taken yet this year." />
@@ -232,9 +235,9 @@ export function TeamAnalytics({
 }
 
 /** One person's own leave, for My record. */
-export function MyAnalytics({ leave, types, balances, today }: { leave: HrLeaveRequest[]; types: HrLeaveType[]; balances: BalanceRow[]; today: string }) {
+export function MyAnalytics({ leave, types, balances, today, skipType }: { leave: HrLeaveRequest[]; types: HrLeaveType[]; balances: BalanceRow[]; today: string; /** A type the page already shows in its own tiles. */ skipType?: string }) {
   const months = lastMonths(today, 12);
-  const limited = balances.filter((r) => r.total !== null);
+  const limited = balances.filter((r) => r.total !== null && r.type.id !== skipType);
   return (
     <section aria-labelledby="my-analytics">
       <SectionTitle title="My leave at a glance" subtitle="Where your allowance has gone, and your requests over the last 12 months." />

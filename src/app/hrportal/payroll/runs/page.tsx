@@ -3,12 +3,15 @@ import { CalendarDays, Eye, FileDown, Search } from "lucide-react";
 
 import { preparePayslipsAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
+import { InsightsPanel } from "@/components/hr/insights-panel";
 import { Modal } from "@/components/hr/modal";
 import { CountTabs, MonthStrip } from "@/components/hr/payroll-ui";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { Badge, Field, inputClass, PageTitle, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { naira, payMonthLabel } from "@/lib/hr/payroll";
+import { holidayDates } from "@/lib/hr/access";
+import { payrollInsights } from "@/lib/hr/insights";
 import { requireHrPage } from "@/lib/hr/session";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +31,8 @@ export default async function PayrollRunsPage({ searchParams }: { searchParams: 
   const today = todayLagos();
   const year = /^\d{4}$/.test(params.year ?? "") ? Number(params.year) : Number(today.slice(0, 4));
   const month = /^\d{4}-\d{2}$/.test(params.month ?? "") && params.month!.startsWith(String(year)) ? params.month : undefined;
-  const slips = await readStore("hrPayslips");
+  const [slips, employees, salaries, events] = await Promise.all([readStore("hrPayslips"), readStore("hrEmployees"), readStore("hrSalaries"), readStore("hrEvents")]);
+  const insights = payrollInsights({ employees, salaries, payslips: slips, today, holidays: holidayDates(events, Number(today.slice(0, 4))) });
   const runs = [...new Set(slips.map((p) => p.month))].sort().reverse().map((m) => {
     const inRun = slips.filter((p) => p.month === m);
     const drafts = inRun.filter((p) => p.status === "draft").length;
@@ -72,6 +76,11 @@ export default async function PayrollRunsPage({ searchParams }: { searchParams: 
           </Modal>
         }
       />
+      {insights.length > 0 && (
+        <div className="mb-5">
+          <InsightsPanel items={insights} />
+        </div>
+      )}
       <MonthStrip base={base} params={p} year={year} month={month} marked={runs.map((r) => r.month)} />
       <section className="hr-card mb-5">
         <form method="get" action={base} className="flex flex-wrap items-center gap-3 px-4 pb-3 pt-4">

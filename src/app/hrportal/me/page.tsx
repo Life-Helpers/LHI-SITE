@@ -3,6 +3,7 @@ import { CalendarCheck, CalendarClock, CalendarDays, Palmtree } from "lucide-rea
 import { requestLeaveAction, setMyDepartmentAction, updateMyContactAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { MyAnalytics } from "@/components/hr/analytics-panels";
+import { InsightsPanel } from "@/components/hr/insights-panel";
 import { BankingCard } from "@/components/hr/banking-card";
 import { BalanceTable } from "@/components/hr/balance-table";
 import { LeaveFields } from "@/components/hr/leave-form";
@@ -12,6 +13,7 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { ReliefPanel, relieverLabel } from "@/components/hr/relief-panel";
 import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
+import { myInsights } from "@/lib/hr/insights";
 import { approversFor, has, holidayDates, relieverOptions } from "@/lib/hr/access";
 import { availableByType, balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
@@ -73,6 +75,11 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         <TintStat tint="amber" icon={CalendarClock} label="Awaiting approval" value={annual?.pending ?? 0} note="Days in pending requests" />
         <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} progress={total ? (left / total) * 100 : 0} />
       </div>
+
+      {(() => {
+        const items = myInsights({ today, annualLeft: annual?.total === null || !annual ? null : left, annualName: annual?.type.name ?? "Leave" });
+        return items.length > 0 && <div className="mt-6"><InsightsPanel title="For you" items={items} /></div>;
+      })()}
 
       {recalls.map((l) => (
         <div key={l.id} className="mt-6">
@@ -183,7 +190,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         </Card>
       </div>
 
-      <MyAnalytics leave={mine} types={ctx.leaveTypes} balances={balances} today={today} />
+      <MyAnalytics leave={mine} types={ctx.leaveTypes} balances={balances} today={today} skipType={annual?.type.id} />
 
       <div className="mt-6">
         <BankingCard person={me} editable={has(ctx.permissions, "self.update")} />
