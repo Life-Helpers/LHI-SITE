@@ -56,7 +56,7 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
                       ))}
                     </select>
                   </Field>
-                  <LeaveFields types={ctx.leaveTypes} holidays={holidayList} relievers={relieverOptions({ id: "", departmentId: undefined }, employees, accounts).map((e) => ({ id: e.id, label: relieverLabel(e) }))} />
+                  <LeaveFields types={ctx.leaveTypes} holidays={holidayList} relievers={relieverOptions({ id: "", departmentId: undefined }, employees, accounts).map((e) => ({ id: e.id, label: relieverLabel(e) }))} forSomeoneElse />
                   <Field label="Status">
                     <select name="status" defaultValue="pending" className={inputClass}>
                       <option value="pending">Pending (needs a decision)</option>

@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NoticeHost } from "@/components/hr/notice-host";
 
 const ICONS = {
   dashboard: LayoutDashboard,
@@ -249,6 +250,7 @@ export function ShellFrame({
           {children}
         </main>
       </div>
+      <NoticeHost />
     </div>
   );
 }

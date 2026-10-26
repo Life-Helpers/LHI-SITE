@@ -13,6 +13,7 @@ import {
   leaveDaysByMonth,
   leaversByMonth,
   tenureBands,
+  averageTenure,
   turnoverRate,
 } from "@/lib/hr/analytics";
 import { DEFAULT_LEAVE_TYPES, type HrEmployee, type HrLeaveRequest } from "@/lib/hr/types";
@@ -96,5 +97,21 @@ describe("leave analytics", () => {
       { date: "2026-10-27", value: 2 },
       { date: "2026-10-28", value: 0 },
     ]);
+  });
+});
+
+describe("staff with no start date", () => {
+  const months = lastMonths("2026-10-26", 12);
+  const staff = [person("dated", { startDate: "2026-03-10" }), person("undated", { startDate: "", createdAt: "2026-10-01T00:00:00Z" })];
+
+  it("count as long-standing, so headcount change matches starters minus leavers", () => {
+    const heads = headcountByMonth(staff, months);
+    expect(heads[0]).toBe(1); // undated already there; dated starts later
+    expect(heads.at(-1)! - heads[0]).toBe(hiresByMonth(staff, months).reduce((n, h) => n + h, 0));
+  });
+
+  it("are left out of length of service rather than counted as zero years", () => {
+    expect(averageTenure(staff, "2026-10-26")).toEqual({ years: expect.closeTo(230 / 365.25, 2), counted: 1 });
+    expect(tenureBands(staff, "2026-10-26").reduce((n, b) => n + b.value, 0)).toBe(1);
   });
 });

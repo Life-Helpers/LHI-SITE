@@ -3,7 +3,7 @@ import { Download, Eye, Search } from "lucide-react";
 
 import { CountTabs, MonthStrip } from "@/components/hr/payroll-ui";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Badge, inputClass, PageTitle, Person, todayLagos } from "@/components/hr/ui";
+import { Badge, inputClass, Notice, PageTitle, Person, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { naira } from "@/lib/hr/payroll";
 import { requireHrPage } from "@/lib/hr/session";
@@ -12,7 +12,7 @@ import { employeeName } from "@/lib/hr/types";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Payslips" };
 
-type Params = { year?: string; month?: string; q?: string; employee?: string; tab?: string };
+type Params = { denied?: string; year?: string; month?: string; q?: string; employee?: string; tab?: string };
 const TABS = [
   { id: "all", label: "All" },
   { id: "draft", label: "Draft" },
@@ -41,6 +41,7 @@ export default async function AdminPayslipsPage({ searchParams }: { searchParams
 
   return (
     <PortalShell ctx={ctx} current={base} crumbs={[{ label: "Payroll Management" }, { label: "Payslips" }]}>
+      {params.denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
       <PageTitle title="Payslips" subtitle="Payslips for every employee. Staff see their own once published." />
       <MonthStrip base={base} params={p} year={year} month={month} marked={[...new Set(slips.map((s) => s.month))]} />
       <section className="hr-card mb-5">
@@ -71,6 +72,7 @@ export default async function AdminPayslipsPage({ searchParams }: { searchParams
         <CountTabs base={base} params={p} tabs={TABS} current={tab} counts={counts} />
       </section>
       <section className="hr-card overflow-hidden">
+        <p className="px-4 pt-3 text-xs text-admin-muted sm:hidden">Swipe sideways to see every column.</p>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead>

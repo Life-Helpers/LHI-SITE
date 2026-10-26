@@ -28,7 +28,11 @@ const monthEnd = (ym: string) => {
 };
 
 /** When someone joined: their start date, or when their record was created. */
-const joined = (e: HrEmployee) => (e.startDate || e.createdAt).slice(0, 10);
+/**
+ * When someone joined. With no start date on record we can't place them, so they count as
+ * long-standing: that keeps headcount change equal to starters minus leavers.
+ */
+const joined = (e: HrEmployee) => (e.startDate || "1900-01-01").slice(0, 10);
 /** When a former employee's record last changed: the best date we have for when they left. */
 const leftOn = (e: HrEmployee) => (isCurrentStaff(e) ? null : e.updatedAt.slice(0, 10));
 
@@ -59,15 +63,22 @@ export function turnoverRate(employees: HrEmployee[], months: string[]): number 
 }
 
 /** Years of service per current employee. */
+/** Years of service from the start date (0 when there's no start date; see averageTenure). */
 export function tenureYears(e: HrEmployee, today: string) {
-  return Math.max(0, (at(today) - at(joined(e))) / (365.25 * DAY));
+  return e.startDate ? Math.max(0, (at(today) - at(e.startDate)) / (365.25 * DAY)) : 0;
+}
+
+/** Average years of service of the staff who have a start date, and how many that is. */
+export function averageTenure(active: HrEmployee[], today: string): { years: number | null; counted: number } {
+  const dated = active.filter((e) => e.startDate);
+  return { years: dated.length ? dated.reduce((n, e) => n + tenureYears(e, today), 0) / dated.length : null, counted: dated.length };
 }
 
 export const TENURE_BANDS = ["Under 1 year", "1–3 years", "3–5 years", "5+ years"] as const;
 
 export function tenureBands(active: HrEmployee[], today: string): { label: string; value: number }[] {
   const counts = [0, 0, 0, 0];
-  for (const e of active) {
+  for (const e of active.filter((x) => x.startDate)) {
     const y = tenureYears(e, today);
     counts[y < 1 ? 0 : y < 3 ? 1 : y < 5 ? 2 : 3] += 1;
   }

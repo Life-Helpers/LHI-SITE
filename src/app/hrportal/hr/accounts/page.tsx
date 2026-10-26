@@ -149,7 +149,7 @@ export default async function AccountsPage() {
                         <ActionForm action={setExtraPermissionsAction} submitLabel="Save extra permissions" className="space-y-3">
                           <input type="hidden" name="accountId" value={a.id} />
                           <p className="text-sm font-medium">Extra permissions on top of the role</p>
-                          <PermissionChecks selected={a.extraPermissions} grantable={ctx.permissions} />
+                          <PermissionChecks selected={a.extraPermissions} grantable={ctx.permissions} fromRole={role?.permissions ?? []} />
                         </ActionForm>
                       </div>
                     )}

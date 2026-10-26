@@ -73,7 +73,7 @@ describe("LHI payroll schedule", () => {
     const pay = monthlyPay(salary, rules);
     const s = pay.schedule;
     expect(s.beforeTax).toEqual([{ name: "Pension (employee) (8%)", amount: 40_000 }]);
-    expect(s.reliefs).toEqual([{ name: "Rent relief (20%)", amount: 20_000 }]); // 240,000 a year / 12
+    expect(s.reliefs).toEqual([{ name: "Rent relief (20%, up to 500,000 a year)", amount: 20_000 }]); // 240,000 a year / 12
     expect(s.totalReliefs).toBe(60_000);
     expect(s.taxable).toBe(440_000);
     // 5,280,000 a year: 330,000 + 2,280,000 x 18% = 740,400; / 12 = 61,700.
@@ -125,7 +125,7 @@ describe("LHI payroll schedule", () => {
       "Monthly Gross After Penalty",
       "Annual Rent Paid",
       "Pension (employee) (8%)",
-      "Rent relief (20%)",
+      "Rent relief (20%, up to 500,000 a year)",
       "Total Reliefs",
       "PAYE tax",
       "Monthly Net Pay",

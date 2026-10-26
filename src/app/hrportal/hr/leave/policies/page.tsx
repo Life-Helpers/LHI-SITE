@@ -64,11 +64,15 @@ function PolicyFields({ policy, ctx }: { policy?: HrLeavePolicy; ctx: HrContext 
         <Field label="Department (if one department)">
           <select name="departmentId" defaultValue={policy?.scope === "department" ? policy.scopeValue : ""} className={inputClass}>
             <option value="">—</option>
-            {ctx.departments.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
-            ))}
+            {/* Open departments only (a policy already on a closed one keeps showing it). */}
+            {ctx.departments
+              .filter((d) => d.active || (policy?.scope === "department" && policy.scopeValue === d.id))
+              .map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                  {d.active ? "" : " (closed)"}
+                </option>
+              ))}
           </select>
         </Field>
         <Field label="Employment type (if one type)">

@@ -41,10 +41,13 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
   const total = annual?.total ?? 0;
   const left = Math.max(0, annual?.available ?? 0);
   const canRequest = has(ctx.permissions, "leave.request");
+  const pendingMine = mine.filter((l) => l.status === "pending");
+  const pendingDays = pendingMine.reduce((n, l) => n + l.days, 0);
+  const pendingCount = pendingMine.length;
   const openDepartments = ctx.departments.filter((d) => d.active).sort((a, b) => a.name.localeCompare(b.name));
   const myDepartment = ctx.departments.find((d) => d.id === me.departmentId);
   const approvers = approversFor(me, employees, ctx.departments);
-  const relievers = relieverOptions(me, employees, accounts);
+  const relievers = relieverOptions(me, employees, accounts, ctx.departments);
   const today = todayLagos();
   // Recalls in the last fortnight, so the person sees they've been called back.
   const recalls = mine.filter((l) => l.endedEarly?.kind === "recalled" && Date.now() - Date.parse(l.endedEarly.at) < 14 * 86_400_000);
@@ -64,7 +67,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <TintStat tint="teal" icon={CalendarDays} label={`${annual?.type.name ?? "Leave"} ${year}`} value={annual?.total === null || !annual ? "No limit" : `${total} days`} />
         <TintStat tint="green" icon={CalendarCheck} label="Taken or approved" value={annual?.used ?? 0} note={`${annual?.type.name ?? "Leave"}, this year`} />
-        <TintStat tint="amber" icon={CalendarClock} label="Awaiting approval" value={annual?.pending ?? 0} note="Days in pending requests" />
+        <TintStat tint="amber" icon={CalendarClock} label="Awaiting approval" value={pendingDays} note={`Days in pending requests, all leave types (${pendingCount} request${pendingCount === 1 ? "" : "s"})`} />
         <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} note={(annual?.available ?? 0) < 0 ? `${-(annual?.available ?? 0)} over the allowance` : undefined} progress={total ? (left / total) * 100 : 0} />
       </div>
 
@@ -92,10 +95,11 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card title="My department" subtitle="Your leave requests go to your line manager and to your department's head and approvers.">
-          {openDepartments.length > 0 && has(ctx.permissions, "self.update") ? (
+          {/* People choose their department once; after that only HR changes it (it decides who approves their leave). */}
+          {!myDepartment && openDepartments.length > 0 && has(ctx.permissions, "self.update") ? (
             <ActionForm action={setMyDepartmentAction} submitLabel="Save department">
               <Field label="Department">
-                <select name="departmentId" defaultValue={myDepartment?.id ?? ""} required className={inputClass}>
+                <select name="departmentId" defaultValue="" required className={inputClass}>
                   <option value="" disabled>
                     Choose your department…
                   </option>
@@ -108,7 +112,10 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
               </Field>
             </ActionForm>
           ) : (
-            <p className="text-sm">{myDepartment?.name ?? me.department ?? "Not set"}</p>
+            <p className="text-sm">
+              {myDepartment?.name ?? (me.department || "Not set")}
+              {myDepartment && <span className="block text-xs text-admin-muted">To move to another department, ask HR.</span>}
+            </p>
           )}
           <div className="mt-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-admin-muted">Who receives your leave requests</p>

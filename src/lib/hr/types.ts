@@ -271,6 +271,9 @@ export interface HrEmployee {
   bankName?: string;
   bankAccountName?: string;
   bankAccountNumber?: string;
+  /** When the bank details last changed, and whether the person changed them themselves (HR is told). */
+  bankChangedAt?: string;
+  bankChangedBySelf?: boolean;
   /** Test record from "Load sample data". */
   sample?: boolean;
   address: string;

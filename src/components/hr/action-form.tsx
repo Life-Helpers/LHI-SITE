@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
-import { Check, Copy, Loader2 } from "lucide-react";
+import { Fragment, useActionState, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Check, Copy, Loader2, X } from "lucide-react";
 
 import type { HrResult } from "@/app/hrportal/actions";
 
@@ -19,6 +20,7 @@ export function ActionForm({
   submitClassName = "",
   danger = false,
   resetOnSuccess = false,
+  closeOnSuccess = false,
   confirmText,
 }: {
   action: Action;
@@ -28,13 +30,31 @@ export function ActionForm({
   submitClassName?: string;
   danger?: boolean;
   resetOnSuccess?: boolean;
+  /**
+   * In a pop-up: on success, close it, start the form afresh (fields and their live hints), and
+   * show the confirmation as a notice on the page instead.
+   */
+  closeOnSuccess?: boolean;
   confirmText?: string;
 }) {
   const [state, formAction, pending] = useActionState(action, null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [round, setRound] = useState(0);
+  const [notice, setNotice] = useState<HrResult | null>(null);
   useEffect(() => {
-    if (state?.ok && resetOnSuccess) formRef.current?.reset();
-  }, [state, resetOnSuccess]);
+    if (!state?.ok) return;
+    if (resetOnSuccess) formRef.current?.reset();
+    if (closeOnSuccess) {
+      formRef.current?.closest("dialog")?.close();
+      setRound((n) => n + 1);
+      setNotice(state);
+    }
+  }, [state, resetOnSuccess, closeOnSuccess]);
+  useEffect(() => {
+    if (!notice || notice.link) return;
+    const t = setTimeout(() => setNotice(null), 8000);
+    return () => clearTimeout(t);
+  }, [notice]);
 
   return (
     <form
@@ -45,7 +65,7 @@ export function ActionForm({
         if (confirmText && !window.confirm(confirmText)) e.preventDefault();
       }}
     >
-      {children}
+      <Fragment key={round}>{children}</Fragment>
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
@@ -58,7 +78,21 @@ export function ActionForm({
           {submitLabel}
         </button>
       </div>
-      <Result state={state} />
+      {closeOnSuccess && state?.ok ? null : <Result state={state} />}
+      {notice &&
+        createPortal(
+          <div className="fixed bottom-4 right-4 z-50 w-[min(26rem,calc(100%-2rem))] rounded-xl border border-admin-border bg-admin-card p-1 shadow-xl">
+            <div className="flex items-start gap-2">
+              <div className="min-w-0 flex-1">
+                <Result state={notice} />
+              </div>
+              <button type="button" onClick={() => setNotice(null)} aria-label="Dismiss" className="rounded p-1 text-admin-muted hover:bg-admin-bg">
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
     </form>
   );
 }

@@ -18,16 +18,18 @@ export async function GET(req: Request) {
   const type = url.searchParams.get("type") ?? "";
   const q = (url.searchParams.get("q") ?? "").trim().toLowerCase();
   const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
+  // The leave type's name as HR set it, not its internal id.
+  const typeName = (id: string) => state.ctx.leaveTypes.find((t) => t.id === id)?.name ?? id;
   const byId = new Map(employees.map((e) => [e.id, e]));
   const rows = leave
     .filter((l) => (tab === "all" || l.status === tab) && (!emp || l.employeeId === emp) && (!type || l.type === type))
-    .filter((l) => !q || [employeeName(byId.get(l.employeeId)), byId.get(l.employeeId)?.email ?? "", l.type, l.reason].some((v) => v.toLowerCase().includes(q)))
+    .filter((l) => !q || [employeeName(byId.get(l.employeeId)), byId.get(l.employeeId)?.email ?? "", typeName(l.type), l.reason].some((v) => v.toLowerCase().includes(q)))
     .sort((a, b) => b.startDate.localeCompare(a.startDate));
   const csv = toCsv(
     ["Employee", "Email", "Department", "Leave type", "Start date", "End date", "Working days", "Status", "Reason", "Reliever", "Reliever answer", "Decided by", "Decided on", "Note", "Applied on"],
     rows.map((l) => {
       const e = byId.get(l.employeeId);
-      return [employeeName(e), e?.email, e?.department, l.type, l.startDate, l.endDate, l.days, l.status, l.reason, l.relieverId ? employeeName(byId.get(l.relieverId)) : "", l.relieverStatus ?? "", l.decidedByName, l.decidedAt?.slice(0, 10), l.decisionNote, l.createdAt.slice(0, 10)];
+      return [employeeName(e), e?.email, e?.department, typeName(l.type), l.startDate, l.endDate, l.days, l.status, l.reason, l.relieverId ? employeeName(byId.get(l.relieverId)) : "", l.relieverStatus ?? "", l.decidedByName, l.decidedAt?.slice(0, 10), l.decisionNote, l.createdAt.slice(0, 10)];
     }),
   );
   return new Response(csv, {

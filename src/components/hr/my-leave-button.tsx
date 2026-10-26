@@ -28,10 +28,10 @@ export async function MyLeaveButton({ ctx, label = "Request Leave", outline = fa
   const balances = balanceFor(me, year, ctx.leaveTypes, policies, leave, adjustments);
   const annual = balances.find((r) => r.type.id === "Annual") ?? balances.find((r) => r.total !== null);
   const left = Math.max(0, annual?.available ?? 0);
-  const relievers = relieverOptions(me, employees, accounts);
+  const relievers = relieverOptions(me, employees, accounts, ctx.departments);
   return (
     <Modal label={label} outline={outline} title="Request leave" description={annual ? `You have ${left} ${annual.type.name.toLowerCase()} days left this year.` : undefined}>
-      <ActionForm action={requestLeaveAction} submitLabel="Send request" resetOnSuccess className="space-y-4">
+      <ActionForm action={requestLeaveAction} submitLabel="Send request" closeOnSuccess className="space-y-4">
         <LeaveFields
           types={ctx.leaveTypes}
           holidays={[...holidayDates(events, year, year + 1)]}

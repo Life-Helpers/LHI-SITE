@@ -183,9 +183,12 @@ export function LeaveListing({
                     {l.relieverId && (
                       <span className="mt-0.5 block text-xs text-admin-muted">
                         Reliever: {employeeName(byId.get(l.relieverId))}{" "}
-                        <span className={l.relieverStatus === "accepted" ? "text-admin-success" : l.relieverStatus === "declined" ? "text-admin-danger" : "text-admin-warning"}>
-                          ({l.relieverStatus === "accepted" ? "accepted" : l.relieverStatus === "declined" ? "declined" : "awaiting reply"})
-                        </span>
+                        {/* Once a request is rejected or cancelled, an unanswered relief request no longer matters. */}
+                        {(l.status === "pending" || l.status === "approved" || l.relieverStatus) && (
+                          <span className={l.relieverStatus === "accepted" ? "text-admin-success" : l.relieverStatus === "declined" ? "text-admin-danger" : "text-admin-warning"}>
+                            ({l.relieverStatus === "accepted" ? "accepted" : l.relieverStatus === "declined" ? "declined" : "awaiting reply"})
+                          </span>
+                        )}
                       </span>
                     )}
                   </td>
@@ -208,8 +211,9 @@ export function LeaveListing({
                       </span>
                     ) : null}
                     {l.decidedByName && !l.endedEarly && l.status !== "cancelled" && (
-                      <span className="mt-0.5 block text-[11px] text-admin-muted" title={l.decisionNote || undefined}>
+                      <span className="mt-0.5 block max-w-[240px] text-[11px] text-admin-muted">
                         {l.decidedByAccountId === "policy" ? l.decidedByName : `by ${l.decidedByName}`}
+                        {l.decisionNote && <span className="block text-admin-text">Note: {l.decisionNote}</span>}
                       </span>
                     )}
                   </td>
@@ -240,8 +244,14 @@ export function LeaveListing({
                         </>
                       )}
                       {canManage?.(l) && !l.returnRequest && today && l.endDate >= today && (
-                        <Modal label="Recall from leave" iconOnly icon="recall" title={`Recall ${employeeName(e)} from leave`} description={`Approved ${leaveName(l.type, leaveTypes)}, ${fmtDate(l.startDate)} – ${fmtDate(l.endDate)}. Unused days go back to their balance.`}>
-                          <ActionForm action={recallLeaveAction} submitLabel="Recall" className="space-y-4 text-left">
+                        <Modal
+                          label={l.startDate > today ? "Call off approved leave" : "Recall from leave"}
+                          iconOnly
+                          icon="recall"
+                          title={l.startDate > today ? `Call off ${employeeName(e)}'s leave` : `Recall ${employeeName(e)} from leave`}
+                          description={`Approved ${leaveName(l.type, leaveTypes)}, ${fmtDate(l.startDate)} – ${fmtDate(l.endDate)}. ${l.startDate > today ? "It hasn't started: choose its first day to call it off completely, or a later day to shorten it." : "Unused days go back to their balance."}`}
+                        >
+                          <ActionForm action={recallLeaveAction} submitLabel={l.startDate > today ? "Call off" : "Recall"} className="space-y-4 text-left">
                             <input type="hidden" name="leaveId" value={l.id} />
                             <Field label="Back at work on" hint="If this is on or before the first day of leave, the leave is called off completely.">
                               <input name="resumeDate" type="date" required min={today} max={l.endDate} defaultValue={today > l.startDate ? today : undefined} className={inputClass} />

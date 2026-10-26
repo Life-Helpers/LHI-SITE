@@ -14,6 +14,7 @@ export function LeaveFields({
   available,
   year,
   holidays = [],
+  forSomeoneElse = false,
 }: {
   types: HrLeaveType[];
   /** Colleagues who can cover; omit to leave the reliever out of the form. */
@@ -29,6 +30,8 @@ export function LeaveFields({
   year?: number;
   /** Public holidays (ISO dates); like weekends, they aren't counted as leave days. */
   holidays?: string[];
+  /** HR recording leave for an employee: the help text talks about "their" work. */
+  forSomeoneElse?: boolean;
 }) {
   const open = types.filter((t) => t.active);
   const [type, setType] = useState(open[0]?.id ?? "");
@@ -94,7 +97,11 @@ export function LeaveFields({
       {relievers && (
         <Field
           label={relieverRequired ? "Reliever" : "Reliever (optional)"}
-          hint="The colleague who will cover your work. They'll be asked to confirm before your leave can be approved."
+          hint={
+            forSomeoneElse
+              ? "The colleague who will cover their work. If the leave is still pending, they'll be asked to confirm."
+              : "The colleague who will cover your work. They'll be asked to confirm before your leave can be approved."
+          }
         >
           <select name="relieverId" required={relieverRequired && relievers.length > 0} defaultValue="" className={inputClass}>
             <option value="">{relievers.length ? "Choose a colleague…" : "No colleagues with a portal login yet"}</option>

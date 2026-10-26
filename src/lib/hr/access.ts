@@ -172,11 +172,25 @@ export function canApproveLeave(actor: Actor, leave: HrLeaveRequest, employees: 
  * Who can relieve this person: current staff with an active portal login (they must confirm),
  * not the person themselves. Colleagues in the same department come first.
  */
-export function relieverOptions(person: Pick<HrEmployee, "id" | "departmentId">, employees: HrEmployee[], accounts: HrAccount[]): HrEmployee[] {
+/**
+ * Colleagues who can relieve `person`: current staff with a portal login. The person's own
+ * approvers (line manager, department head and approvers) are left out, so nobody both covers
+ * the work and decides the request, unless nobody else is available.
+ */
+export function relieverOptions(
+  person: Pick<HrEmployee, "id" | "departmentId"> & Partial<Pick<HrEmployee, "managerId">>,
+  employees: HrEmployee[],
+  accounts: HrAccount[],
+  departments: HrDepartment[] = [],
+): HrEmployee[] {
   const withLogin = new Set(accounts.filter((a) => a.active && a.passwordHash).map((a) => a.employeeId));
-  return employees
+  const dept = departments.find((d) => d.active && d.id === person.departmentId);
+  const approvers = new Set([person.managerId, dept?.headEmployeeId, ...(dept?.approverIds ?? [])].filter(Boolean));
+  const all = employees
     .filter((e) => e.id !== person.id && isCurrentStaff(e) && withLogin.has(e.id))
     .sort((a, b) => Number(b.departmentId === person.departmentId && !!person.departmentId) - Number(a.departmentId === person.departmentId && !!person.departmentId) || `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
+  const others = all.filter((e) => !approvers.has(e.id));
+  return others.length ? others : all;
 }
 
 /**

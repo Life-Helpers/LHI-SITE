@@ -4,7 +4,7 @@ import path from "node:path";
 import { PDFDocument } from "pdf-lib";
 import { describe, expect, it } from "vitest";
 
-import { pdfAmount, payslipFileName, payslipPdf } from "@/lib/hr/payslip-pdf";
+import { pdfAmount, pdfSafe, payslipFileName, payslipPdf } from "@/lib/hr/payslip-pdf";
 import type { HrPayslip } from "@/lib/hr/types";
 
 const slip: HrPayslip = {
@@ -41,5 +41,15 @@ describe("payslip PDF", () => {
     expect((await payslipPdf({ ...slip, status: "draft" })).length).toBeGreaterThan(1000);
     expect(pdfAmount(568765.5)).toBe("NGN 568,765.50");
     expect(payslipFileName(slip)).toBe("payslip-2026-10-aisha-bello.pdf");
+  });
+});
+
+describe("text the PDF fonts can't show", () => {
+  it("never stops the PDF: naira, Hausa letters and long reasons are handled", async () => {
+    expect(pdfSafe("₦5,000")).toBe("NGN 5,000");
+    expect(pdfSafe("Ɗanladi Ƙofar Ɓaƙo")).toBe("Danladi Kofar Bako");
+    expect(pdfSafe("Café – “ok” 你")).toBe("Café – “ok” ?");
+    const long = { ...slip, employee: { ...slip.employee, name: "Ɗanjuma Ƙwairanga" }, deductions: [{ name: "Penalty: QA test: 2 days unauthorised absence (₦20,000 agreed with HR)", amount: 20000 }] };
+    expect((await payslipPdf(long)).length).toBeGreaterThan(1000);
   });
 });

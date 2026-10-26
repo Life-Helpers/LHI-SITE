@@ -4,7 +4,7 @@ import { Modal } from "@/components/hr/modal";
 import { RuleFields } from "@/components/hr/payslip";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { QuickAction } from "@/components/hr/quick-action";
-import { Badge, PageTitle } from "@/components/hr/ui";
+import { Badge, Notice, PageTitle } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { describeRule, payrollRules } from "@/lib/hr/payroll";
 import { requireHrPage } from "@/lib/hr/session";
@@ -13,13 +13,15 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Salary components" };
 
 /** Taxes and deductions taken from pay: add, edit, switch off or remove. */
-export default async function ComponentsPage() {
+export default async function ComponentsPage({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
   const ctx = await requireHrPage("payroll.components.manage");
+  const { denied } = await searchParams;
   const settings = (await readStore("hrPayrollSettings"))[0];
   const rules = payrollRules(settings);
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/payroll/components" crumbs={[{ label: "Payroll Management" }, { label: "Salary Components" }]}>
+      {denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
       <PageTitle
         title="Salary Components"
         subtitle={`Taxes and deductions worked out on every payslip. ${settings?.updatedAt ? `Last changed ${settings.updatedAt.slice(0, 10)} by ${settings.updatedByName}.` : "Starting rates: please confirm them with your tax adviser."}`}
@@ -32,6 +34,7 @@ export default async function ComponentsPage() {
         }
       />
       <section className="hr-card overflow-hidden">
+        <p className="px-4 pt-3 text-xs text-admin-muted sm:hidden">Swipe sideways to see every column.</p>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[820px] text-left text-sm">
             <thead>

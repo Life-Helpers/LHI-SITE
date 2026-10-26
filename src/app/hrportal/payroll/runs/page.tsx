@@ -7,7 +7,7 @@ import { InsightsPanel } from "@/components/hr/insights-panel";
 import { Modal } from "@/components/hr/modal";
 import { CountTabs, MonthStrip } from "@/components/hr/payroll-ui";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Badge, Field, inputClass, PageTitle, todayLagos } from "@/components/hr/ui";
+import { Badge, Field, inputClass, Notice, PageTitle, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { naira, payMonthLabel } from "@/lib/hr/payroll";
 import { has, holidayDates } from "@/lib/hr/access";
@@ -17,7 +17,7 @@ import { requireHrPage } from "@/lib/hr/session";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Payroll runs" };
 
-type Params = { year?: string; month?: string; q?: string; tab?: string };
+type Params = { denied?: string; year?: string; month?: string; q?: string; tab?: string };
 const TABS = [
   { id: "all", label: "All" },
   { id: "draft", label: "Draft" },
@@ -69,6 +69,7 @@ export default async function PayrollRunsPage({ searchParams }: { searchParams: 
 
   return (
     <PortalShell ctx={ctx} current={base} crumbs={[{ label: "Payroll Management" }, { label: "Payroll Runs" }]}>
+      {params.denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
       <PageTitle
         title="Payroll Runs"
         subtitle="Process and manage payroll runs for each pay period."
@@ -105,6 +106,7 @@ export default async function PayrollRunsPage({ searchParams }: { searchParams: 
         <CountTabs base={base} params={p} tabs={TABS} current={tab} counts={counts} />
       </section>
       <section className="hr-card overflow-hidden">
+        <p className="px-4 pt-3 text-xs text-admin-muted sm:hidden">Swipe sideways to see every column.</p>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[960px] text-left text-sm">
             <thead>

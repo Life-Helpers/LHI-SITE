@@ -100,7 +100,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
               description={isHr ? "Meetings, holidays and events, for all staff or just your team. They can repeat daily, weekly or monthly." : "A meeting for you and your team. It can repeat daily, weekly or monthly."}
               wide
             >
-              <ActionForm action={saveCalendarEventAction} submitLabel="Add to calendar" resetOnSuccess className="space-y-4">
+              <ActionForm action={saveCalendarEventAction} submitLabel="Add to calendar" closeOnSuccess className="space-y-4">
                 <EventFields isHr={isHr} />
               </ActionForm>
             </Modal>
@@ -108,7 +108,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_300px]">
         <section className="hr-card overflow-hidden">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-admin-border bg-admin-bg/60 px-4 py-2.5 text-xs text-admin-muted">
             <span className="font-medium">Legend:</span>
@@ -155,7 +155,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
 
           {view === "month" && (
             <div className="overflow-x-auto px-4 pb-4">
-              <div className="min-w-[700px] overflow-hidden rounded-lg border border-admin-border">
+              <div className="min-w-[640px] overflow-hidden rounded-lg border border-admin-border">
                 <div className="grid grid-cols-7 border-b border-admin-border bg-admin-bg/60 text-center text-xs font-semibold">
                   {WEEKDAYS.map((w) => (
                     <div key={w} className="py-2">

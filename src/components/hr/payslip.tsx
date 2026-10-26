@@ -8,7 +8,7 @@ import { Field, inputClass } from "@/components/hr/ui";
 export function PayslipView({ slip, preview = false }: { slip: HrPayslip; /** Worked out from the current salary, not issued. */ preview?: boolean }) {
   const rows = Math.max(slip.earnings.length, slip.deductions.length);
   return (
-    <article className="hr-card mx-auto max-w-3xl p-6 print:border-0 print:shadow-none sm:p-8">
+    <article className="hr-card mx-auto max-w-3xl p-4 print:border-0 print:shadow-none sm:p-8">
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-admin-border pb-5">
         <div className="flex items-center gap-3">
           <Image src="/logo.png" alt="Life Helpers Initiative" width={140} height={40} className="h-10 w-auto" />
@@ -40,7 +40,9 @@ export function PayslipView({ slip, preview = false }: { slip: HrPayslip; /** Wo
           </div>
         ))}
       </dl>
-      <table className="mt-5 w-full text-sm">
+      {/* On a phone the table scrolls inside the payslip rather than widening the page. */}
+      <div className="mt-5 overflow-x-auto">
+      <table className="w-full min-w-[480px] text-sm">
         <thead>
           <tr className="bg-admin-bg text-left text-xs font-semibold text-admin-muted print:bg-transparent">
             <th scope="col" className="px-3 py-2">Earnings</th>
@@ -66,6 +68,7 @@ export function PayslipView({ slip, preview = false }: { slip: HrPayslip; /** Wo
           </tr>
         </tbody>
       </table>
+      </div>
       <div className="mt-5 flex items-center justify-between rounded-lg bg-admin-primary-soft px-4 py-3 print:border print:border-admin-border">
         <span className="font-semibold">Net pay</span>
         <span className="text-xl font-bold tabular-nums">{naira(slip.net)}</span>
@@ -161,7 +164,7 @@ export function SalaryFields({ salary, rules }: { salary?: HrSalary; rules: Payr
             ))}
         </div>
       </fieldset>
-      <p className="text-xs text-admin-muted">Rates are set under Taxes &amp; deductions on the Payroll page.</p>
+      <p className="text-xs text-admin-muted">Rates are set under Payroll Management → Salary Components.</p>
     </div>
   );
 }

@@ -120,7 +120,9 @@ export function monthlyPay(
     const monthly = r.method === "fixed" ? r.amount : r.method === "percent" ? (base * r.rate) / 100 : annualTax(Math.max(0, base) * 12, r.bands) / 12;
     return kobo(r.cap ? Math.min(monthly, r.cap / 12) : monthly);
   };
-  const line = (r: PayrollRule, amount: number): PayLine => ({ name: r.method === "percent" ? `${r.name} (${r.rate}%)` : r.name, amount });
+  // The cap is part of the name ("Rent relief (20%, up to 500,000 a year)") so the label is true when it applies.
+  const capNote = (r: PayrollRule) => (r.cap ? `, up to ${new Intl.NumberFormat("en-NG").format(r.cap)} a year` : "");
+  const line = (r: PayrollRule, amount: number): PayLine => ({ name: r.method === "percent" ? `${r.name} (${r.rate}%${capNote(r)})` : r.name, amount });
   // Before-tax items and reliefs can't depend on taxable pay (that would be circular).
   const early = (r: PayrollRule) => r.base !== "taxable" && ((kind(r) === "deduction" && r.beforeTax) || kind(r) === "relief");
   const amounts = new Map<string, number>();

@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { sessionKey, sign } from "@/lib/cms/auth";
-import { readStore } from "@/lib/cms/store";
+import { readStore, updateStore } from "@/lib/cms/store";
 import { accessProblem, effectivePermissions, findRole, homePath, type AccessProblem, type Actor } from "@/lib/hr/access";
 import type { HrAccount, HrDepartment, HrEmployee, HrLeaveType, HrPermission, HrRole } from "@/lib/hr/types";
 
@@ -34,7 +34,17 @@ export async function createHrSession(account: HrAccount) {
   });
 }
 
+/**
+ * Sign out: the cookie is deleted, and the account's session version is bumped so a copy of the
+ * cookie (e.g. on a shared computer) stops working too. This signs the person out on every device.
+ */
 export async function destroyHrSession() {
+  const claims = await readSessionClaims();
+  if (claims) {
+    await updateStore("hrAccounts", (items) => ({
+      items: items.map((a) => (a.id === claims.aid && a.sessionVersion === claims.v ? { ...a, sessionVersion: a.sessionVersion + 1 } : a)),
+    }));
+  }
   (await cookies()).delete(HR_SESSION_COOKIE);
 }
 

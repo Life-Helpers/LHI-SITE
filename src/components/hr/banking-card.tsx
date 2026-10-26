@@ -43,8 +43,11 @@ export function BankingCard({ person, editable }: { person: HrEmployee; editable
               <input name="bankAccountName" defaultValue={person.bankAccountName} className={inputClass} />
             </Field>
             <Field label="Account number">
-              <input name="bankAccountNumber" inputMode="numeric" autoComplete="off" defaultValue={person.bankAccountNumber} className={inputClass} />
+              <input name="bankAccountNumber" inputMode="numeric" autoComplete="off" pattern="\d{10}" maxLength={10} placeholder={person.bankAccountNumber ? `Ends ${person.bankAccountNumber.slice(-4)}; blank keeps it` : "10-digit NUBAN"} aria-describedby="bank-number-hint" className={inputClass} />
             </Field>
+            <p id="bank-number-hint" className="text-xs text-admin-muted sm:col-span-3">
+              For your security the full account number isn&apos;t shown. Type the new 10-digit number only if it&apos;s changing. HR is told about changes before payroll.
+            </p>
           </ActionForm>
         </details>
       )}

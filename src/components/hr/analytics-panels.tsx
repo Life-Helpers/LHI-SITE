@@ -1,5 +1,6 @@
 import { BarList, ColumnChart, Kpi, SplitBar, type Series } from "@/components/hr/charts";
 import { Card } from "@/components/hr/ui";
+import { workingDays } from "@/lib/hr/access";
 import {
   absenceForecast,
   absenceRate,
@@ -18,7 +19,7 @@ import {
   pct,
   statusCounts,
   tenureBands,
-  tenureYears,
+  averageTenure,
   turnoverRate,
   upcomingLeave,
 } from "@/lib/hr/analytics";
@@ -43,7 +44,9 @@ function leaveSeries(leave: HrLeaveRequest[], months: string[], types: HrLeaveTy
   return leaveDaysByMonth(leave, months, types).map((s) => ({ name: s.type.name, values: s.values, slot: types.indexOf(s.type) }));
 }
 
-const days = (rows: HrLeaveRequest[]) => rows.reduce((n, l) => n + l.days, 0);
+/** Working days already taken (up to today), so leave still under way only counts its past days. */
+const taken = (rows: HrLeaveRequest[], today: string, holidays?: ReadonlySet<string>) =>
+  rows.reduce((n, l) => n + (l.endDate <= today ? l.days : workingDays(l.startDate, today, holidays)), 0);
 
 /**
  * Organisation-wide analytics (HR dashboard and Reports). Totals and breakdowns only; no
@@ -78,7 +81,8 @@ export function OrgAnalytics({
   const active = employees.filter((e) => isCurrentStaff(e));
   const heads = headcountByMonth(employees, months);
   const year = today.slice(0, 4);
-  const inWindow = leave.filter((l) => l.startDate.slice(0, 7) >= months[0] && l.startDate.slice(0, 7) <= months[months.length - 1]);
+  // Requests from the last 12 months onwards, including upcoming ones still waiting for a decision.
+  const inWindow = leave.filter((l) => l.startDate.slice(0, 7) >= months[0]);
   const ytd = leave.filter((l) => l.status === "approved" && l.startDate.startsWith(year) && l.startDate <= today);
   const activeIds = new Set(active.map((e) => e.id));
   const deptOf = (id: string) => {
@@ -86,7 +90,9 @@ export function OrgAnalytics({
     return departments.find((d) => d.id === e?.departmentId)?.name ?? e?.department ?? "";
   };
   const forecast = absenceForecast(leave.filter((l) => activeIds.has(l.employeeId)), today, 10, holidays);
-  const avgTenure = active.length ? active.reduce((n, e) => n + tenureYears(e, today), 0) / active.length : null;
+  const tenure = averageTenure(active, today);
+  const avgTenure = tenure.years;
+  const undated = active.length - tenure.counted;
   const change = active.length - heads[0];
 
   return (
@@ -98,7 +104,7 @@ export function OrgAnalytics({
             <div className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <Kpi label="Current staff" value={String(active.length)} hint={`${change >= 0 ? "+" : ""}${change} since ${full[0]} · ${employees.filter((e) => e.status === "probation").length} on probation`} />
               <Kpi label="Turnover, 12 months" value={pct(turnoverRate(employees, months))} hint="Leavers ÷ average headcount" />
-              <Kpi label="Average length of service" value={avgTenure === null ? "—" : `${num(avgTenure)} yrs`} hint="Current staff, from start date" />
+              <Kpi label="Average length of service" value={avgTenure === null ? "—" : `${num(avgTenure)} yrs`} hint={undated ? `${tenure.counted} staff with a start date (${undated} without)` : "Current staff, from start date"} />
               <Kpi label="Started this year" value={String(active.filter((e) => e.startDate.startsWith(year)).length)} hint="Current staff with a start date this year" />
             </div>
           )}
@@ -128,7 +134,7 @@ export function OrgAnalytics({
             <Card title="By gender">
               <BarList rows={countBy(active, (e) => e.gender)} empty="No staff yet." />
             </Card>
-            <Card title="Length of service">
+            <Card title="Length of service" subtitle="Staff with a start date on record">
               <BarList rows={tenureBands(active, today)} empty="No staff yet." />
             </Card>
             <Card title="Employee status" subtitle="All records, including former staff">
@@ -142,7 +148,7 @@ export function OrgAnalytics({
         <section aria-labelledby="leave-analytics">
           <SectionTitle title="Leave analytics" subtitle={`Leave taken, requests and decisions. Leave is counted in the month it starts.`} />
           <div className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {kpis && <Kpi label={`Leave days taken, ${year}`} value={String(days(ytd))} hint={`${ytd.length} approved request${ytd.length === 1 ? "" : "s"} so far`} />}
+            {kpis && <Kpi label={`Leave days taken, ${year}`} value={String(taken(ytd, today, holidays))} hint={`Working days up to today, from ${ytd.length} approved request${ytd.length === 1 ? "" : "s"}`} />}
             {kpis && <Kpi label={`Absence rate, ${year}`} value={pct(absenceRate(leave, active, today, holidays))} hint="Leave days ÷ working days available" />}
             <Kpi label="Approval rate, 12 months" value={pct(approvalRate(inWindow), 0)} hint="Approved ÷ decided requests" />
             <Kpi label="Average time to decide" value={(() => { const d = averageDecisionDays(inWindow); return d === null ? "—" : `${num(d)} days`; })()} hint="From request to approval or rejection" />
@@ -152,11 +158,11 @@ export function OrgAnalytics({
               <ColumnChart labels={labels} fullLabels={full} series={leaveSeries(leave, months, types)} unit="days" height={220} />
             </Card>
             <Card title="Who's off in the next two weeks" subtitle="Staff on approved leave each working day">
-              <ColumnChart labels={forecast.map((f) => DAY_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} fullLabels={forecast.map((f) => DATE_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} series={[{ name: "Staff off", values: forecast.map((f) => f.value) }]} unit="staff off" height={200} />
+              <ColumnChart labels={forecast.map((f) => DAY_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} fullLabels={forecast.map((f) => DATE_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} series={[{ name: "Staff off", values: forecast.map((f) => f.value) }]} unit="staff off" height={200} xLabel="Day" />
             </Card>
           </div>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
-            <Card title="Requests by status" subtitle="Requests starting in the last 12 months">
+            <Card title="Requests by status" subtitle="Requests starting from 12 months ago, including upcoming">
               <SplitBar parts={statusCounts(inWindow).map((s) => ({ key: s.status, label: STATUS_LABEL[s.status], value: s.value }))} unit="requests" />
             </Card>
             <Card title={`Leave days by department, ${year}`} subtitle="Approved, taken so far">
@@ -198,9 +204,9 @@ export function TeamAnalytics({
     <section aria-labelledby="team-analytics">
       <SectionTitle title="Team analytics" subtitle="Your team's leave this year and what's coming up." />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Kpi label={`Leave days taken, ${year}`} value={String(days(ytd))} hint={`${active.length ? num(days(ytd) / active.length) : "0"} per team member`} />
+        <Kpi label={`Leave days taken, ${year}`} value={String(taken(ytd, today, holidays))} hint={`Up to today; ${active.length ? num(taken(ytd, today, holidays) / active.length) : "0"} per team member`} />
         <Kpi label={`Absence rate, ${year}`} value={pct(absenceRate(leave, active, today, holidays))} hint="Leave days ÷ working days available" />
-        <Kpi label="Booked in the next 30 days" value={String(new Set(soon.map((l) => l.employeeId)).size)} hint={`${soon.filter((l) => l.status === "pending").length} still awaiting a decision`} />
+        <Kpi label="People away in the next 30 days" value={String(new Set(soon.map((l) => l.employeeId)).size)} hint={`${soon.length} request${soon.length === 1 ? "" : "s"}, ${soon.filter((l) => l.status === "pending").length} awaiting a decision`} />
         <Kpi label="Approval rate, 12 months" value={pct(approvalRate(leave.filter((l) => l.startDate.slice(0, 7) >= months[0])), 0)} hint="Approved ÷ decided requests" />
       </div>
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
@@ -208,7 +214,7 @@ export function TeamAnalytics({
           <ColumnChart labels={months.map(monthLabel)} fullLabels={months.map(monthYearLabel)} series={leaveSeries(leave, months, types)} unit="days" height={220} />
         </Card>
         <Card title="Who's off in the next two weeks" subtitle="Team members on approved leave each working day">
-          <ColumnChart labels={forecast.map((f) => DAY_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} fullLabels={forecast.map((f) => DATE_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} series={[{ name: "Off", values: forecast.map((f) => f.value) }]} unit="off" height={200} />
+          <ColumnChart labels={forecast.map((f) => DAY_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} fullLabels={forecast.map((f) => DATE_LABEL.format(new Date(`${f.date}T12:00:00Z`)))} series={[{ name: "Off", values: forecast.map((f) => f.value) }]} unit="off" height={200} xLabel="Day" />
         </Card>
       </div>
       <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -226,7 +232,7 @@ export function TeamAnalytics({
             />
           </Card>
         )}
-        <Card title="Requests by status" subtitle="Requests starting in the last 12 months">
+        <Card title="Requests by status" subtitle="Requests starting from 12 months ago, including upcoming">
           <SplitBar parts={statusCounts(leave.filter((l) => l.startDate.slice(0, 7) >= months[0])).map((s) => ({ key: s.status, label: STATUS_LABEL[s.status], value: s.value }))} unit="requests" />
         </Card>
       </div>

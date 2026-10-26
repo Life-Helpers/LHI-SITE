@@ -35,7 +35,12 @@ export function ReliefPanel({
   const nameOf = (id?: string) => employeeName(employees.find((e) => e.id === id));
   const asked = leave.filter((l) => l.relieverId === me.id && l.status === "pending" && l.relieverStatus === "pending").sort((a, b) => a.startDate.localeCompare(b.startDate));
   const mine = leave.filter((l) => l.employeeId === me.id && l.status === "pending" && l.relieverId).sort((a, b) => a.startDate.localeCompare(b.startDate));
-  if (!asked.length && !mine.length) return null;
+  // Relief already agreed and not yet over, so the answer stays visible after accepting.
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(new Date());
+  const covering = leave
+    .filter((l) => l.relieverId === me.id && l.relieverStatus === "accepted" && (l.status === "pending" || l.status === "approved") && l.endDate >= today)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate));
+  if (!asked.length && !mine.length && !covering.length) return null;
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -51,6 +56,18 @@ export function ReliefPanel({
                   <QuickAction action={respondReliefAction} kind="approve" label={`Accept relief for ${nameOf(l.employeeId)}`} tip="Accept" fields={{ leaveId: l.id, answer: "accept" }} />
                   <QuickAction action={respondReliefAction} kind="reject" label={`Decline relief for ${nameOf(l.employeeId)}`} tip="Decline" fields={{ leaveId: l.id, answer: "decline" }} askNote="Reason for declining (optional):" />
                 </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+      {covering.length > 0 && (
+        <Card title="You're covering" subtitle="Relief you've agreed to" flush>
+          <ul className="divide-y divide-admin-border">
+            {covering.map((l) => (
+              <li key={l.id} className="flex items-center justify-between gap-3 px-5 py-3">
+                <Person name={nameOf(l.employeeId)} sub={range(l)} />
+                <Badge status={l.status === "approved" ? "approved" : "pending"} label={l.status === "approved" ? "Leave approved" : "Leave awaiting approval"} />
               </li>
             ))}
           </ul>

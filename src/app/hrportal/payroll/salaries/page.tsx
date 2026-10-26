@@ -8,7 +8,7 @@ import { CountTabs } from "@/components/hr/payroll-ui";
 import { PayslipView, SalaryFields } from "@/components/hr/payslip";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { QuickAction } from "@/components/hr/quick-action";
-import { Badge, inputClass, PageTitle, Person, todayLagos } from "@/components/hr/ui";
+import { Badge, inputClass, Notice, PageTitle, Person, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { monthlyPay, naira, payrollRules } from "@/lib/hr/payroll";
 import { has } from "@/lib/hr/access";
@@ -18,7 +18,7 @@ import { employeeName, isCurrentStaff } from "@/lib/hr/types";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Employee salaries" };
 
-type Params = { q?: string; employee?: string; tab?: string };
+type Params = { denied?: string; q?: string; employee?: string; tab?: string };
 const TABS = [
   { id: "all", label: "All" },
   { id: "active", label: "Active" },
@@ -48,6 +48,7 @@ export default async function SalariesPage({ searchParams }: { searchParams: Pro
 
   return (
     <PortalShell ctx={ctx} current={base} crumbs={[{ label: "Payroll Management" }, { label: "Employee Salaries" }]}>
+      {params.denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
       <PageTitle title="Employee Salaries" subtitle={`Monthly pay for each current employee. ${canSet ? "Changes apply to payslips prepared afterwards." : "Your access is read only."}`} />
       <section className="hr-card mb-5">
         <form method="get" action={base} className="flex flex-wrap items-center gap-3 px-4 pb-3 pt-4">
@@ -69,6 +70,7 @@ export default async function SalariesPage({ searchParams }: { searchParams: Pro
         <CountTabs base={base} params={params} tabs={TABS} current={tab} counts={counts} />
       </section>
       <section className="hr-card overflow-hidden">
+        <p className="px-4 pt-3 text-xs text-admin-muted sm:hidden">Swipe sideways to see every column.</p>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-left text-sm">
             <thead>

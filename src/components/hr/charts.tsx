@@ -58,7 +58,7 @@ function TableView({ head, rows }: { head: string[]; rows: (string | number)[][]
  * Columns over time. One series is a plain column chart; several are stacked (with a legend,
  * a 2px gap between segments, and the hovered month's breakdown in the tooltip).
  */
-export function ColumnChart({ labels, fullLabels, series, unit, height = 180 }: { labels: string[]; fullLabels?: string[]; series: Series[]; unit: string; height?: number }) {
+export function ColumnChart({ labels, fullLabels, series, unit, height = 180, xLabel = "Month" }: { labels: string[]; fullLabels?: string[]; series: Series[]; unit: string; height?: number; /** Heading for the label column in the table view. */ xLabel?: string }) {
   const [hover, setHover] = useState<number | null>(null);
   // Draw at the card's real width so text stays a readable size in narrow cards.
   const box = useRef<HTMLDivElement>(null);
@@ -162,7 +162,7 @@ export function ColumnChart({ labels, fullLabels, series, unit, height = 180 }: 
         )}
       </div>
       <TableView
-        head={["Month", ...(stacked ? series.map((s) => s.name) : []), stacked ? "Total" : unit.charAt(0).toUpperCase() + unit.slice(1)]}
+        head={[xLabel, ...(stacked ? series.map((s) => s.name) : []), stacked ? "Total" : unit.charAt(0).toUpperCase() + unit.slice(1)]}
         rows={labels.map((l, i) => [fullLabels?.[i] ?? l, ...(stacked ? series.map((s) => fmt(s.values[i] ?? 0)) : []), fmt(totals[i])])}
       />
     </div>

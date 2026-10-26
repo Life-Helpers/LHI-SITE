@@ -47,7 +47,7 @@ export default async function EmployeesPage({ searchParams }: { searchParams: Pr
   const designations = distinct((e) => e.jobTitle);
   const needle = q.trim().toLowerCase();
   const filtered = employees
-    .filter((e) => (!branch || e.location === branch) && (!dept || e.department === dept) && (!role || e.jobTitle === role))
+    .filter((e) => (!branch || e.location === branch) && (!dept || (dept === "none" ? !e.department && !e.departmentId : e.department === dept)) && (!role || e.jobTitle === role))
     .filter((e) => !needle || [employeeName(e), e.email, e.jobTitle, e.department, e.location, e.staffNumber].some((v) => v.toLowerCase().includes(needle)));
   const counts = Object.fromEntries(TABS.map((t) => [t.id, t.id === "all" ? filtered.length : filtered.filter((e) => e.status === t.id).length]));
   const rows = filtered.filter((e) => tab === "all" || e.status === tab).sort((a, b) => (params.dir === "desc" ? -1 : 1) * employeeName(a).localeCompare(employeeName(b)));
@@ -117,6 +117,7 @@ export default async function EmployeesPage({ searchParams }: { searchParams: Pr
           </AutoSubmitSelect>
           <AutoSubmitSelect name="dept" defaultValue={dept} aria-label="Department" className={`${inputClass} mt-0 max-w-56`}>
             <option value="">All Departments</option>
+            <option value="none">No department</option>
             {departmentNames.map((d) => (
               <option key={d}>{d}</option>
             ))}

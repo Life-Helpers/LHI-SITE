@@ -53,7 +53,7 @@ export default async function TeamMemberPage({ params, searchParams }: { params:
             ))}
           </dl>
         </Card>
-        <div className="lg:col-span-2">
+        <div className="min-w-0 lg:col-span-2">
           <LeaveListing leaveTypes={ctx.leaveTypes}
             rows={theirLeave}
             employees={employees}

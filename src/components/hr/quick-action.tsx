@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { Check, CircleCheck, CircleX, Copy, KeyRound, Loader2, Lock, LockOpen, Trash2 } from "lucide-react";
 
 import type { HrResult } from "@/app/hrportal/actions";
+import { announce } from "@/components/hr/notice-host";
 import { Tip } from "@/components/hr/tooltip";
 
 const ICONS = { approve: CircleCheck, reject: CircleX, cancel: Trash2, delete: Trash2, key: KeyRound, lock: Lock, unlock: LockOpen } as const;
@@ -43,7 +44,12 @@ export function QuickAction({
   const [state, formAction, pending] = useActionState(action, null);
   const [copied, setCopied] = useState(false);
   const [dismissed, setDismissed] = useState<HrResult | null>(null);
+  const noteDialog = useRef<HTMLDialogElement>(null);
   const Icon = ICONS[kind];
+  // The row often disappears once it's done (e.g. an approved request), so the confirmation is shown on the page.
+  useEffect(() => {
+    if (state?.ok && !state.link && state.message) announce(state.message);
+  }, [state]);
   return (
     <form
       action={formAction}
@@ -53,24 +59,41 @@ export function QuickAction({
           e.preventDefault();
           return;
         }
-        if (askNote) {
-          const note = window.prompt(askNote) ?? null;
-          if (note === null) {
-            e.preventDefault();
-            return;
-          }
-          const input = e.currentTarget.elements.namedItem("note") as HTMLInputElement | null;
-          if (input) input.value = note;
-        }
+        noteDialog.current?.close();
       }}
     >
       {Object.entries(fields).map(([k, v]) => (
         <input key={k} type="hidden" name={k} value={v} />
       ))}
-      {askNote && <input type="hidden" name="note" defaultValue="" />}
+      {askNote && (
+        <dialog
+          ref={noteDialog}
+          aria-label={label}
+          className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-admin-border bg-admin-card p-0 text-left text-admin-text shadow-2xl backdrop:bg-black/40"
+        >
+          <div className="space-y-3 p-5">
+            <h2 className="text-base font-semibold">{label}</h2>
+            <label className="block text-sm">
+              {askNote}
+              <textarea name="note" rows={3} maxLength={300} className="mt-1 block w-full rounded-lg border border-admin-border bg-admin-card px-3 py-2 text-sm outline-none focus:border-admin-primary" />
+            </label>
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => noteDialog.current?.close()} className="rounded-lg border border-admin-border px-4 py-2 text-sm font-semibold hover:bg-admin-bg">
+                Back
+              </button>
+              <button type="submit" disabled={pending} className={`rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60 ${kind === "approve" ? "bg-admin-primary" : "bg-admin-danger"}`}>
+                {kind === "cancel" ? "Cancel leave" : label.split(" ")[0]}
+              </button>
+            </div>
+          </div>
+        </dialog>
+      )}
       {(() => {
         const button = (
-          <button type="submit" disabled={pending} title={tip ? undefined : label} aria-label={label} className={`rounded-lg p-1.5 disabled:opacity-50 ${TONES[kind]}`}>
+          <button
+            type={askNote ? "button" : "submit"}
+            onClick={askNote ? () => noteDialog.current?.showModal() : undefined}
+            disabled={pending} title={tip ? undefined : label} aria-label={label} className={`rounded-lg p-1.5 disabled:opacity-50 ${TONES[kind]}`}>
             {pending ? <Loader2 className="h-[18px] w-[18px] animate-spin" aria-hidden="true" /> : <Icon className="h-[18px] w-[18px]" aria-hidden="true" />}
           </button>
         );

@@ -1,6 +1,6 @@
 import { Building2 } from "lucide-react";
 
-import { addStandardDepartmentsAction, saveDepartmentAction } from "@/app/hrportal/actions";
+import { addStandardDepartmentsAction, deleteDepartmentAction, saveDepartmentAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
@@ -136,6 +136,12 @@ export default async function DepartmentsPage() {
                       <ActionForm action={saveDepartmentAction} submitLabel="Save department" className="space-y-4">
                         <DepartmentFields dept={d} staff={staff} />
                       </ActionForm>
+                      <div className="mt-4 border-t border-admin-border pt-4">
+                        <ActionForm action={deleteDepartmentAction} submitLabel="Delete department" danger confirmText={`Delete ${d.name}? This can't be undone.`}>
+                          <input type="hidden" name="departmentId" value={d.id} />
+                          <p className="text-xs text-admin-muted">Only a department with no staff and no leave policies can be deleted; otherwise close it instead.</p>
+                        </ActionForm>
+                      </div>
                     </div>
                   </details>
                 )}

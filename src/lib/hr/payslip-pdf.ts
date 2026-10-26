@@ -16,6 +16,24 @@ const LINE = rgb(0.86, 0.88, 0.9);
 const BRAND = rgb(0.06, 0.6, 0.42);
 const SOFT = rgb(0.9, 0.97, 0.94);
 
+/**
+ * The standard PDF fonts only cover Western European letters. Turn anything else into the
+ * nearest they can show: the naira sign becomes "NGN", Hausa ƙ/ɗ/ɓ and accents lose their marks,
+ * and anything still unknown becomes "?", so a name or reason never stops the PDF being made.
+ */
+const WIN_ANSI_EXTRA = new Set("€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ");
+export function pdfSafe(s: string): string {
+  const mapped = s.replace(/₦/g, "NGN ").replace(/[ƙƘ]/g, (c) => (c === "ƙ" ? "k" : "K")).replace(/[ɗƊ]/g, (c) => (c === "ɗ" ? "d" : "D")).replace(/[ɓƁ]/g, (c) => (c === "ɓ" ? "b" : "B")).replace(/[ƴƳ]/g, (c) => (c === "ƴ" ? "y" : "Y"));
+  return [...mapped]
+    .map((c) => {
+      const code = c.codePointAt(0)!;
+      if ((code >= 0x20 && code <= 0x7e) || (code >= 0xa0 && code <= 0xff) || WIN_ANSI_EXTRA.has(c)) return c;
+      const base = c.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+      return base && [...base].every((b) => b.codePointAt(0)! >= 0x20 && b.codePointAt(0)! <= 0x7e) ? base : "?";
+    })
+    .join("");
+}
+
 /** The file name people get, e.g. "payslip-2026-10-aisha-bello.pdf". */
 export const payslipFileName = (slip: Pick<HrPayslip, "month" | "employee">) =>
   `payslip-${slip.month}-${slip.employee.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "employee"}.pdf`;
@@ -23,6 +41,7 @@ export const payslipFileName = (slip: Pick<HrPayslip, "month" | "employee">) =>
 export async function payslipPdf(slip: HrPayslip, logo?: Uint8Array): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.setTitle(`Payslip ${payMonthLabel(slip.month)} - ${slip.employee.name}`);
+  // (Document properties are Unicode; only the drawn text needs pdfSafe.)
   doc.setAuthor("Life Helpers Initiative");
   doc.setSubject("Payslip (confidential)");
   const page = doc.addPage([595.28, 841.89]); // A4
@@ -30,8 +49,21 @@ export async function payslipPdf(slip: HrPayslip, logo?: Uint8Array): Promise<Ui
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
   const left = 48;
   const right = 595.28 - 48;
-  const text = (p: PDFPage, s: string, x: number, y: number, size = 10, f: PDFFont = font, color = INK) => p.drawText(s, { x, y, size, font: f, color });
-  const textRight = (p: PDFPage, s: string, x: number, y: number, size = 10, f: PDFFont = font, color = INK) => text(p, s, x - f.widthOfTextAtSize(s, size), y, size, f, color);
+  const text = (p: PDFPage, s: string, x: number, y: number, size = 10, f: PDFFont = font, color = INK) => p.drawText(pdfSafe(s), { x, y, size, font: f, color });
+  const textRight = (p: PDFPage, s: string, x: number, y: number, size = 10, f: PDFFont = font, color = INK) => text(p, s, x - f.widthOfTextAtSize(pdfSafe(s), size), y, size, f, color);
+  // Long names (e.g. a penalty's reason) shrink to fit their column, down to 7pt, then end in "…".
+  const fitted = (str: string, width: number, size: number, f: PDFFont = font) => {
+    let sz = size;
+    str = pdfSafe(str);
+    while (sz > 7 && f.widthOfTextAtSize(str, sz) > width) sz -= 0.5;
+    let out = str;
+    while (out.length > 1 && f.widthOfTextAtSize(out, sz) > width) out = `${out.slice(0, -2)}…`;
+    return { s: out, size: sz };
+  };
+  const textFit = (p: PDFPage, str: string, x: number, y: number, width: number, size = 10, f: PDFFont = font, color = INK) => {
+    const t = fitted(str, width, size, f);
+    text(p, t.s, x, y, t.size, f, color);
+  };
   const rule = (y: number) => page.drawLine({ start: { x: left, y }, end: { x: right, y }, thickness: 0.8, color: LINE });
 
   // Header: logo left, title and month right.
@@ -65,7 +97,7 @@ export async function payslipPdf(slip: HrPayslip, logo?: Uint8Array): Promise<Ui
     const x = i % 2 === 0 ? left : left + (right - left) / 2;
     const rowY = y - Math.floor(i / 2) * 30;
     text(page, k, x, rowY, 8.5, font, MUTED);
-    text(page, v.slice(0, 48), x, rowY - 12, 10.5, bold);
+    textFit(page, v, x, rowY - 12, (right - left) / 2 - 12, 10.5, bold);
   });
   y -= Math.ceil(details.length / 2) * 30 + 4;
   rule(y);
@@ -84,11 +116,11 @@ export async function payslipPdf(slip: HrPayslip, logo?: Uint8Array): Promise<Ui
     const e = slip.earnings[i];
     const d = slip.deductions[i];
     if (e) {
-      text(page, e.name.slice(0, 34), left + 8, y);
+      textFit(page, e.name, left + 8, y, mid - left - 24 - font.widthOfTextAtSize(pdfAmount(e.amount), 10));
       textRight(page, pdfAmount(e.amount), mid - 8, y);
     }
     if (d) {
-      text(page, d.name.slice(0, 34), mid + 8, y);
+      textFit(page, d.name, mid + 8, y, right - mid - 24 - font.widthOfTextAtSize(pdfAmount(d.amount), 10));
       textRight(page, pdfAmount(d.amount), right - 8, y);
     }
     page.drawLine({ start: { x: left, y: y - 8 }, end: { x: right, y: y - 8 }, thickness: 0.5, color: LINE });
@@ -120,7 +152,7 @@ export async function payslipPdf(slip: HrPayslip, logo?: Uint8Array): Promise<Ui
       text(page, title, x, yy, 8.5, bold, MUTED);
       for (const l of lines) {
         yy -= 15;
-        text(page, l.name.slice(0, 34), x, yy, 9.5);
+        textFit(page, l.name, x, yy, end - x - 12 - font.widthOfTextAtSize(pdfAmount(l.amount), 9.5), 9.5);
         textRight(page, pdfAmount(l.amount), end, yy, 9.5);
       }
       y = Math.min(y, yy);

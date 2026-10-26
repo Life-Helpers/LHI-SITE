@@ -59,7 +59,9 @@ function TypeFields({ type }: { type?: HrLeaveType }) {
 
 export default async function LeaveTypesPage() {
   const ctx = await requireHrPage(["leave.view_all", "leave.manage"]);
-  const leave = await readStore("hrLeave");
+  const [leave, policies] = await Promise.all([readStore("hrLeave"), readStore("hrLeavePolicies")]);
+  // Active policies set the real allowance; the type's own days are only the starting default.
+  const policyDays = (typeId: string) => [...new Set(policies.filter((p) => p.active && p.typeId === typeId).map((p) => (p.days === null ? "no limit" : `${p.days} days`)))];
   const canManage = has(ctx.permissions, "leave.manage");
   const types = [...ctx.leaveTypes].sort((a, b) => Number(b.active) - Number(a.active));
 
@@ -101,7 +103,12 @@ export default async function LeaveTypesPage() {
                     </span>
                     {t.description && <span className="mt-0.5 block text-xs text-admin-muted">{t.description}</span>}
                   </td>
-                  <td className="px-4 py-3">{t.defaultDays === null ? <span className="text-admin-muted">No limit</span> : `${t.defaultDays} days`}</td>
+                  <td className="px-4 py-3">
+                    {t.defaultDays === null ? <span className="text-admin-muted">No limit</span> : `${t.defaultDays} days`}
+                    {policyDays(t.id).length > 0 && policyDays(t.id).join() !== (t.defaultDays === null ? "no limit" : `${t.defaultDays} days`) && (
+                      <span className="block text-xs text-admin-warning">Policy sets {policyDays(t.id).join(" / ")}</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">{t.paid ? "Paid" : "Unpaid"}</td>
                   <td className="px-4 py-3">{leave.filter((l) => l.type === t.id).length}</td>
                   <td className="px-4 py-3">

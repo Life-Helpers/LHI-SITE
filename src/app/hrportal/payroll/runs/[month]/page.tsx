@@ -85,7 +85,8 @@ export default async function PayrollRunPage({ params, searchParams }: { params:
         </section>
       ) : (
         <section className="hr-card overflow-hidden">
-          <div className="overflow-x-auto">
+          <p className="px-4 pt-3 text-xs text-admin-muted sm:hidden">Swipe sideways to see every column.</p>
+        <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
                 <tr className="bg-admin-bg text-xs font-semibold text-admin-muted">
@@ -148,7 +149,8 @@ function ScheduleTable({ slips }: { slips: Parameters<typeof payrollSchedule>[0]
   const cell = (n: number) => (n ? naira(n) : "–");
   return (
     <section className="hr-card overflow-hidden">
-      <div className="overflow-x-auto">
+      <p className="px-4 pt-3 text-xs text-admin-muted sm:hidden">Swipe sideways to see every column.</p>
+        <div className="overflow-x-auto">
         <table className="w-full min-w-[1400px] text-left text-xs">
           <thead>
             <tr className="bg-admin-bg font-semibold text-admin-muted">

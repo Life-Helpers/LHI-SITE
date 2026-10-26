@@ -276,7 +276,10 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
         <OrgAnalytics kpis={false} holidays={holidays} employees={employees} leave={leave} types={ctx.leaveTypes} departments={ctx.departments} today={today} showPeople={seesPeople} showLeave={seesLeave} />
       )}
       {has(p, "accounts.manage") && has(p, "employees.manage") && (
-        <div className="mt-6">
+        // Tucked away so its red "Remove" button isn't pressed by mistake.
+        <details className="mt-6 rounded-xl border border-dashed border-admin-border px-4 py-3">
+          <summary className="cursor-pointer text-sm font-semibold text-admin-muted">Testing tools: sample data</summary>
+          <div className="mt-3">
           <Card title="Sample data for testing" subtitle="Five made-up staff (SAMPLE-001 to SAMPLE-005) with line managers, leave, salaries, payslips and logins, to try the portal safely">
             {/* Both forms stay mounted so each one's result message survives the refresh. */}
             <p className="mb-4 text-sm text-admin-muted">
@@ -293,7 +296,8 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
               <ActionForm action={removeSampleDataAction} submitLabel="Remove sample data" danger confirmText="Remove all sample employees with their leave, salaries, payslips and logins?" />
             </div>
           </Card>
-        </div>
+          </div>
+        </details>
       )}
     </PortalShell>
   );

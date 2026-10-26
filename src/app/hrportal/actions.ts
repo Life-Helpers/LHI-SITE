@@ -8,6 +8,7 @@ import { redirect, unstable_rethrow } from "next/navigation";
 import { getCurrentUser, hashPassword, validatePasswordStrength, verifyPassword } from "@/lib/cms/auth";
 import { can } from "@/lib/cms/schema";
 import { readStore, updateStore } from "@/lib/cms/store";
+import { clientIp } from "@/lib/client-ip";
 import { rateLimited } from "@/lib/rate-limit";
 import {
   accessProblem,
@@ -112,6 +113,9 @@ const noteFailure = (key: string) => {
   failures.set(key, { count: fresh ? 1 : f.count + 1, until: Date.now() + 15 * 60_000 });
 };
 
+/** Connections with too many failed sign-ins recently (until when). */
+const blockedIps = new Map<string, number>();
+
 // Compared against when the email is unknown, so a wrong email takes as long as a wrong password.
 let dummyHash: Promise<string> | null = null;
 
@@ -121,14 +125,17 @@ export async function hrSignInAction(_prev: HrResult | null, form: FormData): Pr
     const password = String(form.get("password") ?? "").slice(0, 200);
     if (!address || !password) return fail("Enter your email and password.");
     if (locked(address)) return fail("Too many failed attempts. Try again in 15 minutes.");
-    if (await rateLimited(new Request("http://hrportal.local/", { headers: await headers() }), "hr-login", 30, 900)) {
-      return fail("Too many sign-in attempts from this connection. Try again in 15 minutes.");
-    }
+    // Only failed sign-ins count against a connection, so a whole office sharing one internet
+    // connection isn't locked out by colleagues signing in successfully.
+    const request = new Request("http://hrportal.local/", { headers: await headers() });
+    const ip = clientIp(request);
+    if ((blockedIps.get(ip) ?? 0) > Date.now()) return fail("Too many failed sign-in attempts from this connection. Try again in 15 minutes.");
     const account = (await readStore("hrAccounts")).find((a) => a.email === address);
     dummyHash ??= hashPassword(randomUUID());
     const valid = await verifyPassword(password, account?.passwordHash ?? (await dummyHash));
     if (!account || !account.passwordHash || !valid) {
       noteFailure(address);
+      if (await rateLimited(request, "hr-login-failed", 50, 900)) blockedIps.set(ip, Date.now() + 15 * 60_000);
       return fail("Incorrect email or password.");
     }
     failures.delete(address);
@@ -266,6 +273,9 @@ export async function setAuditAccessAction(_prev: HrResult | null, form: FormDat
   });
 }
 
+/** Empty, or a phone number: digits with optional +, spaces, dashes and brackets (7 to 15 digits). */
+const phoneOk = (v: string) => !v || (/^[+\d][\d\s()-]*$/.test(v) && /^\d{7,15}$/.test(v.replace(/\D/g, "")));
+
 /* ------------------------------------------------------------------ Self-service */
 
 export async function updateMyContactAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
@@ -277,6 +287,7 @@ export async function updateMyContactAction(_prev: HrResult | null, form: FormDa
       emergencyContactName: text(form, "emergencyContactName", 120),
       emergencyContactPhone: text(form, "emergencyContactPhone", 40),
     };
+    if (!phoneOk(changes.phone) || !phoneOk(changes.emergencyContactPhone)) return fail("Enter phone numbers as digits, e.g. 0803 123 4567 or +234 803 123 4567.");
     // Always the signed-in person's own record: no employee id is taken from the form.
     await updateStore("hrEmployees", (items) => ({
       items: items.map((e) => (e.id === ctx.employee.id ? { ...e, ...changes, updatedAt: new Date().toISOString() } : e)),
@@ -299,7 +310,7 @@ async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "th
   const endDate = text(form, "endDate", 10);
   const reason = text(form, "reason", 500);
   const relieverId = text(form, "relieverId", 64);
-  const [types, policies, adjustments, leave, employees, accounts, events] = await Promise.all([
+  const [types, policies, adjustments, leave, employees, accounts, events, departments] = await Promise.all([
     readStore("hrLeaveTypes"),
     readStore("hrLeavePolicies"),
     readStore("hrLeaveAdjustments"),
@@ -307,6 +318,7 @@ async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "th
     readStore("hrEmployees"),
     readStore("hrAccounts"),
     readStore("hrEvents"),
+    readStore("hrDepartments"),
   ]);
   const leaveType = types.find((t) => t.id === type && t.active);
   if (!leaveType) return { error: "Choose a leave type." };
@@ -321,7 +333,7 @@ async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "th
     return { error: `${who === "you" ? "You already have" : "They already have"} leave booked or pending in those dates.` };
   }
   // Staff asking for their own leave name a reliever (when anyone can relieve them); HR may add one.
-  const options = relieverOptions(employee, employees, accounts);
+  const options = relieverOptions(employee, employees, accounts, departments);
   const reliever = relieverId ? options.find((e) => e.id === relieverId) : undefined;
   if (relieverId && !reliever) return { error: "Choose a reliever from the list (a current colleague with a portal login)." };
   if (!relieverId && who === "you" && options.length) return { error: "Choose who will relieve you while you're away." };
@@ -604,7 +616,7 @@ export async function changeRelieverAction(_prev: HrResult | null, form: FormDat
     const request = leave.find((l) => l.id === id);
     // Only the person's own, still-pending requests.
     if (!request || request.employeeId !== ctx.employee.id || request.status !== "pending") return fail("That request can't be changed.");
-    const reliever = relieverOptions(ctx.employee, employees, accounts).find((e) => e.id === relieverId);
+    const reliever = relieverOptions(ctx.employee, employees, accounts, ctx.departments).find((e) => e.id === relieverId);
     if (!reliever) return fail("Choose a reliever from the list.");
     if (reliever.id === request.relieverId && request.relieverStatus !== "declined") return done("No change.");
     if (leave.some((l) => l.employeeId === reliever.id && (l.status === "pending" || l.status === "approved") && l.startDate <= request.endDate && l.endDate >= request.startDate)) {
@@ -688,6 +700,7 @@ function employeeFields(form: FormData, departments: HrDepartment[]) {
 
 function checkEmployee(fields: ReturnType<typeof employeeFields>, employees: HrEmployee[], selfId: string | null, form?: FormData): string | null {
   if (!fields.firstName || !fields.lastName) return "Enter a first and last name.";
+  if (!phoneOk(fields.phone)) return "Enter phone numbers as digits, e.g. 0803 123 4567 or +234 803 123 4567.";
   if (form && text(form, "departmentId", 64) && !fields.departmentId) return "Choose an active department.";
   if (fields.email && !isEmail(fields.email)) return "Enter a valid work email, or leave it blank.";
   if (fields.email && employees.some((e) => e.email === fields.email && e.id !== selfId)) return "Another employee already has that email.";
@@ -1021,6 +1034,27 @@ export async function saveDepartmentAction(_prev: HrResult | null, form: FormDat
 }
 
 /** Add LHI's standard departments that don't exist yet, and link staff already recorded under those names. */
+/** Delete a department nobody is in. Departments with staff or leave policies must be emptied first. */
+export async function deleteDepartmentAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("employees.manage");
+    const id = text(form, "departmentId", 64);
+    const [departments, employees, policies] = await Promise.all([readStore("hrDepartments"), readStore("hrEmployees"), readStore("hrLeavePolicies")]);
+    const dept = departments.find((d) => d.id === id);
+    if (!dept) return fail("Department not found.");
+    const staff = employees.filter((e) => e.departmentId === id && isCurrentStaff(e));
+    if (staff.length) return fail(`Move its ${staff.length} staff member${staff.length === 1 ? "" : "s"} to another department first.`);
+    const scoped = policies.filter((p) => p.scope === "department" && p.scopeValue === id);
+    if (scoped.length) return fail(`Change or remove the leave polic${scoped.length === 1 ? "y" : "ies"} for this department first (${scoped.map((p) => p.name).join(", ")}).`);
+    await updateStore("hrDepartments", (items) => ({ items: items.filter((d) => d.id !== id) }));
+    // Former staff keep the department's name on their record, without the link.
+    await updateStore("hrEmployees", (items) => ({ items: items.map((e) => (e.departmentId === id ? { ...e, departmentId: undefined } : e)) }));
+    await hrAudit(ctx, "deleted department", dept.name);
+    refresh();
+    return done(`${dept.name} deleted.`);
+  });
+}
+
 export async function addStandardDepartmentsAction(): Promise<HrResult> {
   return guarded(async () => {
     const ctx = await requireHrAction("employees.manage");
@@ -1053,6 +1087,10 @@ export async function setMyDepartmentAction(_prev: HrResult | null, form: FormDa
     const dept = departments.find((d) => d.id === departmentId && d.active);
     if (!dept) return fail("Choose your department.");
     if (ctx.employee.departmentId === dept.id) return done("No change.");
+    // Only a first choice: once someone is in an active department, HR moves them (it changes who approves their leave).
+    if (ctx.employee.departmentId && departments.some((d) => d.id === ctx.employee.departmentId && d.active)) {
+      return fail("You already have a department. Ask HR to move you to another one.");
+    }
     const before = ctx.employee.department || "none";
     // Always the signed-in person's own record.
     await updateStore("hrEmployees", (items) => ({
@@ -1231,16 +1269,22 @@ export async function updateBankingAction(_prev: HrResult | null, form: FormData
     if (self ? !has(ctx.permissions, "self.update") : !has(ctx.permissions, "employees.manage")) throw new HrAccessError("You don't have permission to do that.");
     const bankName = text(form, "bankName", 80);
     const bankAccountName = text(form, "bankAccountName", 120);
-    const bankAccountNumber = text(form, "bankAccountNumber", 30).replace(/\s+/g, "");
-    if (bankAccountNumber && !/^\d{6,20}$/.test(bankAccountNumber)) return fail("The account number should be digits only (Nigerian NUBAN numbers have 10).");
+    // The full number is never sent to the browser, so a blank box keeps the number on file.
+    const typed = text(form, "bankAccountNumber", 30).replace(/\s+/g, "");
+    if (typed && !/^\d{10}$/.test(typed)) return fail("Enter the 10-digit NUBAN account number (digits only).");
     const person = (await readStore("hrEmployees")).find((e) => e.id === employeeId);
     if (!person) return fail("Employee not found.");
+    const bankAccountNumber = typed || person.bankAccountNumber || "";
+    const changed = bankName !== (person.bankName ?? "") || bankAccountName !== (person.bankAccountName ?? "") || bankAccountNumber !== (person.bankAccountNumber ?? "");
+    if (!changed) return done("No change.");
+    const now = new Date().toISOString();
     await updateStore("hrEmployees", (items) => ({
-      items: items.map((e) => (e.id === employeeId ? { ...e, bankName, bankAccountName, bankAccountNumber, updatedAt: new Date().toISOString() } : e)),
+      // A change the person makes themselves is flagged to HR before the next payroll.
+      items: items.map((e) => (e.id === employeeId ? { ...e, bankName, bankAccountName, bankAccountNumber, bankChangedAt: now, bankChangedBySelf: self, updatedAt: now } : e)),
     }));
     await hrAudit(ctx, self ? "updated own banking details" : "updated banking details", employeeName(person), bankAccountNumber ? `Account ending ${bankAccountNumber.slice(-4)}` : "Cleared");
     refresh();
-    return done("Banking details saved.");
+    return done(self ? "Bank details saved. HR is told, so they can check them before the next payroll." : "Bank details saved.");
   });
 }
 
@@ -1505,7 +1549,10 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
       reason,
       status,
       createdAt: now,
-      ...(status === "approved" || status === "rejected" ? { decidedByAccountId: "sample", decidedByName: "Aisha Bello (sample)", decidedAt: now } : {}),
+      // Decided by the person's line manager (or, for Grace, whoever loaded the data), never by themselves.
+      ...(status === "approved" || status === "rejected"
+        ? { decidedByAccountId: "sample", decidedByName: who === 4 ? ctx.displayName : `${employeeName(people.find((p) => p.id === people[who].managerId))} (sample)`, decidedAt: now }
+        : {}),
       sample: true,
     });
     const thisMonday = monday(0);
