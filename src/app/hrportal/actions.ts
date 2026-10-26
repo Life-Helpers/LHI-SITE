@@ -25,7 +25,7 @@ import {
   workingDays,
 } from "@/lib/hr/access";
 import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
-import { approvalRequired, balanceFor, withinBalance } from "@/lib/hr/leave-balance";
+import { approvalRequired, daysOverBalance } from "@/lib/hr/leave-balance";
 import { consumeHrToken, createHrToken, hrAudit, peekHrToken } from "@/lib/hr/data";
 import { createHrSession, destroyHrSession, HrAccessError, loadHrSession, requireHrAction, type HrContext } from "@/lib/hr/session";
 import {
@@ -274,6 +274,12 @@ export async function updateMyContactAction(_prev: HrResult | null, form: FormDa
   });
 }
 
+/** The refusal shown when a request asks for more days than are left. */
+function overMessage(days: number, left: number, typeName: string, startDate: string, who: "you" | "they") {
+  const remaining = Math.max(0, left);
+  return `That's ${days} working day${days === 1 ? "" : "s"}, but ${who === "you" ? "you have" : "they have"} only ${remaining} ${typeName} day${remaining === 1 ? "" : "s"} left in ${startDate.slice(0, 4)} (pending requests count too). Choose ${remaining ? `at most ${remaining} working day${remaining === 1 ? "" : "s"}` : "another leave type"}.`;
+}
+
 /** Validate a leave request for `employee`. Returns the details, or an error message. */
 async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "they") {
   const type = text(form, "type", 64);
@@ -308,13 +314,20 @@ async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "th
   if (reliever && leave.some((l) => l.employeeId === reliever.id && (l.status === "pending" || l.status === "approved") && l.startDate <= endDate && l.endDate >= startDate)) {
     return { error: `${employeeName(reliever)} has leave booked in those dates. Choose another reliever.` };
   }
-  const row = balanceFor(employee, Number(startDate.slice(0, 4)), types, policies, leave, adjustments).find((r) => r.type.id === type);
-  if (!withinBalance(row, days)) {
-    return {
-      error: `That's ${days} working days, but ${who === "you" ? "you have" : "they have"} ${Math.max(0, row!.available!)} ${leaveType.name.toLowerCase()} days left in ${startDate.slice(0, 4)} (including pending requests).`,
-    };
-  }
-  return { type, startDate, endDate, reason, days, typeName: leaveType.name, needsApproval: approvalRequired(employee, type, policies), reliever };
+  const over = daysOverBalance(employee, { id: "", type, startDate, days }, types, policies, leave, adjustments);
+  if (over > 0) return { error: overMessage(days, days - over, leaveType.name, startDate, who) };
+  return {
+    type,
+    startDate,
+    endDate,
+    reason,
+    days,
+    typeName: leaveType.name,
+    needsApproval: approvalRequired(employee, type, policies),
+    reliever,
+    /** Re-checks the balance against the leave list as it is at the moment of saving. */
+    overAtSave: (current: HrLeaveRequest[]) => daysOverBalance(employee, { id: "", type, startDate, days }, types, policies, current, adjustments),
+  };
 }
 
 export async function requestLeaveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
@@ -328,8 +341,12 @@ export async function requestLeaveAction(_prev: HrResult | null, form: FormData)
     // A policy marked "approval not required" approves the request at once (or when the reliever accepts).
     const approveNow = !needsApproval && !reliever;
     const auto = approveNow ? { decidedByAccountId: "policy", decidedByName: "Approved automatically (leave policy)", decidedAt: now } : {};
-    await updateStore("hrLeave", (items) => ({
-      items: [
+    const saved = await updateStore<"hrLeave", boolean>("hrLeave", (items) => {
+      // Checked again as the request is saved, so two requests sent at once can't both use the same days.
+      if (checked.overAtSave(items) > 0) return { items, result: false };
+      return {
+        result: true,
+        items: [
         {
           id: randomUUID(),
           employeeId: ctx.employee.id,
@@ -344,8 +361,10 @@ export async function requestLeaveAction(_prev: HrResult | null, form: FormData)
           ...auto,
         },
         ...items,
-      ],
-    }));
+        ],
+      };
+    });
+    if (!saved) return fail("Your leave balance changed while you were sending this request, and it no longer fits. Check your balance and try again.");
     if (approveNow) await hrAudit(ctx, "approved leave", `leave of ${employeeName(ctx.employee)}`, `${checked.typeName}, ${startDate} to ${endDate}: approval not required by policy`);
     refresh();
     const plural = `${days} working day${days === 1 ? "" : "s"}`;
@@ -371,8 +390,11 @@ export async function recordLeaveAction(_prev: HrResult | null, form: FormData):
     const { type, startDate, endDate, reason, days } = checked;
     const approved = text(form, "status", 10) === "approved";
     const now = new Date().toISOString();
-    await updateStore("hrLeave", (items) => ({
-      items: [
+    const saved = await updateStore<"hrLeave", boolean>("hrLeave", (items) => {
+      if (checked.overAtSave(items) > 0) return { items, result: false };
+      return {
+        result: true,
+        items: [
         {
           id: randomUUID(),
           employeeId,
@@ -388,8 +410,10 @@ export async function recordLeaveAction(_prev: HrResult | null, form: FormData):
           ...(approved ? { decidedByAccountId: ctx.account.id, decidedByName: ctx.displayName, decidedAt: now, decisionNote: "Recorded by HR" } : {}),
         },
         ...items,
-      ],
-    }));
+        ],
+      };
+    });
+    if (!saved) return fail("Their leave balance changed while this was being saved, and it no longer fits. Check their balance and try again.");
     await hrAudit(ctx, approved ? "recorded approved leave" : "recorded leave application", `leave of ${employeeName(employee)}`, `${checked.typeName}, ${startDate} to ${endDate} (${days} days)`);
     refresh();
     return done(`${checked.typeName} recorded for ${employeeName(employee)} (${days} working day${days === 1 ? "" : "s"}, ${approved ? "approved" : "pending"}).`);
@@ -420,14 +444,16 @@ export async function respondReliefAction(_prev: HrResult | null, form: FormData
     const answer = text(form, "answer", 10);
     const note = text(form, "note", 300);
     if (answer !== "accept" && answer !== "decline") return fail("Choose accept or decline.");
-    const [employees, policies] = await Promise.all([readStore("hrEmployees"), readStore("hrLeavePolicies")]);
+    const [employees, policies, types, adjustments] = await Promise.all([readStore("hrEmployees"), readStore("hrLeavePolicies"), readStore("hrLeaveTypes"), readStore("hrLeaveAdjustments")]);
     const now = new Date().toISOString();
     const updated = await updateStore("hrLeave", (items) => {
       const found = items.find((l) => l.id === id);
       // Always the signed-in person as reliever: nobody can answer for someone else.
       if (!found || found.relieverId !== ctx.employee.id || found.status !== "pending" || found.relieverStatus !== "pending") return { items, result: null };
       const requester = employees.find((e) => e.id === found.employeeId);
-      const autoApprove = answer === "accept" && requester !== undefined && !approvalRequired(requester, found.type, policies);
+      // Approved straight away only if no approval is needed and it still fits the balance; otherwise it waits for an approver.
+      const autoApprove =
+        answer === "accept" && requester !== undefined && !approvalRequired(requester, found.type, policies) && daysOverBalance(requester, found, types, policies, items, adjustments) === 0;
       const next = {
         ...found,
         relieverStatus: answer === "accept" ? ("accepted" as const) : ("declined" as const),
@@ -484,11 +510,16 @@ export async function decideLeaveAction(_prev: HrResult | null, form: FormData):
     const decision = text(form, "decision", 10);
     const note = text(form, "note", 500);
     if (decision !== "approve" && decision !== "reject") return fail("Choose approve or reject.");
-    const employees = await readStore("hrEmployees");
-    const decided = await updateStore<"hrLeave", HrLeaveRequest | "reliever" | null>("hrLeave", (items) => {
+    const [employees, types, policies, adjustments] = await Promise.all([readStore("hrEmployees"), readStore("hrLeaveTypes"), readStore("hrLeavePolicies"), readStore("hrLeaveAdjustments")]);
+    let over = 0;
+    const decided = await updateStore<"hrLeave", HrLeaveRequest | "reliever" | "over" | null>("hrLeave", (items) => {
       const found = items.find((l) => l.id === id);
       if (!found || !canDecideLeave(ctx.actor, found, employees, ctx.departments)) return { items, result: null };
       if (decision === "approve" && awaitingReliever(found)) return { items, result: "reliever" as const };
+      // The balance is checked again at approval: a policy or adjustment may have changed since the request.
+      const requester = employees.find((e) => e.id === found.employeeId);
+      over = decision === "approve" && requester ? daysOverBalance(requester, found, types, policies, items, adjustments) : 0;
+      if (over > 0) return { items, result: "over" as const };
       const next = {
         ...found,
         status: decision === "approve" ? ("approved" as const) : ("rejected" as const),
@@ -500,6 +531,7 @@ export async function decideLeaveAction(_prev: HrResult | null, form: FormData):
       return { items: items.map((l) => (l.id === id ? next : l)), result: next };
     });
     if (decided === "reliever") return fail("The reliever hasn't accepted yet, so this can't be approved. You can still reject it.");
+    if (decided === "over") return fail(`This request is ${over} working day${over === 1 ? "" : "s"} more than the leave they have left, so it can't be approved. Reject it, or ask HR to check their allowance.`);
     if (!decided) return fail("You can't decide this request (it may already be decided, be your own, or be outside your team).");
     const who = employeeName(employees.find((e) => e.id === decided.employeeId));
     await hrAudit(ctx, `${decided.status} leave`, `leave of ${who}`, `${decided.type}, ${decided.startDate} to ${decided.endDate} (${decided.days} days)${note ? `. Note: ${note}` : ""}`);

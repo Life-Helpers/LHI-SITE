@@ -665,6 +665,54 @@ test("leave types, policies and balances: HR sets allowances and requests can't 
   await admin.reload();
   await expect(admin.getByRole("button", { name: /^Annual Leave: Allowance 5 \+ adjusted 2/ })).toBeVisible();
 
+  // Nobody can book more than they have left. The manager now has 5 + 2 days, 2 already approved: 5 left.
+  const manager = pages.manager;
+  await manager.goto("/hrportal/me");
+  await manager.getByRole("button", { name: "Request Leave" }).click();
+  form = manager.getByRole("dialog").locator("form");
+  await expect(form.locator('select[name="type"] option[value="Annual"]')).toContainText("5 days left");
+  await form.getByLabel("From", { exact: true }).fill("2026-11-23");
+  await form.getByLabel("To", { exact: true }).fill("2026-11-30");
+  await form.locator('select[name="relieverId"]').selectOption(employeeIds.boss);
+  // The form counts 6 working days and won't send them...
+  await expect(form.getByRole("alert")).toContainText("you have only 5 Annual Leave days left");
+  await form.getByRole("button", { name: "Send request" }).click();
+  await expect(form.getByRole("status")).toHaveCount(0);
+  // ...and the server refuses them even when the browser check is bypassed.
+  await form.getByLabel("To", { exact: true }).evaluate((el: HTMLInputElement) => el.setCustomValidity(""));
+  await form.getByLabel("To", { exact: true }).evaluate((el: HTMLInputElement) => el.form!.requestSubmit());
+  await expect(form.locator("p[role=alert]").filter({ hasText: "left in 2026" })).toBeVisible();
+
+  // Five days fit. If HR lowers the allowance before approval, the approver can't approve it.
+  await form.getByLabel("From", { exact: true }).fill("2026-11-23");
+  await form.getByLabel("To", { exact: true }).fill("2026-11-27");
+  await form.locator('select[name="relieverId"]').selectOption(employeeIds.boss);
+  await expect(form.getByText("5 working days · 0 Annual Leave days left after this")).toBeVisible();
+  await form.getByRole("button", { name: "Send request" }).click();
+  await expect(form.getByRole("status")).toContainText("Leave request sent: 5 working days");
+  await acceptRelief(pages.boss, managerName);
+  await admin.goto("/hrportal/hr/leave/policies");
+  await admin.getByRole("row", { name: /Annual Leave Policy/ }).getByRole("button", { name: "Edit Annual Leave Policy" }).click();
+  form = admin.getByRole("dialog", { name: "Edit Annual Leave Policy" }).locator("form");
+  await form.locator('input[name="days"]').fill("3");
+  await form.getByRole("button", { name: "Save policy" }).click();
+  await expect(form.getByRole("status")).toBeVisible();
+  await pages.boss.goto("/hrportal/team");
+  const novRow = pages.boss.getByRole("row").filter({ hasText: "2026-11-23" });
+  await novRow.getByRole("button", { name: `Approve ${managerName}'s leave` }).click();
+  await expect(novRow.getByRole("alert")).toContainText("more than the leave they have left");
+  // Back to 5 days: now it can be approved.
+  await admin.reload();
+  await admin.getByRole("row", { name: /Annual Leave Policy/ }).getByRole("button", { name: "Edit Annual Leave Policy" }).click();
+  form = admin.getByRole("dialog", { name: "Edit Annual Leave Policy" }).locator("form");
+  await form.locator('input[name="days"]').fill("5");
+  await form.getByRole("button", { name: "Save policy" }).click();
+  await expect(form.getByRole("status")).toBeVisible();
+  await pages.boss.goto("/hrportal/team");
+  const approveManager = pages.boss.getByRole("row").filter({ hasText: "2026-11-23" }).getByRole("button", { name: `Approve ${managerName}'s leave` });
+  await approveManager.click();
+  await expect(approveManager).toHaveCount(0);
+
   // Staff and managers can't reach leave settings.
   for (const path of ["/hrportal/hr/leave/types", "/hrportal/hr/leave/policies", "/hrportal/hr/leave/balances"]) {
     await pages.staff.goto(path);

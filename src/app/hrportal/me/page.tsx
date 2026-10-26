@@ -13,7 +13,7 @@ import { ReliefPanel, relieverLabel } from "@/components/hr/relief-panel";
 import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { approversFor, has, relieverOptions } from "@/lib/hr/access";
-import { balanceFor } from "@/lib/hr/leave-balance";
+import { availableByType, balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName } from "@/lib/hr/types";
 
@@ -55,7 +55,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
           canRequest && (
             <Modal label="Request Leave" title="Request leave" description={annual ? `You have ${left} ${annual.type.name.toLowerCase()} days left this year.` : undefined}>
               <ActionForm action={requestLeaveAction} submitLabel="Send request" resetOnSuccess className="space-y-4">
-                <LeaveFields types={ctx.leaveTypes} relievers={relievers.map((e) => ({ id: e.id, label: relieverLabel(e) }))} relieverRequired />
+                <LeaveFields types={ctx.leaveTypes} relievers={relievers.map((e) => ({ id: e.id, label: relieverLabel(e) }))} relieverRequired available={availableByType(balances)} year={year} />
               </ActionForm>
             </Modal>
           )

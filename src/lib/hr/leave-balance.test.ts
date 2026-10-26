@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { approvalRequired, balanceFor, entitlementFor, withinBalance } from "@/lib/hr/leave-balance";
+import { approvalRequired, balanceFor, daysOverBalance, entitlementFor, withinBalance } from "@/lib/hr/leave-balance";
 import { DEFAULT_LEAVE_TYPES, type HrEmployee, type HrLeaveAdjustment, type HrLeavePolicy, type HrLeaveRequest, type HrLeaveType } from "@/lib/hr/types";
 
 const person = (opts: Partial<HrEmployee> = {}): HrEmployee =>
@@ -93,5 +93,19 @@ describe("balances", () => {
     const row = balanceFor(person(), 2026, types, [], [leave("Annual", "2026-03-02", 18)], []).find((r) => r.type.id === "Annual");
     expect(withinBalance(row, 2)).toBe(true);
     expect(withinBalance(row, 3)).toBe(false);
+  });
+
+  it("measure how far a request goes over, counting it once whether new, pending or being approved", () => {
+    const taken = [leave("Annual", "2026-03-02", 15)];
+    const request = { id: "new", type: "Annual", startDate: "2026-06-01", days: 7 };
+    expect(daysOverBalance(person(), request, types, [], taken, [])).toBe(2);
+    expect(daysOverBalance(person(), { ...request, days: 5 }, types, [], taken, [])).toBe(0);
+    // The same request already saved as pending isn't counted twice.
+    const saved = { ...leave("Annual", "2026-06-01", 5, "pending"), id: "new" };
+    expect(daysOverBalance(person(), { ...request, days: 5 }, types, [], [...taken, saved], [])).toBe(0);
+    // A lower policy set after the request was sent makes it go over at approval time.
+    expect(daysOverBalance(person(), { ...request, days: 5 }, types, [policy({ days: 18 })], [...taken, saved], [])).toBe(2);
+    // Types without a limit never go over.
+    expect(daysOverBalance(person(), { ...request, type: "Sick", days: 99 }, types, [], taken, [])).toBe(0);
   });
 });

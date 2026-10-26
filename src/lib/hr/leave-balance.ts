@@ -84,3 +84,27 @@ export function balanceFor(
 export function withinBalance(row: BalanceRow | undefined, days: number) {
   return !row || row.available === null || days <= row.available;
 }
+
+/**
+ * How many days this request goes over the person's balance (0 when it fits, or the type isn't
+ * limited). The request itself is left out of `leave` and counted once, so the answer is the same
+ * whether it's new, pending or being approved.
+ */
+export function daysOverBalance(
+  employee: HrEmployee,
+  request: Pick<HrLeaveRequest, "id" | "type" | "startDate" | "days">,
+  types: HrLeaveType[],
+  policies: HrLeavePolicy[],
+  leave: HrLeaveRequest[],
+  adjustments: HrLeaveAdjustment[],
+): number {
+  const others = leave.filter((l) => l.id !== request.id);
+  const row = balanceFor(employee, Number(request.startDate.slice(0, 4)), types, policies, others, adjustments).find((r) => r.type.id === request.type);
+  if (!row || row.available === null) return 0;
+  return Math.max(0, request.days - row.available);
+}
+
+/** Days left per leave type for a year (null = no limit), for the request form. */
+export function availableByType(rows: BalanceRow[]): Record<string, number | null> {
+  return Object.fromEntries(rows.map((r) => [r.type.id, r.available === null ? null : Math.max(0, r.available)]));
+}
