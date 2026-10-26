@@ -1,6 +1,6 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect, unstable_rethrow } from "next/navigation";
@@ -50,6 +50,7 @@ import {
   type HrLeavePolicy,
   type PayrollRule,
   type HrSalary,
+  type HrPayslip,
   type PayLine,
   type HrLeaveRequest,
   type HrLeaveType,
@@ -1412,13 +1413,17 @@ export async function addLeaveAdjustmentAction(_prev: HrResult | null, form: For
 
 /* ------------------------------------------------------------------ Sample data for testing */
 
-/** Five made-up staff (clearly marked SAMPLE) to try the portal with. */
+/**
+ * Five made-up staff (clearly marked SAMPLE) to try the portal with. Everyone has a line manager:
+ * Grace (Deputy Director) reports to whoever loads the data, Aisha and Chinedu to Grace, and
+ * Ibrahim and Fatima to Aisha.
+ */
 const SAMPLE_PEOPLE = [
-  { first: "Aisha", last: "Bello", title: "Programme Manager", dept: "Programmes", station: "Sokoto", type: "Full-time", role: "manager", status: "active", manager: null },
+  { first: "Aisha", last: "Bello", title: "Programme Manager", dept: "Programmes", station: "Sokoto", type: "Full-time", role: "manager", status: "active", manager: 4 },
   { first: "Ibrahim", last: "Musa", title: "Field Officer", dept: "Programmes", station: "Sokoto", type: "Full-time", role: "employee", status: "active", manager: 0 },
   { first: "Fatima", last: "Abubakar", title: "Nutrition Officer", dept: "Health & Nutrition", station: "Maiduguri", type: "Fixed-term contract", role: "employee", status: "probation", manager: 0 },
-  { first: "Chinedu", last: "Okafor", title: "Finance Officer", dept: "Finance & Grants", station: "Abuja", type: "Full-time", role: "finance_officer", status: "active", manager: null },
-  { first: "Grace", last: "Danjuma", title: "Deputy Director", dept: "Human Resources & Administration", station: "Sokoto", type: "Full-time", role: "management", status: "active", manager: null },
+  { first: "Chinedu", last: "Okafor", title: "Finance Officer", dept: "Finance & Grants", station: "Abuja", type: "Full-time", role: "finance_officer", status: "active", manager: 4 },
+  { first: "Grace", last: "Danjuma", title: "Deputy Director", dept: "Human Resources & Administration", station: "Sokoto", type: "Full-time", role: "management", status: "active", manager: "loader" },
 ] as const;
 
 /** Made-up monthly pay for each sample person (same order), to try payroll with. */
@@ -1430,17 +1435,21 @@ const SAMPLE_PAY: { basic: number; housing: number; transport: number; allowance
   { basic: 650_000, housing: 260_000, transport: 90_000, allowances: [{ name: "Responsibility allowance", amount: 60_000 }], deductions: [], bank: "UBA" },
 ];
 
+const roleName = (id: string) => BUILT_IN_HR_ROLES.find((r) => r.id === id)?.name ?? id;
+
 const sampleEmail = (first: string, last: string) => `${first}.${last}.sample@example.test`.toLowerCase();
 
 export async function loadSampleDataAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
     const ctx = await requireHrAction(["accounts.manage"]);
     if (!has(ctx.permissions, "employees.manage")) throw new HrAccessError("You don't have permission to do that.");
-    const password = String(form.get("password") ?? "");
-    if (password) {
-      const weak = validatePasswordStrength(password);
+    // Every sample person gets a login; with no password given, one is made up and shown once.
+    const chosen = String(form.get("password") ?? "");
+    if (chosen) {
+      const weak = validatePasswordStrength(chosen);
       if (weak) return fail(`Sample login password: ${weak}`);
     }
+    const password = chosen || `Sample-${randomBytes(4).toString("hex")}-${100 + (randomBytes(1)[0] % 900)}`;
     const [employees, departments, events] = await Promise.all([readStore("hrEmployees"), readStore("hrDepartments"), readStore("hrEvents")]);
     if (employees.some((e) => e.sample)) return fail("Sample data is already loaded. Remove it first to load it again.");
 
@@ -1482,7 +1491,7 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
       };
     });
     SAMPLE_PEOPLE.forEach((p, i) => {
-      if (p.manager !== null) people[i].managerId = people[p.manager].id;
+      people[i].managerId = p.manager === "loader" ? ctx.employee.id : people[p.manager].id;
     });
 
     const req = (who: number, type: string, start: string, end: string, status: HrLeaveRequest["status"], reason: string): HrLeaveRequest => ({
@@ -1517,9 +1526,36 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
         })
       : [];
     if (salaries.length) await updateStore("hrSalaries", (items) => ({ items: [...items, ...salaries] }));
+    // Published payslips for the last two months, so each sample person has some to view and download.
+    const slips: HrPayslip[] = [];
+    if (salaries.length && has(ctx.permissions, "payroll.runs")) {
+      const rules = payrollRules((await readStore("hrPayrollSettings"))[0]);
+      for (const back of [2, 1]) {
+        const first = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - back, 1));
+        const month = first.toISOString().slice(0, 7);
+        const holidays = holidayDates(events, first.getUTCFullYear());
+        let payDate = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).toISOString().slice(0, 10);
+        while (!isWorkingDay(payDate, holidays)) payDate = new Date(Date.parse(`${payDate}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+        people.forEach((e, i) => {
+          slips.push({
+            id: randomUUID(),
+            employeeId: e.id,
+            month,
+            status: "published",
+            employee: { name: employeeName(e), staffNumber: e.staffNumber, jobTitle: e.jobTitle, department: e.department, bankName: e.bankName ?? "", bankAccountEnding: (e.bankAccountNumber ?? "").slice(-4) },
+            ...monthlyPay(salaries[i], rules),
+            preparedByName: `${ctx.displayName} (sample)`,
+            createdAt: now,
+            publishedAt: now,
+            payDate,
+          });
+        });
+      }
+      await updateStore("hrPayslips", (items) => ({ items: [...items, ...slips] }));
+    }
 
     let logins = 0;
-    if (password) {
+    {
       const passwordHash = await hashPassword(password);
       const accounts: HrAccount[] = people.map((e, i) => ({
         id: randomUUID(),
@@ -1541,10 +1577,15 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
         return { items: [...items, ...fresh] };
       });
     }
-    await hrAudit(ctx, "loaded sample data", "sample records", `${people.length} sample employees, ${leave.length} leave requests, ${salaries.length} salaries, ${logins} sample logins`);
+    await hrAudit(ctx, "loaded sample data", "sample records", `${people.length} sample employees, ${leave.length} leave requests, ${salaries.length} salaries, ${slips.length} payslips, ${logins} sample logins`);
     refresh();
+    const loginList = people.map((e, i) => `${e.email} (${roleName(SAMPLE_PEOPLE[i].role)})`).join("; ");
     return done(
-      `Loaded ${people.length} sample employees, ${leave.length} leave requests${salaries.length ? ` and ${salaries.length} salaries (try Payroll Runs)` : ""}${logins ? `, with ${logins} sample logins (e.g. ${people[0].email} as Manager, ${people[3].email} as Finance Officer)` : ""}. Remove them any time with "Remove sample data".`,
+      `Loaded ${people.length} sample employees, ${leave.length} leave requests${salaries.length ? `, ${salaries.length} salaries` : ""}${slips.length ? ` and ${slips.length} published payslips` : ""}. ` +
+        (logins
+          ? `Sample logins, all with the password ${chosen ? "you entered" : password}: ${loginList}. Change any of them under Accounts. `
+          : "") +
+        `Remove everything any time with "Remove sample data".`,
     );
   });
 }

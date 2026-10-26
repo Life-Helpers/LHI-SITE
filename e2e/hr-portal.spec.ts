@@ -214,7 +214,7 @@ test("each role lands on its own dashboard and sees only its own navigation", as
   const nav = (p: Page) => p.getByRole("navigation", { name: "HR portal" });
   await expect(nav(pages.staff).getByRole("link")).toHaveText(["My record", "Calendar", "My payslips"]);
   await expect(nav(pages.manager).getByRole("link")).toHaveText(["My record", "Calendar", "My payslips", "My team"]);
-  await expect(nav(pages.boss).getByRole("link")).toHaveText(["Reports", "My record", "Calendar", "My payslips", "My team"]);
+  await expect(nav(pages.boss).getByRole("link")).toHaveText(["Analytics", "My record", "Calendar", "My payslips", "My team"]);
   await expect(nav(pages.officer).getByRole("link", { name: "Accounts" })).toHaveCount(0);
   await expect(nav(pages.admin).getByRole("link", { name: "Accounts" })).toHaveCount(1);
 });
@@ -704,12 +704,22 @@ test("HR and Finance set salaries and publish payslips; each person sees only th
 
   // The employee sees and can print their own payslip; nobody else (outside HR and Finance) can open it.
   await pages.staff.goto("/hrportal/payslips");
-  await pages.staff.getByRole("link", { name: /October 2026/ }).click();
+  await pages.staff.getByRole("link", { name: "View October 2026 payslip" }).click();
   await expect(pages.staff.getByRole("heading", { name: "Payslip" })).toBeVisible();
   await expect(pages.staff.getByText("Net pay", { exact: true })).toBeVisible();
-  await expect(pages.staff.getByRole("button", { name: "Print / Save as PDF" })).toBeVisible();
+  await expect(pages.staff.getByRole("button", { name: "Print" })).toBeVisible();
   await expect(pages.staff.getByRole("cell", { name: "Development levy" })).toBeVisible();
   expect((await pages.manager.goto(slipUrl))?.status()).toBe(404);
+  // It downloads as a PDF for its owner (and HR/Finance), and for nobody else.
+  const download = pages.staff.waitForEvent("download");
+  await pages.staff.getByRole("link", { name: "Download PDF" }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toMatch(/^payslip-2026-10-.+\.pdf$/);
+  const pdf = await pages.staff.request.get(`${slipUrl}/pdf`);
+  expect(pdf.headers()["content-type"]).toBe("application/pdf");
+  expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
+  expect((await admin.request.get(`${slipUrl}/pdf`)).status()).toBe(200);
+  expect((await pages.manager.request.get(`${slipUrl}/pdf`)).status()).toBe(404);
   // HR and Finance can see that it was opened.
   await admin.goto("/hrportal/payroll/payslips?year=2026&tab=viewed");
   await expect(admin.getByRole("row", { name: new RegExp(staffName) })).toContainText("Viewed");
@@ -1063,6 +1073,8 @@ test("HR loads sample records for testing and removes them in one go", async () 
   await admin.getByLabel(/Password for sample logins/).fill(PASSWORD);
   await admin.getByRole("button", { name: "Load sample data" }).click();
   await expect(admin.getByRole("main").getByRole("status")).toContainText("Loaded 5 sample employees");
+  await expect(admin.getByRole("main").getByRole("status")).toContainText("10 published payslips");
+  await expect(admin.getByRole("main").getByRole("status")).toContainText("chinedu.okafor.sample@example.test (Finance Officer)");
   await admin.goto("/hrportal/hr/employees?q=SAMPLE");
   await expect(admin.getByText("SAMPLE-005")).toBeVisible();
   // Sample salaries, ready to try a payroll run with.
@@ -1077,6 +1089,11 @@ test("HR loads sample records for testing and removes them in one go", async () 
   const sample = await freshPage();
   await signIn(sample, "aisha.bello.sample@example.test");
   await expect(sample).toHaveURL(/\/hrportal\/team/);
+  // Everyone has a line manager, and two payslips to view and download.
+  await sample.goto("/hrportal/me");
+  await expect(sample.locator("text=Grace Danjuma >> visible=true").first()).toBeVisible();
+  await sample.goto("/hrportal/payslips");
+  await expect(sample.getByRole("link", { name: /payslip as PDF/ })).toHaveCount(2);
   await sample.goto("/hrportal/hr/employees");
   await expect(sample).toHaveURL(/denied=1$/);
 

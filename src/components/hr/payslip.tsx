@@ -5,7 +5,7 @@ import type { HrPayslip, HrSalary, PayrollRule } from "@/lib/hr/types";
 import { Field, inputClass } from "@/components/hr/ui";
 
 /** A payslip laid out for screen and print (the portal's menus are hidden when printing). */
-export function PayslipView({ slip }: { slip: HrPayslip }) {
+export function PayslipView({ slip, preview = false }: { slip: HrPayslip; /** Worked out from the current salary, not issued. */ preview?: boolean }) {
   const rows = Math.max(slip.earnings.length, slip.deductions.length);
   return (
     <article className="hr-card mx-auto max-w-3xl p-6 print:border-0 print:shadow-none sm:p-8">
@@ -16,7 +16,11 @@ export function PayslipView({ slip }: { slip: HrPayslip }) {
         <div className="text-right">
           <h2 className="text-xl font-semibold">Payslip</h2>
           <p className="text-sm text-admin-muted">{payMonthLabel(slip.month)}</p>
-          {slip.status === "draft" && <p className="mt-1 inline-block rounded border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800">DRAFT: not yet published</p>}
+          {preview ? (
+            <p className="mt-1 inline-block rounded border border-blue-300 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-800">PREVIEW: from the current salary</p>
+          ) : (
+            slip.status === "draft" && <p className="mt-1 inline-block rounded border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800">DRAFT: not yet published</p>
+          )}
         </div>
       </header>
       <dl className="grid gap-x-6 gap-y-2 border-b border-admin-border py-5 text-sm sm:grid-cols-2">

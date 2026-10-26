@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ReceiptText } from "lucide-react";
+import { Download, Eye, ReceiptText } from "lucide-react";
 
 import { PortalShell } from "@/components/hr/portal-shell";
-import { PageTitle } from "@/components/hr/ui";
+import { outlineButtonClass, PageTitle } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { naira, payMonthLabel } from "@/lib/hr/payroll";
 import { requireHrPage } from "@/lib/hr/session";
@@ -16,26 +16,35 @@ export default async function MyPayslipsPage() {
   const slips = (await readStore("hrPayslips")).filter((p) => p.employeeId === ctx.employee.id && p.status === "published").sort((a, b) => b.month.localeCompare(a.month));
   return (
     <PortalShell ctx={ctx} current="/hrportal/payslips" crumbs={[{ label: "My payslips" }]}>
-      <PageTitle title="My payslips" subtitle="Your monthly payslips from HR and Finance. Open one to view or print it." />
+      <PageTitle title="My payslips" subtitle="Your monthly payslips from HR and Finance. View, print or download each one as a PDF." />
       <section className="hr-card overflow-hidden">
         <ul className="divide-y divide-admin-border">
           {slips.map((p) => (
-            <li key={p.id}>
-              <Link href={`/hrportal/payslips/${p.id}`} className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-admin-bg">
-                <span className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-admin-primary-soft text-admin-primary">
-                    <ReceiptText className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                  <span>
-                    <span className="block font-semibold">{payMonthLabel(p.month)}</span>
-                    <span className="block text-xs text-admin-muted">Issued {p.publishedAt?.slice(0, 10)}</span>
+            <li key={p.id} className="flex flex-wrap items-center justify-between gap-4 px-5 py-4">
+              <span className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-admin-primary-soft text-admin-primary">
+                  <ReceiptText className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <span>
+                  <span className="block font-semibold">{payMonthLabel(p.month)}</span>
+                  <span className="block text-xs text-admin-muted">
+                    Issued {p.publishedAt?.slice(0, 10)}
+                    {p.payDate ? ` · paid ${p.payDate}` : ""}
                   </span>
                 </span>
-                <span className="text-right">
+              </span>
+              <span className="flex flex-wrap items-center gap-3">
+                <span className="mr-2 text-right">
                   <span className="block text-xs text-admin-muted">Net pay</span>
                   <span className="block font-semibold tabular-nums">{naira(p.net)}</span>
                 </span>
-              </Link>
+                <Link href={`/hrportal/payslips/${p.id}`} aria-label={`View ${payMonthLabel(p.month)} payslip`} className={outlineButtonClass}>
+                  <Eye className="h-4 w-4" aria-hidden="true" /> View
+                </Link>
+                <a href={`/hrportal/payslips/${p.id}/pdf`} download aria-label={`Download ${payMonthLabel(p.month)} payslip as PDF`} className={outlineButtonClass}>
+                  <Download className="h-4 w-4" aria-hidden="true" /> PDF
+                </a>
+              </span>
             </li>
           ))}
         </ul>

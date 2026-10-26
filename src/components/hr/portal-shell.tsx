@@ -12,7 +12,7 @@ import type { HrPermission } from "@/lib/hr/types";
 /** Menu built from the signed-in person's permissions (display only: every page checks again). */
 const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrPermission[]; children?: { href: string; label: string; any?: HrPermission[] }[] }[] = [
   { group: "Overview", href: "/hrportal/hr", label: "Dashboard", icon: "dashboard", any: ["employees.view", "employees.manage", "accounts.manage"] },
-  { group: "Overview", href: "/hrportal/reports", label: "Reports", icon: "reports", any: ["reports.view"] },
+  { group: "Overview", href: "/hrportal/reports", label: "Analytics", icon: "reports", any: ["reports.view"] },
   { group: "Me", href: "/hrportal/me", label: "My record", icon: "me", any: ["self.view"] },
   { group: "Me", href: "/hrportal/calendar", label: "Calendar", icon: "calendar", any: ["self.view"] },
   { group: "Me", href: "/hrportal/payslips", label: "My payslips", icon: "payslips", any: ["self.view"] },

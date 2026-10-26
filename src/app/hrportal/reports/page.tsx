@@ -6,7 +6,7 @@ import { holidayDates } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Reports" };
+export const metadata = { title: "Analytics" };
 
 /** Organisation-wide figures for management. Totals only: no individual's details. */
 export default async function ReportsPage({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
@@ -18,9 +18,9 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   const holidays = holidayDates(await readStore("hrEvents"), Number(today.slice(0, 4)) - 1, Number(today.slice(0, 4)) + 1);
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/reports" crumbs={[{ label: "Reports" }]}>
+    <PortalShell ctx={ctx} current="/hrportal/reports" crumbs={[{ label: "Analytics" }]}>
       {denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
-      <PageTitle title="Reports" subtitle={`LHI-wide workforce and leave analytics, ${year}. Totals only: no one's personal details.`} />
+      <PageTitle title="Analytics" subtitle={`LHI-wide workforce and leave analytics, ${year}. The one place for these charts. Totals only: no one's personal details.`} />
       <OrgAnalytics holidays={holidays} employees={employees} leave={leave} types={ctx.leaveTypes} departments={ctx.departments} today={today} showPeople showLeave />
     </PortalShell>
   );

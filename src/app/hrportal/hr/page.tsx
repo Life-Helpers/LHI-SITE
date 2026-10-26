@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, Briefcase, CalendarCheck, ClipboardList, Gift, PartyPopper, Repeat, UserCheck, Users } from "lucide-react";
+import { Activity, ArrowRight, BarChart3, Briefcase, CalendarCheck, ClipboardList, Gift, PartyPopper, Repeat, UserCheck, Users } from "lucide-react";
 
 import { decideLeaveAction, loadSampleDataAction, removeSampleDataAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
@@ -256,10 +256,28 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
           </Card>
         )}
       </div>
-      <OrgAnalytics kpis={false} holidays={holidays} employees={employees} leave={leave} types={ctx.leaveTypes} departments={ctx.departments} today={today} showPeople={seesPeople} showLeave={seesLeave} />
+      {/* The charts live in one place, Analytics; only someone without it sees them here. */}
+      {has(p, "reports.view") ? (
+        <Link href="/hrportal/reports" className="hr-card mt-6 flex items-center justify-between gap-4 px-5 py-4 hover:shadow-md">
+          <span className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-admin-primary-soft text-admin-primary">
+              <BarChart3 className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <span>
+              <span className="block font-semibold">Workforce and leave analytics</span>
+              <span className="block text-sm text-admin-muted">Headcount, turnover, absence and leave trends over 12 months, all in Analytics.</span>
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-1 text-sm font-semibold text-admin-primary">
+            Open Analytics <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </span>
+        </Link>
+      ) : (
+        <OrgAnalytics kpis={false} holidays={holidays} employees={employees} leave={leave} types={ctx.leaveTypes} departments={ctx.departments} today={today} showPeople={seesPeople} showLeave={seesLeave} />
+      )}
       {has(p, "accounts.manage") && has(p, "employees.manage") && (
         <div className="mt-6">
-          <Card title="Sample data for testing" subtitle="Five made-up staff (staff numbers SAMPLE-001 to SAMPLE-005) with leave requests, to try the portal safely">
+          <Card title="Sample data for testing" subtitle="Five made-up staff (SAMPLE-001 to SAMPLE-005) with line managers, leave, salaries, payslips and logins, to try the portal safely">
             {/* Both forms stay mounted so each one's result message survives the refresh. */}
             <p className="mb-4 text-sm text-admin-muted">
               {sampleCount
@@ -268,11 +286,11 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
             </p>
             <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
               <ActionForm action={loadSampleDataAction} submitLabel="Load sample data" className="space-y-3">
-                <Field label="Password for sample logins (optional)" hint="Leave blank for records only. With a password, each sample person gets a login (e.g. aisha.bello.sample@example.test) so you can test each role.">
+                <Field label="Password for sample logins (optional)" hint="Each sample person gets a login (Employee, Manager, Finance Officer, Management) so you can test each role. Leave blank and a password is made up and shown once.">
                   <input type="password" name="password" autoComplete="new-password" className={`${inputClass} max-w-sm`} />
                 </Field>
               </ActionForm>
-              <ActionForm action={removeSampleDataAction} submitLabel="Remove sample data" danger confirmText="Remove all sample employees, their leave and sample logins?" />
+              <ActionForm action={removeSampleDataAction} submitLabel="Remove sample data" danger confirmText="Remove all sample employees with their leave, salaries, payslips and logins?" />
             </div>
           </Card>
         </div>

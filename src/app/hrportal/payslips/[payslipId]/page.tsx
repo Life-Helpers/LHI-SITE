@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 
 import { PayslipView } from "@/components/hr/payslip";
 import { PortalShell } from "@/components/hr/portal-shell";
@@ -34,7 +34,12 @@ export default async function PayslipPage({ params }: { params: Promise<{ paysli
         <Link href={back} className={outlineButtonClass}>
           <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back
         </Link>
-        <PrintButton />
+        <span className="flex flex-wrap gap-2">
+          <a href={`/hrportal/payslips/${slip.id}/pdf`} download className={outlineButtonClass}>
+            <Download className="h-4 w-4" aria-hidden="true" /> Download PDF
+          </a>
+          <PrintButton label="Print" />
+        </span>
       </div>
       <PayslipView slip={slip} />
     </PortalShell>

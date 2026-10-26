@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Eye, Search } from "lucide-react";
+import { Download, Eye, Search } from "lucide-react";
 
 import { CountTabs, MonthStrip } from "@/components/hr/payroll-ui";
 import { PortalShell } from "@/components/hr/portal-shell";
@@ -103,6 +103,9 @@ export default async function AdminPayslipsPage({ searchParams }: { searchParams
                       <Link href={`/hrportal/payslips/${s.id}`} aria-label={`View ${s.employee.name}'s payslip`} className="inline-flex rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
                         <Eye className="h-[18px] w-[18px]" aria-hidden="true" />
                       </Link>
+                      <a href={`/hrportal/payslips/${s.id}/pdf`} download aria-label={`Download ${s.employee.name}'s payslip as PDF`} className="inline-flex rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
+                        <Download className="h-[18px] w-[18px]" aria-hidden="true" />
+                      </a>
                     </td>
                   </tr>
                 );

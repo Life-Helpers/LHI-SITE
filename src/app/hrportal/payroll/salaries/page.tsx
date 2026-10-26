@@ -5,10 +5,10 @@ import { removeSalaryAction, saveSalaryAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { Modal } from "@/components/hr/modal";
 import { CountTabs } from "@/components/hr/payroll-ui";
-import { SalaryFields } from "@/components/hr/payslip";
+import { PayslipView, SalaryFields } from "@/components/hr/payslip";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { QuickAction } from "@/components/hr/quick-action";
-import { Badge, inputClass, PageTitle, Person } from "@/components/hr/ui";
+import { Badge, inputClass, PageTitle, Person, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { monthlyPay, naira, payrollRules } from "@/lib/hr/payroll";
 import { has } from "@/lib/hr/access";
@@ -42,6 +42,7 @@ export default async function SalariesPage({ searchParams }: { searchParams: Pro
   const counts = { all: filtered.length, active: filtered.filter((r) => r.salary).length, unset: filtered.filter((r) => !r.salary).length };
   const rows = filtered.filter((r) => tab === "all" || (tab === "active" ? r.salary : !r.salary));
   const base = "/hrportal/payroll/salaries";
+  const today = todayLagos();
   const canSet = has(ctx.permissions, "payroll.salaries.manage");
   const canSeeSlips = has(ctx.permissions, "payroll.payslips.view");
 
@@ -99,19 +100,27 @@ export default async function SalariesPage({ searchParams }: { searchParams: Pro
                   <td className="px-4 py-3">
                     <span className="flex items-center justify-center gap-1">
                       {pay && (
-                        <Modal label="View breakdown" iconOnly icon="view" title={`Monthly pay: ${employeeName(e)}`}>
-                          <dl className="space-y-1 text-sm">
-                            {[...pay.earnings.map((l) => ({ ...l, minus: false })), ...pay.deductions.map((l) => ({ ...l, minus: true }))].map((l, k) => (
-                              <div key={k} className="flex justify-between gap-4">
-                                <dt className="text-admin-muted">{l.name}</dt>
-                                <dd className="tabular-nums">{l.minus ? "−" : ""}{naira(l.amount)}</dd>
-                              </div>
-                            ))}
-                            <div className="flex justify-between gap-4 border-t border-admin-border pt-2 font-semibold">
-                              <dt>Net pay</dt>
-                              <dd className="tabular-nums">{naira(pay.net)}</dd>
-                            </div>
-                          </dl>
+                        <Modal label="View payslip" iconOnly icon="view" title={`Payslip preview: ${employeeName(e)}`} wide>
+                          <PayslipView
+                            preview
+                            slip={{
+                              id: "preview",
+                              employeeId: e.id,
+                              month: today.slice(0, 7),
+                              status: "draft",
+                              employee: {
+                                name: employeeName(e),
+                                staffNumber: e.staffNumber,
+                                jobTitle: e.jobTitle,
+                                department: e.department,
+                                bankName: e.bankName ?? "",
+                                bankAccountEnding: (e.bankAccountNumber ?? "").slice(-4),
+                              },
+                              ...pay,
+                              preparedByName: salary!.updatedByName,
+                              createdAt: salary!.updatedAt,
+                            }}
+                          />
                         </Modal>
                       )}
                       {!canSet ? null : e.id === ctx.employee.id ? (

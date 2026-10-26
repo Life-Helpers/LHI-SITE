@@ -141,7 +141,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
             {[
               ["Staff number", me.staffNumber || "—"],
               ["Duty station", me.location || "—"],
-              ["Line manager", manager ? employeeName(manager) : "—"],
+              ["Line manager", manager ? employeeName(manager) : "Not set yet (HR adds it)"],
               ["Work email", me.email || "—"],
               ["Start date", fmtDate(me.startDate)],
               ["Portal role", ctx.role.name],

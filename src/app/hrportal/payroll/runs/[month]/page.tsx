@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Eye, FileDown } from "lucide-react";
+import { ArrowLeft, Download, Eye, FileDown } from "lucide-react";
 
 import { discardPayslipDraftsAction, publishPayslipsAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
@@ -68,7 +68,7 @@ export default async function PayrollRunPage({ params }: { params: Promise<{ mon
                   <th scope="col" className="px-4 py-3 text-right">Deductions</th>
                   <th scope="col" className="px-4 py-3 text-right">Net</th>
                   <th scope="col" className="px-4 py-3">Status</th>
-                  <th scope="col" className="px-4 py-3 text-center">View</th>
+                  <th scope="col" className="px-4 py-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-admin-border">
@@ -87,6 +87,9 @@ export default async function PayrollRunPage({ params }: { params: Promise<{ mon
                       <Link href={`/hrportal/payslips/${p.id}`} aria-label={`View ${p.employee.name}'s payslip`} className="inline-flex rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
                         <Eye className="h-[18px] w-[18px]" aria-hidden="true" />
                       </Link>
+                      <a href={`/hrportal/payslips/${p.id}/pdf`} download aria-label={`Download ${p.employee.name}'s payslip as PDF`} className="inline-flex rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg hover:text-admin-text">
+                        <Download className="h-[18px] w-[18px]" aria-hidden="true" />
+                      </a>
                     </td>
                   </tr>
                 ))}
