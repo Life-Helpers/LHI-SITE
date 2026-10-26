@@ -28,6 +28,7 @@ import {
   workingDays,
 } from "@/lib/hr/access";
 import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
+import { isOccurrence } from "@/lib/hr/calendar";
 import { approvalRequired, daysOverBalance } from "@/lib/hr/leave-balance";
 import { consumeHrToken, createHrToken, hrAudit, peekHrToken } from "@/lib/hr/data";
 import { createHrSession, destroyHrSession, HrAccessError, loadHrSession, requireHrAction, type HrContext } from "@/lib/hr/session";
@@ -1602,6 +1603,9 @@ export async function saveCalendarEventAction(_prev: HrResult | null, form: Form
       repeatUntil,
       audience: current && !isHr ? current.audience : audience,
       ownerEmployeeId: current?.ownerEmployeeId ?? ctx.employee.id,
+      // Occurrences skipped or changed on their own stay that way when the series is edited.
+      ...(repeat !== "none" && current?.skipDates?.length ? { skipDates: current.skipDates } : {}),
+      ...(repeat !== "none" && current?.overrides?.length ? { overrides: current.overrides } : {}),
       createdByName: current?.createdByName ?? ctx.displayName,
       createdAt: current?.createdAt ?? new Date().toISOString(),
     };
@@ -1626,3 +1630,67 @@ export async function deleteCalendarEventAction(_prev: HrResult | null, form: Fo
     return done(`${event.title} removed from the calendar.`);
   });
 }
+
+/** Load a repeating entry the signed-in person may change, and check `date` is one of its occurrences. */
+async function loadOccurrence(form: FormData) {
+  const { ctx, isHr } = await requireCalendarEditor();
+  const id = text(form, "eventId", 64);
+  const date = text(form, "occurrenceDate", 10);
+  const event = (await readStore("hrEvents")).find((e) => e.id === id);
+  if (!event) throw new HrAccessError("Event not found.");
+  if (!canChangeEvent(ctx, isHr, event)) throw new HrAccessError("You can only change meetings you added.");
+  if (!event.repeat || event.repeat === "none" || !isDate(date) || !isOccurrence(event, date)) throw new HrAccessError("That isn't one of this meeting's dates.");
+  return { ctx, event, date };
+}
+
+/** Change one occurrence of a repeating entry (its date, time, title, place or details). */
+export async function saveOccurrenceAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const { ctx, event, date } = await loadOccurrence(form);
+    const title = text(form, "title", 120);
+    const startDate = text(form, "startDate", 10);
+    const endDate = text(form, "endDate", 10) || startDate;
+    const time = text(form, "time", 5);
+    if (!title) return fail("Give it a title.");
+    if (!isDate(startDate) || !isDate(endDate) || endDate < startDate) return fail("Enter a valid date.");
+    if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return fail("Enter the time as HH:MM, or leave it blank.");
+    const override = { date, startDate, endDate, time, title, location: text(form, "location", 120), description: text(form, "description", 500) };
+    await updateStore("hrEvents", (items) => ({
+      items: items.map((e) =>
+        e.id === event.id ? { ...e, overrides: [...(e.overrides ?? []).filter((o) => o.date !== date), override], skipDates: (e.skipDates ?? []).filter((d) => d !== date) } : e,
+      ),
+    }));
+    await hrAudit(ctx, "changed one occurrence", `${event.kind} ${event.title}`, `${date} → ${startDate}${time ? ` at ${time}` : ""}${title !== event.title ? `, "${title}"` : ""}`);
+    refresh();
+    return done(`Changed for ${date} only. The rest of the series is unchanged.`);
+  });
+}
+
+/** Take one occurrence out of a repeating entry (e.g. no stand-up on a public holiday). */
+export async function skipOccurrenceAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const { ctx, event, date } = await loadOccurrence(form);
+    await updateStore("hrEvents", (items) => ({
+      items: items.map((e) =>
+        e.id === event.id ? { ...e, skipDates: [...new Set([...(e.skipDates ?? []), date])].sort(), overrides: (e.overrides ?? []).filter((o) => o.date !== date) } : e,
+      ),
+    }));
+    await hrAudit(ctx, "skipped one occurrence", `${event.kind} ${event.title}`, date);
+    refresh();
+    return done(`Skipped on ${date}. You can restore it from the meeting's details.`);
+  });
+}
+
+/** Put a skipped or changed occurrence back as the series has it. */
+export async function restoreOccurrenceAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const { ctx, event, date } = await loadOccurrence(form);
+    await updateStore("hrEvents", (items) => ({
+      items: items.map((e) => (e.id === event.id ? { ...e, skipDates: (e.skipDates ?? []).filter((d) => d !== date), overrides: (e.overrides ?? []).filter((o) => o.date !== date) } : e)),
+    }));
+    await hrAudit(ctx, "restored one occurrence", `${event.kind} ${event.title}`, date);
+    refresh();
+    return done(`${date} is back as the series has it.`);
+  });
+}
+

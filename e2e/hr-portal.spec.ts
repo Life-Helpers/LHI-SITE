@@ -608,6 +608,33 @@ test("the calendar shows HR events to everyone, and leave only to those who may 
   await expect(staff.getByRole("button", { name: "Meeting: Team stand-up" })).toHaveCount(5);
   await pages.outsider.goto("/hrportal/calendar?view=month&date=2026-12-01");
   await expect(pages.outsider.getByRole("button", { name: "Meeting: Team stand-up" })).toHaveCount(0);
+  // One occurrence can be skipped or changed on its own.
+  const occ = (page: Page) => page.getByRole("button", { name: /^Meeting: Team stand-up/ });
+  await occ(manager).nth(2).click(); // Tue 15 Dec
+  let dlg = manager.getByRole("dialog", { name: "Team stand-up" }).filter({ hasText: "15 Dec 2026" });
+  manager.once("dialog", (d) => void d.accept());
+  await dlg.getByRole("button", { name: "Skip this date" }).click();
+  await expect(occ(manager)).toHaveCount(4);
+  await occ(manager).nth(2).click(); // Tue 22 Dec
+  dlg = manager.getByRole("dialog", { name: "Team stand-up" }).filter({ hasText: "22 Dec 2026" });
+  await dlg.getByLabel("Date", { exact: true }).fill("2026-12-23");
+  await dlg.getByLabel("Time (optional)").first().fill("11:30");
+  await dlg.getByRole("button", { name: "Save this occurrence" }).click();
+  await expect(manager.getByRole("button", { name: "Meeting: Team stand-up" }).filter({ hasText: "11:30" })).toHaveCount(1);
+  await staff.goto("/hrportal/calendar?view=day&date=2026-12-23");
+  await expect(staff.getByRole("button", { name: "Meeting: Team stand-up" })).toContainText("11:30");
+  await staff.goto("/hrportal/calendar?view=day&date=2026-12-22");
+  await expect(staff.getByRole("button", { name: "Meeting: Team stand-up" })).toHaveCount(0);
+  // ...and restored from the series' details.
+  await manager.reload();
+  await occ(manager).first().click();
+  dlg = manager.getByRole("dialog", { name: "Team stand-up" }).filter({ hasText: "1 Dec 2026" });
+  await dlg.getByText("All occurrences (the whole series)").click();
+  await dlg.getByRole("button", { name: "Restore" }).click();
+  await expect(dlg.getByRole("button", { name: "Restore" })).toHaveCount(0);
+  await manager.reload();
+  await expect(occ(manager)).toHaveCount(5);
+
   // A manager can't change HR's events.
   await manager.getByRole("button", { name: "Meeting: Quarterly Review" }).click();
   const hrEvent = manager.getByRole("dialog", { name: "Quarterly Review" });

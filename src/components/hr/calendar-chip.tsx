@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { X } from "lucide-react";
 
-import { deleteCalendarEventAction, saveCalendarEventAction } from "@/app/hrportal/actions";
+import { deleteCalendarEventAction, restoreOccurrenceAction, saveCalendarEventAction, saveOccurrenceAction, skipOccurrenceAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { Field, inputClass } from "@/components/hr/ui";
 import { KIND_STYLE } from "@/components/hr/calendar-style";
@@ -139,21 +139,19 @@ export function CalendarChip({
             {item.end !== item.start && ` – ${fmt(item.end)}`}
             {item.time && ` · ${item.time}`}
           </p>
-          {item.repeatLabel && <p className="text-admin-muted">{item.repeatLabel}. Changes apply to every occurrence.</p>}
+          {item.repeatLabel && <p className="text-admin-muted">{item.repeatLabel}.{item.overridden ? " This date was changed on its own." : ""}</p>}
           {item.detail && <p className="text-admin-muted">{item.detail}</p>}
           {personHref && (
             <a href={personHref} className="inline-block font-semibold text-admin-primary hover:underline">
               View their record
             </a>
           )}
-          {event && canEdit && (
+          {event && canEdit && item.occurrenceDate && (
+            <OccurrenceControls item={item} event={event} isHr={isHr} />
+          )}
+          {event && canEdit && !item.occurrenceDate && (
             <div className="space-y-4 border-t border-admin-border pt-4">
-              <ActionForm action={saveCalendarEventAction} submitLabel="Save event" className="space-y-4">
-                <EventFields event={event} isHr={isHr} />
-              </ActionForm>
-              <ActionForm action={deleteCalendarEventAction} submitLabel="Delete event" danger confirmText={`Remove ${event.title} from the calendar?`}>
-                <input type="hidden" name="eventId" value={event.id} />
-              </ActionForm>
+              <SeriesForms event={event} isHr={isHr} />
             </div>
           )}
         </div>
@@ -161,3 +159,91 @@ export function CalendarChip({
     </>
   );
 }
+
+function SeriesForms({ event, isHr }: { event: HrCalendarEvent; isHr: boolean }) {
+  return (
+    <>
+      <ActionForm action={saveCalendarEventAction} submitLabel="Save event" className="space-y-4">
+        <EventFields event={event} isHr={isHr} />
+      </ActionForm>
+      <ActionForm action={deleteCalendarEventAction} submitLabel={event.repeat && event.repeat !== "none" ? "Delete every occurrence" : "Delete event"} danger confirmText={`Remove ${event.title} from the calendar${event.repeat && event.repeat !== "none" ? " (every occurrence)" : ""}?`}>
+        <input type="hidden" name="eventId" value={event.id} />
+      </ActionForm>
+    </>
+  );
+}
+
+/** For one date of a repeating entry: change it, skip it, or reset it; or edit the whole series. */
+function OccurrenceControls({ item, event, isHr }: { item: CalendarItem; event: HrCalendarEvent; isHr: boolean }) {
+  const date = item.occurrenceDate!;
+  const override = event.overrides?.find((o) => o.date === date);
+  const keys = (
+    <>
+      <input type="hidden" name="eventId" value={event.id} />
+      <input type="hidden" name="occurrenceDate" value={date} />
+    </>
+  );
+  return (
+    <div className="space-y-5 border-t border-admin-border pt-4">
+      <section className="space-y-3">
+        <h3 className="text-sm font-semibold">
+          This occurrence only <span className="font-normal text-admin-muted">({fmt(date)}{item.overridden ? ", changed" : ""})</span>
+        </h3>
+        <ActionForm action={saveOccurrenceAction} submitLabel="Save this occurrence" className="space-y-3">
+          {keys}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Title">
+              <input name="title" required maxLength={120} defaultValue={override?.title ?? event.title} className={inputClass} />
+            </Field>
+            <Field label="Date">
+              <input name="startDate" type="date" required defaultValue={override?.startDate ?? item.start} className={inputClass} />
+            </Field>
+            {item.end !== item.start && <input type="hidden" name="endDate" value={override?.endDate ?? item.end} />}
+            <Field label="Time (optional)">
+              <input name="time" type="time" defaultValue={override?.time ?? event.time} className={inputClass} />
+            </Field>
+            <Field label="Location (optional)">
+              <input name="location" maxLength={120} defaultValue={override?.location ?? event.location} className={inputClass} />
+            </Field>
+          </div>
+          <Field label="Details (optional)">
+            <textarea name="description" rows={2} maxLength={500} defaultValue={override?.description ?? event.description} className={inputClass} />
+          </Field>
+        </ActionForm>
+        <div className="flex flex-wrap gap-3">
+          <ActionForm action={skipOccurrenceAction} submitLabel="Skip this date" danger confirmText={`Skip ${item.title} on ${fmt(date)}? The rest of the series stays.`}>
+            {keys}
+          </ActionForm>
+          {item.overridden && (
+            <ActionForm action={restoreOccurrenceAction} submitLabel="Reset to the series">
+              {keys}
+            </ActionForm>
+          )}
+        </div>
+      </section>
+      <details className="rounded-lg border border-admin-border">
+        <summary className="cursor-pointer px-3 py-2 text-sm font-semibold">All occurrences (the whole series)</summary>
+        <div className="space-y-4 border-t border-admin-border p-3">
+          {(event.skipDates?.length ?? 0) > 0 && (
+            <div>
+              <p className="text-xs font-medium text-admin-muted">Skipped dates</p>
+              <ul className="mt-1 space-y-1">
+                {event.skipDates!.map((d) => (
+                  <li key={d} className="flex items-center justify-between gap-3 text-sm">
+                    {fmt(d)}
+                    <ActionForm action={restoreOccurrenceAction} submitLabel="Restore" submitClassName="px-3 py-1 text-xs" className="flex">
+                      <input type="hidden" name="eventId" value={event.id} />
+                      <input type="hidden" name="occurrenceDate" value={d} />
+                    </ActionForm>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <SeriesForms event={event} isHr={isHr} />
+        </div>
+      </details>
+    </div>
+  );
+}
+

@@ -318,6 +318,18 @@ export interface HrLeaveRequest {
   sample?: boolean;
 }
 
+/** One occurrence of a repeating calendar entry, changed on its own. */
+export interface HrEventOverride {
+  /** The occurrence's original start date in the series. */
+  date: string;
+  startDate: string;
+  endDate: string;
+  time: string;
+  title: string;
+  location: string;
+  description: string;
+}
+
 /** A meeting, holiday or event HR puts on the portal calendar for all staff. */
 export interface HrCalendarEvent {
   id: string;
@@ -336,6 +348,10 @@ export interface HrCalendarEvent {
   audience?: "all" | "team";
   /** The employee who added it (a manager's team meetings belong to them). */
   ownerEmployeeId?: string;
+  /** Occurrences (by their original start date) taken out of a repeating series. */
+  skipDates?: string[];
+  /** Single occurrences changed on their own, keyed by the original start date they replace. */
+  overrides?: HrEventOverride[];
   createdByName: string;
   createdAt: string;
 }

@@ -142,3 +142,32 @@ describe("repeating meetings", () => {
   });
 });
 
+describe("single occurrences", () => {
+  const weekly = {
+    id: "w",
+    title: "Stand-up",
+    kind: "meeting" as const,
+    startDate: "2026-12-01",
+    endDate: "2026-12-01",
+    time: "09:00",
+    location: "",
+    description: "",
+    repeat: "weekly" as const,
+    repeatUntil: "2026-12-31",
+    skipDates: ["2026-12-15"],
+    overrides: [{ date: "2026-12-22", startDate: "2026-12-23", endDate: "2026-12-23", time: "10:00", title: "Stand-up (moved)", location: "Hall", description: "" }],
+    createdByName: "",
+    createdAt: "",
+  };
+
+  it("can be skipped or moved without changing the rest of the series", () => {
+    const items = calendarItems({ from: "2026-12-01", to: "2026-12-31", events: [weekly], leave: [], employees: [], types: [], birthdaysOf: [] }).filter((i) => i.eventId === "w");
+    expect(items.map((i) => [i.start, i.title, i.time, i.occurrenceDate, Boolean(i.overridden)])).toEqual([
+      ["2026-12-01", "Stand-up", "09:00", "2026-12-01", false],
+      ["2026-12-08", "Stand-up", "09:00", "2026-12-08", false],
+      ["2026-12-23", "Stand-up (moved)", "10:00", "2026-12-22", true],
+      ["2026-12-29", "Stand-up", "09:00", "2026-12-29", false],
+    ]);
+  });
+});
+

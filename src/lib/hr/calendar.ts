@@ -21,6 +21,10 @@ export interface CalendarItem {
   eventId?: string;
   /** e.g. "Repeats weekly until 31 Dec 2026". */
   repeatLabel?: string;
+  /** For a repeating entry: the occurrence's original start date in the series. */
+  occurrenceDate?: string;
+  /** This occurrence was changed on its own. */
+  overridden?: boolean;
   personId?: string;
 }
 
@@ -48,7 +52,21 @@ const lastDayOf = (y: number, m: number) => new Date(Date.UTC(y, m, 0)).getUTCDa
  * Daily repeats on working days (Monday to Friday); weekly on the same weekday; monthly on the
  * same date (or the month's last day when it's shorter).
  */
-export function occurrences(e: Pick<HrCalendarEvent, "startDate" | "endDate" | "repeat" | "repeatUntil">, from: string, to: string): { start: string; end: string }[] {
+export function occurrences(
+  e: Pick<HrCalendarEvent, "startDate" | "endDate" | "repeat" | "repeatUntil" | "skipDates" | "overrides">,
+  from: string,
+  to: string,
+): { start: string; end: string }[] {
+  // Skipped and individually changed occurrences are left out here (changed ones are added separately).
+  const out0 = seriesDates(e, from, to);
+  const removed = new Set([...(e.skipDates ?? []), ...(e.overrides ?? []).map((o) => o.date)]);
+  return out0.filter((o) => !removed.has(o.start));
+}
+
+/** Is `date` the start of an occurrence in the series (ignoring skips and changes)? */
+export const isOccurrence = (e: Pick<HrCalendarEvent, "startDate" | "endDate" | "repeat" | "repeatUntil">, date: string) => seriesDates(e, date, date).some((o) => o.start === date);
+
+function seriesDates(e: Pick<HrCalendarEvent, "startDate" | "endDate" | "repeat" | "repeatUntil">, from: string, to: string): { start: string; end: string }[] {
   const length = Math.round((Date.parse(`${e.endDate}T12:00:00Z`) - Date.parse(`${e.startDate}T12:00:00Z`)) / DAY);
   const until = e.repeat && e.repeat !== "none" ? (e.repeatUntil && e.repeatUntil < to ? e.repeatUntil : to) : e.startDate;
   const out: { start: string; end: string }[] = [];
@@ -117,8 +135,25 @@ export function calendarItems({
   for (const e of events) {
     const detail = [e.location, e.description].filter(Boolean).join(" · ") || undefined;
     const repeatLabel = e.repeat && e.repeat !== "none" ? `Repeats ${REPEAT_LABEL[e.repeat]}${e.repeatUntil ? ` until ${RESUME.format(new Date(`${e.repeatUntil}T12:00:00Z`))}` : ""}` : undefined;
+    const repeating = Boolean(repeatLabel);
     for (const o of occurrences(e, from, to)) {
-      items.push({ id: `ev-${e.id}-${o.start}`, kind: e.kind, title: e.title, start: o.start, end: o.end, time: e.time || undefined, detail, eventId: e.id, repeatLabel });
+      items.push({ id: `ev-${e.id}-${o.start}`, kind: e.kind, title: e.title, start: o.start, end: o.end, time: e.time || undefined, detail, eventId: e.id, repeatLabel, ...(repeating ? { occurrenceDate: o.start } : {}) });
+    }
+    for (const o of e.overrides ?? []) {
+      if (!touches(o.startDate, o.endDate)) continue;
+      items.push({
+        id: `ev-${e.id}-o-${o.date}`,
+        kind: e.kind,
+        title: o.title,
+        start: o.startDate,
+        end: o.endDate,
+        time: o.time || undefined,
+        detail: [o.location, o.description].filter(Boolean).join(" · ") || undefined,
+        eventId: e.id,
+        repeatLabel,
+        occurrenceDate: o.date,
+        overridden: true,
+      });
     }
   }
   for (const y of years) {
