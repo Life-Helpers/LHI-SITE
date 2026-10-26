@@ -212,9 +212,9 @@ test("each role lands on its own dashboard and sees only its own navigation", as
   await expect(pages.officer).toHaveURL(/\/hrportal\/hr$/);
 
   const nav = (p: Page) => p.getByRole("navigation", { name: "HR portal" });
-  await expect(nav(pages.staff).getByRole("link")).toHaveText(["My record", "Calendar"]);
-  await expect(nav(pages.manager).getByRole("link")).toHaveText(["My record", "Calendar", "My team"]);
-  await expect(nav(pages.boss).getByRole("link")).toHaveText(["Reports", "My record", "Calendar", "My team"]);
+  await expect(nav(pages.staff).getByRole("link")).toHaveText(["My record", "Calendar", "My payslips"]);
+  await expect(nav(pages.manager).getByRole("link")).toHaveText(["My record", "Calendar", "My payslips", "My team"]);
+  await expect(nav(pages.boss).getByRole("link")).toHaveText(["Reports", "My record", "Calendar", "My payslips", "My team"]);
   await expect(nav(pages.officer).getByRole("link", { name: "Accounts" })).toHaveCount(0);
   await expect(nav(pages.admin).getByRole("link", { name: "Accounts" })).toHaveCount(1);
 });
@@ -640,6 +640,52 @@ test("the calendar shows HR events to everyone, and leave only to those who may 
   const hrEvent = manager.getByRole("dialog", { name: "Quarterly Review" });
   await expect(hrEvent).toBeVisible();
   await expect(hrEvent.getByRole("button", { name: "Delete event" })).toHaveCount(0);
+});
+
+test("HR and Finance set salaries and publish payslips; each person sees only their own", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  const staffName = `${people.staff.first} ${people.staff.last}`;
+  // Payroll is for HR and Finance only.
+  for (const key of ["staff", "officer", "manager"] as const) {
+    await pages[key].goto("/hrportal/payroll");
+    await expect(pages[key]).toHaveURL(/denied=1$/);
+  }
+
+  await admin.goto("/hrportal/payroll");
+  await expect(admin.getByRole("row", { name: new RegExp(`${people.admin.first} ${people.admin.last}`) })).toContainText("Set by a colleague");
+  await admin.getByRole("button", { name: `Salary: ${staffName}` }).click();
+  const form = admin.getByRole("dialog", { name: `Salary: ${staffName}` }).locator("form");
+  await form.locator('input[name="basic"]').fill("300000");
+  await form.locator('input[name="housing"]').fill("150000");
+  await form.locator('input[name="transport"]').fill("50000");
+  await form.getByRole("button", { name: "Save salary" }).click();
+  await expect(form.getByRole("status")).toContainText(`Salary saved for ${staffName}`);
+  await admin.reload();
+  await expect(admin.getByRole("row", { name: new RegExp(staffName) })).toContainText("500,000.00");
+
+  // Drafts first: staff can't see them yet.
+  await admin.locator('input[name="month"]').fill("2026-10");
+  await admin.getByRole("button", { name: "Prepare payslips" }).click();
+  await expect(admin.getByRole("main").getByRole("status").first()).toContainText("draft payslip");
+  await admin.goto("/hrportal/payroll/2026-10");
+  const view = admin.getByRole("link", { name: `View ${staffName}'s payslip` });
+  const slipUrl = (await view.getAttribute("href"))!;
+  expect((await pages.staff.goto(slipUrl))?.status()).toBe(404);
+  await pages.staff.goto("/hrportal/payslips");
+  await expect(pages.staff.getByText("No payslips yet")).toBeVisible();
+
+  admin.once("dialog", (d) => void d.accept());
+  await admin.getByRole("button", { name: /^Publish \d+ draft/ }).click();
+  await expect(admin.getByRole("row", { name: new RegExp(staffName) })).toContainText("Published");
+
+  // The employee sees and can print their own payslip; nobody else (outside HR and Finance) can open it.
+  await pages.staff.goto("/hrportal/payslips");
+  await pages.staff.getByRole("link", { name: /October 2026/ }).click();
+  await expect(pages.staff.getByRole("heading", { name: "Payslip" })).toBeVisible();
+  await expect(pages.staff.getByText("Net pay", { exact: true })).toBeVisible();
+  await expect(pages.staff.getByRole("button", { name: "Print / Save as PDF" })).toBeVisible();
+  expect((await pages.manager.goto(slipUrl))?.status()).toBe(404);
 });
 
 test("HR imports employees from CSV and manages their status", async () => {

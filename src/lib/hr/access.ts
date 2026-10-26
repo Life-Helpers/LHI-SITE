@@ -209,6 +209,7 @@ export function homePath(perms: readonly HrPermission[]): string {
   if (has(perms, "accounts.manage") || has(perms, "employees.manage") || has(perms, "employees.view")) return "/hrportal/hr";
   if (has(perms, "reports.view")) return "/hrportal/reports";
   if (has(perms, "team.view")) return "/hrportal/team";
+  if (has(perms, "payroll.manage")) return "/hrportal/payroll";
   if (has(perms, "self.view")) return "/hrportal/me";
   return "/hrportal/no-access";
 }

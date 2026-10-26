@@ -42,6 +42,10 @@ export const HR_PERMISSION_GROUPS = [
     label: "Reports",
     items: [{ id: "reports.view", label: "View reports", help: "See organisation-wide headcount and leave reports." }],
   },
+  {
+    label: "Payroll",
+    items: [{ id: "payroll.manage", label: "Manage salaries & payslips", help: "Set every employee's salary, prepare and publish monthly payslips, and see all payslips." }],
+  },
 ] as const;
 
 export type HrPermission = (typeof HR_PERMISSION_GROUPS)[number]["items"][number]["id"];
@@ -83,6 +87,13 @@ export const BUILT_IN_HR_ROLES: HrRole[] = [
     name: "HR Officer",
     description: "Organisation-wide HR operations: employee records, reporting lines and leave.",
     permissions: [...SELF, "employees.view", "employees.manage", "leave.view_all", "leave.manage", "reports.view"],
+    builtIn: true,
+  },
+  {
+    id: "finance_officer",
+    name: "Finance Officer",
+    description: "Self-service plus salaries and monthly payslips for all staff.",
+    permissions: [...SELF, "payroll.manage"],
     builtIn: true,
   },
   {
@@ -368,6 +379,78 @@ export const FIXED_PUBLIC_HOLIDAYS: { md: string; title: string }[] = [
   { md: "12-25", title: "Christmas Day" },
   { md: "12-26", title: "Boxing Day" },
 ];
+
+/** One named amount on a salary or payslip (an allowance or a deduction). */
+export interface PayLine {
+  name: string;
+  amount: number;
+}
+
+/** An employee's monthly salary, set by HR or Finance. Amounts are in naira per month. */
+export interface HrSalary {
+  employeeId: string;
+  basic: number;
+  housing: number;
+  transport: number;
+  allowances: PayLine[];
+  /** Other regular deductions (e.g. a staff loan). */
+  deductions: PayLine[];
+  /** Employee pension contribution (a share of basic + housing + transport). */
+  pension: boolean;
+  /** National Housing Fund (a share of basic). */
+  nhf: boolean;
+  updatedAt: string;
+  updatedByName: string;
+}
+
+/** Payroll rates. PAYE bands are annual; `upTo` null means "and above". */
+export interface HrPayrollSettings {
+  id: "settings";
+  pensionRate: number;
+  nhfRate: number;
+  taxBands: { upTo: number | null; rate: number }[];
+  updatedAt: string;
+  updatedByName: string;
+}
+
+/**
+ * Starting rates: employee pension 8% (Pension Reform Act 2014), NHF 2.5% of basic, and the PAYE
+ * bands of the Nigeria Tax Act 2025 (from January 2026). Finance should confirm them; they're
+ * editable on the Payroll page.
+ */
+export const DEFAULT_PAYROLL_SETTINGS: HrPayrollSettings = {
+  id: "settings",
+  pensionRate: 8,
+  nhfRate: 2.5,
+  taxBands: [
+    { upTo: 800_000, rate: 0 },
+    { upTo: 3_000_000, rate: 15 },
+    { upTo: 12_000_000, rate: 18 },
+    { upTo: 25_000_000, rate: 21 },
+    { upTo: 50_000_000, rate: 23 },
+    { upTo: null, rate: 25 },
+  ],
+  updatedAt: "",
+  updatedByName: "",
+};
+
+/** A month's payslip: a fixed copy of the pay at the time, so later salary changes don't alter it. */
+export interface HrPayslip {
+  id: string;
+  employeeId: string;
+  /** "YYYY-MM". */
+  month: string;
+  status: "draft" | "published";
+  employee: { name: string; staffNumber: string; jobTitle: string; department: string; bankName: string; bankAccountEnding: string };
+  earnings: PayLine[];
+  deductions: PayLine[];
+  gross: number;
+  totalDeductions: number;
+  net: number;
+  preparedByName: string;
+  createdAt: string;
+  publishedAt?: string;
+}
 
 export interface HrAuditEntry {
   id: string;

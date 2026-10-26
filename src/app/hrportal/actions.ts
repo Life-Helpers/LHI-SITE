@@ -30,10 +30,12 @@ import {
 import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
 import { isOccurrence } from "@/lib/hr/calendar";
 import { approvalRequired, daysOverBalance } from "@/lib/hr/leave-balance";
+import { monthlyPay } from "@/lib/hr/payroll";
 import { consumeHrToken, createHrToken, hrAudit, peekHrToken } from "@/lib/hr/data";
 import { createHrSession, destroyHrSession, HrAccessError, loadHrSession, requireHrAction, type HrContext } from "@/lib/hr/session";
 import {
   BUILT_IN_HR_ROLES,
+  DEFAULT_PAYROLL_SETTINGS,
   employeeName,
   STANDARD_DEPARTMENTS,
   EMPLOYMENT_TYPES,
@@ -1694,3 +1696,169 @@ export async function restoreOccurrenceAction(_prev: HrResult | null, form: Form
   });
 }
 
+
+/* ------------------------------------------------------------------ Payroll */
+
+const money = (form: FormData, key: string) => {
+  const raw = text(form, key, 20).replace(/,/g, "");
+  if (raw === "") return 0;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 && n <= 1_000_000_000 ? Math.round(n * 100) / 100 : NaN;
+};
+const payLines = (form: FormData, prefix: string) => {
+  const lines: { name: string; amount: number }[] = [];
+  for (let i = 0; i < 6; i++) {
+    const name = text(form, `${prefix}_name_${i}`, 60);
+    const amount = money(form, `${prefix}_amount_${i}`);
+    if (!name && !amount) continue;
+    if (!name || Number.isNaN(amount)) return null;
+    lines.push({ name, amount });
+  }
+  return lines;
+};
+
+/** HR or Finance sets someone's monthly salary. Nobody sets their own. */
+export async function saveSalaryAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("payroll.manage");
+    const employeeId = text(form, "employeeId", 64);
+    if (employeeId === ctx.employee.id) return fail("Ask a colleague in HR or Finance to set your own salary.");
+    const person = (await readStore("hrEmployees")).find((e) => e.id === employeeId);
+    if (!person) return fail("Employee not found.");
+    const basic = money(form, "basic");
+    const housing = money(form, "housing");
+    const transport = money(form, "transport");
+    const allowances = payLines(form, "allowance");
+    const deductions = payLines(form, "deduction");
+    if ([basic, housing, transport].some(Number.isNaN)) return fail("Amounts must be numbers of naira (e.g. 250000).");
+    if (!basic) return fail("Enter the basic salary.");
+    if (!allowances || !deductions) return fail("Each extra allowance or deduction needs a name and an amount.");
+    const salary = {
+      employeeId,
+      basic,
+      housing,
+      transport,
+      allowances,
+      deductions,
+      pension: form.get("pension") !== null,
+      nhf: form.get("nhf") !== null,
+      updatedAt: new Date().toISOString(),
+      updatedByName: ctx.displayName,
+    };
+    const before = (await readStore("hrSalaries")).find((s) => s.employeeId === employeeId);
+    await updateStore("hrSalaries", (items) => ({ items: [...items.filter((s) => s.employeeId !== employeeId), salary] }));
+    // The amounts aren't written to the audit trail, only that the salary changed.
+    await hrAudit(ctx, before ? "changed salary" : "set salary", employeeName(person));
+    refresh();
+    return done(`Salary saved for ${employeeName(person)}. It applies to payslips prepared from now on.`);
+  });
+}
+
+export async function savePayrollSettingsAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("payroll.manage");
+    const pensionRate = Number(text(form, "pensionRate", 6));
+    const nhfRate = Number(text(form, "nhfRate", 6));
+    if (![pensionRate, nhfRate].every((r) => Number.isFinite(r) && r >= 0 && r <= 100)) return fail("Rates must be percentages from 0 to 100.");
+    const taxBands: { upTo: number | null; rate: number }[] = [];
+    for (let i = 0; i < 8; i++) {
+      const upToRaw = text(form, `band_upTo_${i}`, 20).replace(/,/g, "");
+      const rateRaw = text(form, `band_rate_${i}`, 6);
+      if (!upToRaw && !rateRaw) continue;
+      const rate = Number(rateRaw);
+      const upTo = upToRaw ? Number(upToRaw) : null;
+      if (!Number.isFinite(rate) || rate < 0 || rate > 100 || (upTo !== null && (!Number.isFinite(upTo) || upTo <= 0))) return fail(`Check tax band ${i + 1}.`);
+      taxBands.push({ upTo, rate });
+    }
+    if (!taxBands.length || taxBands.at(-1)!.upTo !== null) return fail("The last tax band must have no upper limit (leave its 'up to' blank).");
+    if (taxBands.some((b, i) => i > 0 && b.upTo !== null && b.upTo <= (taxBands[i - 1].upTo ?? Infinity))) return fail("Tax bands must go up in order.");
+    if (taxBands.slice(0, -1).some((b) => b.upTo === null)) return fail("Only the last band can have no upper limit.");
+    const settings = { id: "settings" as const, pensionRate, nhfRate, taxBands, updatedAt: new Date().toISOString(), updatedByName: ctx.displayName };
+    await updateStore("hrPayrollSettings", () => ({ items: [settings] }));
+    await hrAudit(ctx, "changed payroll rates", "payroll settings", `Pension ${pensionRate}%, NHF ${nhfRate}%, ${taxBands.length} PAYE bands`);
+    refresh();
+    return done("Payroll rates saved. They apply to payslips prepared from now on.");
+  });
+}
+
+/** Prepare draft payslips for a month for every current employee with a salary (published ones stay). */
+export async function preparePayslipsAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("payroll.manage");
+    const month = text(form, "month", 7);
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return fail("Choose a month.");
+    const [employees, salaries, settingsList, departments] = await Promise.all([readStore("hrEmployees"), readStore("hrSalaries"), readStore("hrPayrollSettings"), readStore("hrDepartments")]);
+    const settings = settingsList[0] ?? DEFAULT_PAYROLL_SETTINGS;
+    const now = new Date().toISOString();
+    const counts = await updateStore<"hrPayslips", { made: number; kept: number }>("hrPayslips", (items) => {
+      const published = new Set(items.filter((p) => p.month === month && p.status === "published").map((p) => p.employeeId));
+      const fresh = employees
+        .filter((e) => isCurrentStaff(e) && !published.has(e.id))
+        .flatMap((e) => {
+          const salary = salaries.find((s) => s.employeeId === e.id);
+          if (!salary) return [];
+          const pay = monthlyPay(salary, settings);
+          return [
+            {
+              id: randomUUID(),
+              employeeId: e.id,
+              month,
+              status: "draft" as const,
+              employee: {
+                name: employeeName(e),
+                staffNumber: e.staffNumber,
+                jobTitle: e.jobTitle,
+                department: departments.find((d) => d.id === e.departmentId)?.name ?? e.department,
+                bankName: e.bankName ?? "",
+                bankAccountEnding: (e.bankAccountNumber ?? "").slice(-4),
+              },
+              ...pay,
+              preparedByName: ctx.displayName,
+              createdAt: now,
+            },
+          ];
+        });
+      // Drafts for the month are replaced; published payslips are never changed.
+      return { items: [...items.filter((p) => !(p.month === month && p.status === "draft")), ...fresh], result: { made: fresh.length, kept: published.size } };
+    });
+    const missing = employees.filter((e) => isCurrentStaff(e) && !salaries.some((s) => s.employeeId === e.id)).length;
+    await hrAudit(ctx, "prepared payslips", `payslips ${month}`, `${counts?.made ?? 0} drafts`);
+    refresh();
+    return done(
+      `${counts?.made ?? 0} draft payslip${counts?.made === 1 ? "" : "s"} prepared for ${month}.${counts?.kept ? ` ${counts.kept} already published were left as they are.` : ""}${missing ? ` ${missing} current staff have no salary set yet.` : ""} Check them, then publish.`,
+    );
+  });
+}
+
+/** Publish a month's drafts: staff can then see and print them. Published payslips can't be changed. */
+export async function publishPayslipsAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("payroll.manage");
+    const month = text(form, "month", 7);
+    const now = new Date().toISOString();
+    const n = await updateStore<"hrPayslips", number>("hrPayslips", (items) => {
+      let count = 0;
+      const next = items.map((p) => (p.month === month && p.status === "draft" ? (count++, { ...p, status: "published" as const, publishedAt: now }) : p));
+      return { items: next, result: count };
+    });
+    if (!n) return fail("There are no drafts to publish for that month.");
+    await hrAudit(ctx, "published payslips", `payslips ${month}`, `${n} payslips`);
+    refresh();
+    return done(`${n} payslip${n === 1 ? "" : "s"} published. Staff can now view and print them under My payslips.`);
+  });
+}
+
+export async function discardPayslipDraftsAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("payroll.manage");
+    const month = text(form, "month", 7);
+    const n = await updateStore<"hrPayslips", number>("hrPayslips", (items) => {
+      const keep = items.filter((p) => !(p.month === month && p.status === "draft"));
+      return { items: keep, result: items.length - keep.length };
+    });
+    if (!n) return done("There were no drafts to discard.");
+    await hrAudit(ctx, "discarded payslip drafts", `payslips ${month}`, `${n} drafts`);
+    refresh();
+    return done(`${n} draft${n === 1 ? "" : "s"} discarded.`);
+  });
+}
