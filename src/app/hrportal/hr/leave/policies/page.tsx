@@ -1,18 +1,24 @@
-import { ScrollText } from "lucide-react";
+import Link from "next/link";
+import { ArrowUpDown, CalendarDays, CircleCheck, CircleX, LayoutGrid, Search } from "lucide-react";
 
-import { deleteLeavePolicyAction, saveLeavePolicyAction } from "@/app/hrportal/actions";
+import { deleteLeavePolicyAction, saveLeavePolicyAction, setLeavePolicyActiveAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
-import { LEAVE_COLOR_STYLE } from "@/components/hr/leave-style";
+import { AutoSubmitSelect } from "@/components/hr/filters";
+import { leaveName, leaveStyle } from "@/components/hr/leave-style";
 import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Badge, Card, Field, inputClass, PageTitle } from "@/components/hr/ui";
+import { hrefWith } from "@/components/hr/query";
+import { QuickAction } from "@/components/hr/quick-action";
+import { Badge, Field, inputClass, outlineButtonClass, PageTitle } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { has } from "@/lib/hr/access";
 import { requireHrPage, type HrContext } from "@/lib/hr/session";
-import { EMPLOYMENT_TYPES, type HrLeavePolicy } from "@/lib/hr/types";
+import { EMPLOYMENT_TYPES, isCurrentStaff, type HrLeavePolicy } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Leave policies" };
+
+type Params = { q?: string; type?: string; tab?: string; sort?: string; dir?: string };
 
 function PolicyFields({ policy, ctx }: { policy?: HrLeavePolicy; ctx: HrContext }) {
   return (
@@ -20,7 +26,33 @@ function PolicyFields({ policy, ctx }: { policy?: HrLeavePolicy; ctx: HrContext 
       {policy && <input type="hidden" name="policyId" value={policy.id} />}
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Policy name">
-          <input name="name" required defaultValue={policy?.name} placeholder="e.g. Standard staff leave" className={inputClass} />
+          <input name="name" required defaultValue={policy?.name} placeholder="e.g. Annual Leave Policy" className={inputClass} />
+        </Field>
+        <Field label="Leave type">
+          <select name="typeId" required defaultValue={policy?.typeId ?? ""} className={inputClass}>
+            <option value="" disabled>
+              Choose…
+            </option>
+            {ctx.leaveTypes
+              .filter((t) => t.active || t.id === policy?.typeId)
+              .map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+          </select>
+        </Field>
+        <Field label="Days a year" hint="Leave blank for no limit.">
+          <input name="days" type="number" min={0} max={366} step="0.5" defaultValue={policy?.days ?? ""} placeholder="No limit" className={inputClass} />
+        </Field>
+        <Field label="Carry forward (days)" hint="Most unused days that roll into next year. 0 = none.">
+          <input name="carryForward" type="number" min={0} max={366} defaultValue={policy?.carryForward ?? 0} className={inputClass} />
+        </Field>
+        <Field label="Approval" hint="Not required: requests are approved as soon as they're sent.">
+          <select name="approvalRequired" defaultValue={policy?.approvalRequired === false ? "false" : "true"} className={inputClass}>
+            <option value="true">Required</option>
+            <option value="false">Not required</option>
+          </select>
         </Field>
         <Field label="Applies to">
           <select name="scope" defaultValue={policy?.scope ?? "all"} className={inputClass}>
@@ -51,60 +83,70 @@ function PolicyFields({ policy, ctx }: { policy?: HrLeavePolicy; ctx: HrContext 
       <Field label="Description (optional)">
         <input name="description" defaultValue={policy?.description} className={inputClass} />
       </Field>
-      <fieldset className="rounded-lg border border-admin-border p-3">
-        <legend className="px-1 text-sm font-medium">Days a year per leave type</legend>
-        <p className="mb-3 text-xs text-admin-muted">Leave a box blank to use a broader policy or the leave type&apos;s default.</p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {ctx.leaveTypes
-            .filter((t) => t.active || policy?.entitlements[t.id] !== undefined)
-            .map((t) => (
-              <label key={t.id} className="flex items-center justify-between gap-3 text-sm">
-                <span className="inline-flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${LEAVE_COLOR_STYLE[t.color].dot}`} aria-hidden="true" />
-                  {t.name}
-                </span>
-                <input name={`days_${t.id}`} type="number" min={0} max={366} step="0.5" defaultValue={policy?.entitlements[t.id] ?? ""} placeholder={t.defaultDays === null ? "No limit" : String(t.defaultDays)} aria-label={`${t.name} days a year`} className={`${inputClass} mt-0 max-w-28`} />
-              </label>
-            ))}
-        </div>
-      </fieldset>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Carry-over limit (days)" hint="Most unused days that roll into next year, for leave types set to carry over.">
-          <input name="carryOverMax" type="number" min={0} max={366} defaultValue={policy?.carryOverMax ?? 0} className={inputClass} />
+      {policy && (
+        <Field label="Status">
+          <select name="active" defaultValue={policy.active ? "true" : "false"} className={`${inputClass} sm:w-1/2`}>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
         </Field>
-        {policy && (
-          <Field label="Status">
-            <select name="active" defaultValue={policy.active ? "true" : "false"} className={inputClass}>
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
-          </Field>
-        )}
-      </div>
+      )}
     </div>
   );
 }
 
-export default async function LeavePoliciesPage() {
+const TABS = [
+  { id: "all", label: "All", icon: LayoutGrid },
+  { id: "active", label: "Active", icon: CircleCheck },
+  { id: "inactive", label: "Inactive", icon: CircleX },
+] as const;
+
+export default async function LeavePoliciesPage({ searchParams }: { searchParams: Promise<Params> }) {
   const ctx = await requireHrPage(["leave.view_all", "leave.manage"]);
+  const params = await searchParams;
   const [policies, employees] = await Promise.all([readStore("hrLeavePolicies"), readStore("hrEmployees")]);
   const canManage = has(ctx.permissions, "leave.manage");
+  const types = ctx.leaveTypes;
+  const base = "/hrportal/hr/leave/policies";
+  const link = (changes: Record<string, string | undefined>) => hrefWith(base, params as Record<string, string | undefined>, changes);
+
+  const q = (params.q ?? "").trim().toLowerCase();
+  const typeFilter = types.some((t) => t.id === params.type) ? params.type! : "";
+  const tab = TABS.some((t) => t.id === params.tab) ? params.tab! : "all";
+  const filtered = policies.filter(
+    (p) => (!typeFilter || p.typeId === typeFilter) && (!q || `${p.name} ${leaveName(p.typeId, types)} ${p.description}`.toLowerCase().includes(q)),
+  );
+  const counts = { all: filtered.length, active: filtered.filter((p) => p.active).length, inactive: filtered.filter((p) => !p.active).length };
+  const typeOrder = (id: string) => {
+    const i = types.findIndex((t) => t.id === id);
+    return i === -1 ? types.length : i;
+  };
+  const sort = params.sort === "name" || params.sort === "created" ? params.sort : "";
+  const dir = params.dir === "desc" ? -1 : 1;
+  const rows = filtered
+    .filter((p) => tab === "all" || (tab === "active" ? p.active : !p.active))
+    .sort((a, b) =>
+      sort === "name"
+        ? dir * a.name.localeCompare(b.name)
+        : sort === "created"
+          ? dir * a.createdAt.localeCompare(b.createdAt)
+          : b.createdAt.localeCompare(a.createdAt) || typeOrder(a.typeId) - typeOrder(b.typeId),
+    );
+
   const scopeLabel = (p: HrLeavePolicy) =>
     p.scope === "all" ? "All staff" : p.scope === "department" ? `Department: ${ctx.departments.find((d) => d.id === p.scopeValue)?.name ?? "removed department"}` : `Employment type: ${p.scopeValue}`;
   const covered = (p: HrLeavePolicy) =>
-    employees.filter((e) => (e.status === "active" || e.status === "probation") && (p.scope === "all" || (p.scope === "department" ? e.departmentId === p.scopeValue : e.employmentType === p.scopeValue))).length;
-  const order = { department: 0, employmentType: 1, all: 2 } as const;
-  const sorted = [...policies].sort((a, b) => Number(b.active) - Number(a.active) || order[a.scope] - order[b.scope] || a.name.localeCompare(b.name));
-  const typeName = (id: string) => ctx.leaveTypes.find((t) => t.id === id)?.name ?? id;
+    employees.filter((e) => isCurrentStaff(e) && (p.scope === "all" || (p.scope === "department" ? e.departmentId === p.scopeValue : e.employmentType === p.scopeValue))).length;
+  const sortLink = (key: "name" | "created") => link({ sort: key, dir: sort === key && dir === 1 ? "desc" : undefined });
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/hr/leave/policies" crumbs={[{ label: "Leave Management", href: "/hrportal/hr/leave" }, { label: "Leave Policies" }]}>
+    <PortalShell ctx={ctx} current={base} crumbs={[{ label: "Leave Management", href: "/hrportal/hr/leave" }, { label: "Leave Policies" }]}>
       <PageTitle
         title="Leave Policies"
-        subtitle="Yearly leave allowances for groups of staff. A department's policy beats an employment-type policy, which beats the all-staff policy."
+        subtitle="Manage leave policies for your organization."
         actions={
           canManage && (
-            <Modal label="Add Leave Policy" title="Add a leave policy" wide>
+            <Modal label="Add Leave Policy" title="Add a leave policy" description="A department's policy beats an employment-type policy, which beats the all-staff policy." wide>
               <ActionForm action={saveLeavePolicyAction} submitLabel="Create policy" resetOnSuccess className="space-y-4">
                 <PolicyFields ctx={ctx} />
               </ActionForm>
@@ -112,58 +154,158 @@ export default async function LeavePoliciesPage() {
           )
         }
       />
-      {sorted.length === 0 && (
-        <Card>
-          <p className="py-6 text-center text-sm text-admin-muted">
-            No policies yet, so everyone gets each leave type&apos;s default allowance. Add an all-staff policy with LHI&apos;s allowances to get started.
-          </p>
-        </Card>
-      )}
-      <div className="grid gap-5 lg:grid-cols-2">
-        {sorted.map((p) => (
-          <section key={p.id} className="hr-card">
-            <div className="flex items-start justify-between gap-3 border-b border-admin-border px-5 py-4">
-              <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-admin-primary-soft text-admin-primary">
-                  <ScrollText className="h-5 w-5" aria-hidden="true" />
-                </span>
-                <div>
-                  <h2 className="font-semibold">{p.name}</h2>
-                  <p className="text-xs text-admin-muted">
-                    {scopeLabel(p)} · {covered(p)} staff
-                  </p>
-                </div>
-              </div>
-              <Badge status={p.active ? "active" : "cancelled"} label={p.active ? "Active" : "Inactive"} />
-            </div>
-            <div className="px-5 py-4 text-sm">
-              {p.description && <p className="mb-3 text-admin-muted">{p.description}</p>}
-              <ul className="divide-y divide-admin-border">
-                {Object.entries(p.entitlements).map(([id, d]) => (
-                  <li key={id} className="flex justify-between py-1.5">
-                    <span>{typeName(id)}</span>
-                    <span className="font-mono font-semibold">{d} days</span>
-                  </li>
-                ))}
-              </ul>
-              {Object.keys(p.entitlements).length === 0 && <p className="text-admin-muted">No allowances set.</p>}
-              <p className="mt-3 text-xs text-admin-muted">Carry-over limit: {p.carryOverMax} days</p>
-              {canManage && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Modal label="Edit" outline title={`Edit ${p.name}`} wide>
-                    <ActionForm action={saveLeavePolicyAction} submitLabel="Save policy" className="space-y-4">
-                      <PolicyFields policy={p} ctx={ctx} />
-                    </ActionForm>
-                  </Modal>
-                  <ActionForm action={deleteLeavePolicyAction} submitLabel="Delete" danger confirmText={`Delete the policy ${p.name}? Staff it covers fall back to broader policies.`}>
-                    <input type="hidden" name="policyId" value={p.id} />
-                  </ActionForm>
-                </div>
-              )}
-            </div>
-          </section>
-        ))}
-      </div>
+
+      <section className="hr-card mb-5">
+        <form method="get" action={base} className="flex flex-wrap items-center gap-3 px-4 pb-3 pt-4">
+          {tab !== "all" && <input type="hidden" name="tab" value={tab} />}
+          <div className="relative w-full max-w-64">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-admin-muted" aria-hidden="true" />
+            <input name="q" defaultValue={params.q ?? ""} placeholder="Search..." aria-label="Search policies" className={`${inputClass} mt-0 pl-9`} />
+          </div>
+          <AutoSubmitSelect name="type" defaultValue={typeFilter} aria-label="Leave type" className={`${inputClass} mt-0 max-w-48`}>
+            <option value="">All Leave Types</option>
+            {types.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </AutoSubmitSelect>
+          <button type="submit" className={`${outlineButtonClass} ml-auto`}>
+            Filters
+          </button>
+        </form>
+        <nav aria-label="Policy status" className="flex gap-1 overflow-x-auto border-t border-admin-border px-2">
+          {TABS.map((t) => (
+            <Link
+              key={t.id}
+              href={link({ tab: t.id === "all" ? undefined : t.id })}
+              aria-current={tab === t.id ? "page" : undefined}
+              className={`inline-flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium ${tab === t.id ? "border-admin-primary text-admin-primary" : "border-transparent text-admin-muted hover:text-admin-text"}`}
+            >
+              <t.icon className="h-4 w-4" aria-hidden="true" />
+              {t.label}
+              <span className={`rounded-full px-1.5 py-0.5 text-[11px] ${tab === t.id ? "bg-admin-primary text-white" : "bg-admin-bg text-admin-muted"}`}>{counts[t.id]}</span>
+            </Link>
+          ))}
+        </nav>
+      </section>
+
+      <section className="hr-card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[960px] text-left text-sm">
+            <thead>
+              <tr className="bg-admin-bg text-xs font-semibold text-admin-muted">
+                <th scope="col" className="px-4 py-3">#</th>
+                <th scope="col" className="px-4 py-3">
+                  <Link href={sortLink("name")} className="inline-flex items-center gap-1 hover:text-admin-text">
+                    Policy Name <ArrowUpDown className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Link>
+                </th>
+                <th scope="col" className="px-4 py-3">Leave Type</th>
+                <th scope="col" className="px-4 py-3">Days a Year</th>
+                <th scope="col" className="px-4 py-3">Carry Forward</th>
+                <th scope="col" className="px-4 py-3">Approval</th>
+                <th scope="col" className="px-4 py-3">Status</th>
+                <th scope="col" className="px-4 py-3">
+                  <Link href={sortLink("created")} className="inline-flex items-center gap-1 hover:text-admin-text">
+                    Created At <ArrowUpDown className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Link>
+                </th>
+                <th scope="col" className="px-4 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-admin-border">
+              {rows.map((p, i) => (
+                <tr key={p.id} className="hover:bg-admin-bg/60">
+                  <td className="px-4 py-3 text-admin-muted">{i + 1}</td>
+                  <td className="px-4 py-3">
+                    <span className="block font-medium">{p.name}</span>
+                    {p.scope !== "all" && <span className="block text-xs text-admin-muted">{scopeLabel(p)}</span>}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center gap-2">
+                      <span className={`h-2.5 w-2.5 rounded-full ${leaveStyle(p.typeId, types).dot}`} aria-hidden="true" />
+                      {leaveName(p.typeId, types)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 tabular-nums">{p.days === null ? "No limit" : `${p.days} days`}</td>
+                  <td className="px-4 py-3 tabular-nums">{p.carryForward} days</td>
+                  <td className="px-4 py-3">
+                    <Badge status={p.approvalRequired ? "pending" : "approved"} label={p.approvalRequired ? "Required" : "Not Required"} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge status={p.active ? "active" : "inactive"} label={p.active ? "Active" : "Inactive"} />
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-admin-muted">
+                    <span className="inline-flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                      {p.createdAt.slice(0, 10)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-1">
+                      <Modal label="View" iconOnly icon="view" title={p.name}>
+                        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                          {(
+                            [
+                              ["Leave type", leaveName(p.typeId, types)],
+                              ["Applies to", `${scopeLabel(p)} (${covered(p)} staff)`],
+                              ["Days a year", p.days === null ? "No limit" : `${p.days} days`],
+                              ["Carry forward", `${p.carryForward} days`],
+                              ["Approval", p.approvalRequired ? "Required" : "Not required (approved when sent)"],
+                              ["Status", p.active ? "Active" : "Inactive"],
+                              ["Created", p.createdAt.slice(0, 10)],
+                              ["Last changed", p.updatedAt.slice(0, 10)],
+                            ] as const
+                          ).map(([k, v]) => (
+                            <div key={k}>
+                              <dt className="text-xs text-admin-muted">{k}</dt>
+                              <dd className="font-medium">{v}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                        {p.description && <p className="mt-4 text-sm text-admin-muted">{p.description}</p>}
+                      </Modal>
+                      {canManage && (
+                        <>
+                          <Modal label="Edit" iconOnly icon="edit" title={`Edit ${p.name}`} wide>
+                            <ActionForm action={saveLeavePolicyAction} submitLabel="Save policy" className="space-y-4 text-left">
+                              <PolicyFields policy={p} ctx={ctx} />
+                            </ActionForm>
+                          </Modal>
+                          <QuickAction
+                            action={setLeavePolicyActiveAction}
+                            fields={{ policyId: p.id, active: p.active ? "false" : "true" }}
+                            kind={p.active ? "lock" : "unlock"}
+                            label={p.active ? `Lock ${p.name}` : `Unlock ${p.name}`}
+                            tip={p.active ? "Lock (make inactive)" : "Unlock (make active)"}
+                          />
+                          <QuickAction
+                            action={deleteLeavePolicyAction}
+                            fields={{ policyId: p.id }}
+                            kind="delete"
+                            label={`Delete ${p.name}`}
+                            tip="Delete"
+                            confirmText={`Delete ${p.name}? Staff it covers fall back to a broader policy or the leave type's default.`}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {rows.length === 0 && <p className="px-5 py-10 text-center text-sm text-admin-muted">No policies match.</p>}
+      </section>
+      <p className="mt-3 text-xs text-admin-muted">
+        Without an active policy, a leave type uses its default days from{" "}
+        <Link href="/hrportal/hr/leave/types" className="font-medium text-admin-primary hover:underline">
+          Leave Types
+        </Link>
+        . Locked policies stay on record but don&apos;t apply.
+      </p>
     </PortalShell>
   );
 }

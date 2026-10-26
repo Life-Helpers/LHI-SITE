@@ -44,7 +44,7 @@ import {
 } from "@/lib/cms/seed";
 import type { CollectionRecords } from "@/lib/cms/types";
 import type { HrAccount, HrAuditEntry, HrDepartment, HrEmployee, HrLeaveAdjustment, HrLeavePolicy, HrLeaveRequest, HrLeaveType, HrRole, HrToken } from "@/lib/hr/types";
-import { DEFAULT_LEAVE_TYPES } from "@/lib/hr/types";
+import { DEFAULT_LEAVE_POLICIES, DEFAULT_LEAVE_TYPES } from "@/lib/hr/types";
 
 /**
  * JSON content store. Each collection (posts, users, settings…) is one JSON document:
@@ -151,7 +151,7 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   hrRoles: () => [],
   hrLeave: () => [],
   hrLeaveTypes: () => structuredClone(DEFAULT_LEAVE_TYPES),
-  hrLeavePolicies: () => [],
+  hrLeavePolicies: () => structuredClone(DEFAULT_LEAVE_POLICIES),
   hrLeaveAdjustments: () => [],
   hrAudit: () => [],
   hrTokens: () => [],

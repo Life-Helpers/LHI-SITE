@@ -159,21 +159,42 @@ export const DEFAULT_LEAVE_TYPES: HrLeaveType[] = LEAVE_TYPES.map((id, i) => ({
  * Leave allowances for a group of staff. The most specific active policy wins for each leave
  * type: a department's policy, then an employment-type policy, then the all-staff policy.
  */
+/** The rules for one leave type, for all staff or a narrower group. */
 export interface HrLeavePolicy {
   id: string;
   name: string;
   description: string;
+  /** The leave type this policy is for. */
+  typeId: string;
+  /** Days a year; null = no limit. */
+  days: number | null;
+  /** Most unused days that roll into next year (0 = none). */
+  carryForward: number;
+  /** False: requests of this type are approved as soon as they're sent. */
+  approvalRequired: boolean;
   scope: "all" | "department" | "employmentType";
   /** Department id or employment type, for the narrower scopes. */
   scopeValue: string;
-  /** Days a year per leave type id. Types not listed fall back to a broader policy or the type's default. */
-  entitlements: Record<string, number>;
-  /** Most days of carried-over leave allowed into the next year (for types that carry over). */
-  carryOverMax: number;
   active: boolean;
   createdAt: string;
   updatedAt: string;
 }
+
+/** One all-staff policy per default leave type, served until HR saves its own. */
+export const DEFAULT_LEAVE_POLICIES: HrLeavePolicy[] = DEFAULT_LEAVE_TYPES.map((t) => ({
+  id: `lp_${t.id.toLowerCase()}`,
+  name: `${t.name} Policy`,
+  description: "",
+  typeId: t.id,
+  days: t.defaultDays,
+  carryForward: 0,
+  approvalRequired: true,
+  scope: "all",
+  scopeValue: "",
+  active: true,
+  createdAt: "2026-10-23T00:00:00.000Z",
+  updatedAt: "2026-10-23T00:00:00.000Z",
+}));
 
 /** A manual change to one person's balance for a year (e.g. days earned for weekend work). */
 export interface HrLeaveAdjustment {

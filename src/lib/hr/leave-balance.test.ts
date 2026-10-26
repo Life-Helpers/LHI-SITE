@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { balanceFor, entitlementFor, withinBalance } from "@/lib/hr/leave-balance";
+import { approvalRequired, balanceFor, entitlementFor, withinBalance } from "@/lib/hr/leave-balance";
 import { DEFAULT_LEAVE_TYPES, type HrEmployee, type HrLeaveAdjustment, type HrLeavePolicy, type HrLeaveRequest, type HrLeaveType } from "@/lib/hr/types";
 
 const person = (opts: Partial<HrEmployee> = {}): HrEmployee =>
@@ -12,10 +12,12 @@ const policy = (p: Partial<HrLeavePolicy>): HrLeavePolicy => ({
   id: p.id ?? "x",
   name: "",
   description: "",
+  typeId: "Annual",
+  days: 20,
+  carryForward: 0,
+  approvalRequired: true,
   scope: "all",
   scopeValue: "",
-  entitlements: {},
-  carryOverMax: 0,
   active: true,
   createdAt: "",
   updatedAt: "",
@@ -38,16 +40,28 @@ describe("leave allowances", () => {
     expect(entitlementFor(person(), annual, [])).toBe(20);
     expect(entitlementFor(person(), sick, [])).toBeNull();
     const policies = [
-      policy({ id: "all", entitlements: { Annual: 21, Sick: 10 } }),
-      policy({ id: "ft", scope: "employmentType", scopeValue: "Full-time", entitlements: { Annual: 22 } }),
-      policy({ id: "dept", scope: "department", scopeValue: "prog", entitlements: { Annual: 25 } }),
-      policy({ id: "off", scope: "department", scopeValue: "prog", entitlements: { Annual: 99 }, active: false }),
+      policy({ id: "all", days: 21 }),
+      policy({ id: "sick", typeId: "Sick", days: 10 }),
+      policy({ id: "ft", scope: "employmentType", scopeValue: "Full-time", days: 22 }),
+      policy({ id: "dept", scope: "department", scopeValue: "prog", days: 25 }),
+      policy({ id: "off", scope: "department", scopeValue: "prog", days: 99, active: false }),
     ];
     expect(entitlementFor(person(), annual, policies)).toBe(25);
     expect(entitlementFor(person({ departmentId: "fin" }), annual, policies)).toBe(22);
     expect(entitlementFor(person({ departmentId: "fin", employmentType: "Consultancy" }), annual, policies)).toBe(21);
-    // A type the specific policies don't mention falls through to the broader one.
+    // Each leave type has its own policies.
     expect(entitlementFor(person(), sick, policies)).toBe(10);
+    // A policy can lift the limit altogether.
+    expect(entitlementFor(person(), annual, [policy({ days: null })])).toBeNull();
+  });
+});
+
+describe("approval", () => {
+  it("is required unless the type's policy says otherwise", () => {
+    expect(approvalRequired(person(), "Sick", [])).toBe(true);
+    expect(approvalRequired(person(), "Sick", [policy({ typeId: "Sick", approvalRequired: false })])).toBe(false);
+    expect(approvalRequired(person(), "Annual", [policy({ typeId: "Sick", approvalRequired: false })])).toBe(true);
+    expect(approvalRequired(person(), "Sick", [policy({ typeId: "Sick", approvalRequired: false, active: false })])).toBe(true);
   });
 });
 
@@ -59,7 +73,7 @@ describe("balances", () => {
   });
 
   it("carry unused days into the next year up to the policy limit", () => {
-    const policies = [policy({ carryOverMax: 5 })];
+    const policies = [policy({ carryForward: 5 })];
     const rows = balanceFor(person(), 2027, types, policies, [leave("Annual", "2026-03-02", 12)], []);
     expect(rows.find((r) => r.type.id === "Annual")).toMatchObject({ carried: 5, total: 25 });
     const noCap = balanceFor(person(), 2027, types, [], [leave("Annual", "2026-03-02", 12)], []);

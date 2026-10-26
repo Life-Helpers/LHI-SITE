@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { FileUp, KeyRound, Plus, X } from "lucide-react";
+import { Eye, FileUp, KeyRound, Plus, SquarePen, X } from "lucide-react";
 
 import { Tip } from "@/components/hr/tooltip";
 
@@ -23,11 +23,11 @@ export function Modal({
   wide?: boolean;
   /** Secondary (outlined) button instead of the green one. */
   outline?: boolean;
-  icon?: "plus" | "upload" | "key";
+  icon?: "plus" | "upload" | "key" | "edit" | "view";
   /** Show just the icon (with a tooltip), e.g. in a table row. */
   iconOnly?: boolean;
 }) {
-  const Icon = icon === "upload" ? FileUp : icon === "key" ? KeyRound : Plus;
+  const Icon = { plus: Plus, upload: FileUp, key: KeyRound, edit: SquarePen, view: Eye }[icon];
   const ref = useRef<HTMLDialogElement>(null);
   return (
     <>

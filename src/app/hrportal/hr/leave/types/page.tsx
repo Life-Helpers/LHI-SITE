@@ -44,9 +44,6 @@ function TypeFields({ type }: { type?: HrLeaveType }) {
         <label className="flex items-center gap-2">
           <input type="checkbox" name="paid" defaultChecked={type?.paid ?? true} /> Paid leave
         </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" name="carryOver" defaultChecked={type?.carryOver ?? false} /> Unused days can carry over to next year
-        </label>
       </div>
       {type && (
         <Field label="Status">
@@ -89,7 +86,6 @@ export default async function LeaveTypesPage() {
                 <th scope="col" className="px-4 py-3">Leave Type</th>
                 <th scope="col" className="px-4 py-3">Days a Year</th>
                 <th scope="col" className="px-4 py-3">Paid</th>
-                <th scope="col" className="px-4 py-3">Carry Over</th>
                 <th scope="col" className="px-4 py-3">Requests</th>
                 <th scope="col" className="px-4 py-3">Status</th>
                 {canManage && <th scope="col" className="px-4 py-3"><span className="sr-only">Edit</span></th>}
@@ -107,7 +103,6 @@ export default async function LeaveTypesPage() {
                   </td>
                   <td className="px-4 py-3">{t.defaultDays === null ? <span className="text-admin-muted">No limit</span> : `${t.defaultDays} days`}</td>
                   <td className="px-4 py-3">{t.paid ? "Paid" : "Unpaid"}</td>
-                  <td className="px-4 py-3">{t.carryOver ? "Yes" : "No"}</td>
                   <td className="px-4 py-3">{leave.filter((l) => l.type === t.id).length}</td>
                   <td className="px-4 py-3">
                     <Badge status={t.active ? "active" : "cancelled"} label={t.active ? "Open" : "Retired"} />

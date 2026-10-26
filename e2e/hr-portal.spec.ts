@@ -552,13 +552,18 @@ test("leave types, policies and balances: HR sets allowances and requests can't 
   await admin.reload();
   await expect(admin.getByRole("cell", { name: "Hajj Leave" })).toBeVisible();
 
+  // Each leave type has its own policy row; a new type gets one automatically.
   await admin.goto("/hrportal/hr/leave/policies");
-  await admin.getByRole("button", { name: "Add Leave Policy" }).click();
-  form = admin.getByRole("dialog").locator("form");
-  await form.locator('input[name="name"]').fill("E2E short allowance");
-  await form.locator('input[name="days_Annual"]').fill("5");
-  await form.getByRole("button", { name: "Create policy" }).click();
+  await expect(admin.getByRole("row", { name: /Hajj Leave Policy/ })).toBeVisible();
+  const annualRow = admin.getByRole("row", { name: /Annual Leave Policy/ });
+  await expect(annualRow).toContainText("20 days");
+  await annualRow.getByRole("button", { name: "Edit Annual Leave Policy" }).click();
+  form = admin.getByRole("dialog", { name: "Edit Annual Leave Policy" }).locator("form");
+  await form.locator('input[name="days"]').fill("5");
+  await form.getByRole("button", { name: "Save policy" }).click();
   await expect(form.getByRole("status")).toBeVisible();
+  await admin.reload();
+  await expect(admin.getByRole("row", { name: /Annual Leave Policy/ })).toContainText("5 days");
 
   // The policy's 5 days apply at once, and a 6-day request is refused.
   await admin.goto(`/hrportal/hr/leave/balances?emp=${employeeIds.manager}&year=2026`);
@@ -591,10 +596,39 @@ test("leave types, policies and balances: HR sets allowances and requests can't 
     await expect(pages.staff).toHaveURL(/denied=1$/);
   }
 
+  // Locking a policy stops it applying (the type's default of 20 days returns); unlocking restores it.
+  await admin.goto("/hrportal/hr/leave/policies");
+  await admin.getByRole("row", { name: /Annual Leave Policy/ }).getByRole("button", { name: "Lock Annual Leave Policy" }).click();
+  await expect(admin.getByRole("row", { name: /Annual Leave Policy/ })).toContainText("Inactive");
+  await admin.goto(`/hrportal/hr/leave/balances?emp=${employeeIds.manager}&year=2026`);
+  await expect(admin.getByRole("button", { name: /^Annual Leave: Allowance 20 / })).toBeVisible();
+  await admin.goto("/hrportal/hr/leave/policies?tab=inactive");
+  await admin.getByRole("row", { name: /Annual Leave Policy/ }).getByRole("button", { name: "Unlock Annual Leave Policy" }).click();
+  await admin.goto("/hrportal/hr/leave/policies");
+  await expect(admin.getByRole("row", { name: /Annual Leave Policy/ })).toContainText("Active");
+
+  // "Approval not required": a request of that type is approved as soon as it's sent.
+  await admin.getByRole("row", { name: /Paternity Leave Policy/ }).getByRole("button", { name: "Edit Paternity Leave Policy" }).click();
+  form = admin.getByRole("dialog", { name: "Edit Paternity Leave Policy" }).locator("form");
+  await form.locator('select[name="approvalRequired"]').selectOption("false");
+  await form.getByRole("button", { name: "Save policy" }).click();
+  await expect(form.getByRole("status")).toBeVisible();
+  await admin.reload();
+  await expect(admin.getByRole("row", { name: /Paternity Leave Policy/ })).toContainText("Not Required");
+  await pages.officer.goto("/hrportal/me");
+  await pages.officer.getByRole("button", { name: "Request Leave" }).click();
+  form = pages.officer.getByRole("dialog").locator("form");
+  await form.locator('select[name="type"]').selectOption("Paternity");
+  await form.getByLabel("From", { exact: true }).fill("2026-11-02");
+  await form.getByLabel("To", { exact: true }).fill("2026-11-03");
+  await form.getByRole("button", { name: "Send request" }).click();
+  await expect(form.getByRole("status")).toContainText("Paternity Leave approved");
+
+  // Delete removes a policy for good.
   await admin.goto("/hrportal/hr/leave/policies");
   admin.once("dialog", (d) => void d.accept());
-  await admin.getByRole("button", { name: "Delete" }).click();
-  await expect(admin.getByText("E2E short allowance")).toHaveCount(0);
+  await admin.getByRole("row", { name: /Hajj Leave Policy/ }).getByRole("button", { name: "Delete Hajj Leave Policy" }).click();
+  await expect(admin.getByRole("row", { name: /Hajj Leave Policy/ })).toHaveCount(0);
 });
 
 test("HR loads sample records for testing and removes them in one go", async () => {

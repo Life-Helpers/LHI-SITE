@@ -4,23 +4,27 @@
  */
 import type { HrEmployee, HrLeaveAdjustment, HrLeavePolicy, HrLeaveRequest, HrLeaveType } from "@/lib/hr/types";
 
-/** Policies that apply to this person, most specific first. */
-export function policiesFor(employee: Pick<HrEmployee, "departmentId" | "employmentType">, policies: HrLeavePolicy[]): HrLeavePolicy[] {
-  const active = policies.filter((p) => p.active);
-  return [
-    ...active.filter((p) => p.scope === "department" && p.scopeValue && p.scopeValue === employee.departmentId),
-    ...active.filter((p) => p.scope === "employmentType" && p.scopeValue && p.scopeValue === employee.employmentType),
-    ...active.filter((p) => p.scope === "all"),
-  ];
+type Who = Pick<HrEmployee, "departmentId" | "employmentType">;
+
+/** The policy for this person and leave type: department beats employment type beats all staff. */
+export function policyFor(employee: Who, typeId: string, policies: HrLeavePolicy[]): HrLeavePolicy | undefined {
+  const mine = policies.filter((p) => p.active && p.typeId === typeId);
+  return (
+    mine.find((p) => p.scope === "department" && p.scopeValue && p.scopeValue === employee.departmentId) ??
+    mine.find((p) => p.scope === "employmentType" && p.scopeValue && p.scopeValue === employee.employmentType) ??
+    mine.find((p) => p.scope === "all")
+  );
 }
 
 /** Days a year of this leave type for this person, or null when the type isn't limited. */
-export function entitlementFor(employee: Pick<HrEmployee, "departmentId" | "employmentType">, type: HrLeaveType, policies: HrLeavePolicy[]): number | null {
-  for (const p of policiesFor(employee, policies)) {
-    const days = p.entitlements[type.id];
-    if (typeof days === "number" && days >= 0) return days;
-  }
-  return type.defaultDays;
+export function entitlementFor(employee: Who, type: HrLeaveType, policies: HrLeavePolicy[]): number | null {
+  const policy = policyFor(employee, type.id, policies);
+  return policy ? policy.days : type.defaultDays;
+}
+
+/** Does a request of this type need someone to approve it? (Yes unless its policy says not.) */
+export function approvalRequired(employee: Who, typeId: string, policies: HrLeavePolicy[]): boolean {
+  return policyFor(employee, typeId, policies)?.approvalRequired ?? true;
 }
 
 function taken(employeeId: string, typeId: string, year: number, leave: HrLeaveRequest[]) {
@@ -58,14 +62,14 @@ export function balanceFor(
   leave: HrLeaveRequest[],
   adjustments: HrLeaveAdjustment[],
 ): BalanceRow[] {
-  const carryCap = policiesFor(employee, policies).find((p) => p.carryOverMax > 0)?.carryOverMax ?? 0;
   return types
     .map((type) => {
       const entitlement = entitlementFor(employee, type, policies);
+      const carryCap = policyFor(employee, type.id, policies)?.carryForward ?? 0;
       const { approved, pending } = taken(employee.id, type.id, year, leave);
       const adj = adjusted(employee.id, type.id, year, adjustments);
       let carried = 0;
-      if (entitlement !== null && type.carryOver && carryCap > 0) {
+      if (entitlement !== null && carryCap > 0) {
         const prev = taken(employee.id, type.id, year - 1, leave);
         const prevLeft = entitlement + adjusted(employee.id, type.id, year - 1, adjustments) - prev.approved;
         carried = Math.max(0, Math.min(carryCap, prevLeft));

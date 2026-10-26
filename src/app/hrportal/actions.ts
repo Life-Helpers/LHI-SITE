@@ -23,7 +23,7 @@ import {
   workingDays,
 } from "@/lib/hr/access";
 import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
-import { balanceFor, withinBalance } from "@/lib/hr/leave-balance";
+import { approvalRequired, balanceFor, withinBalance } from "@/lib/hr/leave-balance";
 import { consumeHrToken, createHrToken, hrAudit, peekHrToken } from "@/lib/hr/data";
 import { createHrSession, destroyHrSession, HrAccessError, loadHrSession, requireHrAction, type HrContext } from "@/lib/hr/session";
 import {
@@ -301,7 +301,7 @@ async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "th
       error: `That's ${days} working days, but ${who === "you" ? "you have" : "they have"} ${Math.max(0, row!.available!)} ${leaveType.name.toLowerCase()} days left in ${startDate.slice(0, 4)} (including pending requests).`,
     };
   }
-  return { type, startDate, endDate, reason, days, typeName: leaveType.name };
+  return { type, startDate, endDate, reason, days, typeName: leaveType.name, needsApproval: approvalRequired(employee, type, policies) };
 }
 
 export async function requestLeaveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
@@ -310,15 +310,20 @@ export async function requestLeaveAction(_prev: HrResult | null, form: FormData)
     // Always for the signed-in person: no employee id is taken from the form.
     const checked = await checkLeave(form, ctx.employee, "you");
     if ("error" in checked) return fail(checked.error!);
-    const { type, startDate, endDate, reason, days } = checked;
+    const { type, startDate, endDate, reason, days, needsApproval } = checked;
+    const now = new Date().toISOString();
+    // A policy marked "approval not required" approves the request at once.
+    const auto = needsApproval ? {} : { decidedByAccountId: "policy", decidedByName: "Approved automatically (leave policy)", decidedAt: now };
     await updateStore("hrLeave", (items) => ({
-      items: [
-        { id: randomUUID(), employeeId: ctx.employee.id, type, startDate, endDate, days, reason, status: "pending" as const, createdAt: new Date().toISOString() },
-        ...items,
-      ],
+      items: [{ id: randomUUID(), employeeId: ctx.employee.id, type, startDate, endDate, days, reason, status: needsApproval ? ("pending" as const) : ("approved" as const), createdAt: now, ...auto }, ...items],
     }));
+    if (!needsApproval) await hrAudit(ctx, "approved leave", `leave of ${employeeName(ctx.employee)}`, `${checked.typeName}, ${startDate} to ${endDate}: approval not required by policy`);
     refresh();
-    return done(`Leave request sent: ${days} working day${days === 1 ? "" : "s"}.`);
+    return done(
+      needsApproval
+        ? `Leave request sent: ${days} working day${days === 1 ? "" : "s"}.`
+        : `${checked.typeName} approved: ${days} working day${days === 1 ? "" : "s"}. This leave type doesn't need approval.`,
+    );
   });
 }
 
@@ -1016,10 +1021,20 @@ export async function saveLeaveTypeAction(_prev: HrResult | null, form: FormData
       color,
       paid: form.get("paid") !== null,
       defaultDays,
-      carryOver: form.get("carryOver") !== null,
+      carryOver: current?.carryOver ?? false,
       active: existingId ? text(form, "active", 5) !== "false" : true,
     };
     await updateStore("hrLeaveTypes", (items) => ({ items: current ? items.map((t) => (t.id === type.id ? type : t)) : [...items, type] }));
+    if (!current) {
+      // Every new type starts with its own all-staff policy, so it shows (and can be tuned) under Leave Policies.
+      const now = new Date().toISOString();
+      await updateStore("hrLeavePolicies", (items) => ({
+        items: [
+          ...items,
+          { id: `lp_${randomUUID().slice(0, 8)}`, name: `${name} Policy`, description: "", typeId: type.id, days: defaultDays, carryForward: 0, approvalRequired: true, scope: "all" as const, scopeValue: "", active: true, createdAt: now, updatedAt: now },
+        ],
+      }));
+    }
     const days = (d: number | null) => (d === null ? "no limit" : `${d} days`);
     await hrAudit(
       ctx,
@@ -1039,49 +1054,67 @@ export async function saveLeavePolicyAction(_prev: HrResult | null, form: FormDa
     const ctx = await requireHrAction("leave.manage");
     const existingId = text(form, "policyId", 64);
     const name = text(form, "name", 80);
-    const scope = text(form, "scope", 20) as HrLeavePolicy["scope"];
+    const typeId = text(form, "typeId", 64);
+    const scope = (text(form, "scope", 20) || "all") as HrLeavePolicy["scope"];
     const scopeValue = scope === "department" ? text(form, "departmentId", 64) : scope === "employmentType" ? text(form, "employmentType", 40) : "";
+    const days = daysOrNull(text(form, "days", 6));
+    const carryForward = Number(text(form, "carryForward", 4) || 0);
     if (!name) return fail("Give the policy a name.");
+    const types = await readStore("hrLeaveTypes");
+    const type = types.find((t) => t.id === typeId);
+    if (!type) return fail("Choose a leave type.");
+    if (days === undefined) return fail("Days a year must be a number from 0 to 366, or blank for no limit.");
+    if (!Number.isFinite(carryForward) || carryForward < 0 || carryForward > 366) return fail("Carry forward must be a number of days from 0 to 366.");
     if (!["all", "department", "employmentType"].includes(scope)) return fail("Choose who the policy applies to.");
     if (scope === "department" && !ctx.departments.some((d) => d.id === scopeValue)) return fail("Choose a department.");
     if (scope === "employmentType" && !(EMPLOYMENT_TYPES as readonly string[]).includes(scopeValue)) return fail("Choose an employment type.");
-    const types = await readStore("hrLeaveTypes");
-    const entitlements: Record<string, number> = {};
-    for (const t of types) {
-      const raw = text(form, `days_${t.id}`, 6);
-      if (raw === "") continue;
-      const d = daysOrNull(raw);
-      if (d === undefined || d === null) return fail(`Days for ${t.name} must be a number from 0 to 366, or blank.`);
-      entitlements[t.id] = d;
-    }
-    const carry = Number(text(form, "carryOverMax", 4) || 0);
-    if (!Number.isFinite(carry) || carry < 0 || carry > 366) return fail("Carry-over must be a number of days from 0 to 366.");
     const policies = await readStore("hrLeavePolicies");
     const current = existingId ? policies.find((p) => p.id === existingId) : undefined;
     if (existingId && !current) return fail("Policy not found.");
-    if (policies.some((p) => p.active && p.id !== existingId && p.scope === scope && p.scopeValue === scopeValue && text(form, "active", 5) !== "false")) {
-      return fail("Another active policy already covers the same staff. Edit that one instead.");
+    const active = existingId ? text(form, "active", 5) !== "false" : true;
+    if (active && policies.some((p) => p.active && p.id !== existingId && p.typeId === typeId && p.scope === scope && p.scopeValue === scopeValue)) {
+      return fail(`Another active ${type.name} policy already covers the same staff. Edit that one instead.`);
     }
     const now = new Date().toISOString();
     const policy: HrLeavePolicy = {
       id: current?.id ?? `lp_${randomUUID().slice(0, 8)}`,
       name,
       description: text(form, "description", 300),
+      typeId,
+      days,
+      carryForward: Math.round(carryForward),
+      approvalRequired: text(form, "approvalRequired", 5) !== "false",
       scope,
       scopeValue,
-      entitlements,
-      carryOverMax: Math.round(carry),
-      active: existingId ? text(form, "active", 5) !== "false" : true,
+      active,
       createdAt: current?.createdAt ?? now,
       updatedAt: now,
     };
     await updateStore("hrLeavePolicies", (items) => ({ items: current ? items.map((p) => (p.id === policy.id ? policy : p)) : [...items, policy] }));
-    const summary = Object.entries(entitlements)
-      .map(([id, d]) => `${types.find((t) => t.id === id)?.name ?? id}: ${d}`)
-      .join(", ");
-    await hrAudit(ctx, current ? "changed leave policy" : "created leave policy", `leave policy ${name}`, `${summary || "no allowances"}; carry-over up to ${policy.carryOverMax} days${policy.active ? "" : "; inactive"}`);
+    const summary = `${type.name}: ${days === null ? "no limit" : `${days} days`}; carry forward ${policy.carryForward} days; approval ${policy.approvalRequired ? "required" : "not required"}${active ? "" : "; inactive"}`;
+    await hrAudit(ctx, current ? "changed leave policy" : "created leave policy", `leave policy ${name}`, summary);
     refresh();
     return done(current ? `${name} saved. Balances are updated straight away.` : `${name} created. Balances are updated straight away.`);
+  });
+}
+
+/** Lock (pause) or unlock a policy without deleting it. */
+export async function setLeavePolicyActiveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("leave.manage");
+    const id = text(form, "policyId", 64);
+    const active = text(form, "active", 5) === "true";
+    const policies = await readStore("hrLeavePolicies");
+    const policy = policies.find((p) => p.id === id);
+    if (!policy) return fail("Policy not found.");
+    if (policy.active === active) return done("No change.");
+    if (active && policies.some((p) => p.active && p.id !== id && p.typeId === policy.typeId && p.scope === policy.scope && p.scopeValue === policy.scopeValue)) {
+      return fail("Another active policy already covers the same leave type and staff.");
+    }
+    await updateStore("hrLeavePolicies", (items) => ({ items: items.map((p) => (p.id === id ? { ...p, active, updatedAt: new Date().toISOString() } : p)) }));
+    await hrAudit(ctx, active ? "unlocked leave policy" : "locked leave policy", `leave policy ${policy.name}`);
+    refresh();
+    return done(active ? `${policy.name} is active again.` : `${policy.name} is locked (inactive). The leave type's default applies until it's unlocked.`);
   });
 }
 
@@ -1112,7 +1145,7 @@ export async function addLeaveAdjustmentAction(_prev: HrResult | null, form: For
     const person = employees.find((e) => e.id === employeeId);
     const type = types.find((t) => t.id === typeId);
     if (!person) return fail("Choose an employee.");
-    if (!type || type.defaultDays === null && !(await readStore("hrLeavePolicies")).some((p) => typeId in p.entitlements)) {
+    if (!type || (type.defaultDays === null && !(await readStore("hrLeavePolicies")).some((p) => p.typeId === typeId && p.days !== null))) {
       return fail("Choose a leave type that has an allowance (unlimited types have no balance).");
     }
     if (!Number.isInteger(year) || year < 2000 || year > 2100) return fail("Enter a valid year.");
