@@ -1,5 +1,6 @@
 import { CalendarCheck, CalendarClock, UsersRound } from "lucide-react";
 
+import { TeamAnalytics } from "@/components/hr/analytics-panels";
 import { LeaveCalendar } from "@/components/hr/leave-calendar";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { PortalShell } from "@/components/hr/portal-shell";
@@ -7,6 +8,7 @@ import { isIsoDate, mondayOf } from "@/components/hr/query";
 import { Notice, PageTitle, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { canDecideLeave, has, teamOf } from "@/lib/hr/access";
+import { balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
 import { isCurrentStaff } from "@/lib/hr/types";
 
@@ -17,7 +19,12 @@ export const metadata = { title: "My team" };
 export default async function TeamPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage("team.view");
   const params = (await searchParams) as LeaveParams;
-  const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
+  const [employees, leave, policies, adjustments] = await Promise.all([
+    readStore("hrEmployees"),
+    readStore("hrLeave"),
+    readStore("hrLeavePolicies"),
+    readStore("hrLeaveAdjustments"),
+  ]);
   const teamIds = teamOf(ctx.employee.id, employees, ctx.departments);
   const team = employees.filter((e) => teamIds.has(e.id));
   const teamLeave = leave.filter((l) => teamIds.has(l.employeeId));
@@ -26,6 +33,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
   const away = new Set(teamLeave.filter((l) => l.status === "approved" && l.startDate <= today && l.endDate >= today).map((l) => l.employeeId)).size;
   const weekStart = mondayOf(isIsoDate(params.week) ? params.week : today);
   const memberHref = (id: string) => `/hrportal/team/${id}`;
+  const balances = team.filter((e) => isCurrentStaff(e)).map((e) => ({ employee: e, rows: balanceFor(e, Number(today.slice(0, 4)), ctx.leaveTypes, policies, leave, adjustments) }));
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/team" crumbs={[{ label: "My team" }]}>
@@ -47,6 +55,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
           viewHref={memberHref}
         />
       </div>
+      <TeamAnalytics team={team} leave={teamLeave} types={ctx.leaveTypes} balances={balances} today={today} />
     </PortalShell>
   );
 }

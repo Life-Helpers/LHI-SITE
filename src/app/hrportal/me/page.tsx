@@ -2,13 +2,14 @@ import { CalendarCheck, CalendarClock, CalendarDays, Palmtree } from "lucide-rea
 
 import { requestLeaveAction, setMyDepartmentAction, updateMyContactAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
+import { MyAnalytics } from "@/components/hr/analytics-panels";
 import { BankingCard } from "@/components/hr/banking-card";
 import { BalanceTable } from "@/components/hr/balance-table";
 import { LeaveFields } from "@/components/hr/leave-form";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, Person, TintStat } from "@/components/hr/ui";
+import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { approversFor, has } from "@/lib/hr/access";
 import { balanceFor } from "@/lib/hr/leave-balance";
@@ -162,6 +163,8 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
           <BalanceTable rows={balances} />
         </Card>
       </div>
+
+      <MyAnalytics leave={mine} types={ctx.leaveTypes} balances={balances} today={todayLagos()} />
 
       <div className="mt-6">
         <BankingCard person={me} editable={has(ctx.permissions, "self.update")} />

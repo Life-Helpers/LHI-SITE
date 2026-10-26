@@ -3,6 +3,7 @@ import { Briefcase, Building2, CalendarCheck, CalendarClock, CalendarDays, Clipb
 
 import { decideLeaveAction, loadSampleDataAction, removeSampleDataAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
+import { OrgAnalytics } from "@/components/hr/analytics-panels";
 import { leaveName, leaveStyle } from "@/components/hr/leave-style";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { QuickAction } from "@/components/hr/quick-action";
@@ -62,10 +63,6 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
     .filter((b) => b.inDays <= 30)
     .sort((a, b) => a.inDays - b.inDays)
     .slice(0, 8);
-  const byDept = [...departments]
-    .map((d) => ({ d, n: active.filter((e) => e.department === d).length }))
-    .sort((a, b) => b.n - a.n);
-  const unassigned = active.filter((e) => !e.department).length;
   const sampleCount = employees.filter((e) => e.sample).length;
   const sampleLogins = accounts.filter((a) => a.sample).length;
   const nameOf = (id: string) => employeeName(employees.find((e) => e.id === id));
@@ -203,24 +200,6 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
           </Card>
         )}
 
-        <Card title="Headcount by department" subtitle={`${active.length} active staff`}>
-          <ul className="space-y-3">
-            {byDept.map(({ d, n }) => (
-              <li key={d}>
-                <div className="flex justify-between text-sm">
-                  <span>{d}</span>
-                  <span className="font-semibold">{n}</span>
-                </div>
-                <span className="mt-1 block h-2 overflow-hidden rounded-full bg-admin-bg" aria-hidden="true">
-                  <span className="block h-full rounded-full bg-admin-primary" style={{ width: `${(n / Math.max(1, active.length)) * 100}%` }} />
-                </span>
-              </li>
-            ))}
-            {unassigned > 0 && <li className="text-xs text-admin-muted">{unassigned} without a department on record</li>}
-          </ul>
-          {active.length === 0 && <p className="py-6 text-center text-sm text-admin-muted">No employees yet.</p>}
-        </Card>
-
         {has(p, "audit.view") && (
           <Card
             title="Recent activity"
@@ -252,6 +231,7 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
           </Card>
         )}
       </div>
+      <OrgAnalytics employees={employees} leave={leave} types={ctx.leaveTypes} departments={ctx.departments} today={today} showPeople={seesPeople} showLeave={seesLeave} />
       {has(p, "accounts.manage") && has(p, "employees.manage") && (
         <div className="mt-6">
           <Card title="Sample data for testing" subtitle="Five made-up staff (staff numbers SAMPLE-001 to SAMPLE-005) with leave requests, to try the portal safely">
