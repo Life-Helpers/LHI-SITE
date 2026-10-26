@@ -671,6 +671,8 @@ test("leave types, policies and balances: HR sets allowances and requests can't 
   await manager.getByRole("button", { name: "Request Leave" }).click();
   form = manager.getByRole("dialog").locator("form");
   await expect(form.locator('select[name="type"] option[value="Annual"]')).toContainText("5 days left");
+  // The days left show as soon as a leave type is chosen, before any dates.
+  await expect(form.getByText("You have 5 Annual Leave days left in 2026")).toBeVisible();
   await form.getByLabel("From", { exact: true }).fill("2026-11-23");
   await form.getByLabel("To", { exact: true }).fill("2026-11-30");
   await form.locator('select[name="relieverId"]').selectOption(employeeIds.boss);

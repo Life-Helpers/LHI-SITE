@@ -71,10 +71,18 @@ export function LeaveFields({
           <input ref={endRef} name="endDate" type="date" required min={start || undefined} className={inputClass} value={end} onChange={(e) => setEnd(e.target.value)} />
         </Field>
       </div>
-      {(days > 0 || problem) && available && (
+      {available && (
         <p role={problem ? "alert" : undefined} aria-live="polite" className={`rounded-lg px-3 py-2 text-sm ${problem ? "bg-admin-danger-soft text-admin-danger" : "bg-admin-bg text-admin-muted"}`}>
           {problem ||
-            `${days} working day${days === 1 ? "" : "s"}${typeof left === "number" ? ` · ${left - days} ${typeName} day${left - days === 1 ? "" : "s"} left after this` : ""}`}
+            (left === undefined
+              ? days > 0
+                ? `${days} working day${days === 1 ? "" : "s"}. Your balance for ${start.slice(0, 4)} is checked when you send this.`
+                : `Your balance for that year is checked when you send this.`
+              : left === null
+                ? `${typeName} has no yearly limit.${days > 0 ? ` ${days} working day${days === 1 ? "" : "s"}.` : ""}`
+                : days > 0
+                  ? `${days} working day${days === 1 ? "" : "s"} · ${left - days} ${typeName} day${left - days === 1 ? "" : "s"} left after this (of ${left})`
+                  : `You have ${left} ${typeName} day${left === 1 ? "" : "s"} left${year ? ` in ${year}` : ""}. Pending requests count too.`)}
         </p>
       )}
       {relievers && (
