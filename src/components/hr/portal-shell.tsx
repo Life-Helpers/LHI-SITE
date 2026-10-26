@@ -32,7 +32,19 @@ const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrP
       { href: "/hrportal/hr/leave/policies", label: "Leave Policies" },
     ],
   },
-  { group: "Finance", href: "/hrportal/payroll", label: "Payroll", icon: "payroll", any: ["payroll.manage"] },
+  {
+    group: "Finance",
+    href: "/hrportal/payroll/runs",
+    label: "Payroll Management",
+    icon: "payroll",
+    any: ["payroll.manage"],
+    children: [
+      { href: "/hrportal/payroll/payslips", label: "Payslips" },
+      { href: "/hrportal/payroll/runs", label: "Payroll Runs" },
+      { href: "/hrportal/payroll/salaries", label: "Employee Salaries" },
+      { href: "/hrportal/payroll/components", label: "Salary Components" },
+    ],
+  },
   { group: "Administration", href: "/hrportal/hr/accounts", label: "Accounts", icon: "accounts", any: ["accounts.manage"] },
   { group: "Administration", href: "/hrportal/hr/roles", label: "Roles & permissions", icon: "roles", any: ["roles.manage"] },
   { group: "Administration", href: "/hrportal/hr/audit", label: "Audit trail", icon: "audit", any: ["audit.view"] },
@@ -50,7 +62,7 @@ export async function PortalShell({ ctx, current, crumbs = [], children }: { ctx
   const reliefAsks = leave.filter((l) => l.relieverId === ctx.employee.id && l.status === "pending" && l.relieverStatus === "pending").length;
   const groups: ShellNavGroup[] = [];
   for (const n of NAV.filter((item) => item.any.some((p) => has(ctx.permissions, p)))) {
-    const active = current === n.href || (n.href !== "/hrportal/hr" && current.startsWith(`${n.href}/`));
+    const active = current === n.href || (n.href !== "/hrportal/hr" && current.startsWith(`${n.href}/`)) || Boolean(n.children?.some((c) => c.href === current));
     const group = groups.find((g) => g.label === n.group) ?? groups[groups.push({ label: n.group, items: [] }) - 1];
     group.items.push({
       href: n.href,

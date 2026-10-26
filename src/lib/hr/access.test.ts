@@ -233,7 +233,7 @@ describe("leave that ends early", () => {
 describe("payroll access", () => {
   it("Finance Officers land on Payroll; HR administrators also manage payroll; nobody else does", () => {
     const finance = BUILT_IN_HR_ROLES.find((r) => r.id === "finance_officer")!;
-    expect(homePath(finance.permissions)).toBe("/hrportal/payroll");
+    expect(homePath(finance.permissions)).toBe("/hrportal/payroll/runs");
     expect(BUILT_IN_HR_ROLES.find((r) => r.id === "hr_admin")!.permissions).toContain("payroll.manage");
     for (const id of ["employee", "manager", "management", "hr_officer"]) {
       expect(BUILT_IN_HR_ROLES.find((r) => r.id === id)!.permissions).not.toContain("payroll.manage");

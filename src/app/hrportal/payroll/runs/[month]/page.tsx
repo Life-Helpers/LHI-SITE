@@ -1,19 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Eye } from "lucide-react";
+import { ArrowLeft, Eye, FileDown } from "lucide-react";
 
 import { discardPayslipDraftsAction, publishPayslipsAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
 import { PortalShell } from "@/components/hr/portal-shell";
-import { Badge, outlineButtonClass, PageTitle } from "@/components/hr/ui";
+import { Badge, outlineButtonClass, PageTitle, Person } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { naira, payMonthLabel } from "@/lib/hr/payroll";
 import { requireHrPage } from "@/lib/hr/session";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Payslips" };
+export const metadata = { title: "Payroll run" };
 
-export default async function PayrollMonthPage({ params }: { params: Promise<{ month: string }> }) {
+export default async function PayrollRunPage({ params }: { params: Promise<{ month: string }> }) {
   const ctx = await requireHrPage("payroll.manage");
   const { month } = await params;
   if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) notFound();
@@ -22,14 +22,19 @@ export default async function PayrollMonthPage({ params }: { params: Promise<{ m
   const total = (f: (p: (typeof slips)[number]) => number) => naira(slips.reduce((n, p) => n + f(p), 0));
 
   return (
-    <PortalShell ctx={ctx} current="/hrportal/payroll" crumbs={[{ label: "Payroll", href: "/hrportal/payroll" }, { label: payMonthLabel(month) }]}>
+    <PortalShell ctx={ctx} current="/hrportal/payroll/runs" crumbs={[{ label: "Payroll Management" }, { label: "Payroll Runs", href: "/hrportal/payroll/runs" }, { label: payMonthLabel(month) }]}>
       <PageTitle
-        title={`Payslips: ${payMonthLabel(month)}`}
-        subtitle={`${slips.length - drafts} published, ${drafts} draft${drafts === 1 ? "" : "s"}. Gross ${total((p) => p.gross)} · net ${total((p) => p.net)}.`}
+        title={`${payMonthLabel(month)} Payroll`}
+        subtitle={`${slips.length - drafts} published, ${drafts} draft${drafts === 1 ? "" : "s"}. Gross ${total((p) => p.gross)} · deductions ${total((p) => p.totalDeductions)} · net ${total((p) => p.net)}.`}
         actions={
-          <Link href="/hrportal/payroll" className={outlineButtonClass}>
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back
-          </Link>
+          <>
+            <a href={`/hrportal/payroll/runs/${month}/export`} className={outlineButtonClass}>
+              <FileDown className="h-4 w-4" aria-hidden="true" /> Export
+            </a>
+            <Link href="/hrportal/payroll/runs" className={outlineButtonClass}>
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back
+            </Link>
+          </>
         }
       />
       {drafts > 0 && (
@@ -59,8 +64,7 @@ export default async function PayrollMonthPage({ params }: { params: Promise<{ m
               {slips.map((p) => (
                 <tr key={p.id}>
                   <td className="px-4 py-3">
-                    <span className="block font-medium">{p.employee.name}</span>
-                    <span className="block text-xs text-admin-muted">{p.employee.staffNumber || p.employee.jobTitle}</span>
+                    <Person name={p.employee.name} sub={p.employee.staffNumber || p.employee.jobTitle} />
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">{naira(p.gross)}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{naira(p.totalDeductions)}</td>

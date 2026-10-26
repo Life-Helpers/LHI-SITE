@@ -22,6 +22,7 @@ import {
   findRole,
   has,
   holidayDates,
+  isWorkingDay,
   homePath,
   relieverOptions,
   shortenLeave,
@@ -30,12 +31,11 @@ import {
 import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
 import { isOccurrence } from "@/lib/hr/calendar";
 import { approvalRequired, daysOverBalance } from "@/lib/hr/leave-balance";
-import { monthlyPay } from "@/lib/hr/payroll";
+import { describeRule, monthlyPay, payrollRules } from "@/lib/hr/payroll";
 import { consumeHrToken, createHrToken, hrAudit, peekHrToken } from "@/lib/hr/data";
 import { createHrSession, destroyHrSession, HrAccessError, loadHrSession, requireHrAction, type HrContext } from "@/lib/hr/session";
 import {
   BUILT_IN_HR_ROLES,
-  DEFAULT_PAYROLL_SETTINGS,
   employeeName,
   STANDARD_DEPARTMENTS,
   EMPLOYMENT_TYPES,
@@ -48,6 +48,7 @@ import {
   type HrDepartment,
   type HrEmployee,
   type HrLeavePolicy,
+  type PayrollRule,
   type HrLeaveRequest,
   type HrLeaveType,
   LEAVE_COLORS,
@@ -1733,6 +1734,8 @@ export async function saveSalaryAction(_prev: HrResult | null, form: FormData): 
     if ([basic, housing, transport].some(Number.isNaN)) return fail("Amounts must be numbers of naira (e.g. 250000).");
     if (!basic) return fail("Enter the basic salary.");
     if (!allowances || !deductions) return fail("Each extra allowance or deduction needs a name and an amount.");
+    // Each tax or deduction ticked (or not) for this person.
+    const rules = payrollRules((await readStore("hrPayrollSettings"))[0]);
     const salary = {
       employeeId,
       basic,
@@ -1740,8 +1743,7 @@ export async function saveSalaryAction(_prev: HrResult | null, form: FormData): 
       transport,
       allowances,
       deductions,
-      pension: form.get("pension") !== null,
-      nhf: form.get("nhf") !== null,
+      applies: Object.fromEntries(rules.map((r) => [r.id, form.get(`apply_${r.id}`) !== null])),
       updatedAt: new Date().toISOString(),
       updatedByName: ctx.displayName,
     };
@@ -1754,30 +1756,76 @@ export async function saveSalaryAction(_prev: HrResult | null, form: FormData): 
   });
 }
 
-export async function savePayrollSettingsAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+const PAY_BASES = ["basic", "basic_housing_transport", "gross", "taxable"] as const;
+
+/** HR or Finance adds or edits a tax or statutory deduction (e.g. a new levy, or new PAYE bands). */
+export async function savePayrollRuleAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
     const ctx = await requireHrAction("payroll.manage");
-    const pensionRate = Number(text(form, "pensionRate", 6));
-    const nhfRate = Number(text(form, "nhfRate", 6));
-    if (![pensionRate, nhfRate].every((r) => Number.isFinite(r) && r >= 0 && r <= 100)) return fail("Rates must be percentages from 0 to 100.");
-    const taxBands: { upTo: number | null; rate: number }[] = [];
-    for (let i = 0; i < 8; i++) {
-      const upToRaw = text(form, `band_upTo_${i}`, 20).replace(/,/g, "");
-      const rateRaw = text(form, `band_rate_${i}`, 6);
-      if (!upToRaw && !rateRaw) continue;
-      const rate = Number(rateRaw);
-      const upTo = upToRaw ? Number(upToRaw) : null;
-      if (!Number.isFinite(rate) || rate < 0 || rate > 100 || (upTo !== null && (!Number.isFinite(upTo) || upTo <= 0))) return fail(`Check tax band ${i + 1}.`);
-      taxBands.push({ upTo, rate });
+    const existingId = text(form, "ruleId", 64);
+    const name = text(form, "name", 60);
+    const method = text(form, "method", 10) as PayrollRule["method"];
+    const base = text(form, "base", 30) as PayrollRule["base"];
+    const rate = Number(text(form, "rate", 10) || 0);
+    const amount = money(form, "amount");
+    const beforeTax = form.get("beforeTax") !== null;
+    if (!name) return fail("Give it a name, e.g. Development levy.");
+    if (!["percent", "fixed", "bands"].includes(method)) return fail("Choose how it's worked out.");
+    if (!PAY_BASES.includes(base)) return fail("Choose what it's worked out on.");
+    if (method === "percent" && (!Number.isFinite(rate) || rate <= 0 || rate > 100)) return fail("Enter a percentage above 0 and up to 100.");
+    if (method === "fixed" && (Number.isNaN(amount) || amount <= 0)) return fail("Enter the amount in naira a month.");
+    if (beforeTax && base === "taxable") return fail("An item taken off before tax can't be worked out on taxable pay. Choose basic, basic + housing + transport, or gross.");
+    const bands: PayrollRule["bands"] = [];
+    if (method === "bands") {
+      for (let i = 0; i < 8; i++) {
+        const upToRaw = text(form, `band_upTo_${i}`, 20).replace(/,/g, "");
+        const rateRaw = text(form, `band_rate_${i}`, 6);
+        if (!upToRaw && !rateRaw) continue;
+        const r = Number(rateRaw);
+        const upTo = upToRaw ? Number(upToRaw) : null;
+        if (!Number.isFinite(r) || r < 0 || r > 100 || (upTo !== null && (!Number.isFinite(upTo) || upTo <= 0))) return fail(`Check band ${i + 1}.`);
+        bands.push({ upTo, rate: r });
+      }
+      if (!bands.length || bands.at(-1)!.upTo !== null) return fail("The last band must have no upper limit (leave its 'up to' blank).");
+      if (bands.slice(0, -1).some((b) => b.upTo === null)) return fail("Only the last band can have no upper limit.");
+      if (bands.some((b, i) => i > 0 && b.upTo !== null && b.upTo <= (bands[i - 1].upTo ?? Infinity))) return fail("Bands must go up in order.");
     }
-    if (!taxBands.length || taxBands.at(-1)!.upTo !== null) return fail("The last tax band must have no upper limit (leave its 'up to' blank).");
-    if (taxBands.some((b, i) => i > 0 && b.upTo !== null && b.upTo <= (taxBands[i - 1].upTo ?? Infinity))) return fail("Tax bands must go up in order.");
-    if (taxBands.slice(0, -1).some((b) => b.upTo === null)) return fail("Only the last band can have no upper limit.");
-    const settings = { id: "settings" as const, pensionRate, nhfRate, taxBands, updatedAt: new Date().toISOString(), updatedByName: ctx.displayName };
-    await updateStore("hrPayrollSettings", () => ({ items: [settings] }));
-    await hrAudit(ctx, "changed payroll rates", "payroll settings", `Pension ${pensionRate}%, NHF ${nhfRate}%, ${taxBands.length} PAYE bands`);
+    const settings = (await readStore("hrPayrollSettings"))[0];
+    const rules = payrollRules(settings);
+    const current = existingId ? rules.find((r) => r.id === existingId) : undefined;
+    if (existingId && !current) return fail("That item wasn't found.");
+    if (rules.some((r) => r.name.toLowerCase() === name.toLowerCase() && r.id !== existingId)) return fail("There's already an item with that name.");
+    const rule: PayrollRule = {
+      id: current?.id ?? `rule_${randomUUID().slice(0, 8)}`,
+      name,
+      method,
+      rate: method === "percent" ? rate : 0,
+      amount: method === "fixed" ? amount : 0,
+      base: method === "fixed" ? "gross" : base,
+      bands,
+      beforeTax,
+      defaultOn: form.get("defaultOn") !== null,
+      active: existingId ? form.get("active") !== null : true,
+    };
+    const next = current ? rules.map((r) => (r.id === rule.id ? rule : r)) : [...rules, rule];
+    await updateStore("hrPayrollSettings", () => ({ items: [{ id: "settings" as const, rules: next, updatedAt: new Date().toISOString(), updatedByName: ctx.displayName }] }));
+    await hrAudit(ctx, current ? "changed payroll item" : "added payroll item", `payroll ${name}`, `${describeRule(rule)}${rule.beforeTax ? ", before tax" : ""}${rule.active ? "" : ", switched off"}`);
     refresh();
-    return done("Payroll rates saved. They apply to payslips prepared from now on.");
+    return done(`${name} saved. It applies to payslips prepared from now on; published payslips don't change.`);
+  });
+}
+
+export async function deletePayrollRuleAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("payroll.manage");
+    const id = text(form, "ruleId", 64);
+    const rules = payrollRules((await readStore("hrPayrollSettings"))[0]);
+    const rule = rules.find((r) => r.id === id);
+    if (!rule) return fail("That item wasn't found.");
+    await updateStore("hrPayrollSettings", () => ({ items: [{ id: "settings" as const, rules: rules.filter((r) => r.id !== id), updatedAt: new Date().toISOString(), updatedByName: ctx.displayName }] }));
+    await hrAudit(ctx, "removed payroll item", `payroll ${rule.name}`);
+    refresh();
+    return done(`${rule.name} removed. Published payslips keep it.`);
   });
 }
 
@@ -1787,8 +1835,22 @@ export async function preparePayslipsAction(_prev: HrResult | null, form: FormDa
     const ctx = await requireHrAction("payroll.manage");
     const month = text(form, "month", 7);
     if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return fail("Choose a month.");
-    const [employees, salaries, settingsList, departments] = await Promise.all([readStore("hrEmployees"), readStore("hrSalaries"), readStore("hrPayrollSettings"), readStore("hrDepartments")]);
-    const settings = settingsList[0] ?? DEFAULT_PAYROLL_SETTINGS;
+    const [employees, salaries, settingsList, departments, events] = await Promise.all([
+      readStore("hrEmployees"),
+      readStore("hrSalaries"),
+      readStore("hrPayrollSettings"),
+      readStore("hrDepartments"),
+      readStore("hrEvents"),
+    ]);
+    // Pay date: as chosen, or the month's last working day.
+    let payDate = text(form, "payDate", 10);
+    if (payDate && !isDate(payDate)) return fail("Enter a valid pay date.");
+    if (!payDate) {
+      const holidays = holidayDates(events, Number(month.slice(0, 4)));
+      payDate = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0)).toISOString().slice(0, 10);
+      while (!isWorkingDay(payDate, holidays)) payDate = new Date(Date.parse(`${payDate}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+    }
+    const rules = payrollRules(settingsList[0]);
     const now = new Date().toISOString();
     const counts = await updateStore<"hrPayslips", { made: number; kept: number }>("hrPayslips", (items) => {
       const published = new Set(items.filter((p) => p.month === month && p.status === "published").map((p) => p.employeeId));
@@ -1797,7 +1859,7 @@ export async function preparePayslipsAction(_prev: HrResult | null, form: FormDa
         .flatMap((e) => {
           const salary = salaries.find((s) => s.employeeId === e.id);
           if (!salary) return [];
-          const pay = monthlyPay(salary, settings);
+          const pay = monthlyPay(salary, rules);
           return [
             {
               id: randomUUID(),
@@ -1815,6 +1877,7 @@ export async function preparePayslipsAction(_prev: HrResult | null, form: FormDa
               ...pay,
               preparedByName: ctx.displayName,
               createdAt: now,
+              payDate,
             },
           ];
         });
@@ -1862,3 +1925,36 @@ export async function discardPayslipDraftsAction(_prev: HrResult | null, form: F
     return done(`${n} draft${n === 1 ? "" : "s"} discarded.`);
   });
 }
+
+/** Remove someone's salary (e.g. set by mistake). Their published payslips stay. */
+export async function removeSalaryAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("payroll.manage");
+    const employeeId = text(form, "employeeId", 64);
+    if (employeeId === ctx.employee.id) return fail("Ask a colleague in HR or Finance to change your own salary.");
+    const person = (await readStore("hrEmployees")).find((e) => e.id === employeeId);
+    const had = (await readStore("hrSalaries")).some((s) => s.employeeId === employeeId);
+    if (!person || !had) return fail("There's no salary to remove.");
+    await updateStore("hrSalaries", (items) => ({ items: items.filter((s) => s.employeeId !== employeeId) }));
+    await hrAudit(ctx, "removed salary", employeeName(person));
+    refresh();
+    return done(`Salary removed for ${employeeName(person)}. Their published payslips stay.`);
+  });
+}
+
+/** Switch a tax or deduction on or off without removing it. */
+export async function setPayrollRuleActiveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("payroll.manage");
+    const id = text(form, "ruleId", 64);
+    const active = text(form, "active", 5) === "true";
+    const rules = payrollRules((await readStore("hrPayrollSettings"))[0]);
+    const rule = rules.find((r) => r.id === id);
+    if (!rule) return fail("That item wasn't found.");
+    await updateStore("hrPayrollSettings", () => ({ items: [{ id: "settings" as const, rules: rules.map((r) => (r.id === id ? { ...r, active } : r)), updatedAt: new Date().toISOString(), updatedByName: ctx.displayName }] }));
+    await hrAudit(ctx, active ? "switched on payroll item" : "switched off payroll item", `payroll ${rule.name}`);
+    refresh();
+    return done(`${rule.name} is ${active ? "in use again" : "switched off"} for payslips prepared from now on.`);
+  });
+}
+

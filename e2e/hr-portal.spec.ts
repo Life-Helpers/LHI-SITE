@@ -653,6 +653,9 @@ test("HR and Finance set salaries and publish payslips; each person sees only th
   }
 
   await admin.goto("/hrportal/payroll");
+  await expect(admin).toHaveURL(/\/hrportal\/payroll\/runs$/);
+  await expect(admin.getByRole("navigation", { name: "HR portal" }).getByRole("link", { name: "Salary Components" })).toBeVisible();
+  await admin.goto("/hrportal/payroll/salaries");
   await expect(admin.getByRole("row", { name: new RegExp(`${people.admin.first} ${people.admin.last}`) })).toContainText("Set by a colleague");
   await admin.getByRole("button", { name: `Salary: ${staffName}` }).click();
   const form = admin.getByRole("dialog", { name: `Salary: ${staffName}` }).locator("form");
@@ -664,11 +667,31 @@ test("HR and Finance set salaries and publish payslips; each person sees only th
   await admin.reload();
   await expect(admin.getByRole("row", { name: new RegExp(staffName) })).toContainText("500,000.00");
 
+  // New taxes or deductions can be added; they appear on payslips prepared afterwards.
+  await admin.goto("/hrportal/payroll/components");
+  await admin.getByRole("button", { name: "Add tax or deduction" }).click();
+  const rule = admin.getByRole("dialog", { name: "Add a tax or deduction" }).locator("form");
+  await rule.locator('input[name="name"]').fill("Development levy");
+  await rule.locator('select[name="method"]').selectOption("fixed");
+  await rule.locator('input[name="amount"]').fill("2000");
+  await rule.getByRole("button", { name: "Add" }).click();
+  await expect(rule.getByRole("status")).toContainText("Development levy saved");
+  await admin.reload();
+  await expect(admin.getByRole("row", { name: /Development levy/ })).toContainText("In use");
+
   // Drafts first: staff can't see them yet.
-  await admin.locator('input[name="month"]').fill("2026-10");
-  await admin.getByRole("button", { name: "Prepare payslips" }).click();
-  await expect(admin.getByRole("main").getByRole("status").first()).toContainText("draft payslip");
-  await admin.goto("/hrportal/payroll/2026-10");
+  await admin.goto("/hrportal/payroll/runs");
+  await admin.getByRole("button", { name: "Add Payroll Run" }).click();
+  const run = admin.getByRole("dialog", { name: "Add a payroll run" }).locator("form");
+  await run.locator('input[name="month"]').fill("2026-10");
+  await run.getByRole("button", { name: "Prepare payslips" }).click();
+  await expect(run.getByRole("status")).toContainText("draft payslip");
+  await admin.goto("/hrportal/payroll/runs?year=2026");
+  await expect(admin.getByRole("row", { name: /October 2026 Payroll/ })).toContainText("Draft");
+  const csv = await admin.request.get("/hrportal/payroll/runs/2026-10/export");
+  expect(await csv.text()).toContain("Development levy");
+  expect((await pages.staff.request.get("/hrportal/payroll/runs/2026-10/export")).status()).toBe(404);
+  await admin.goto("/hrportal/payroll/runs/2026-10");
   const view = admin.getByRole("link", { name: `View ${staffName}'s payslip` });
   const slipUrl = (await view.getAttribute("href"))!;
   expect((await pages.staff.goto(slipUrl))?.status()).toBe(404);
@@ -685,7 +708,11 @@ test("HR and Finance set salaries and publish payslips; each person sees only th
   await expect(pages.staff.getByRole("heading", { name: "Payslip" })).toBeVisible();
   await expect(pages.staff.getByText("Net pay", { exact: true })).toBeVisible();
   await expect(pages.staff.getByRole("button", { name: "Print / Save as PDF" })).toBeVisible();
+  await expect(pages.staff.getByRole("cell", { name: "Development levy" })).toBeVisible();
   expect((await pages.manager.goto(slipUrl))?.status()).toBe(404);
+  // HR and Finance can see that it was opened.
+  await admin.goto("/hrportal/payroll/payslips?year=2026&tab=viewed");
+  await expect(admin.getByRole("row", { name: new RegExp(staffName) })).toContainText("Viewed");
 });
 
 test("HR imports employees from CSV and manages their status", async () => {

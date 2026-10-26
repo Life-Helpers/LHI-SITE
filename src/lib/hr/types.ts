@@ -395,44 +395,71 @@ export interface HrSalary {
   allowances: PayLine[];
   /** Other regular deductions (e.g. a staff loan). */
   deductions: PayLine[];
-  /** Employee pension contribution (a share of basic + housing + transport). */
-  pension: boolean;
-  /** National Housing Fund (a share of basic). */
-  nhf: boolean;
+  /** Which payroll rules apply to this person (rule id -> yes/no); rules not listed use their default. */
+  applies?: Record<string, boolean>;
+  /** Older salaries: pension and NHF on or off (read as applies.pension / applies.nhf). */
+  pension?: boolean;
+  nhf?: boolean;
   updatedAt: string;
   updatedByName: string;
 }
 
-/** Payroll rates. PAYE bands are annual; `upTo` null means "and above". */
+/** What a percentage is taken of. "taxable" is gross pay less the items taken off before tax. */
+export type PayBase = "basic" | "basic_housing_transport" | "gross" | "taxable";
+
+/** A tax or statutory deduction Finance can add, edit, switch off or remove. */
+export interface PayrollRule {
+  id: string;
+  name: string;
+  /** A percentage of `base`, a fixed amount a month, or yearly progressive bands (like PAYE). */
+  method: "percent" | "fixed" | "bands";
+  /** For "percent". */
+  rate: number;
+  /** For "fixed": naira a month. */
+  amount: number;
+  base: PayBase;
+  /** For "bands": yearly amounts; `upTo` null means "and above". Worked out on base x 12, then / 12. */
+  bands: { upTo: number | null; rate: number }[];
+  /** Taken off before tax (reduces taxable pay), like pension and NHF. */
+  beforeTax: boolean;
+  /** Applies to new salaries unless unticked for the person. */
+  defaultOn: boolean;
+  active: boolean;
+}
+
+/** Payroll rules: the taxes and statutory deductions on every payslip. */
 export interface HrPayrollSettings {
   id: "settings";
-  pensionRate: number;
-  nhfRate: number;
-  taxBands: { upTo: number | null; rate: number }[];
+  rules: PayrollRule[];
   updatedAt: string;
   updatedByName: string;
+  /** Older stored rates, turned into rules when read (see payrollRules). */
+  pensionRate?: number;
+  nhfRate?: number;
+  taxBands?: { upTo: number | null; rate: number }[];
 }
 
+/** Nigeria Tax Act 2025 PAYE bands (from January 2026), yearly. */
+export const NTA_2025_BANDS = [
+  { upTo: 800_000, rate: 0 },
+  { upTo: 3_000_000, rate: 15 },
+  { upTo: 12_000_000, rate: 18 },
+  { upTo: 25_000_000, rate: 21 },
+  { upTo: 50_000_000, rate: 23 },
+  { upTo: null, rate: 25 },
+];
+
 /**
- * Starting rates: employee pension 8% (Pension Reform Act 2014), NHF 2.5% of basic, and the PAYE
- * bands of the Nigeria Tax Act 2025 (from January 2026). Finance should confirm them; they're
- * editable on the Payroll page.
+ * Starting rules: employee pension 8% (Pension Reform Act 2014), NHF 2.5% of basic, and PAYE on the
+ * Nigeria Tax Act 2025 bands. Finance should confirm them; all are editable on the Payroll page.
  */
-export const DEFAULT_PAYROLL_SETTINGS: HrPayrollSettings = {
-  id: "settings",
-  pensionRate: 8,
-  nhfRate: 2.5,
-  taxBands: [
-    { upTo: 800_000, rate: 0 },
-    { upTo: 3_000_000, rate: 15 },
-    { upTo: 12_000_000, rate: 18 },
-    { upTo: 25_000_000, rate: 21 },
-    { upTo: 50_000_000, rate: 23 },
-    { upTo: null, rate: 25 },
-  ],
-  updatedAt: "",
-  updatedByName: "",
-};
+export const DEFAULT_PAYROLL_RULES: PayrollRule[] = [
+  { id: "pension", name: "Pension (employee)", method: "percent", rate: 8, amount: 0, base: "basic_housing_transport", bands: [], beforeTax: true, defaultOn: true, active: true },
+  { id: "nhf", name: "National Housing Fund", method: "percent", rate: 2.5, amount: 0, base: "basic", bands: [], beforeTax: true, defaultOn: false, active: true },
+  { id: "paye", name: "PAYE tax", method: "bands", rate: 0, amount: 0, base: "taxable", bands: NTA_2025_BANDS, beforeTax: false, defaultOn: true, active: true },
+];
+
+export const DEFAULT_PAYROLL_SETTINGS: HrPayrollSettings = { id: "settings", rules: DEFAULT_PAYROLL_RULES, updatedAt: "", updatedByName: "" };
 
 /** A month's payslip: a fixed copy of the pay at the time, so later salary changes don't alter it. */
 export interface HrPayslip {
@@ -450,6 +477,10 @@ export interface HrPayslip {
   preparedByName: string;
   createdAt: string;
   publishedAt?: string;
+  /** The day staff are paid (set when the run is prepared). */
+  payDate?: string;
+  /** First time the employee opened it after it was published. */
+  viewedAt?: string;
 }
 
 export interface HrAuditEntry {
