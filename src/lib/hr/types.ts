@@ -329,6 +329,13 @@ export interface HrCalendarEvent {
   time: string;
   location: string;
   description: string;
+  /** How it repeats (each occurrence keeps the same length), up to `repeatUntil`. */
+  repeat?: "none" | "daily" | "weekly" | "monthly";
+  repeatUntil?: string;
+  /** "all": every staff member (HR); "team": the manager who added it and their team. */
+  audience?: "all" | "team";
+  /** The employee who added it (a manager's team meetings belong to them). */
+  ownerEmployeeId?: string;
   createdByName: string;
   createdAt: string;
 }

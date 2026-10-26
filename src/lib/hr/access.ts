@@ -217,11 +217,11 @@ export function homePath(perms: readonly HrPermission[]): string {
  * Public holidays as ISO dates for the given years: Nigeria's fixed-date holidays plus every day
  * of the holidays HR puts on the calendar (e.g. Easter, the Eids).
  */
-export function holidayDates(events: Pick<HrCalendarEvent, "kind" | "startDate" | "endDate">[], fromYear: number, toYear = fromYear): Set<string> {
+export function holidayDates(events: Pick<HrCalendarEvent, "kind" | "startDate" | "endDate" | "audience">[], fromYear: number, toYear = fromYear): Set<string> {
   const out = new Set<string>();
   for (let y = fromYear; y <= toYear; y++) for (const h of FIXED_PUBLIC_HOLIDAYS) out.add(`${y}-${h.md}`);
   for (const e of events) {
-    if (e.kind !== "holiday" || e.endDate.slice(0, 4) < String(fromYear) || e.startDate.slice(0, 4) > String(toYear)) continue;
+    if (e.kind !== "holiday" || e.audience === "team" || e.endDate.slice(0, 4) < String(fromYear) || e.startDate.slice(0, 4) > String(toYear)) continue;
     for (let d = e.startDate; d <= e.endDate; d = new Date(Date.parse(`${d}T12:00:00Z`) + 86_400_000).toISOString().slice(0, 10)) out.add(d);
   }
   return out;

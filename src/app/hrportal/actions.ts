@@ -41,6 +41,7 @@ import {
   statusLabel,
   isHrPermission,
   type HrAccount,
+  type HrCalendarEvent,
   type HrDepartment,
   type HrEmployee,
   type HrLeavePolicy,
@@ -1549,24 +1550,46 @@ export async function removeSampleDataAction(): Promise<HrResult> {
 
 const EVENT_KINDS = ["meeting", "holiday", "event"] as const;
 
-/** HR adds or edits a meeting, holiday or event on the calendar every staff member sees. */
+const REPEATS = ["none", "daily", "weekly", "monthly"] as const;
+
+/**
+ * Who may add calendar entries: HR (anything, for all staff) and managers (meetings for their
+ * team only). Managers can change and delete only the meetings they added.
+ */
+async function requireCalendarEditor() {
+  const ctx = await requireHrAction(["employees.manage", "team.view"]);
+  return { ctx, isHr: has(ctx.permissions, "employees.manage") };
+}
+const canChangeEvent = (ctx: HrContext, isHr: boolean, e: HrCalendarEvent) => isHr || e.ownerEmployeeId === ctx.employee.id;
+
 export async function saveCalendarEventAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("employees.manage");
+    const { ctx, isHr } = await requireCalendarEditor();
     const existingId = text(form, "eventId", 64);
     const title = text(form, "title", 120);
-    const kind = text(form, "kind", 10) as (typeof EVENT_KINDS)[number];
+    // Managers add meetings for their team; only HR adds holidays and events, or shares with everyone.
+    const kind = (isHr ? text(form, "kind", 10) : "meeting") as (typeof EVENT_KINDS)[number];
+    const audience = isHr ? (text(form, "audience", 5) === "team" ? "team" : "all") : "team";
     const startDate = text(form, "startDate", 10);
     const endDate = text(form, "endDate", 10) || startDate;
     const time = text(form, "time", 5);
+    const repeat = (text(form, "repeat", 10) || "none") as (typeof REPEATS)[number];
+    const repeatUntil = repeat === "none" ? "" : text(form, "repeatUntil", 10);
     if (!title) return fail("Give the event a title.");
     if (!EVENT_KINDS.includes(kind)) return fail("Choose meeting, holiday or event.");
+    if (!REPEATS.includes(repeat)) return fail("Choose how it repeats.");
     if (!isDate(startDate) || !isDate(endDate) || endDate < startDate) return fail("Enter a valid start and end date.");
     if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return fail("Enter the time as HH:MM, or leave it blank.");
+    if (repeat !== "none") {
+      if (!isDate(repeatUntil) || repeatUntil < startDate) return fail("Choose the date it repeats until (on or after the first day).");
+      if (Date.parse(repeatUntil) - Date.parse(startDate) > 2 * 366 * 86_400_000) return fail("Repeats can run for at most two years; add it again after that.");
+      if (repeat === "daily" && endDate !== startDate) return fail("A daily repeat must be a one-day event.");
+    }
     const events = await readStore("hrEvents");
     const current = existingId ? events.find((e) => e.id === existingId) : undefined;
     if (existingId && !current) return fail("Event not found.");
-    const event = {
+    if (current && !canChangeEvent(ctx, isHr, current)) return fail("You can only change meetings you added.");
+    const event: HrCalendarEvent = {
       id: current?.id ?? randomUUID(),
       title,
       kind,
@@ -1575,24 +1598,30 @@ export async function saveCalendarEventAction(_prev: HrResult | null, form: Form
       time,
       location: text(form, "location", 120),
       description: text(form, "description", 500),
+      repeat,
+      repeatUntil,
+      audience: current && !isHr ? current.audience : audience,
+      ownerEmployeeId: current?.ownerEmployeeId ?? ctx.employee.id,
       createdByName: current?.createdByName ?? ctx.displayName,
       createdAt: current?.createdAt ?? new Date().toISOString(),
     };
     await updateStore("hrEvents", (items) => ({ items: current ? items.map((e) => (e.id === event.id ? event : e)) : [...items, event] }));
-    await hrAudit(ctx, current ? "changed calendar event" : "added calendar event", `${kind} ${title}`, `${startDate}${endDate !== startDate ? ` to ${endDate}` : ""}${time ? ` at ${time}` : ""}`);
+    const when = `${startDate}${endDate !== startDate ? ` to ${endDate}` : ""}${time ? ` at ${time}` : ""}${repeat !== "none" ? `, repeats ${repeat} until ${repeatUntil}` : ""}`;
+    await hrAudit(ctx, current ? "changed calendar event" : "added calendar event", `${kind} ${title}`, `${when}. For ${event.audience === "team" ? "their team" : "all staff"}.`);
     refresh();
-    return done(current ? `${title} saved.` : `${title} added to the calendar.`);
+    return done(current ? `${title} saved.` : `${title} added to the calendar${event.audience === "team" ? " for your team" : ""}.`);
   });
 }
 
 export async function deleteCalendarEventAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
   return guarded(async () => {
-    const ctx = await requireHrAction("employees.manage");
+    const { ctx, isHr } = await requireCalendarEditor();
     const id = text(form, "eventId", 64);
     const event = (await readStore("hrEvents")).find((e) => e.id === id);
     if (!event) return fail("Event not found.");
+    if (!canChangeEvent(ctx, isHr, event)) return fail("You can only delete meetings you added.");
     await updateStore("hrEvents", (items) => ({ items: items.filter((e) => e.id !== id) }));
-    await hrAudit(ctx, "deleted calendar event", `${event.kind} ${event.title}`, event.startDate);
+    await hrAudit(ctx, "deleted calendar event", `${event.kind} ${event.title}`, `${event.startDate}${event.repeat && event.repeat !== "none" ? ` (every occurrence)` : ""}`);
     refresh();
     return done(`${event.title} removed from the calendar.`);
   });

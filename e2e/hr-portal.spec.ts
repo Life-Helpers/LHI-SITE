@@ -587,6 +587,32 @@ test("the calendar shows HR events to everyone, and leave only to those who may 
   // A manager sees their team's leave.
   await pages.manager.goto("/hrportal/calendar?view=month&date=2026-12-01");
   await expect(pages.manager.getByRole("button", { name: `Leave: ${people.staff.first} ${people.staff.last} - Annual Leave` }).first()).toBeVisible();
+
+  // Managers add repeating meetings for their team; only the team sees them.
+  const manager = pages.manager;
+  await expect(staff.getByRole("button", { name: "Add Meeting" })).toHaveCount(0);
+  await manager.getByRole("button", { name: "Add Meeting" }).click();
+  const meet = manager.getByRole("dialog", { name: "Add to the calendar" }).locator("form");
+  await expect(meet.locator('select[name="kind"]')).toHaveCount(0);
+  await meet.locator('input[name="title"]').fill("Team stand-up");
+  await meet.locator('input[name="startDate"]').fill("2026-12-01");
+  await meet.locator('input[name="time"]').fill("09:00");
+  await meet.locator('select[name="repeat"]').selectOption("weekly");
+  await meet.locator('input[name="repeatUntil"]').fill("2026-12-31");
+  await meet.getByRole("button", { name: "Add to calendar" }).click();
+  await expect(meet.getByRole("status")).toContainText("added to the calendar for your team");
+  await manager.reload();
+  // Every Tuesday in December 2026.
+  await expect(manager.getByRole("button", { name: "Meeting: Team stand-up" })).toHaveCount(5);
+  await staff.goto("/hrportal/calendar?view=month&date=2026-12-01");
+  await expect(staff.getByRole("button", { name: "Meeting: Team stand-up" })).toHaveCount(5);
+  await pages.outsider.goto("/hrportal/calendar?view=month&date=2026-12-01");
+  await expect(pages.outsider.getByRole("button", { name: "Meeting: Team stand-up" })).toHaveCount(0);
+  // A manager can't change HR's events.
+  await manager.getByRole("button", { name: "Meeting: Quarterly Review" }).click();
+  const hrEvent = manager.getByRole("dialog", { name: "Quarterly Review" });
+  await expect(hrEvent).toBeVisible();
+  await expect(hrEvent.getByRole("button", { name: "Delete event" })).toHaveCount(0);
 });
 
 test("HR imports employees from CSV and manages their status", async () => {

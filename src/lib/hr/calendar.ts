@@ -17,8 +17,10 @@ export interface CalendarItem {
   detail?: string;
   /** Leave still waiting for approval. */
   pending?: boolean;
-  /** An HR event (can be edited or deleted by HR). */
+  /** The calendar event behind this item (HR's or a manager's). */
   eventId?: string;
+  /** e.g. "Repeats weekly until 31 Dec 2026". */
+  repeatLabel?: string;
   personId?: string;
 }
 
@@ -35,6 +37,52 @@ const RESUME = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeri
 const backOn = (end: string, holidays?: ReadonlySet<string>) => `Back on ${RESUME.format(new Date(`${resumptionDate(end, holidays)}T12:00:00Z`))}`;
 
 const isLeap = (y: number) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+
+const REPEAT_LABEL = { daily: "every working day", weekly: "weekly", monthly: "monthly" } as const;
+const MAX_OCCURRENCES = 800;
+
+const lastDayOf = (y: number, m: number) => new Date(Date.UTC(y, m, 0)).getUTCDate();
+
+/**
+ * The dates an event happens on within [from, to]. Each occurrence keeps the event's length.
+ * Daily repeats on working days (Monday to Friday); weekly on the same weekday; monthly on the
+ * same date (or the month's last day when it's shorter).
+ */
+export function occurrences(e: Pick<HrCalendarEvent, "startDate" | "endDate" | "repeat" | "repeatUntil">, from: string, to: string): { start: string; end: string }[] {
+  const length = Math.round((Date.parse(`${e.endDate}T12:00:00Z`) - Date.parse(`${e.startDate}T12:00:00Z`)) / DAY);
+  const until = e.repeat && e.repeat !== "none" ? (e.repeatUntil && e.repeatUntil < to ? e.repeatUntil : to) : e.startDate;
+  const out: { start: string; end: string }[] = [];
+  const push = (start: string) => {
+    const end = addDays(start, length);
+    if (start <= to && end >= from) out.push({ start, end });
+  };
+  if (!e.repeat || e.repeat === "none") {
+    push(e.startDate);
+    return out;
+  }
+  if (e.repeat === "monthly") {
+    const [y, m, d] = e.startDate.split("-").map(Number);
+    for (let i = 0; i < MAX_OCCURRENCES; i++) {
+      const yy = y + Math.floor((m - 1 + i) / 12);
+      const mm = ((m - 1 + i) % 12) + 1;
+      const start = `${yy}-${String(mm).padStart(2, "0")}-${String(Math.min(d, lastDayOf(yy, mm))).padStart(2, "0")}`;
+      if (start > until) break;
+      push(start);
+    }
+    return out;
+  }
+  const step = e.repeat === "weekly" ? 7 : 1;
+  // Jump close to the window rather than walking from a start date years back.
+  let start = e.startDate;
+  const behind = Math.floor((Date.parse(`${from}T12:00:00Z`) - Date.parse(`${start}T12:00:00Z`)) / DAY) - length - 7;
+  if (behind > 0) start = addDays(start, Math.floor(behind / step) * step);
+  for (let i = 0; i < MAX_OCCURRENCES && start <= until; i++, start = addDays(start, step)) {
+    const wd = new Date(`${start}T12:00:00Z`).getUTCDay();
+    if (e.repeat === "daily" && (wd === 0 || wd === 6)) continue;
+    push(start);
+  }
+  return out;
+}
 
 /** Every item that touches [from, to], sorted by start date, then all-day before timed, then title. */
 export function calendarItems({
@@ -67,8 +115,10 @@ export function calendarItems({
   const years = Array.from({ length: Number(to.slice(0, 4)) - Number(from.slice(0, 4)) + 1 }, (_, i) => Number(from.slice(0, 4)) + i);
 
   for (const e of events) {
-    if (touches(e.startDate, e.endDate)) {
-      items.push({ id: `ev-${e.id}`, kind: e.kind, title: e.title, start: e.startDate, end: e.endDate, time: e.time || undefined, detail: [e.location, e.description].filter(Boolean).join(" · ") || undefined, eventId: e.id });
+    const detail = [e.location, e.description].filter(Boolean).join(" · ") || undefined;
+    const repeatLabel = e.repeat && e.repeat !== "none" ? `Repeats ${REPEAT_LABEL[e.repeat]}${e.repeatUntil ? ` until ${RESUME.format(new Date(`${e.repeatUntil}T12:00:00Z`))}` : ""}` : undefined;
+    for (const o of occurrences(e, from, to)) {
+      items.push({ id: `ev-${e.id}-${o.start}`, kind: e.kind, title: e.title, start: o.start, end: o.end, time: e.time || undefined, detail, eventId: e.id, repeatLabel });
     }
   }
   for (const y of years) {

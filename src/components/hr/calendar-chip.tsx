@@ -14,7 +14,8 @@ const DATE = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric"
 const fmt = (iso: string) => DATE.format(new Date(`${iso}T12:00:00Z`));
 
 /** Title, type, dates, time and place of an HR calendar event. */
-export function EventFields({ event }: { event?: HrCalendarEvent }) {
+/** `isHr`: HR chooses the type and who sees it; managers add meetings for their team. */
+export function EventFields({ event, isHr = true }: { event?: HrCalendarEvent; isHr?: boolean }) {
   return (
     <div className="space-y-4">
       {event && <input type="hidden" name="eventId" value={event.id} />}
@@ -22,13 +23,19 @@ export function EventFields({ event }: { event?: HrCalendarEvent }) {
         <Field label="Title">
           <input name="title" required maxLength={120} defaultValue={event?.title} placeholder="e.g. Team Meeting" className={inputClass} />
         </Field>
-        <Field label="Type">
-          <select name="kind" defaultValue={event?.kind ?? "meeting"} className={inputClass}>
-            <option value="meeting">Meeting</option>
-            <option value="holiday">Holiday</option>
-            <option value="event">Event</option>
-          </select>
-        </Field>
+        {isHr ? (
+          <Field label="Type">
+            <select name="kind" defaultValue={event?.kind ?? "meeting"} className={inputClass}>
+              <option value="meeting">Meeting</option>
+              <option value="holiday">Holiday</option>
+              <option value="event">Event</option>
+            </select>
+          </Field>
+        ) : (
+          <Field label="Who sees it">
+            <p className="mt-1 rounded-lg border border-admin-border bg-admin-bg px-3 py-2 text-sm text-admin-muted">You and your team</p>
+          </Field>
+        )}
         <Field label="Starts">
           <input name="startDate" type="date" required defaultValue={event?.startDate} className={inputClass} />
         </Field>
@@ -41,6 +48,25 @@ export function EventFields({ event }: { event?: HrCalendarEvent }) {
         <Field label="Location (optional)">
           <input name="location" maxLength={120} defaultValue={event?.location} placeholder="e.g. Sokoto office" className={inputClass} />
         </Field>
+        <Field label="Repeats">
+          <select name="repeat" defaultValue={event?.repeat ?? "none"} className={inputClass}>
+            <option value="none">Does not repeat</option>
+            <option value="daily">Daily (Monday to Friday)</option>
+            <option value="weekly">Weekly (same day each week)</option>
+            <option value="monthly">Monthly (same date each month)</option>
+          </select>
+        </Field>
+        <Field label="Repeat until" hint="Needed when it repeats (up to two years).">
+          <input name="repeatUntil" type="date" defaultValue={event?.repeatUntil} className={inputClass} />
+        </Field>
+        {isHr && (
+          <Field label="Who sees it">
+            <select name="audience" defaultValue={event?.audience ?? "all"} className={inputClass}>
+              <option value="all">All staff</option>
+              <option value="team">Me and my team</option>
+            </select>
+          </Field>
+        )}
       </div>
       <Field label="Details (optional)">
         <textarea name="description" rows={3} maxLength={500} defaultValue={event?.description} className={inputClass} />
@@ -54,6 +80,7 @@ export function CalendarChip({
   item,
   event,
   canEdit = false,
+  isHr = true,
   personHref,
   full = false,
   cutStart = false,
@@ -63,6 +90,7 @@ export function CalendarChip({
   /** The HR event behind this item, when there is one. */
   event?: HrCalendarEvent;
   canEdit?: boolean;
+  isHr?: boolean;
   personHref?: string;
   /** Show the time and details inline (week and day views). */
   full?: boolean;
@@ -111,6 +139,7 @@ export function CalendarChip({
             {item.end !== item.start && ` – ${fmt(item.end)}`}
             {item.time && ` · ${item.time}`}
           </p>
+          {item.repeatLabel && <p className="text-admin-muted">{item.repeatLabel}. Changes apply to every occurrence.</p>}
           {item.detail && <p className="text-admin-muted">{item.detail}</p>}
           {personHref && (
             <a href={personHref} className="inline-block font-semibold text-admin-primary hover:underline">
@@ -120,7 +149,7 @@ export function CalendarChip({
           {event && canEdit && (
             <div className="space-y-4 border-t border-admin-border pt-4">
               <ActionForm action={saveCalendarEventAction} submitLabel="Save event" className="space-y-4">
-                <EventFields event={event} />
+                <EventFields event={event} isHr={isHr} />
               </ActionForm>
               <ActionForm action={deleteCalendarEventAction} submitLabel="Delete event" danger confirmText={`Remove ${event.title} from the calendar?`}>
                 <input type="hidden" name="eventId" value={event.id} />

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { holidayDates, workingDays } from "@/lib/hr/access";
-import { calendarItems, monthWeeks, resumptionDate, weekSegments, workingRuns } from "@/lib/hr/calendar";
+import { calendarItems, monthWeeks, occurrences, resumptionDate, weekSegments, workingRuns } from "@/lib/hr/calendar";
 import { DEFAULT_LEAVE_TYPES, type HrEmployee, type HrLeaveRequest } from "@/lib/hr/types";
 
 const person = (id: string, dob?: string) => ({ id, firstName: id, lastName: "Bello", dateOfBirth: dob, status: "active" }) as HrEmployee;
@@ -117,6 +117,28 @@ describe("leave counts working days only", () => {
       ["l-1", "2026-12-28", "2026-12-29"],
       ["h", "2026-12-25", "2026-12-25"],
     ]);
+  });
+});
+
+describe("repeating meetings", () => {
+  const base = { startDate: "2026-10-05", endDate: "2026-10-05" };
+  const starts = (o: { start: string }[]) => o.map((x) => x.start);
+
+  it("repeat daily on working days, weekly on the same weekday, and monthly on the same date", () => {
+    expect(starts(occurrences({ ...base, repeat: "daily", repeatUntil: "2026-10-12" }, "2026-10-01", "2026-10-31"))).toEqual([
+      "2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08", "2026-10-09", "2026-10-12",
+    ]);
+    expect(starts(occurrences({ ...base, repeat: "weekly", repeatUntil: "2026-10-31" }, "2026-10-01", "2026-10-31"))).toEqual(["2026-10-05", "2026-10-12", "2026-10-19", "2026-10-26"]);
+    expect(starts(occurrences({ ...base, repeat: "monthly", repeatUntil: "2027-01-31" }, "2026-10-01", "2027-03-31"))).toEqual(["2026-10-05", "2026-11-05", "2026-12-05", "2027-01-05"]);
+  });
+
+  it("uses the last day of shorter months, keeps multi-day lengths, and only returns dates in view", () => {
+    expect(starts(occurrences({ startDate: "2027-01-31", endDate: "2027-01-31", repeat: "monthly", repeatUntil: "2027-04-30" }, "2027-01-01", "2027-04-30"))).toEqual(["2027-01-31", "2027-02-28", "2027-03-31", "2027-04-30"]);
+    expect(occurrences({ startDate: "2026-10-05", endDate: "2026-10-06", repeat: "weekly", repeatUntil: "2026-12-31" }, "2026-12-01", "2026-12-10")).toEqual([
+      { start: "2026-11-30", end: "2026-12-01" },
+      { start: "2026-12-07", end: "2026-12-08" },
+    ]);
+    expect(occurrences({ ...base, repeat: "none" }, "2026-11-01", "2026-11-30")).toEqual([]);
   });
 });
 

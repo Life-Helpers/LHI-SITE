@@ -38,7 +38,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const today = todayLagos();
   const view: View = VIEWS.includes(params.view as View) ? (params.view as View) : "month";
   const date = isIsoDate(params.date) ? params.date : today;
-  const [events, leave, employees] = await Promise.all([readStore("hrEvents"), readStore("hrLeave"), readStore("hrEmployees")]);
+  const [allEvents, leave, employees] = await Promise.all([readStore("hrEvents"), readStore("hrLeave"), readStore("hrEmployees")]);
   const p = ctx.permissions;
 
   // The same visibility as the rest of the portal.
@@ -51,7 +51,19 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const fullIds = new Set(visibleLeave.map((l) => l.id));
   const colleagueLeave = leave.filter((l) => deptmates.has(l.employeeId) && !fullIds.has(l.id));
   const birthdaysOf = employees.filter((e) => isCurrentStaff(e) && (seesAllPeople || e.id === ctx.employee.id || team.has(e.id)));
-  const canEdit = has(p, "employees.manage");
+  const isHr = has(p, "employees.manage");
+  const isManager = has(p, "team.view");
+  // Team meetings are for the manager who added them and their team; everything else is for all staff.
+  const teamsOf = new Map<string, Set<string>>();
+  const inTeamOf = (ownerId: string) => {
+    if (!teamsOf.has(ownerId)) teamsOf.set(ownerId, teamOf(ownerId, employees, ctx.departments));
+    return teamsOf.get(ownerId)!.has(ctx.employee.id);
+  };
+  const events = allEvents.filter((e) => e.audience !== "team" || isHr || e.ownerEmployeeId === ctx.employee.id || (e.ownerEmployeeId && inTeamOf(e.ownerEmployeeId)));
+  const canEditEvent = (id?: string) => {
+    const e = id ? events.find((x) => x.id === id) : undefined;
+    return Boolean(e && (isHr || (isManager && e.ownerEmployeeId === ctx.employee.id)));
+  };
   const personHref = (id?: string) =>
     !id || id === ctx.employee.id ? (id ? "/hrportal/me" : undefined) : seesAllPeople ? `/hrportal/hr/employees/${id}` : team.has(id) ? `/hrportal/team/${id}` : undefined;
 
@@ -65,7 +77,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const monthItems = calendarItems({ from: monthStart, to: addDays(`${addDays(monthStart, 32).slice(0, 7)}-01`, -1), events, leave: visibleLeave, colleagueLeave, employees, types: ctx.leaveTypes, birthdaysOf, holidays });
   const eventOf = (item: CalendarItem) => (item.eventId ? events.find((e) => e.id === item.eventId) : undefined);
   const chip = (item: CalendarItem, extra: { full?: boolean; cutStart?: boolean; cutEnd?: boolean } = {}) => (
-    <CalendarChip item={item} event={eventOf(item)} canEdit={canEdit} personHref={personHref(item.personId)} {...extra} />
+    <CalendarChip item={item} event={eventOf(item)} canEdit={canEditEvent(item.eventId)} isHr={isHr} personHref={personHref(item.personId)} {...extra} />
   );
 
   const link = (changes: { view?: View; date?: string }) => {
@@ -81,10 +93,15 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
         title="Calendar"
         subtitle="Meetings, holidays, leave and birthdays in one place. Colleagues in your department show as on leave, with the day they're back."
         actions={
-          canEdit && (
-            <Modal label="Add Event" title="Add to the calendar" description="Meetings, holidays and events are shown to all staff." wide>
+          (isHr || isManager) && (
+            <Modal
+              label={isHr ? "Add Event" : "Add Meeting"}
+              title="Add to the calendar"
+              description={isHr ? "Meetings, holidays and events, for all staff or just your team. They can repeat daily, weekly or monthly." : "A meeting for you and your team. It can repeat daily, weekly or monthly."}
+              wide
+            >
               <ActionForm action={saveCalendarEventAction} submitLabel="Add to calendar" resetOnSuccess className="space-y-4">
-                <EventFields />
+                <EventFields isHr={isHr} />
               </ActionForm>
             </Modal>
           )
