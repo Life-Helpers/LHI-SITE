@@ -19,6 +19,7 @@ import {
   UserCog,
   Users,
   UsersRound,
+  CalendarRange,
   X,
 } from "lucide-react";
 
@@ -31,6 +32,7 @@ const ICONS = {
   employees: Users,
   departments: Building2,
   leave: CalendarDays,
+  calendar: CalendarRange,
   accounts: UserCog,
   roles: ShieldCheck,
   audit: ClipboardList,

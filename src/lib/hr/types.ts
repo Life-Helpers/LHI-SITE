@@ -318,6 +318,34 @@ export interface HrLeaveRequest {
   sample?: boolean;
 }
 
+/** A meeting, holiday or event HR puts on the portal calendar for all staff. */
+export interface HrCalendarEvent {
+  id: string;
+  title: string;
+  kind: "meeting" | "holiday" | "event";
+  startDate: string;
+  endDate: string;
+  /** Optional start time, "HH:MM". */
+  time: string;
+  location: string;
+  description: string;
+  createdByName: string;
+  createdAt: string;
+}
+
+/**
+ * Nigeria's public holidays that fall on the same date every year (month-day). Holidays that
+ * move (Good Friday, Easter Monday, Eid al-Fitr, Eid al-Adha, Maulud) are added by HR each year.
+ */
+export const FIXED_PUBLIC_HOLIDAYS: { md: string; title: string }[] = [
+  { md: "01-01", title: "New Year's Day" },
+  { md: "05-01", title: "Workers' Day" },
+  { md: "06-12", title: "Democracy Day" },
+  { md: "10-01", title: "Independence Day" },
+  { md: "12-25", title: "Christmas Day" },
+  { md: "12-26", title: "Boxing Day" },
+];
+
 export interface HrAuditEntry {
   id: string;
   at: string;

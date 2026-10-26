@@ -14,6 +14,7 @@ const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrP
   { group: "Overview", href: "/hrportal/hr", label: "Dashboard", icon: "dashboard", any: ["employees.view", "employees.manage", "accounts.manage"] },
   { group: "Overview", href: "/hrportal/reports", label: "Reports", icon: "reports", any: ["reports.view"] },
   { group: "Me", href: "/hrportal/me", label: "My record", icon: "me", any: ["self.view"] },
+  { group: "Me", href: "/hrportal/calendar", label: "Calendar", icon: "calendar", any: ["self.view"] },
   { group: "Me", href: "/hrportal/team", label: "My team", icon: "team", any: ["team.view"] },
   { group: "HR", href: "/hrportal/hr/employees", label: "Employees", icon: "employees", any: ["employees.view", "employees.manage"] },
   { group: "HR", href: "/hrportal/hr/departments", label: "Departments", icon: "departments", any: ["employees.view", "employees.manage"] },

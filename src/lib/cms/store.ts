@@ -43,7 +43,7 @@ import {
   seedTeam,
 } from "@/lib/cms/seed";
 import type { CollectionRecords } from "@/lib/cms/types";
-import type { HrAccount, HrAuditEntry, HrDepartment, HrEmployee, HrLeaveAdjustment, HrLeavePolicy, HrLeaveRequest, HrLeaveType, HrRole, HrToken } from "@/lib/hr/types";
+import type { HrAccount, HrAuditEntry, HrCalendarEvent, HrDepartment, HrEmployee, HrLeaveAdjustment, HrLeavePolicy, HrLeaveRequest, HrLeaveType, HrRole, HrToken } from "@/lib/hr/types";
 import { DEFAULT_LEAVE_POLICIES, DEFAULT_LEAVE_TYPES } from "@/lib/hr/types";
 
 /**
@@ -107,6 +107,7 @@ interface StoreShape extends CollectionRecords {
   hrLeaveAdjustments: HrLeaveAdjustment;
   hrAudit: HrAuditEntry;
   hrTokens: HrToken;
+  hrEvents: HrCalendarEvent;
 }
 
 export type StoreName = keyof StoreShape;
@@ -155,6 +156,7 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   hrLeaveAdjustments: () => [],
   hrAudit: () => [],
   hrTokens: () => [],
+  hrEvents: () => [],
 };
 
 const cache = new Map<string, { mtimeMs: number; data: unknown }>();

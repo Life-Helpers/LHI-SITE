@@ -212,9 +212,9 @@ test("each role lands on its own dashboard and sees only its own navigation", as
   await expect(pages.officer).toHaveURL(/\/hrportal\/hr$/);
 
   const nav = (p: Page) => p.getByRole("navigation", { name: "HR portal" });
-  await expect(nav(pages.staff).getByRole("link")).toHaveText(["My record"]);
-  await expect(nav(pages.manager).getByRole("link")).toHaveText(["My record", "My team"]);
-  await expect(nav(pages.boss).getByRole("link")).toHaveText(["Reports", "My record", "My team"]);
+  await expect(nav(pages.staff).getByRole("link")).toHaveText(["My record", "Calendar"]);
+  await expect(nav(pages.manager).getByRole("link")).toHaveText(["My record", "Calendar", "My team"]);
+  await expect(nav(pages.boss).getByRole("link")).toHaveText(["Reports", "My record", "Calendar", "My team"]);
   await expect(nav(pages.officer).getByRole("link", { name: "Accounts" })).toHaveCount(0);
   await expect(nav(pages.admin).getByRole("link", { name: "Accounts" })).toHaveCount(1);
 });
@@ -527,6 +527,57 @@ test("departments: heads receive their staff's leave requests, and staff choose 
   for (const key of ["staff", "outsider", "boss"] as const) {
     expect((await pages[key].request.get("/hrportal/hr/employees/export")).status()).toBe(404);
   }
+});
+
+test("the calendar shows HR events to everyone, and leave only to those who may see it", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  await admin.goto("/hrportal/calendar?view=month&date=2026-12-01");
+  await admin.getByRole("button", { name: "Add Event" }).click();
+  const form = admin.getByRole("dialog", { name: "Add to the calendar" }).locator("form");
+  await form.locator('input[name="title"]').fill("Quarterly Review");
+  await form.locator('input[name="startDate"]').fill("2026-12-03");
+  await form.locator('input[name="time"]').fill("10:00");
+  const captured = await captureAction(admin, () => form.getByRole("button", { name: "Add to calendar" }).click());
+  await expect(form.getByRole("status")).toContainText("added to the calendar");
+  await admin.reload();
+  await expect(admin.getByRole("button", { name: "Meeting: Quarterly Review" })).toBeVisible();
+  await expect(admin.getByRole("button", { name: "Holiday: Christmas Day" })).toBeVisible();
+  await expect(admin.getByRole("button", { name: `Leave: ${people.staff.first} ${people.staff.last} - Annual Leave` }).first()).toBeVisible();
+
+  // Staff see HR events and their own leave, not other people's; they can't add events.
+  const staff = pages.staff;
+  await staff.goto("/hrportal/calendar?view=month&date=2026-12-01");
+  await expect(staff.getByRole("button", { name: "Meeting: Quarterly Review" })).toBeVisible();
+  await expect(staff.getByRole("button", { name: `Leave: ${people.staff.first} ${people.staff.last} - Annual Leave` }).first()).toBeVisible();
+  await expect(staff.getByRole("button", { name: /^Leave: Musa Manager/ })).toHaveCount(0);
+  await expect(staff.getByRole("button", { name: "Add Event" })).toHaveCount(0);
+  expect(await replay(staff, captured)).toContain("You don't have permission to do that.");
+
+  // Staff also see department colleagues who are away (no leave type) and the day they're back.
+  await admin.goto(`/hrportal/hr/employees/${employeeIds.outsider}?tab=edit`);
+  await admin.locator('select[name="departmentId"]').selectOption({ label: "Programmes" });
+  await admin.getByRole("button", { name: "Save record" }).click();
+  await expect(admin.getByRole("main").getByRole("status")).toContainText("saved");
+  await admin.goto("/hrportal/hr/leave");
+  await admin.getByRole("button", { name: "Add Leave Application" }).click();
+  const rec = admin.getByRole("dialog").locator("form");
+  await rec.locator('select[name="employeeId"]').selectOption({ label: `${people.outsider.first} ${people.outsider.last}` });
+  await rec.locator('select[name="type"]').selectOption("Sick");
+  await rec.getByLabel("From", { exact: true }).fill("2026-12-14");
+  await rec.getByLabel("To", { exact: true }).fill("2026-12-16");
+  await rec.locator('select[name="status"]').selectOption("approved");
+  await rec.getByRole("button", { name: "Save leave application" }).click();
+  await expect(rec.getByRole("status")).toContainText("recorded");
+  await staff.goto("/hrportal/calendar?view=month&date=2026-12-01");
+  const away = staff.getByRole("button", { name: `Leave: ${people.outsider.first} ${people.outsider.last} - On leave` }).first();
+  await expect(away).toBeVisible();
+  await expect(away).toHaveAttribute("title", /Back on Thu 17 Dec/);
+  await expect(staff.getByRole("button", { name: /Outsider - Sick Leave/ })).toHaveCount(0);
+
+  // A manager sees their team's leave.
+  await pages.manager.goto("/hrportal/calendar?view=month&date=2026-12-01");
+  await expect(pages.manager.getByRole("button", { name: `Leave: ${people.staff.first} ${people.staff.last} - Annual Leave` }).first()).toBeVisible();
 });
 
 test("HR imports employees from CSV and manages their status", async () => {

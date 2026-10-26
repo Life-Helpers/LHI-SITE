@@ -1541,3 +1541,56 @@ export async function removeSampleDataAction(): Promise<HrResult> {
     return done(`Removed ${ids.size} sample employees, their leave and ${accountIds.size} sample logins.`);
   });
 }
+
+/* ------------------------------------------------------------------ Calendar events */
+
+const EVENT_KINDS = ["meeting", "holiday", "event"] as const;
+
+/** HR adds or edits a meeting, holiday or event on the calendar every staff member sees. */
+export async function saveCalendarEventAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("employees.manage");
+    const existingId = text(form, "eventId", 64);
+    const title = text(form, "title", 120);
+    const kind = text(form, "kind", 10) as (typeof EVENT_KINDS)[number];
+    const startDate = text(form, "startDate", 10);
+    const endDate = text(form, "endDate", 10) || startDate;
+    const time = text(form, "time", 5);
+    if (!title) return fail("Give the event a title.");
+    if (!EVENT_KINDS.includes(kind)) return fail("Choose meeting, holiday or event.");
+    if (!isDate(startDate) || !isDate(endDate) || endDate < startDate) return fail("Enter a valid start and end date.");
+    if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return fail("Enter the time as HH:MM, or leave it blank.");
+    const events = await readStore("hrEvents");
+    const current = existingId ? events.find((e) => e.id === existingId) : undefined;
+    if (existingId && !current) return fail("Event not found.");
+    const event = {
+      id: current?.id ?? randomUUID(),
+      title,
+      kind,
+      startDate,
+      endDate,
+      time,
+      location: text(form, "location", 120),
+      description: text(form, "description", 500),
+      createdByName: current?.createdByName ?? ctx.displayName,
+      createdAt: current?.createdAt ?? new Date().toISOString(),
+    };
+    await updateStore("hrEvents", (items) => ({ items: current ? items.map((e) => (e.id === event.id ? event : e)) : [...items, event] }));
+    await hrAudit(ctx, current ? "changed calendar event" : "added calendar event", `${kind} ${title}`, `${startDate}${endDate !== startDate ? ` to ${endDate}` : ""}${time ? ` at ${time}` : ""}`);
+    refresh();
+    return done(current ? `${title} saved.` : `${title} added to the calendar.`);
+  });
+}
+
+export async function deleteCalendarEventAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("employees.manage");
+    const id = text(form, "eventId", 64);
+    const event = (await readStore("hrEvents")).find((e) => e.id === id);
+    if (!event) return fail("Event not found.");
+    await updateStore("hrEvents", (items) => ({ items: items.filter((e) => e.id !== id) }));
+    await hrAudit(ctx, "deleted calendar event", `${event.kind} ${event.title}`, event.startDate);
+    refresh();
+    return done(`${event.title} removed from the calendar.`);
+  });
+}
