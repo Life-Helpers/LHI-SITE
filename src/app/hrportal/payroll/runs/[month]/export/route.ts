@@ -1,5 +1,6 @@
 import { readStore } from "@/lib/cms/store";
 import { has } from "@/lib/hr/access";
+import { payrollSchedule } from "@/lib/hr/payroll-schedule";
 import { loadHrSession } from "@/lib/hr/session";
 
 const cell = (v: unknown) => {
@@ -14,23 +15,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ month: 
   const { month } = await params;
   if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return new Response("Not found", { status: 404 });
   const slips = (await readStore("hrPayslips")).filter((p) => p.month === month).sort((a, b) => a.employee.name.localeCompare(b.employee.name));
-  const deductionNames = [...new Set(slips.flatMap((p) => p.deductions.map((d) => d.name)))];
-  const head = ["Employee", "Staff number", "Department", "Status", "Pay date", "Gross", ...deductionNames, "Total deductions", "Net", "Bank", "Account ending"];
-  const rows = slips.map((p) => [
-    p.employee.name,
-    p.employee.staffNumber,
-    p.employee.department,
-    p.status,
-    p.payDate ?? "",
-    p.gross.toFixed(2),
-    ...deductionNames.map((n) => (p.deductions.find((d) => d.name === n)?.amount ?? 0).toFixed(2)),
-    p.totalDeductions.toFixed(2),
-    p.net.toFixed(2),
-    p.employee.bankName,
-    p.employee.bankAccountEnding,
-  ]);
-  const csv = [head, ...rows].map((r) => r.map(cell).join(",")).join("\r\n");
+  // LHI's payroll schedule layout, with a totals row.
+  const { columns, rows, totals } = payrollSchedule(slips);
+  const head = ["Staff Name", "Position", ...columns.map((c) => c.label), "Status", "Pay Date", "Bank", "Account Ending"];
+  const body = [
+    ...rows.map((r, i) => [r.name, r.position, ...columns.map((c) => (r.values[c.key] ?? 0).toFixed(2)), slips[i].status, slips[i].payDate ?? "", slips[i].employee.bankName, slips[i].employee.bankAccountEnding]),
+    ["Total", "", ...columns.map((c) => totals[c.key].toFixed(2)), "", "", "", ""],
+  ];
+  const csv = [head, ...body].map((r) => r.map(cell).join(",")).join("\r\n");
   return new Response(`﻿${csv}\r\n`, {
-    headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="payroll-${month}.csv"`, "cache-control": "no-store" },
+    headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="payroll-schedule-${month}.csv"`, "cache-control": "no-store" },
   });
 }

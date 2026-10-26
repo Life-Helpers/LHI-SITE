@@ -662,6 +662,7 @@ test("HR and Finance set salaries and publish payslips; each person sees only th
   await form.locator('input[name="basic"]').fill("300000");
   await form.locator('input[name="housing"]').fill("150000");
   await form.locator('input[name="transport"]').fill("50000");
+  await form.locator('input[name="annualRent"]').fill("1200000");
   await form.getByRole("button", { name: "Save salary" }).click();
   await expect(form.getByRole("status")).toContainText(`Salary saved for ${staffName}`);
   await admin.reload();
@@ -690,7 +691,22 @@ test("HR and Finance set salaries and publish payslips; each person sees only th
   await expect(admin.getByRole("row", { name: /October 2026 Payroll/ })).toContainText("Draft");
   const csv = await admin.request.get("/hrportal/payroll/runs/2026-10/export");
   expect(await csv.text()).toContain("Development levy");
+  expect(await csv.text()).toContain("Total Monthly Emolument");
   expect((await pages.staff.request.get("/hrportal/payroll/runs/2026-10/export")).status()).toBe(404);
+  await admin.goto("/hrportal/payroll/runs/2026-10");
+  // A penalty on one draft: taken off gross before tax, with its reason on the payslip.
+  await admin.getByRole("button", { name: `Penalty: ${staffName}, October 2026` }).click();
+  const fine = admin.getByRole("dialog", { name: `Penalty: ${staffName}, October 2026` }).locator("form");
+  await fine.locator('input[name="penalty"]').fill("10000");
+  await fine.locator('input[name="penaltyReason"]').fill("Unauthorised absence");
+  await fine.getByRole("button", { name: "Save penalty" }).click();
+  await expect(fine.getByRole("status")).toContainText("Penalty saved");
+  // The payroll schedule, in Finance's columns.
+  await admin.goto("/hrportal/payroll/runs/2026-10?view=schedule");
+  for (const heading of ["Annual Gross", "Monthly Gross After Penalty", "Annual Rent Paid", "Rent relief (20%)", "Total Reliefs", "Monthly Net Pay", "Employer pension (10%)", "NSITF contribution (1%)", "Total Monthly Emolument"]) {
+    await expect(admin.getByRole("columnheader", { name: heading, exact: true })).toBeVisible();
+  }
+  await expect(admin.getByRole("row", { name: new RegExp(staffName) })).toContainText("490,000.00");
   await admin.goto("/hrportal/payroll/runs/2026-10");
   const view = admin.getByRole("link", { name: `View ${staffName}'s payslip` });
   const slipUrl = (await view.getAttribute("href"))!;
@@ -709,6 +725,8 @@ test("HR and Finance set salaries and publish payslips; each person sees only th
   await expect(pages.staff.getByText("Net pay", { exact: true })).toBeVisible();
   await expect(pages.staff.getByRole("button", { name: "Print" })).toBeVisible();
   await expect(pages.staff.getByRole("cell", { name: "Development levy" })).toBeVisible();
+  await expect(pages.staff.getByRole("cell", { name: "Penalty: Unauthorised absence" })).toBeVisible();
+  await expect(pages.staff.getByText("Paid by LHI on top of your pay")).toBeVisible();
   expect((await pages.manager.goto(slipUrl))?.status()).toBe(404);
   // It downloads as a PDF for its owner (and HR/Finance), and for nobody else.
   const download = pages.staff.waitForEvent("download");

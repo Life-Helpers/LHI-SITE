@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { BASE_LABEL, describeRule, naira, payMonthLabel, ruleApplies } from "@/lib/hr/payroll";
+import { BASE_LABEL, describeRule, KIND_LABEL, naira, payMonthLabel, ruleApplies } from "@/lib/hr/payroll";
 import type { HrPayslip, HrSalary, PayrollRule } from "@/lib/hr/types";
 import { Field, inputClass } from "@/components/hr/ui";
 
@@ -70,6 +70,40 @@ export function PayslipView({ slip, preview = false }: { slip: HrPayslip; /** Wo
         <span className="font-semibold">Net pay</span>
         <span className="text-xl font-bold tabular-nums">{naira(slip.net)}</span>
       </div>
+      {slip.schedule && (slip.schedule.reliefs.length > 0 || slip.schedule.employer.length > 0) && (
+        <div className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
+          {slip.schedule.reliefs.length > 0 && (
+            <section>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-admin-muted">Tax reliefs (lower your taxable pay)</h3>
+              <dl className="mt-1 space-y-1">
+                {slip.schedule.reliefs.map((l) => (
+                  <div key={l.name} className="flex justify-between gap-4">
+                    <dt>{l.name}</dt>
+                    <dd className="tabular-nums">{naira(l.amount)}</dd>
+                  </div>
+                ))}
+                <div className="flex justify-between gap-4 text-admin-muted">
+                  <dt>Taxable pay this month</dt>
+                  <dd className="tabular-nums">{naira(slip.schedule.taxable)}</dd>
+                </div>
+              </dl>
+            </section>
+          )}
+          {slip.schedule.employer.length > 0 && (
+            <section>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-admin-muted">Paid by LHI on top of your pay</h3>
+              <dl className="mt-1 space-y-1">
+                {slip.schedule.employer.map((l) => (
+                  <div key={l.name} className="flex justify-between gap-4">
+                    <dt>{l.name}</dt>
+                    <dd className="tabular-nums">{naira(l.amount)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+        </div>
+      )}
       <p className="mt-6 text-xs text-admin-muted">
         Prepared by {slip.preparedByName}
         {slip.publishedAt ? ` · issued ${slip.publishedAt.slice(0, 10)}` : ""}. Life Helpers Initiative. This payslip is confidential.
@@ -100,6 +134,9 @@ export function SalaryFields({ salary, rules }: { salary?: HrSalary; rules: Payr
           <input name="transport" type="number" min={0} step="0.01" defaultValue={salary?.transport ?? 0} className={inputClass} />
         </Field>
       </div>
+      <Field label="Rent paid a year (₦, optional)" hint="For rent relief: 20% of yearly rent comes off taxable pay, up to ₦500,000 a year. Leave 0 if none.">
+        <input name="annualRent" type="number" min={0} step="0.01" defaultValue={salary?.annualRent ?? 0} className={`${inputClass} max-w-xs`} />
+      </Field>
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium">Other monthly allowances (optional)</legend>
         {extra("allowance", salary?.allowances)}
@@ -109,7 +146,7 @@ export function SalaryFields({ salary, rules }: { salary?: HrSalary; rules: Payr
         {extra("deduction", salary?.deductions)}
       </fieldset>
       <fieldset>
-        <legend className="text-sm font-medium">Taxes and statutory deductions for this person</legend>
+        <legend className="text-sm font-medium">Taxes, reliefs and contributions for this person</legend>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           {rules
             .filter((r) => r.active)
@@ -139,6 +176,15 @@ export function RuleFields({ rule }: { rule?: PayrollRule }) {
         <Field label="Name">
           <input name="name" required maxLength={60} defaultValue={rule?.name} placeholder="e.g. Development levy" className={inputClass} />
         </Field>
+        <Field label="What it is">
+          <select name="kind" defaultValue={rule?.kind ?? "deduction"} className={inputClass}>
+            {(Object.keys(KIND_LABEL) as (keyof typeof KIND_LABEL)[]).map((k) => (
+              <option key={k} value={k}>
+                {KIND_LABEL[k]}
+              </option>
+            ))}
+          </select>
+        </Field>
         <Field label="Worked out as">
           <select name="method" defaultValue={rule?.method ?? "percent"} className={inputClass}>
             <option value="percent">A percentage</option>
@@ -152,7 +198,10 @@ export function RuleFields({ rule }: { rule?: PayrollRule }) {
         <Field label="Amount (₦ a month)" hint="For a fixed amount.">
           <input name="amount" type="number" min={0} step="0.01" defaultValue={rule?.method === "fixed" ? rule.amount : ""} className={inputClass} />
         </Field>
-        <Field label="Worked out on" hint="For a percentage or bands. Taxable pay is gross less the items taken off before tax.">
+        <Field label="Yearly limit (₦, optional)" hint="Most it can come to in a year, e.g. ₦500,000 for rent relief. Blank for no limit.">
+          <input name="cap" type="number" min={0} step="0.01" defaultValue={rule?.cap ?? ""} className={inputClass} />
+        </Field>
+        <Field label="Worked out on" hint="For a percentage or bands. Taxable pay is gross less penalties, items taken off before tax, and reliefs.">
           <select name="base" defaultValue={rule?.base ?? "taxable"} className={inputClass}>
             {(Object.keys(BASE_LABEL) as (keyof typeof BASE_LABEL)[]).map((b) => (
               <option key={b} value={b}>
@@ -174,7 +223,7 @@ export function RuleFields({ rule }: { rule?: PayrollRule }) {
       </fieldset>
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
         <label className="flex items-center gap-2">
-          <input type="checkbox" name="beforeTax" defaultChecked={rule?.beforeTax ?? false} /> Taken off before tax (like pension)
+          <input type="checkbox" name="beforeTax" defaultChecked={rule?.beforeTax ?? false} /> Taken off before tax (like employee pension; deductions only)
         </label>
         <label className="flex items-center gap-2">
           <input type="checkbox" name="defaultOn" defaultChecked={rule?.defaultOn ?? true} /> Applies to everyone unless unticked for a person

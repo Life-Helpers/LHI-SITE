@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { annualTax, monthlyPay, payrollRules } from "@/lib/hr/payroll";
+import { payrollSchedule } from "@/lib/hr/payroll-schedule";
 import { DEFAULT_PAYROLL_RULES, NTA_2025_BANDS, type PayrollRule } from "@/lib/hr/types";
 
 const bands = NTA_2025_BANDS;
@@ -63,3 +64,77 @@ describe("editable taxes and deductions", () => {
   });
 });
 
+
+describe("LHI payroll schedule", () => {
+  // Monthly gross 500,000; rent 1,200,000 a year.
+  const salary = { basic: 300_000, housing: 150_000, transport: 50_000, allowances: [], deductions: [], annualRent: 1_200_000 };
+
+  it("takes pension and rent relief off taxable pay, and adds employer pension and NSITF on top", () => {
+    const pay = monthlyPay(salary, rules);
+    const s = pay.schedule;
+    expect(s.beforeTax).toEqual([{ name: "Pension (employee) (8%)", amount: 40_000 }]);
+    expect(s.reliefs).toEqual([{ name: "Rent relief (20%)", amount: 20_000 }]); // 240,000 a year / 12
+    expect(s.totalReliefs).toBe(60_000);
+    expect(s.taxable).toBe(440_000);
+    // 5,280,000 a year: 330,000 + 2,280,000 x 18% = 740,400; / 12 = 61,700.
+    expect(s.tax).toEqual([{ name: "PAYE tax", amount: 61_700 }]);
+    expect(pay.net).toBe(398_300);
+    // Rent relief isn't taken from pay.
+    expect(pay.deductions.map((d) => d.name)).toEqual(["Pension (employee) (8%)", "PAYE tax"]);
+    expect(s.employer).toEqual([
+      { name: "Employer pension (10%)", amount: 50_000 },
+      { name: "NSITF contribution (1%)", amount: 5_000 },
+    ]);
+    expect(s.totalEmolument).toBe(555_000);
+  });
+
+  it("takes a penalty off gross before tax, and caps rent relief at ₦500,000 a year", () => {
+    const pay = monthlyPay(salary, rules, { penalty: 10_000, penaltyReason: "Absence" });
+    expect(pay.schedule.grossAfterPenalty).toBe(490_000);
+    expect(pay.deductions[0]).toEqual({ name: "Penalty: Absence", amount: 10_000 });
+    expect(pay.schedule.taxable).toBe(430_000);
+    expect(pay.schedule.tax[0].amount).toBe(59_900); // (330,000 + 2,160,000 x 18%) / 12
+    expect(pay.net).toBe(390_100);
+    expect(pay.schedule.totalEmolument).toBe(544_900); // 490,000 + 50,000 + 4,900
+    expect(monthlyPay({ ...salary, annualRent: 3_000_000 }, rules).schedule.reliefs[0].amount).toBeCloseTo(500_000 / 12, 2);
+  });
+
+  it("adds the new standard rules once to saved rule lists, and not after", () => {
+    const saved = [rules[0], rules[2]];
+    expect(payrollRules({ rules: saved }).map((r) => r.id)).toEqual(["pension", "paye", "rent_relief", "employer_pension", "nsitf"]);
+    expect(payrollRules({ rules: saved, rulesVersion: 2 }).map((r) => r.id)).toEqual(["pension", "paye"]);
+  });
+
+  it("lays the run out in the schedule's columns, with totals", () => {
+    const slip = (id: string, name: string, penalty = 0) => ({
+      id,
+      employeeId: id,
+      month: "2026-10",
+      status: "draft" as const,
+      employee: { name, staffNumber: "", jobTitle: "Officer", department: "", bankName: "", bankAccountEnding: "" },
+      ...monthlyPay(salary, rules, { penalty }),
+      penalty: penalty || undefined,
+      preparedByName: "",
+      createdAt: "",
+    });
+    const { columns, rows, totals } = payrollSchedule([slip("a", "Amina", 10_000), slip("b", "Bello")]);
+    expect(columns.map((c) => c.label)).toEqual([
+      "Annual Gross",
+      "Monthly Gross",
+      "Penalty",
+      "Monthly Gross After Penalty",
+      "Annual Rent Paid",
+      "Pension (employee) (8%)",
+      "Rent relief (20%)",
+      "Total Reliefs",
+      "PAYE tax",
+      "Monthly Net Pay",
+      "Employer pension (10%)",
+      "NSITF contribution (1%)",
+      "Total Monthly Emolument",
+    ]);
+    expect(rows[1].values.annualGross).toBe(6_000_000);
+    expect(totals.net).toBe(390_100 + 398_300);
+    expect(totals.totalEmolument).toBe(544_900 + 555_000);
+  });
+});

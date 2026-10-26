@@ -39,7 +39,7 @@ export default async function ComponentsPage() {
                 <th scope="col" className="px-4 py-3">#</th>
                 <th scope="col" className="px-4 py-3">Name</th>
                 <th scope="col" className="px-4 py-3">Calculation</th>
-                <th scope="col" className="px-4 py-3">Before tax</th>
+                <th scope="col" className="px-4 py-3">Type</th>
                 <th scope="col" className="px-4 py-3">Applies to</th>
                 <th scope="col" className="px-4 py-3">Status</th>
                 <th scope="col" className="px-4 py-3 text-center">Actions</th>
@@ -51,7 +51,7 @@ export default async function ComponentsPage() {
                   <td className="px-4 py-3 text-admin-muted">{i + 1}</td>
                   <td className="px-4 py-3 font-medium">{r.name}</td>
                   <td className="px-4 py-3">{describeRule(r)}</td>
-                  <td className="px-4 py-3">{r.beforeTax ? "Yes" : "No"}</td>
+                  <td className="px-4 py-3">{r.kind === "relief" ? "Tax relief" : r.kind === "employer" ? "Paid by LHI" : r.beforeTax ? "Deduction, before tax" : "Deduction"}</td>
                   <td className="px-4 py-3">{r.defaultOn ? "Everyone (unless unticked)" : "Only people ticked"}</td>
                   <td className="px-4 py-3">
                     <Badge status={r.active ? "approved" : "rejected"} label={r.active ? "In use" : "Switched off"} />

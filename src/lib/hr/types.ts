@@ -415,6 +415,8 @@ export interface HrSalary {
   allowances: PayLine[];
   /** Other regular deductions (e.g. a staff loan). */
   deductions: PayLine[];
+  /** Rent the person pays a year (naira), for rent relief; 0 or unset if none. */
+  annualRent?: number;
   /** Which payroll rules apply to this person (rule id -> yes/no); rules not listed use their default. */
   applies?: Record<string, boolean>;
   /** Older salaries: pension and NHF on or off (read as applies.pension / applies.nhf). */
@@ -425,7 +427,8 @@ export interface HrSalary {
 }
 
 /** What a percentage is taken of. "taxable" is gross pay less the items taken off before tax. */
-export type PayBase = "basic" | "basic_housing_transport" | "gross" | "taxable";
+/** What a rule is worked out on. "annual_rent" is the rent the person says they pay a year. */
+export type PayBase = "basic" | "basic_housing_transport" | "gross" | "taxable" | "annual_rent";
 
 /** A tax or statutory deduction Finance can add, edit, switch off or remove. */
 export interface PayrollRule {
@@ -445,6 +448,13 @@ export interface PayrollRule {
   /** Applies to new salaries unless unticked for the person. */
   defaultOn: boolean;
   active: boolean;
+  /**
+   * What it is (default "deduction"): taken from pay; a tax "relief" (lowers taxable pay only,
+   * like rent relief); or an "employer" contribution LHI pays on top (like employer pension, NSITF).
+   */
+  kind?: "deduction" | "relief" | "employer";
+  /** Most it can come to in a year (naira), e.g. rent relief's ₦500,000; null or unset for no limit. */
+  cap?: number | null;
 }
 
 /** Payroll rules: the taxes and statutory deductions on every payslip. */
@@ -453,6 +463,8 @@ export interface HrPayrollSettings {
   rules: PayrollRule[];
   updatedAt: string;
   updatedByName: string;
+  /** Bumped when new standard rules are added, so saved rule lists get them once (see payrollRules). */
+  rulesVersion?: number;
   /** Older stored rates, turned into rules when read (see payrollRules). */
   pensionRate?: number;
   nhfRate?: number;
@@ -477,9 +489,17 @@ export const DEFAULT_PAYROLL_RULES: PayrollRule[] = [
   { id: "pension", name: "Pension (employee)", method: "percent", rate: 8, amount: 0, base: "basic_housing_transport", bands: [], beforeTax: true, defaultOn: true, active: true },
   { id: "nhf", name: "National Housing Fund", method: "percent", rate: 2.5, amount: 0, base: "basic", bands: [], beforeTax: true, defaultOn: false, active: true },
   { id: "paye", name: "PAYE tax", method: "bands", rate: 0, amount: 0, base: "taxable", bands: NTA_2025_BANDS, beforeTax: false, defaultOn: true, active: true },
+  // Nigeria Tax Act 2025: rent relief is 20% of yearly rent paid, up to ₦500,000 a year.
+  { id: "rent_relief", name: "Rent relief", method: "percent", rate: 20, amount: 0, base: "annual_rent", bands: [], beforeTax: false, defaultOn: true, active: true, kind: "relief", cap: 500_000 },
+  { id: "employer_pension", name: "Employer pension", method: "percent", rate: 10, amount: 0, base: "basic_housing_transport", bands: [], beforeTax: false, defaultOn: true, active: true, kind: "employer" },
+  { id: "nsitf", name: "NSITF contribution", method: "percent", rate: 1, amount: 0, base: "gross", bands: [], beforeTax: false, defaultOn: true, active: true, kind: "employer" },
 ];
 
-export const DEFAULT_PAYROLL_SETTINGS: HrPayrollSettings = { id: "settings", rules: DEFAULT_PAYROLL_RULES, updatedAt: "", updatedByName: "" };
+/** Rules added after the first release; saved rule lists older than this version get them once. */
+export const PAYROLL_RULES_VERSION = 2;
+export const RULES_ADDED_IN_V2 = ["rent_relief", "employer_pension", "nsitf"];
+
+export const DEFAULT_PAYROLL_SETTINGS: HrPayrollSettings = { id: "settings", rules: DEFAULT_PAYROLL_RULES, updatedAt: "", updatedByName: "", rulesVersion: PAYROLL_RULES_VERSION };
 
 /** A month's payslip: a fixed copy of the pay at the time, so later salary changes don't alter it. */
 export interface HrPayslip {
@@ -501,6 +521,34 @@ export interface HrPayslip {
   payDate?: string;
   /** First time the employee opened it after it was published. */
   viewedAt?: string;
+  /** Taken off this month's gross before anything else (e.g. lateness), with the reason. */
+  penalty?: number;
+  penaltyReason?: string;
+  /** The payroll schedule figures (payslips made before these existed don't have them). */
+  schedule?: PaySchedule;
+}
+
+/** The figures on LHI's payroll schedule for one person and month. */
+export interface PaySchedule {
+  grossAfterPenalty: number;
+  annualRent: number;
+  /** Taken off before tax (e.g. employee pension). */
+  beforeTax: PayLine[];
+  /** Reliefs: lower taxable pay only (e.g. rent relief). */
+  reliefs: PayLine[];
+  /** Before-tax items plus reliefs. */
+  totalReliefs: number;
+  taxable: number;
+  /** Banded taxes (PAYE). */
+  tax: PayLine[];
+  /** Other rules taken from pay (e.g. NHF after tax, a levy). */
+  other: PayLine[];
+  /** The person's own regular deductions (e.g. a staff loan). */
+  own: PayLine[];
+  /** Paid by LHI on top of pay (employer pension, NSITF). */
+  employer: PayLine[];
+  /** Gross after penalty plus employer contributions: what the month costs LHI. */
+  totalEmolument: number;
 }
 
 export interface HrAuditEntry {

@@ -106,6 +106,27 @@ export async function payslipPdf(slip: HrPayslip, logo?: Uint8Array): Promise<Ui
   text(page, "Net pay", left + 12, y + 2, 12, bold);
   textRight(page, pdfAmount(slip.net), right - 12, y + 1, 15, bold);
 
+  // Reliefs and what LHI pays on top, when there are any.
+  const extra: [string, { name: string; amount: number }[]][] = [];
+  if (slip.schedule?.reliefs.length) extra.push(["Tax reliefs (lower taxable pay)", [...slip.schedule.reliefs, { name: "Taxable pay this month", amount: slip.schedule.taxable }]]);
+  if (slip.schedule?.employer.length) extra.push(["Paid by LHI on top of your pay", slip.schedule.employer]);
+  if (extra.length) {
+    y -= 40;
+    const top = y;
+    extra.forEach(([title, lines], i) => {
+      const x = i === 0 ? left : mid + 8;
+      const end = i === 0 ? mid - 8 : right;
+      let yy = top;
+      text(page, title, x, yy, 8.5, bold, MUTED);
+      for (const l of lines) {
+        yy -= 15;
+        text(page, l.name.slice(0, 34), x, yy, 9.5);
+        textRight(page, pdfAmount(l.amount), end, yy, 9.5);
+      }
+      y = Math.min(y, yy);
+    });
+  }
+
   y -= 44;
   text(page, `Prepared by ${slip.preparedByName}${slip.publishedAt ? ` - issued ${slip.publishedAt.slice(0, 10)}` : ""}.`, left, y, 8.5, font, MUTED);
   text(page, "Life Helpers Initiative. This payslip is confidential.", left, y - 12, 8.5, font, MUTED);

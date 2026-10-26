@@ -50,6 +50,7 @@ import {
   type HrLeavePolicy,
   type PayrollRule,
   type HrSalary,
+  PAYROLL_RULES_VERSION,
   type HrPayslip,
   type PayLine,
   type HrLeaveRequest,
@@ -1427,12 +1428,12 @@ const SAMPLE_PEOPLE = [
 ] as const;
 
 /** Made-up monthly pay for each sample person (same order), to try payroll with. */
-const SAMPLE_PAY: { basic: number; housing: number; transport: number; allowances: PayLine[]; deductions: PayLine[]; bank: string }[] = [
-  { basic: 450_000, housing: 180_000, transport: 70_000, allowances: [{ name: "Field allowance", amount: 40_000 }], deductions: [], bank: "First Bank" },
-  { basic: 220_000, housing: 90_000, transport: 40_000, allowances: [{ name: "Field allowance", amount: 25_000 }], deductions: [{ name: "Staff loan repayment", amount: 15_000 }], bank: "Access Bank" },
-  { basic: 260_000, housing: 100_000, transport: 45_000, allowances: [], deductions: [], bank: "Zenith Bank" },
-  { basic: 300_000, housing: 120_000, transport: 50_000, allowances: [], deductions: [{ name: "Cooperative savings", amount: 10_000 }], bank: "GTBank" },
-  { basic: 650_000, housing: 260_000, transport: 90_000, allowances: [{ name: "Responsibility allowance", amount: 60_000 }], deductions: [], bank: "UBA" },
+const SAMPLE_PAY: { basic: number; housing: number; transport: number; annualRent: number; allowances: PayLine[]; deductions: PayLine[]; bank: string }[] = [
+  { basic: 450_000, housing: 180_000, transport: 70_000, annualRent: 1_800_000, allowances: [{ name: "Field allowance", amount: 40_000 }], deductions: [], bank: "First Bank" },
+  { basic: 220_000, housing: 90_000, transport: 40_000, annualRent: 600_000, allowances: [{ name: "Field allowance", amount: 25_000 }], deductions: [{ name: "Staff loan repayment", amount: 15_000 }], bank: "Access Bank" },
+  { basic: 260_000, housing: 100_000, transport: 45_000, annualRent: 0, allowances: [], deductions: [], bank: "Zenith Bank" },
+  { basic: 300_000, housing: 120_000, transport: 50_000, annualRent: 960_000, allowances: [], deductions: [{ name: "Cooperative savings", amount: 10_000 }], bank: "GTBank" },
+  { basic: 650_000, housing: 260_000, transport: 90_000, annualRent: 3_000_000, allowances: [{ name: "Responsibility allowance", amount: 60_000 }], deductions: [], bank: "UBA" },
 ];
 
 const roleName = (id: string) => BUILT_IN_HR_ROLES.find((r) => r.id === id)?.name ?? id;
@@ -1521,8 +1522,8 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
     // Salaries only for someone who may set them (HR Administrators can).
     const salaries: HrSalary[] = has(ctx.permissions, "payroll.salaries.manage")
       ? people.map((e, i) => {
-          const { basic, housing, transport, allowances, deductions } = SAMPLE_PAY[i];
-          return { employeeId: e.id, basic, housing, transport, allowances, deductions, updatedAt: now, updatedByName: `${ctx.displayName} (sample)` };
+          const { basic, housing, transport, annualRent, allowances, deductions } = SAMPLE_PAY[i];
+          return { employeeId: e.id, basic, housing, transport, annualRent, allowances, deductions, updatedAt: now, updatedByName: `${ctx.displayName} (sample)` };
         })
       : [];
     if (salaries.length) await updateStore("hrSalaries", (items) => ({ items: [...items, ...salaries] }));
@@ -1794,9 +1795,10 @@ export async function saveSalaryAction(_prev: HrResult | null, form: FormData): 
     const basic = money(form, "basic");
     const housing = money(form, "housing");
     const transport = money(form, "transport");
+    const annualRent = money(form, "annualRent");
     const allowances = payLines(form, "allowance");
     const deductions = payLines(form, "deduction");
-    if ([basic, housing, transport].some(Number.isNaN)) return fail("Amounts must be numbers of naira (e.g. 250000).");
+    if ([basic, housing, transport, annualRent].some(Number.isNaN)) return fail("Amounts must be numbers of naira (e.g. 250000).");
     if (!basic) return fail("Enter the basic salary.");
     if (!allowances || !deductions) return fail("Each extra allowance or deduction needs a name and an amount.");
     // Each tax or deduction ticked (or not) for this person.
@@ -1806,6 +1808,7 @@ export async function saveSalaryAction(_prev: HrResult | null, form: FormData): 
       basic,
       housing,
       transport,
+      annualRent,
       allowances,
       deductions,
       applies: Object.fromEntries(rules.map((r) => [r.id, form.get(`apply_${r.id}`) !== null])),
@@ -1821,7 +1824,8 @@ export async function saveSalaryAction(_prev: HrResult | null, form: FormData): 
   });
 }
 
-const PAY_BASES = ["basic", "basic_housing_transport", "gross", "taxable"] as const;
+const PAY_BASES = ["basic", "basic_housing_transport", "gross", "taxable", "annual_rent"] as const;
+const RULE_KINDS = ["deduction", "relief", "employer"] as const;
 
 /** HR or Finance adds or edits a tax or statutory deduction (e.g. a new levy, or new PAYE bands). */
 export async function savePayrollRuleAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
@@ -1833,8 +1837,15 @@ export async function savePayrollRuleAction(_prev: HrResult | null, form: FormDa
     const base = text(form, "base", 30) as PayrollRule["base"];
     const rate = Number(text(form, "rate", 10) || 0);
     const amount = money(form, "amount");
-    const beforeTax = form.get("beforeTax") !== null;
+    const kind = (text(form, "kind", 10) || "deduction") as NonNullable<PayrollRule["kind"]>;
+    // Only items taken from pay can be "before tax"; reliefs lower taxable pay by definition.
+    const beforeTax = kind === "deduction" && form.get("beforeTax") !== null;
+    const capRaw = text(form, "cap", 20).replace(/,/g, "");
+    const cap = capRaw ? Number(capRaw) : null;
     if (!name) return fail("Give it a name, e.g. Development levy.");
+    if (!RULE_KINDS.includes(kind)) return fail("Choose what kind of item it is.");
+    if (cap !== null && (!Number.isFinite(cap) || cap <= 0)) return fail("Enter the yearly limit in naira, or leave it blank for no limit.");
+    if (kind === "relief" && base === "taxable") return fail("A relief can't be worked out on taxable pay. Choose yearly rent paid, basic, or gross.");
     if (!["percent", "fixed", "bands"].includes(method)) return fail("Choose how it's worked out.");
     if (!PAY_BASES.includes(base)) return fail("Choose what it's worked out on.");
     if (method === "percent" && (!Number.isFinite(rate) || rate <= 0 || rate > 100)) return fail("Enter a percentage above 0 and up to 100.");
@@ -1871,9 +1882,11 @@ export async function savePayrollRuleAction(_prev: HrResult | null, form: FormDa
       beforeTax,
       defaultOn: form.get("defaultOn") !== null,
       active: existingId ? form.get("active") !== null : true,
+      kind,
+      cap,
     };
     const next = current ? rules.map((r) => (r.id === rule.id ? rule : r)) : [...rules, rule];
-    await updateStore("hrPayrollSettings", () => ({ items: [{ id: "settings" as const, rules: next, updatedAt: new Date().toISOString(), updatedByName: ctx.displayName }] }));
+    await updateStore("hrPayrollSettings", () => ({ items: [{ id: "settings" as const, rules: next, updatedAt: new Date().toISOString(), updatedByName: ctx.displayName, rulesVersion: PAYROLL_RULES_VERSION }] }));
     await hrAudit(ctx, current ? "changed payroll item" : "added payroll item", `payroll ${name}`, `${describeRule(rule)}${rule.beforeTax ? ", before tax" : ""}${rule.active ? "" : ", switched off"}`);
     refresh();
     return done(`${name} saved. It applies to payslips prepared from now on; published payslips don't change.`);
@@ -1887,7 +1900,7 @@ export async function deletePayrollRuleAction(_prev: HrResult | null, form: Form
     const rules = payrollRules((await readStore("hrPayrollSettings"))[0]);
     const rule = rules.find((r) => r.id === id);
     if (!rule) return fail("That item wasn't found.");
-    await updateStore("hrPayrollSettings", () => ({ items: [{ id: "settings" as const, rules: rules.filter((r) => r.id !== id), updatedAt: new Date().toISOString(), updatedByName: ctx.displayName }] }));
+    await updateStore("hrPayrollSettings", () => ({ items: [{ id: "settings" as const, rules: rules.filter((r) => r.id !== id), updatedAt: new Date().toISOString(), updatedByName: ctx.displayName, rulesVersion: PAYROLL_RULES_VERSION }] }));
     await hrAudit(ctx, "removed payroll item", `payroll ${rule.name}`);
     refresh();
     return done(`${rule.name} removed. Published payslips keep it.`);
@@ -1919,12 +1932,15 @@ export async function preparePayslipsAction(_prev: HrResult | null, form: FormDa
     const now = new Date().toISOString();
     const counts = await updateStore<"hrPayslips", { made: number; kept: number }>("hrPayslips", (items) => {
       const published = new Set(items.filter((p) => p.month === month && p.status === "published").map((p) => p.employeeId));
+      // Penalties already entered on this month's drafts carry over when the drafts are prepared again.
+      const penalties = new Map(items.filter((p) => p.month === month && p.status === "draft" && p.penalty).map((p) => [p.employeeId, { penalty: p.penalty!, penaltyReason: p.penaltyReason ?? "" }]));
       const fresh = employees
         .filter((e) => isCurrentStaff(e) && !published.has(e.id))
         .flatMap((e) => {
           const salary = salaries.find((s) => s.employeeId === e.id);
           if (!salary) return [];
-          const pay = monthlyPay(salary, rules);
+          const kept = penalties.get(e.id);
+          const pay = monthlyPay(salary, rules, kept);
           return [
             {
               id: randomUUID(),
@@ -1943,6 +1959,7 @@ export async function preparePayslipsAction(_prev: HrResult | null, form: FormDa
               preparedByName: ctx.displayName,
               createdAt: now,
               payDate,
+              ...(kept ? kept : {}),
             },
           ];
         });
@@ -1955,6 +1972,36 @@ export async function preparePayslipsAction(_prev: HrResult | null, form: FormDa
     return done(
       `${counts?.made ?? 0} draft payslip${counts?.made === 1 ? "" : "s"} prepared for ${month}.${counts?.kept ? ` ${counts.kept} already published were left as they are.` : ""}${missing ? ` ${missing} current staff have no salary set yet.` : ""} Check them, then publish.`,
     );
+  });
+}
+
+/** Set (or clear, with 0) a penalty on one draft payslip; its pay is worked out again. */
+export async function setPayslipPenaltyAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("payroll.runs");
+    // Entering a penalty shows that person's pay, so it also needs "See everyone's payslips".
+    if (!has(ctx.permissions, "payroll.payslips.view")) throw new HrAccessError("You don't have permission to do that.");
+    const payslipId = text(form, "payslipId", 64);
+    const penalty = money(form, "penalty");
+    const reason = text(form, "penaltyReason", 80);
+    if (Number.isNaN(penalty) || penalty < 0) return fail("Enter the penalty in naira (0 to clear it).");
+    const [slips, salaries, settingsList] = await Promise.all([readStore("hrPayslips"), readStore("hrSalaries"), readStore("hrPayrollSettings")]);
+    const slip = slips.find((p) => p.id === payslipId);
+    if (!slip) return fail("Payslip not found.");
+    if (slip.status !== "draft") return fail("Published payslips can't be changed.");
+    if (slip.employeeId === ctx.employee.id) return fail("Ask a colleague to change your own payslip.");
+    const salary = salaries.find((x) => x.employeeId === slip.employeeId);
+    if (!salary) return fail("This person has no salary any more; prepare the month again.");
+    if (penalty > 0 && !reason) return fail("Give a short reason for the penalty (it shows on the payslip).");
+    const pay = monthlyPay(salary, payrollRules(settingsList[0]), { penalty, penaltyReason: reason });
+    if (penalty > pay.gross) return fail("The penalty can't be more than the month's gross pay.");
+    await updateStore("hrPayslips", (items) => ({
+      items: items.map((p) => (p.id === slip.id && p.status === "draft" ? { ...p, ...pay, penalty: penalty || undefined, penaltyReason: penalty ? reason : undefined } : p)),
+    }));
+    // Amounts aren't written to the audit trail.
+    await hrAudit(ctx, penalty ? "set payslip penalty" : "cleared payslip penalty", `payslip ${slip.month} ${slip.employee.name}`, penalty ? reason : "");
+    refresh();
+    return done(penalty ? `Penalty saved for ${slip.employee.name}; their draft payslip has been worked out again.` : `Penalty cleared for ${slip.employee.name}.`);
   });
 }
 
@@ -2016,7 +2063,7 @@ export async function setPayrollRuleActiveAction(_prev: HrResult | null, form: F
     const rules = payrollRules((await readStore("hrPayrollSettings"))[0]);
     const rule = rules.find((r) => r.id === id);
     if (!rule) return fail("That item wasn't found.");
-    await updateStore("hrPayrollSettings", () => ({ items: [{ id: "settings" as const, rules: rules.map((r) => (r.id === id ? { ...r, active } : r)), updatedAt: new Date().toISOString(), updatedByName: ctx.displayName }] }));
+    await updateStore("hrPayrollSettings", () => ({ items: [{ id: "settings" as const, rules: rules.map((r) => (r.id === id ? { ...r, active } : r)), updatedAt: new Date().toISOString(), updatedByName: ctx.displayName, rulesVersion: PAYROLL_RULES_VERSION }] }));
     await hrAudit(ctx, active ? "switched on payroll item" : "switched off payroll item", `payroll ${rule.name}`);
     refresh();
     return done(`${rule.name} is ${active ? "in use again" : "switched off"} for payslips prepared from now on.`);
