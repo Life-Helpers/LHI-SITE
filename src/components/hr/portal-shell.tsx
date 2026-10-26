@@ -38,10 +38,13 @@ const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrP
 export async function PortalShell({ ctx, current, crumbs = [], children }: { ctx: HrContext; current: string; crumbs?: Crumb[]; children: React.ReactNode }) {
   // Requests waiting for this person (as line manager or department head/approver).
   let waiting = 0;
+  const leave = await readStore("hrLeave");
   if (has(ctx.permissions, "team.leave.approve")) {
-    const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
+    const employees = await readStore("hrEmployees");
     waiting = leave.filter((l) => l.status === "pending" && canDecideLeave(ctx.actor, l, employees, ctx.departments)).length;
   }
+  // Relief requests waiting for this person's answer.
+  const reliefAsks = leave.filter((l) => l.relieverId === ctx.employee.id && l.status === "pending" && l.relieverStatus === "pending").length;
   const groups: ShellNavGroup[] = [];
   for (const n of NAV.filter((item) => item.any.some((p) => has(ctx.permissions, p)))) {
     const active = current === n.href || (n.href !== "/hrportal/hr" && current.startsWith(`${n.href}/`));
@@ -52,6 +55,7 @@ export async function PortalShell({ ctx, current, crumbs = [], children }: { ctx
       icon: n.icon,
       active,
       ...(n.href === "/hrportal/team" && waiting ? { badge: waiting } : {}),
+      ...(n.href === "/hrportal/me" && reliefAsks ? { badge: reliefAsks } : {}),
       ...(n.children ? { children: n.children.map((c) => ({ ...c, active: current === c.href })) } : {}),
     });
   }

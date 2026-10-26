@@ -60,6 +60,14 @@ async function signIn(page: Page, email: string) {
   await page.getByRole("button", { name: "Sign in" }).click();
 }
 
+/** The reliever accepts covering `requester`'s leave from their own My record page. */
+async function acceptRelief(page: Page, requester: string) {
+  await page.goto("/hrportal/me");
+  const accept = page.getByRole("button", { name: `Accept relief for ${requester}` }).first();
+  await accept.click();
+  await expect(accept).toHaveCount(0);
+}
+
 /** Capture the next server-action POST a page sends, to replay it from someone else's session. */
 async function captureAction(page: Page, trigger: () => Promise<void>) {
   const requestPromise = page.waitForRequest((r) => r.method() === "POST" && Boolean(r.headers()["next-action"]));
@@ -286,13 +294,21 @@ test("leave goes from employee to manager, and nobody can approve their own", as
   const form = staff.getByRole("dialog").locator("form");
   await form.getByLabel("From", { exact: true }).fill("2026-12-07");
   await form.getByLabel("To", { exact: true }).fill("2026-12-11");
+  await form.locator('select[name="relieverId"]').selectOption(employeeIds.boss);
   await form.getByRole("button", { name: "Send request" }).click();
   await expect(form.getByRole("status")).toContainText("5 working days");
+  await expect(form.getByRole("status")).toContainText(`${people.boss.first} ${people.boss.last} has been asked to confirm`);
 
-  // The manager approves it, and we keep a copy of that request to replay later.
+  // Until the reliever accepts, the manager can only reject.
   const manager = pages.manager;
   await manager.goto("/hrportal/team");
   const approve = manager.getByRole("button", { name: `Approve ${people.staff.first} ${people.staff.last}'s leave` });
+  await expect(approve).toHaveCount(0);
+  await expect(manager.getByText("Awaiting reliever").first()).toBeVisible();
+  await acceptRelief(pages.boss, `${people.staff.first} ${people.staff.last}`);
+
+  // The manager approves it, and we keep a copy of that request to replay later.
+  await manager.goto("/hrportal/team");
   const firstLeaveId = await manager.locator("form", { has: approve }).locator('input[name="leaveId"]').inputValue();
   const captured = await captureAction(manager, () => approve.click());
   // Decided requests leave the Pending tab.
@@ -304,8 +320,11 @@ test("leave goes from employee to manager, and nobody can approve their own", as
   await staff.getByRole("button", { name: "Request Leave" }).click();
   await form.getByLabel("From", { exact: true }).fill("2026-12-14");
   await form.getByLabel("To", { exact: true }).fill("2026-12-15");
+  await form.locator('select[name="relieverId"]').selectOption(employeeIds.boss);
   await form.getByRole("button", { name: "Send request" }).click();
   await expect(form.getByRole("status")).toContainText("2 working days");
+  await acceptRelief(pages.boss, `${people.staff.first} ${people.staff.last}`);
+  await staff.goto("/hrportal/me");
   await staff.reload();
   const ownLeaveId = await staff.locator('form input[name="leaveId"]').first().inputValue();
   const answer = await replay(staff, captured, [[firstLeaveId, ownLeaveId]]);
@@ -316,6 +335,60 @@ test("leave goes from employee to manager, and nobody can approve their own", as
   await expect(staff.getByRole("cell", { name: "pending", exact: true })).toBeVisible();
   // Control: the same replay from the manager's own session does go through.
   expect(await replay(manager, captured, [[firstLeaveId, ownLeaveId]])).toContain("Leave approved for Esther Staff");
+});
+
+test("relievers: chosen by the applicant, only they can answer, and a decline means choosing again", async () => {
+  test.skip(!pages.manager, "setup did not run");
+  const manager = pages.manager;
+  const managerName = `${people.manager.first} ${people.manager.last}`;
+  await manager.goto("/hrportal/me");
+  await manager.getByRole("button", { name: "Request Leave" }).click();
+  const form = manager.getByRole("dialog").locator("form");
+  await form.getByLabel("From", { exact: true }).fill("2026-12-08");
+  await form.getByLabel("To", { exact: true }).fill("2026-12-09");
+
+  // A reliever is required, and can't be someone already off in those dates.
+  await form.locator('select[name="relieverId"]').evaluate((el) => el.removeAttribute("required"));
+  await form.getByRole("button", { name: "Send request" }).click();
+  await expect(form.getByRole("alert")).toContainText("Choose who will relieve you");
+  await form.getByLabel("From", { exact: true }).fill("2026-12-08");
+  await form.getByLabel("To", { exact: true }).fill("2026-12-09");
+  await form.locator('select[name="relieverId"]').selectOption(employeeIds.staff);
+  await form.getByRole("button", { name: "Send request" }).click();
+  await expect(form.getByRole("alert")).toContainText("has leave booked in those dates");
+
+  // The officer is asked, and declines with a reason.
+  await form.getByLabel("From", { exact: true }).fill("2026-12-21");
+  await form.getByLabel("To", { exact: true }).fill("2026-12-22");
+  await form.locator('select[name="relieverId"]').selectOption(employeeIds.officer);
+  await form.getByRole("button", { name: "Send request" }).click();
+  await expect(form.getByRole("status")).toContainText("has been asked to confirm");
+
+  // Reliever details stay private: the reliever sees who and when, not the reason.
+  const officer = pages.officer;
+  await officer.goto("/hrportal/me");
+  await expect(officer.getByRole("navigation", { name: "HR portal" }).getByRole("link", { name: /My record/ })).toContainText("1");
+  const decline = officer.getByRole("button", { name: `Decline relief for ${managerName}` });
+  // Nobody else can answer for the officer, even by replaying the officer's own request.
+  const captured = await captureAction(officer, async () => {
+    officer.once("dialog", (d) => void d.accept("Away at a workshop"));
+    await decline.click();
+  });
+  await expect(decline).toHaveCount(0);
+  expect(await replay(pages.staff, captured)).toContain("can't be answered");
+
+  // The applicant sees the decline and picks someone else, who accepts.
+  await manager.goto("/hrportal/me");
+  await expect(manager.getByText("Reliever declined").first()).toBeVisible();
+  await expect(manager.getByText("Away at a workshop")).toBeVisible();
+  await manager.getByRole("button", { name: "Choose another" }).click();
+  const change = manager.getByRole("dialog", { name: "Choose a reliever" }).locator("form");
+  await change.locator('select[name="relieverId"]').selectOption(employeeIds.boss);
+  await change.getByRole("button", { name: "Ask to relieve me" }).click();
+  await expect(change.getByRole("status")).toContainText("has been asked to confirm");
+  await acceptRelief(pages.boss, managerName);
+  await manager.goto("/hrportal/me");
+  await expect(manager.getByText("Reliever accepted").first()).toBeVisible();
 });
 
 test("HR records leave for others (never themselves) and only HR can export leave", async () => {
@@ -367,8 +440,10 @@ test("departments: heads receive their staff's leave requests, and staff choose 
   const form = staff.getByRole("dialog").locator("form");
   await form.getByLabel("From", { exact: true }).fill("2027-01-04");
   await form.getByLabel("To", { exact: true }).fill("2027-01-05");
+  await form.locator('select[name="relieverId"]').selectOption(employeeIds.boss);
   await form.getByRole("button", { name: "Send request" }).click();
   await expect(form.getByRole("status")).toContainText("2 working days");
+  await acceptRelief(pages.boss, `${people.staff.first} ${people.staff.last}`);
 
   // The head (an ordinary Employee account) now has a team view with the request waiting.
   const head = pages.outsider;
@@ -621,8 +696,12 @@ test("leave types, policies and balances: HR sets allowances and requests can't 
   await form.locator('select[name="type"]').selectOption("Paternity");
   await form.getByLabel("From", { exact: true }).fill("2026-11-02");
   await form.getByLabel("To", { exact: true }).fill("2026-11-03");
+  await form.locator('select[name="relieverId"]').selectOption(employeeIds.boss);
   await form.getByRole("button", { name: "Send request" }).click();
-  await expect(form.getByRole("status")).toContainText("Paternity Leave approved");
+  await expect(form.getByRole("status")).toContainText("it's approved as soon as they accept");
+  await acceptRelief(pages.boss, `${people.officer.first} ${people.officer.last}`);
+  await pages.officer.goto("/hrportal/me");
+  await expect(pages.officer.getByRole("button", { name: "Paternity Leave: No limit · 2 used" })).toBeVisible();
 
   // Delete removes a policy for good.
   await admin.goto("/hrportal/hr/leave/policies");

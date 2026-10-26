@@ -11,6 +11,7 @@ import { readStore, updateStore } from "@/lib/cms/store";
 import { rateLimited } from "@/lib/rate-limit";
 import {
   accessProblem,
+  awaitingReliever,
   canDecideLeave,
   canGrant,
   canManageAccount,
@@ -20,6 +21,7 @@ import {
   findRole,
   has,
   homePath,
+  relieverOptions,
   workingDays,
 } from "@/lib/hr/access";
 import { mapEmployeeRows, parseCsv } from "@/lib/hr/csv-import";
@@ -278,11 +280,14 @@ async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "th
   const startDate = text(form, "startDate", 10);
   const endDate = text(form, "endDate", 10);
   const reason = text(form, "reason", 500);
-  const [types, policies, adjustments, leave] = await Promise.all([
+  const relieverId = text(form, "relieverId", 64);
+  const [types, policies, adjustments, leave, employees, accounts] = await Promise.all([
     readStore("hrLeaveTypes"),
     readStore("hrLeavePolicies"),
     readStore("hrLeaveAdjustments"),
     readStore("hrLeave"),
+    readStore("hrEmployees"),
+    readStore("hrAccounts"),
   ]);
   const leaveType = types.find((t) => t.id === type && t.active);
   if (!leaveType) return { error: "Choose a leave type." };
@@ -295,13 +300,21 @@ async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "th
   if (booked.some((l) => l.startDate <= endDate && l.endDate >= startDate)) {
     return { error: `${who === "you" ? "You already have" : "They already have"} leave booked or pending in those dates.` };
   }
+  // Staff asking for their own leave name a reliever (when anyone can relieve them); HR may add one.
+  const options = relieverOptions(employee, employees, accounts);
+  const reliever = relieverId ? options.find((e) => e.id === relieverId) : undefined;
+  if (relieverId && !reliever) return { error: "Choose a reliever from the list (a current colleague with a portal login)." };
+  if (!relieverId && who === "you" && options.length) return { error: "Choose who will relieve you while you're away." };
+  if (reliever && leave.some((l) => l.employeeId === reliever.id && (l.status === "pending" || l.status === "approved") && l.startDate <= endDate && l.endDate >= startDate)) {
+    return { error: `${employeeName(reliever)} has leave booked in those dates. Choose another reliever.` };
+  }
   const row = balanceFor(employee, Number(startDate.slice(0, 4)), types, policies, leave, adjustments).find((r) => r.type.id === type);
   if (!withinBalance(row, days)) {
     return {
       error: `That's ${days} working days, but ${who === "you" ? "you have" : "they have"} ${Math.max(0, row!.available!)} ${leaveType.name.toLowerCase()} days left in ${startDate.slice(0, 4)} (including pending requests).`,
     };
   }
-  return { type, startDate, endDate, reason, days, typeName: leaveType.name, needsApproval: approvalRequired(employee, type, policies) };
+  return { type, startDate, endDate, reason, days, typeName: leaveType.name, needsApproval: approvalRequired(employee, type, policies), reliever };
 }
 
 export async function requestLeaveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
@@ -310,19 +323,37 @@ export async function requestLeaveAction(_prev: HrResult | null, form: FormData)
     // Always for the signed-in person: no employee id is taken from the form.
     const checked = await checkLeave(form, ctx.employee, "you");
     if ("error" in checked) return fail(checked.error!);
-    const { type, startDate, endDate, reason, days, needsApproval } = checked;
+    const { type, startDate, endDate, reason, days, needsApproval, reliever } = checked;
     const now = new Date().toISOString();
-    // A policy marked "approval not required" approves the request at once.
-    const auto = needsApproval ? {} : { decidedByAccountId: "policy", decidedByName: "Approved automatically (leave policy)", decidedAt: now };
+    // A policy marked "approval not required" approves the request at once (or when the reliever accepts).
+    const approveNow = !needsApproval && !reliever;
+    const auto = approveNow ? { decidedByAccountId: "policy", decidedByName: "Approved automatically (leave policy)", decidedAt: now } : {};
     await updateStore("hrLeave", (items) => ({
-      items: [{ id: randomUUID(), employeeId: ctx.employee.id, type, startDate, endDate, days, reason, status: needsApproval ? ("pending" as const) : ("approved" as const), createdAt: now, ...auto }, ...items],
+      items: [
+        {
+          id: randomUUID(),
+          employeeId: ctx.employee.id,
+          type,
+          startDate,
+          endDate,
+          days,
+          reason,
+          status: approveNow ? ("approved" as const) : ("pending" as const),
+          createdAt: now,
+          ...(reliever ? { relieverId: reliever.id, relieverStatus: "pending" as const } : {}),
+          ...auto,
+        },
+        ...items,
+      ],
     }));
-    if (!needsApproval) await hrAudit(ctx, "approved leave", `leave of ${employeeName(ctx.employee)}`, `${checked.typeName}, ${startDate} to ${endDate}: approval not required by policy`);
+    if (approveNow) await hrAudit(ctx, "approved leave", `leave of ${employeeName(ctx.employee)}`, `${checked.typeName}, ${startDate} to ${endDate}: approval not required by policy`);
     refresh();
+    const plural = `${days} working day${days === 1 ? "" : "s"}`;
+    if (approveNow) return done(`${checked.typeName} approved: ${plural}. This leave type doesn't need approval.`);
     return done(
-      needsApproval
-        ? `Leave request sent: ${days} working day${days === 1 ? "" : "s"}.`
-        : `${checked.typeName} approved: ${days} working day${days === 1 ? "" : "s"}. This leave type doesn't need approval.`,
+      reliever
+        ? `Leave request sent: ${plural}. ${employeeName(reliever)} has been asked to confirm they'll relieve you; ${needsApproval ? "your approver can approve it once they accept" : "it's approved as soon as they accept"}.`
+        : `Leave request sent: ${plural}.`,
     );
   });
 }
@@ -352,6 +383,8 @@ export async function recordLeaveAction(_prev: HrResult | null, form: FormData):
           reason,
           status: approved ? ("approved" as const) : ("pending" as const),
           createdAt: now,
+          // On an approved paper form the reliever has already signed; otherwise they confirm in the portal.
+          ...(checked.reliever ? { relieverId: checked.reliever.id, relieverStatus: approved ? ("accepted" as const) : ("pending" as const), ...(approved ? { relieverRespondedAt: now, relieverNote: "Recorded by HR" } : {}) } : {}),
           ...(approved ? { decidedByAccountId: ctx.account.id, decidedByName: ctx.displayName, decidedAt: now, decisionNote: "Recorded by HR" } : {}),
         },
         ...items,
@@ -379,6 +412,69 @@ export async function cancelMyLeaveAction(_prev: HrResult | null, form: FormData
   });
 }
 
+/** The named reliever accepts or declines covering a colleague's leave. Only the reliever can answer. */
+export async function respondReliefAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("self.view");
+    const id = text(form, "leaveId", 64);
+    const answer = text(form, "answer", 10);
+    const note = text(form, "note", 300);
+    if (answer !== "accept" && answer !== "decline") return fail("Choose accept or decline.");
+    const [employees, policies] = await Promise.all([readStore("hrEmployees"), readStore("hrLeavePolicies")]);
+    const now = new Date().toISOString();
+    const updated = await updateStore("hrLeave", (items) => {
+      const found = items.find((l) => l.id === id);
+      // Always the signed-in person as reliever: nobody can answer for someone else.
+      if (!found || found.relieverId !== ctx.employee.id || found.status !== "pending" || found.relieverStatus !== "pending") return { items, result: null };
+      const requester = employees.find((e) => e.id === found.employeeId);
+      const autoApprove = answer === "accept" && requester !== undefined && !approvalRequired(requester, found.type, policies);
+      const next = {
+        ...found,
+        relieverStatus: answer === "accept" ? ("accepted" as const) : ("declined" as const),
+        relieverRespondedAt: now,
+        relieverNote: note,
+        ...(autoApprove ? { status: "approved" as const, decidedByAccountId: "policy", decidedByName: "Approved automatically (leave policy)", decidedAt: now } : {}),
+      };
+      return { items: items.map((l) => (l.id === id ? next : l)), result: next };
+    });
+    if (!updated) return fail("This relief request can't be answered (it may have been withdrawn, changed or already decided).");
+    const who = employeeName(employees.find((e) => e.id === updated.employeeId));
+    await hrAudit(ctx, answer === "accept" ? "accepted relief" : "declined relief", `leave of ${who}`, `${updated.startDate} to ${updated.endDate}${note ? `. Note: ${note}` : ""}`);
+    if (updated.status === "approved") await hrAudit(ctx, "approved leave", `leave of ${who}`, "Approval not required by policy; approved when the reliever accepted");
+    refresh();
+    return done(answer === "accept" ? `You've agreed to relieve ${who}.` : `You've declined. ${who} will be asked to choose someone else.`);
+  });
+}
+
+/** The person on leave names a different reliever (e.g. after a decline), while the request is pending. */
+export async function changeRelieverAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
+  return guarded(async () => {
+    const ctx = await requireHrAction("leave.request");
+    const id = text(form, "leaveId", 64);
+    const relieverId = text(form, "relieverId", 64);
+    const [leave, employees, accounts] = await Promise.all([readStore("hrLeave"), readStore("hrEmployees"), readStore("hrAccounts")]);
+    const request = leave.find((l) => l.id === id);
+    // Only the person's own, still-pending requests.
+    if (!request || request.employeeId !== ctx.employee.id || request.status !== "pending") return fail("That request can't be changed.");
+    const reliever = relieverOptions(ctx.employee, employees, accounts).find((e) => e.id === relieverId);
+    if (!reliever) return fail("Choose a reliever from the list.");
+    if (reliever.id === request.relieverId && request.relieverStatus !== "declined") return done("No change.");
+    if (leave.some((l) => l.employeeId === reliever.id && (l.status === "pending" || l.status === "approved") && l.startDate <= request.endDate && l.endDate >= request.startDate)) {
+      return fail(`${employeeName(reliever)} has leave booked in those dates. Choose another reliever.`);
+    }
+    await updateStore("hrLeave", (items) => ({
+      items: items.map((l) =>
+        l.id === id && l.employeeId === ctx.employee.id && l.status === "pending"
+          ? { ...l, relieverId: reliever.id, relieverStatus: "pending" as const, relieverRespondedAt: undefined, relieverNote: undefined }
+          : l,
+      ),
+    }));
+    await hrAudit(ctx, "changed reliever", `leave of ${employeeName(ctx.employee)}`, `${request.startDate} to ${request.endDate}: ${employeeName(reliever)}`);
+    refresh();
+    return done(`${employeeName(reliever)} has been asked to confirm they'll relieve you.`);
+  });
+}
+
 /* ------------------------------------------------------------------ Leave decisions */
 
 export async function decideLeaveAction(_prev: HrResult | null, form: FormData): Promise<HrResult> {
@@ -389,9 +485,10 @@ export async function decideLeaveAction(_prev: HrResult | null, form: FormData):
     const note = text(form, "note", 500);
     if (decision !== "approve" && decision !== "reject") return fail("Choose approve or reject.");
     const employees = await readStore("hrEmployees");
-    const decided = await updateStore("hrLeave", (items) => {
+    const decided = await updateStore<"hrLeave", HrLeaveRequest | "reliever" | null>("hrLeave", (items) => {
       const found = items.find((l) => l.id === id);
       if (!found || !canDecideLeave(ctx.actor, found, employees, ctx.departments)) return { items, result: null };
+      if (decision === "approve" && awaitingReliever(found)) return { items, result: "reliever" as const };
       const next = {
         ...found,
         status: decision === "approve" ? ("approved" as const) : ("rejected" as const),
@@ -402,6 +499,7 @@ export async function decideLeaveAction(_prev: HrResult | null, form: FormData):
       };
       return { items: items.map((l) => (l.id === id ? next : l)), result: next };
     });
+    if (decided === "reliever") return fail("The reliever hasn't accepted yet, so this can't be approved. You can still reject it.");
     if (!decided) return fail("You can't decide this request (it may already be decided, be your own, or be outside your team).");
     const who = employeeName(employees.find((e) => e.id === decided.employeeId));
     await hrAudit(ctx, `${decided.status} leave`, `leave of ${who}`, `${decided.type}, ${decided.startDate} to ${decided.endDate} (${decided.days} days)${note ? `. Note: ${note}` : ""}`);

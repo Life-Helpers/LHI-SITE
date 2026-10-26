@@ -297,6 +297,12 @@ export interface HrLeaveRequest {
   decidedByName?: string;
   decidedAt?: string;
   decisionNote?: string;
+  /** The colleague covering this person's work while they're away. */
+  relieverId?: string;
+  /** The reliever's answer; the leave can only be approved once they've accepted. */
+  relieverStatus?: "pending" | "accepted" | "declined";
+  relieverRespondedAt?: string;
+  relieverNote?: string;
   /** Test record from "Load sample data". */
   sample?: boolean;
 }

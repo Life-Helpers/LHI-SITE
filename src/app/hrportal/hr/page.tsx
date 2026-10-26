@@ -9,7 +9,7 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { QuickAction } from "@/components/hr/quick-action";
 import { Card, Field, fmtDate, fmtDateTime, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { canDecideLeave, has } from "@/lib/hr/access";
+import { awaitingReliever, canDecideLeave, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName, type HrEmployee, isCurrentStaff } from "@/lib/hr/types";
 
@@ -189,7 +189,11 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
                     </span>
                     {canDecideLeave(ctx.actor, l, employees, ctx.departments) && (
                       <span className="flex shrink-0 gap-1">
-                        <QuickAction action={decideLeaveAction} kind="approve" label={`Approve ${nameOf(l.employeeId)}'s leave`} fields={{ leaveId: l.id, decision: "approve" }} />
+                        {awaitingReliever(l) ? (
+                          <span className="self-center px-1 text-[11px] text-admin-muted">Awaiting reliever</span>
+                        ) : (
+                          <QuickAction action={decideLeaveAction} kind="approve" label={`Approve ${nameOf(l.employeeId)}'s leave`} fields={{ leaveId: l.id, decision: "approve" }} />
+                        )}
                         <QuickAction action={decideLeaveAction} kind="reject" label={`Reject ${nameOf(l.employeeId)}'s leave`} fields={{ leaveId: l.id, decision: "reject" }} askNote="Reason for rejecting (optional):" />
                       </span>
                     )}

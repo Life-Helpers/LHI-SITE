@@ -7,6 +7,7 @@ import { leaveName, leaveStyle } from "@/components/hr/leave-style";
 import { hrefWith } from "@/components/hr/query";
 import { QuickAction } from "@/components/hr/quick-action";
 import { Badge, fmtDate, inputClass, Person } from "@/components/hr/ui";
+import { awaitingReliever } from "@/lib/hr/access";
 import { employeeName, type HrEmployee, type HrLeaveRequest, type HrLeaveType } from "@/lib/hr/types";
 
 const TABS = [
@@ -168,6 +169,14 @@ export function LeaveListing({
                       {leaveName(l.type, leaveTypes)}
                     </span>
                     {l.reason && <span className="mt-0.5 block max-w-[220px] truncate text-xs text-admin-muted" title={l.reason}>{l.reason}</span>}
+                    {l.relieverId && (
+                      <span className="mt-0.5 block text-xs text-admin-muted">
+                        Reliever: {employeeName(byId.get(l.relieverId))}{" "}
+                        <span className={l.relieverStatus === "accepted" ? "text-admin-success" : l.relieverStatus === "declined" ? "text-admin-danger" : "text-admin-warning"}>
+                          ({l.relieverStatus === "accepted" ? "accepted" : l.relieverStatus === "declined" ? "declined" : "awaiting reply"})
+                        </span>
+                      </span>
+                    )}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">{l.startDate}</td>
                   <td className="whitespace-nowrap px-4 py-3">{l.endDate}</td>
@@ -190,7 +199,13 @@ export function LeaveListing({
                       )}
                       {canDecide?.(l) && (
                         <>
-                          <QuickAction action={decideLeaveAction} kind="approve" label={`Approve ${employeeName(e)}'s leave`} fields={{ leaveId: l.id, decision: "approve" }} />
+                          {awaitingReliever(l) ? (
+                            <span className="px-1 text-[11px] text-admin-muted" title="It can be approved once the reliever accepts.">
+                              Awaiting reliever
+                            </span>
+                          ) : (
+                            <QuickAction action={decideLeaveAction} kind="approve" label={`Approve ${employeeName(e)}'s leave`} fields={{ leaveId: l.id, decision: "approve" }} />
+                          )}
                           <QuickAction action={decideLeaveAction} kind="reject" label={`Reject ${employeeName(e)}'s leave`} fields={{ leaveId: l.id, decision: "reject" }} askNote="Reason for rejecting (optional):" />
                         </>
                       )}

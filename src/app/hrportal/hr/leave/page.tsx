@@ -7,10 +7,11 @@ import { LeaveFields } from "@/components/hr/leave-form";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
+import { relieverLabel } from "@/components/hr/relief-panel";
 import { hrefWith, isIsoDate, mondayOf } from "@/components/hr/query";
 import { Field, inputClass, outlineButtonClass, PageTitle, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { canDecideLeave, has } from "@/lib/hr/access";
+import { canDecideLeave, has, relieverOptions } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName, isCurrentStaff } from "@/lib/hr/types";
 
@@ -20,7 +21,7 @@ export const metadata = { title: "Leave applications" };
 export default async function LeaveApplicationsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage(["leave.view_all", "leave.manage"]);
   const params = (await searchParams) as LeaveParams;
-  const [employees, leave] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave")]);
+  const [employees, leave, accounts] = await Promise.all([readStore("hrEmployees"), readStore("hrLeave"), readStore("hrAccounts")]);
   const weekStart = mondayOf(isIsoDate(params.week) ? params.week : todayLagos());
   const canViewPeople = has(ctx.permissions, "employees.view") || has(ctx.permissions, "employees.manage");
   const viewHref = canViewPeople ? (id: string) => `/hrportal/hr/employees/${id}` : undefined;
@@ -51,7 +52,7 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
                       ))}
                     </select>
                   </Field>
-                  <LeaveFields types={ctx.leaveTypes} />
+                  <LeaveFields types={ctx.leaveTypes} relievers={relieverOptions({ id: "", departmentId: undefined }, employees, accounts).map((e) => ({ id: e.id, label: relieverLabel(e) }))} />
                   <Field label="Status">
                     <select name="status" defaultValue="pending" className={inputClass}>
                       <option value="pending">Pending (needs a decision)</option>

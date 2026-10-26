@@ -132,6 +132,25 @@ export function canDecideLeave(actor: Actor, leave: HrLeaveRequest, employees: H
   return has(actor.permissions, "team.leave.approve") && teamOf(actor.employeeId, employees, departments).has(leave.employeeId);
 }
 
+/** A named reliever hasn't accepted yet, so the leave can't be approved (it can still be rejected). */
+export const awaitingReliever = (leave: Pick<HrLeaveRequest, "relieverId" | "relieverStatus">) => Boolean(leave.relieverId) && leave.relieverStatus !== "accepted";
+
+/** May the actor approve (not just reject) this request? */
+export function canApproveLeave(actor: Actor, leave: HrLeaveRequest, employees: HrEmployee[], departments: HrDepartment[] = []): boolean {
+  return canDecideLeave(actor, leave, employees, departments) && !awaitingReliever(leave);
+}
+
+/**
+ * Who can relieve this person: current staff with an active portal login (they must confirm),
+ * not the person themselves. Colleagues in the same department come first.
+ */
+export function relieverOptions(person: Pick<HrEmployee, "id" | "departmentId">, employees: HrEmployee[], accounts: HrAccount[]): HrEmployee[] {
+  const withLogin = new Set(accounts.filter((a) => a.active && a.passwordHash).map((a) => a.employeeId));
+  return employees
+    .filter((e) => e.id !== person.id && isCurrentStaff(e) && withLogin.has(e.id))
+    .sort((a, b) => Number(b.departmentId === person.departmentId && !!person.departmentId) - Number(a.departmentId === person.departmentId && !!person.departmentId) || `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
+}
+
 /**
  * May the actor change this account (role, permissions, active state, linked employee)?
  * Nobody may change their own account, so nobody can raise their own access.

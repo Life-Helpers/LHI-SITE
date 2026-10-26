@@ -9,9 +9,10 @@ import { LeaveFields } from "@/components/hr/leave-form";
 import { LeaveListing, type LeaveParams } from "@/components/hr/leave-listing";
 import { Modal } from "@/components/hr/modal";
 import { PortalShell } from "@/components/hr/portal-shell";
+import { ReliefPanel, relieverLabel } from "@/components/hr/relief-panel";
 import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { approversFor, has } from "@/lib/hr/access";
+import { approversFor, has, relieverOptions } from "@/lib/hr/access";
 import { balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName } from "@/lib/hr/types";
@@ -23,11 +24,12 @@ export const metadata = { title: "My record" };
 export default async function MyRecordPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage("self.view");
   const params = (await searchParams) as LeaveParams;
-  const [employees, leave, policies, adjustments] = await Promise.all([
+  const [employees, leave, policies, adjustments, accounts] = await Promise.all([
     readStore("hrEmployees"),
     readStore("hrLeave"),
     readStore("hrLeavePolicies"),
     readStore("hrLeaveAdjustments"),
+    readStore("hrAccounts"),
   ]);
   const me = ctx.employee;
   const manager = employees.find((e) => e.id === me.managerId);
@@ -41,6 +43,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
   const openDepartments = ctx.departments.filter((d) => d.active).sort((a, b) => a.name.localeCompare(b.name));
   const myDepartment = ctx.departments.find((d) => d.id === me.departmentId);
   const approvers = approversFor(me, employees, ctx.departments);
+  const relievers = relieverOptions(me, employees, accounts);
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/me" crumbs={[{ label: "My record" }]}>
@@ -52,7 +55,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
           canRequest && (
             <Modal label="Request Leave" title="Request leave" description={annual ? `You have ${left} ${annual.type.name.toLowerCase()} days left this year.` : undefined}>
               <ActionForm action={requestLeaveAction} submitLabel="Send request" resetOnSuccess className="space-y-4">
-                <LeaveFields types={ctx.leaveTypes} />
+                <LeaveFields types={ctx.leaveTypes} relievers={relievers.map((e) => ({ id: e.id, label: relieverLabel(e) }))} relieverRequired />
               </ActionForm>
             </Modal>
           )
@@ -65,6 +68,8 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
         <TintStat tint="amber" icon={CalendarClock} label="Awaiting approval" value={annual?.pending ?? 0} note="Days in pending requests" />
         <TintStat tint="blue" icon={Palmtree} label="Days left" value={left} progress={total ? (left / total) * 100 : 0} />
       </div>
+
+      <ReliefPanel me={me} leave={leave} employees={employees} options={relievers} />
 
       {openDepartments.length > 0 && !myDepartment && has(ctx.permissions, "self.update") && (
         <div className="mt-6">
