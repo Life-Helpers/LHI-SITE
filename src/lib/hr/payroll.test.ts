@@ -95,7 +95,9 @@ describe("LHI payroll schedule", () => {
     expect(pay.schedule.taxable).toBe(430_000);
     expect(pay.schedule.tax[0].amount).toBe(59_900); // (330,000 + 2,160,000 x 18%) / 12
     expect(pay.net).toBe(390_100);
-    expect(pay.schedule.totalEmolument).toBe(544_900); // 490,000 + 50,000 + 4,900
+    // NSITF stays on the full gross (5,000); the emolument is what LHI pays: 490,000 + 50,000 + 5,000.
+    expect(pay.schedule.employer[1]).toEqual({ name: "NSITF contribution (1%)", amount: 5_000 });
+    expect(pay.schedule.totalEmolument).toBe(545_000);
     expect(monthlyPay({ ...salary, annualRent: 3_000_000 }, rules).schedule.reliefs[0].amount).toBeCloseTo(500_000 / 12, 2);
   });
 
@@ -103,6 +105,10 @@ describe("LHI payroll schedule", () => {
     const saved = [rules[0], rules[2]];
     expect(payrollRules({ rules: saved }).map((r) => r.id)).toEqual(["pension", "paye", "rent_relief", "employer_pension", "nsitf"]);
     expect(payrollRules({ rules: saved, rulesVersion: 2 }).map((r) => r.id)).toEqual(["pension", "paye"]);
+    // A saved NSITF rule on gross moves to gross before any penalty, once.
+    const oldNsitf = { ...rules.find((r) => r.id === "nsitf")!, base: "gross" as const };
+    expect(payrollRules({ rules: [oldNsitf], rulesVersion: 2 })[0].base).toBe("gross_before_penalty");
+    expect(payrollRules({ rules: [oldNsitf], rulesVersion: 3 })[0].base).toBe("gross");
   });
 
   it("lays the run out in the schedule's columns, with totals", () => {
@@ -135,6 +141,6 @@ describe("LHI payroll schedule", () => {
     ]);
     expect(rows[1].values.annualGross).toBe(6_000_000);
     expect(totals.net).toBe(390_100 + 398_300);
-    expect(totals.totalEmolument).toBe(544_900 + 555_000);
+    expect(totals.totalEmolument).toBe(545_000 + 555_000);
   });
 });

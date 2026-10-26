@@ -25,9 +25,12 @@ export function annualTax(amount: number, bands: PayrollRule["bands"]): number {
 export function payrollRules(settings: Partial<HrPayrollSettings> | undefined): PayrollRule[] {
   if (settings?.rules) {
     // Saved before rent relief and the employer contributions existed: add them once.
-    if ((settings.rulesVersion ?? 1) >= PAYROLL_RULES_VERSION) return settings.rules;
+    const version = settings.rulesVersion ?? 1;
+    if (version >= PAYROLL_RULES_VERSION) return settings.rules;
     const have = new Set(settings.rules.map((r) => r.id));
-    return [...settings.rules, ...DEFAULT_PAYROLL_RULES.filter((r) => RULES_ADDED_IN_V2.includes(r.id) && !have.has(r.id))];
+    const added = version < 2 ? DEFAULT_PAYROLL_RULES.filter((r) => RULES_ADDED_IN_V2.includes(r.id) && !have.has(r.id)) : [];
+    // Version 3: NSITF moved to gross before any penalty.
+    return [...settings.rules, ...added].map((r) => (r.id === "nsitf" && r.base === "gross" ? { ...r, base: "gross_before_penalty" as const } : r));
   }
   if (!settings || (settings.pensionRate === undefined && !settings.taxBands)) return DEFAULT_PAYROLL_RULES;
   return DEFAULT_PAYROLL_RULES.map((r) =>
@@ -54,7 +57,8 @@ export function ruleApplies(rule: PayrollRule, salary: Pick<HrSalary, "applies" 
 export const BASE_LABEL: Record<PayBase, string> = {
   basic: "basic",
   basic_housing_transport: "basic + housing + transport",
-  gross: "gross pay",
+  gross: "gross pay (after any penalty)",
+  gross_before_penalty: "gross pay before any penalty",
   taxable: "taxable pay",
   annual_rent: "yearly rent paid",
 };
@@ -111,6 +115,7 @@ export function monthlyPay(
     basic: salary.basic,
     basic_housing_transport: salary.basic + salary.housing + salary.transport,
     gross: grossAfterPenalty,
+    gross_before_penalty: gross,
     annual_rent: annualRent / 12,
   };
   const applying = rules.filter((r) => ruleApplies(r, salary));

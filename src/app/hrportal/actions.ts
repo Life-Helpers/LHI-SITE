@@ -1871,7 +1871,7 @@ export async function saveSalaryAction(_prev: HrResult | null, form: FormData): 
   });
 }
 
-const PAY_BASES = ["basic", "basic_housing_transport", "gross", "taxable", "annual_rent"] as const;
+const PAY_BASES = ["basic", "basic_housing_transport", "gross", "gross_before_penalty", "taxable", "annual_rent"] as const;
 const RULE_KINDS = ["deduction", "relief", "employer"] as const;
 
 /** HR or Finance adds or edits a tax or statutory deduction (e.g. a new levy, or new PAYE bands). */

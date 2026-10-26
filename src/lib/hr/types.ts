@@ -431,7 +431,7 @@ export interface HrSalary {
 
 /** What a percentage is taken of. "taxable" is gross pay less the items taken off before tax. */
 /** What a rule is worked out on. "annual_rent" is the rent the person says they pay a year. */
-export type PayBase = "basic" | "basic_housing_transport" | "gross" | "taxable" | "annual_rent";
+export type PayBase = "basic" | "basic_housing_transport" | "gross" | "gross_before_penalty" | "taxable" | "annual_rent";
 
 /** A tax or statutory deduction Finance can add, edit, switch off or remove. */
 export interface PayrollRule {
@@ -495,11 +495,12 @@ export const DEFAULT_PAYROLL_RULES: PayrollRule[] = [
   // Nigeria Tax Act 2025: rent relief is 20% of yearly rent paid, up to ₦500,000 a year.
   { id: "rent_relief", name: "Rent relief", method: "percent", rate: 20, amount: 0, base: "annual_rent", bands: [], beforeTax: false, defaultOn: true, active: true, kind: "relief", cap: 500_000 },
   { id: "employer_pension", name: "Employer pension", method: "percent", rate: 10, amount: 0, base: "basic_housing_transport", bands: [], beforeTax: false, defaultOn: true, active: true, kind: "employer" },
-  { id: "nsitf", name: "NSITF contribution", method: "percent", rate: 1, amount: 0, base: "gross", bands: [], beforeTax: false, defaultOn: true, active: true, kind: "employer" },
+  // NSITF is on the full month's gross: a penalty doesn't reduce it.
+  { id: "nsitf", name: "NSITF contribution", method: "percent", rate: 1, amount: 0, base: "gross_before_penalty", bands: [], beforeTax: false, defaultOn: true, active: true, kind: "employer" },
 ];
 
 /** Rules added after the first release; saved rule lists older than this version get them once. */
-export const PAYROLL_RULES_VERSION = 2;
+export const PAYROLL_RULES_VERSION = 3;
 export const RULES_ADDED_IN_V2 = ["rent_relief", "employer_pension", "nsitf"];
 
 export const DEFAULT_PAYROLL_SETTINGS: HrPayrollSettings = { id: "settings", rules: DEFAULT_PAYROLL_RULES, updatedAt: "", updatedByName: "", rulesVersion: PAYROLL_RULES_VERSION };
