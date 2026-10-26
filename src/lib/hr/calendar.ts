@@ -2,6 +2,7 @@
  * Portal calendar: one list of dated items (HR events, public holidays, leave, birthdays) and the
  * month-grid layout. Callers decide what the viewer may see and pass only that.
  */
+import { holidayDates, isWorkingDay } from "@/lib/hr/access";
 import { employeeName, FIXED_PUBLIC_HOLIDAYS, type HrCalendarEvent, type HrEmployee, type HrLeaveRequest, type HrLeaveType } from "@/lib/hr/types";
 
 export type CalendarKind = "meeting" | "holiday" | "leave" | "birthday" | "event";
@@ -24,17 +25,14 @@ export interface CalendarItem {
 const DAY = 86_400_000;
 export const isoDay = (t: number) => new Date(t).toISOString().slice(0, 10);
 export const addDays = (iso: string, n: number) => isoDay(Date.parse(`${iso}T12:00:00Z`) + n * DAY);
-/** The first working day after leave ending on `end` (skipping weekends and fixed public holidays). */
-export function resumptionDate(end: string): string {
+/** The first working day after leave ending on `end` (skipping weekends and public holidays). */
+export function resumptionDate(end: string, holidays: ReadonlySet<string> = holidayDates([], Number(end.slice(0, 4)), Number(end.slice(0, 4)) + 1)): string {
   let d = addDays(end, 1);
-  for (;;) {
-    const wd = new Date(`${d}T12:00:00Z`).getUTCDay();
-    if (wd !== 0 && wd !== 6 && !FIXED_PUBLIC_HOLIDAYS.some((h) => h.md === d.slice(5))) return d;
-    d = addDays(d, 1);
-  }
+  while (!isWorkingDay(d, holidays)) d = addDays(d, 1);
+  return d;
 }
 const RESUME = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
-const backOn = (end: string) => `Back on ${RESUME.format(new Date(`${resumptionDate(end)}T12:00:00Z`))}`;
+const backOn = (end: string, holidays?: ReadonlySet<string>) => `Back on ${RESUME.format(new Date(`${resumptionDate(end, holidays)}T12:00:00Z`))}`;
 
 const isLeap = (y: number) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 
@@ -48,6 +46,7 @@ export function calendarItems({
   employees,
   types,
   birthdaysOf,
+  holidays,
 }: {
   from: string;
   to: string;
@@ -60,6 +59,8 @@ export function calendarItems({
   types: HrLeaveType[];
   /** People whose birthdays the viewer may see. */
   birthdaysOf: HrEmployee[];
+  /** Public holidays, for return dates (defaults to the fixed-date ones). */
+  holidays?: ReadonlySet<string>;
 }): CalendarItem[] {
   const items: CalendarItem[] = [];
   const touches = (s: string, e: string) => s <= to && e >= from;
@@ -87,14 +88,14 @@ export function calendarItems({
       start: l.startDate,
       end: l.endDate,
       pending: l.status === "pending",
-      detail: `${l.days} working day${l.days === 1 ? "" : "s"} · ${backOn(l.endDate)}${l.status === "pending" ? " · pending approval" : ""}`,
+      detail: `${l.days} working day${l.days === 1 ? "" : "s"} · ${backOn(l.endDate, holidays)}${l.status === "pending" ? " · pending approval" : ""}`,
       personId: l.employeeId,
     });
   }
   for (const l of colleagueLeave) {
     if (l.status !== "approved" || !touches(l.startDate, l.endDate)) continue;
     const person = employees.find((e) => e.id === l.employeeId);
-    items.push({ id: `lv-${l.id}`, kind: "leave", title: `${employeeName(person)} - On leave`, start: l.startDate, end: l.endDate, detail: backOn(l.endDate) });
+    items.push({ id: `lv-${l.id}`, kind: "leave", title: `${employeeName(person)} - On leave`, start: l.startDate, end: l.endDate, detail: backOn(l.endDate, holidays) });
   }
   for (const p of birthdaysOf) {
     if (!p.dateOfBirth) continue;
@@ -105,6 +106,27 @@ export function calendarItems({
     }
   }
   return items.sort((a, b) => a.start.localeCompare(b.start) || Number(Boolean(a.time)) - Number(Boolean(b.time)) || (a.time ?? "").localeCompare(b.time ?? "") || a.title.localeCompare(b.title));
+}
+
+/**
+ * Leave only covers working days, so on the calendar it's drawn as separate runs that skip
+ * weekends and public holidays. Other items are returned as they are.
+ */
+export function workingRuns(items: CalendarItem[], holidays: ReadonlySet<string>): CalendarItem[] {
+  return items.flatMap((item) => {
+    if (item.kind !== "leave") return [item];
+    const runs: CalendarItem[] = [];
+    let runStart: string | null = null;
+    for (let d = item.start; d <= addDays(item.end, 1); d = addDays(d, 1)) {
+      const working = d <= item.end && isWorkingDay(d, holidays);
+      if (working && runStart === null) runStart = d;
+      if (!working && runStart !== null) {
+        runs.push({ ...item, id: `${item.id}-${runs.length}`, start: runStart, end: addDays(d, -1) });
+        runStart = null;
+      }
+    }
+    return runs;
+  });
 }
 
 /** The Sunday on or before `iso`. */

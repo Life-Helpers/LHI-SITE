@@ -11,7 +11,7 @@ import { relieverLabel } from "@/components/hr/relief-panel";
 import { hrefWith, isIsoDate, mondayOf } from "@/components/hr/query";
 import { Field, inputClass, outlineButtonClass, PageTitle, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { canDecideLeave, canManageApprovedLeave, has, relieverOptions } from "@/lib/hr/access";
+import { canDecideLeave, canManageApprovedLeave, has, holidayDates, relieverOptions } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName, isCurrentStaff } from "@/lib/hr/types";
 
@@ -26,6 +26,8 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
   const canViewPeople = has(ctx.permissions, "employees.view") || has(ctx.permissions, "employees.manage");
   const viewHref = canViewPeople ? (id: string) => `/hrportal/hr/employees/${id}` : undefined;
   const others = employees.filter((e) => isCurrentStaff(e) && e.id !== ctx.employee.id).sort((a, b) => employeeName(a).localeCompare(employeeName(b)));
+
+  const holidayList = [...holidayDates(await readStore("hrEvents"), new Date().getFullYear(), new Date().getFullYear() + 1)];
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/hr/leave" crumbs={[{ label: "Leave Management" }, { label: "Leave Applications" }]}>
@@ -52,7 +54,7 @@ export default async function LeaveApplicationsPage({ searchParams }: { searchPa
                       ))}
                     </select>
                   </Field>
-                  <LeaveFields types={ctx.leaveTypes} relievers={relieverOptions({ id: "", departmentId: undefined }, employees, accounts).map((e) => ({ id: e.id, label: relieverLabel(e) }))} />
+                  <LeaveFields types={ctx.leaveTypes} holidays={holidayList} relievers={relieverOptions({ id: "", departmentId: undefined }, employees, accounts).map((e) => ({ id: e.id, label: relieverLabel(e) }))} />
                   <Field label="Status">
                     <select name="status" defaultValue="pending" className={inputClass}>
                       <option value="pending">Pending (needs a decision)</option>

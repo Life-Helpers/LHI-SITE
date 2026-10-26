@@ -7,7 +7,7 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { isIsoDate, mondayOf } from "@/components/hr/query";
 import { Notice, PageTitle, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { canDecideLeave, canManageApprovedLeave, has, teamOf } from "@/lib/hr/access";
+import { canDecideLeave, canManageApprovedLeave, has, holidayDates, teamOf } from "@/lib/hr/access";
 import { balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
 import { isCurrentStaff } from "@/lib/hr/types";
@@ -35,6 +35,8 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
   const memberHref = (id: string) => `/hrportal/team/${id}`;
   const balances = team.filter((e) => isCurrentStaff(e)).map((e) => ({ employee: e, rows: balanceFor(e, Number(today.slice(0, 4)), ctx.leaveTypes, policies, leave, adjustments) }));
 
+  const holidays = holidayDates(await readStore("hrEvents"), Number(today.slice(0, 4)) - 1, Number(today.slice(0, 4)) + 1);
+
   return (
     <PortalShell ctx={ctx} current="/hrportal/team" crumbs={[{ label: "My team" }]}>
       {params.denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
@@ -57,7 +59,7 @@ export default async function TeamPage({ searchParams }: { searchParams: Promise
           viewHref={memberHref}
         />
       </div>
-      <TeamAnalytics team={team} leave={teamLeave} types={ctx.leaveTypes} balances={balances} today={today} />
+      <TeamAnalytics holidays={holidays} team={team} leave={teamLeave} types={ctx.leaveTypes} balances={balances} today={today} />
     </PortalShell>
   );
 }

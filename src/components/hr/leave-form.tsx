@@ -13,6 +13,7 @@ export function LeaveFields({
   relieverRequired = false,
   available,
   year,
+  holidays = [],
 }: {
   types: HrLeaveType[];
   /** Colleagues who can cover; omit to leave the reliever out of the form. */
@@ -26,13 +27,16 @@ export function LeaveFields({
   available?: Record<string, number | null>;
   /** The year `available` is for; leave in another year is checked by the server only. */
   year?: number;
+  /** Public holidays (ISO dates); like weekends, they aren't counted as leave days. */
+  holidays?: string[];
 }) {
   const open = types.filter((t) => t.active);
   const [type, setType] = useState(open[0]?.id ?? "");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const endRef = useRef<HTMLInputElement>(null);
-  const days = start && end && end >= start ? workingDays(start, end) : 0;
+  const holidaySet = new Set(holidays);
+  const days = start && end && end >= start ? workingDays(start, end, holidaySet) : 0;
   const sameYear = !start || !year || start.startsWith(String(year));
   const left = available && sameYear ? available[type] : undefined;
   const typeName = open.find((t) => t.id === type)?.name ?? "leave";
@@ -44,7 +48,9 @@ export function LeaveFields({
       ? "Split leave that crosses into a new year into two requests."
       : start && end && end < start
         ? "The end date is before the start date."
-        : "";
+        : start && end && days === 0
+          ? "Those dates are all weekends or public holidays, so there's nothing to take."
+          : "";
 
   // Stop the browser sending the form while the dates don't fit.
   useEffect(() => {

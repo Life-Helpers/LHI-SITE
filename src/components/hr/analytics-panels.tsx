@@ -57,6 +57,7 @@ export function OrgAnalytics({
   today,
   showPeople,
   showLeave,
+  holidays,
 }: {
   employees: HrEmployee[];
   leave: HrLeaveRequest[];
@@ -65,6 +66,8 @@ export function OrgAnalytics({
   today: string;
   showPeople: boolean;
   showLeave: boolean;
+  /** Public holidays (they aren't working days). */
+  holidays?: ReadonlySet<string>;
 }) {
   const months = lastMonths(today, 12);
   const labels = months.map(monthLabel);
@@ -79,7 +82,7 @@ export function OrgAnalytics({
     const e = employees.find((x) => x.id === id);
     return departments.find((d) => d.id === e?.departmentId)?.name ?? e?.department ?? "";
   };
-  const forecast = absenceForecast(leave.filter((l) => activeIds.has(l.employeeId)), today, 10);
+  const forecast = absenceForecast(leave.filter((l) => activeIds.has(l.employeeId)), today, 10, holidays);
   const avgTenure = active.length ? active.reduce((n, e) => n + tenureYears(e, today), 0) / active.length : null;
 
   return (
@@ -134,7 +137,7 @@ export function OrgAnalytics({
           <SectionTitle title="Leave analytics" subtitle={`Leave taken, requests and decisions. Leave is counted in the month it starts.`} />
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <Kpi label={`Leave days taken, ${year}`} value={String(days(ytd))} hint={`${ytd.length} approved request${ytd.length === 1 ? "" : "s"} so far`} />
-            <Kpi label={`Absence rate, ${year}`} value={pct(absenceRate(leave, active, today))} hint="Leave days ÷ working days available" />
+            <Kpi label={`Absence rate, ${year}`} value={pct(absenceRate(leave, active, today, holidays))} hint="Leave days ÷ working days available" />
             <Kpi label="Approval rate, 12 months" value={pct(approvalRate(inWindow), 0)} hint="Approved ÷ decided requests" />
             <Kpi label="Average time to decide" value={(() => { const d = averageDecisionDays(inWindow); return d === null ? "—" : `${num(d)} days`; })()} hint="From request to approval or rejection" />
           </div>
@@ -170,6 +173,7 @@ export function TeamAnalytics({
   types,
   balances,
   today,
+  holidays,
 }: {
   team: HrEmployee[];
   leave: HrLeaveRequest[];
@@ -177,13 +181,14 @@ export function TeamAnalytics({
   /** Each current team member's balance rows for this year. */
   balances: { employee: HrEmployee; rows: BalanceRow[] }[];
   today: string;
+  holidays?: ReadonlySet<string>;
 }) {
   const months = lastMonths(today, 12);
   const year = today.slice(0, 4);
   const active = team.filter((e) => isCurrentStaff(e));
   const ytd = leave.filter((l) => l.status === "approved" && l.startDate.startsWith(year) && l.startDate <= today);
   const soon = upcomingLeave(leave, today, 30);
-  const forecast = absenceForecast(leave, today, 10);
+  const forecast = absenceForecast(leave, today, 10, holidays);
   const annual = types.find((t) => t.id === "Annual") ?? types.find((t) => t.defaultDays !== null);
 
   return (
@@ -191,7 +196,7 @@ export function TeamAnalytics({
       <SectionTitle title="Team analytics" subtitle="Your team's leave this year and what's coming up." />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Kpi label={`Leave days taken, ${year}`} value={String(days(ytd))} hint={`${active.length ? num(days(ytd) / active.length) : "0"} per team member`} />
-        <Kpi label={`Absence rate, ${year}`} value={pct(absenceRate(leave, active, today))} hint="Leave days ÷ working days available" />
+        <Kpi label={`Absence rate, ${year}`} value={pct(absenceRate(leave, active, today, holidays))} hint="Leave days ÷ working days available" />
         <Kpi label="Booked in the next 30 days" value={String(new Set(soon.map((l) => l.employeeId)).size)} hint={`${soon.filter((l) => l.status === "pending").length} still awaiting a decision`} />
         <Kpi label="Approval rate, 12 months" value={pct(approvalRate(leave.filter((l) => l.startDate.slice(0, 7) >= months[0])), 0)} hint="Approved ÷ decided requests" />
       </div>

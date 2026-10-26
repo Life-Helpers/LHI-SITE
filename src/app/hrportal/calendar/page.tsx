@@ -10,8 +10,8 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { isIsoDate } from "@/components/hr/query";
 import { PageTitle, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { has, teamOf } from "@/lib/hr/access";
-import { addDays, calendarItems, monthWeeks, sundayOf, weekSegments, type CalendarItem, type CalendarKind } from "@/lib/hr/calendar";
+import { has, holidayDates, teamOf } from "@/lib/hr/access";
+import { addDays, calendarItems, monthWeeks, sundayOf, weekSegments, workingRuns, type CalendarItem, type CalendarKind } from "@/lib/hr/calendar";
 import { requireHrPage } from "@/lib/hr/session";
 import { isCurrentStaff } from "@/lib/hr/types";
 
@@ -57,10 +57,12 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
 
   const weeks = monthWeeks(date);
   const [from, to] = view === "month" ? [weeks[0][0], weeks.at(-1)![6]] : view === "week" ? [sundayOf(date), addDays(sundayOf(date), 6)] : [date, date];
-  const items = calendarItems({ from, to, events, leave: visibleLeave, colleagueLeave, employees, types: ctx.leaveTypes, birthdaysOf });
-  const upcoming = calendarItems({ from: today, to: addDays(today, 60), events, leave: visibleLeave, colleagueLeave, employees, types: ctx.leaveTypes, birthdaysOf }).slice(0, 8);
+  const holidays = holidayDates(events, Number(from.slice(0, 4)) - 1, Number(to.slice(0, 4)) + 1);
+  // Leave is drawn only on working days (it skips weekends and public holidays).
+  const items = workingRuns(calendarItems({ from, to, events, leave: visibleLeave, colleagueLeave, employees, types: ctx.leaveTypes, birthdaysOf, holidays }), holidays);
+  const upcoming = calendarItems({ from: today, to: addDays(today, 60), events, leave: visibleLeave, colleagueLeave, employees, types: ctx.leaveTypes, birthdaysOf, holidays }).slice(0, 8);
   const monthStart = `${date.slice(0, 7)}-01`;
-  const monthItems = calendarItems({ from: monthStart, to: addDays(`${addDays(monthStart, 32).slice(0, 7)}-01`, -1), events, leave: visibleLeave, colleagueLeave, employees, types: ctx.leaveTypes, birthdaysOf });
+  const monthItems = calendarItems({ from: monthStart, to: addDays(`${addDays(monthStart, 32).slice(0, 7)}-01`, -1), events, leave: visibleLeave, colleagueLeave, employees, types: ctx.leaveTypes, birthdaysOf, holidays });
   const eventOf = (item: CalendarItem) => (item.eventId ? events.find((e) => e.id === item.eventId) : undefined);
   const chip = (item: CalendarItem, extra: { full?: boolean; cutStart?: boolean; cutEnd?: boolean } = {}) => (
     <CalendarChip item={item} event={eventOf(item)} canEdit={canEdit} personHref={personHref(item.personId)} {...extra} />

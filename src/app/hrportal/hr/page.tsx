@@ -9,7 +9,7 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { QuickAction } from "@/components/hr/quick-action";
 import { Card, Field, fmtDate, fmtDateTime, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { awaitingReliever, canDecideLeave, has } from "@/lib/hr/access";
+import { awaitingReliever, canDecideLeave, has, holidayDates } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName, type HrEmployee, isCurrentStaff } from "@/lib/hr/types";
 
@@ -67,6 +67,8 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
   const sampleLogins = accounts.filter((a) => a.sample).length;
   const nameOf = (id: string) => employeeName(employees.find((e) => e.id === id));
   const personHref = (id: string) => (seesPeople ? `/hrportal/hr/employees/${id}` : undefined);
+
+  const holidays = holidayDates(await readStore("hrEvents"), Number(today.slice(0, 4)) - 1, Number(today.slice(0, 4)) + 1);
 
   return (
     <PortalShell ctx={ctx} current="/hrportal/hr" crumbs={[{ label: "HR overview" }]}>
@@ -235,7 +237,7 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
           </Card>
         )}
       </div>
-      <OrgAnalytics employees={employees} leave={leave} types={ctx.leaveTypes} departments={ctx.departments} today={today} showPeople={seesPeople} showLeave={seesLeave} />
+      <OrgAnalytics holidays={holidays} employees={employees} leave={leave} types={ctx.leaveTypes} departments={ctx.departments} today={today} showPeople={seesPeople} showLeave={seesLeave} />
       {has(p, "accounts.manage") && has(p, "employees.manage") && (
         <div className="mt-6">
           <Card title="Sample data for testing" subtitle="Five made-up staff (staff numbers SAMPLE-001 to SAMPLE-005) with leave requests, to try the portal safely">

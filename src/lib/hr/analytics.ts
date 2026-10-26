@@ -2,7 +2,7 @@
  * Dashboard analytics: pure functions over employee and leave records, so every figure on
  * the HR dashboard, Reports, My team and My record is worked out the same way.
  */
-import { workingDays } from "@/lib/hr/access";
+import { isWorkingDay, workingDays } from "@/lib/hr/access";
 import { isCurrentStaff, type HrEmployee, type HrLeaveRequest, type HrLeaveType } from "@/lib/hr/types";
 
 const DAY = 86_400_000;
@@ -122,19 +122,19 @@ export function averageDecisionDays(leave: HrLeaveRequest[]): number | null {
  * Absence rate: approved leave days taken so far this year as a share of the working days
  * available to current staff so far this year.
  */
-export function absenceRate(leave: HrLeaveRequest[], active: HrEmployee[], today: string): number | null {
+export function absenceRate(leave: HrLeaveRequest[], active: HrEmployee[], today: string, holidays?: ReadonlySet<string>): number | null {
   const yearStart = `${today.slice(0, 4)}-01-01`;
   const ids = new Set(active.map((e) => e.id));
   let available = 0;
   for (const e of active) {
     const from = joined(e) > yearStart ? joined(e) : yearStart;
-    if (from <= today) available += workingDays(from, today);
+    if (from <= today) available += workingDays(from, today, holidays);
   }
   if (!available) return null;
   let taken = 0;
   for (const l of leave) {
     if (l.status !== "approved" || !ids.has(l.employeeId) || l.endDate < yearStart || l.startDate > today) continue;
-    taken += workingDays(l.startDate < yearStart ? yearStart : l.startDate, l.endDate > today ? today : l.endDate);
+    taken += workingDays(l.startDate < yearStart ? yearStart : l.startDate, l.endDate > today ? today : l.endDate, holidays);
   }
   return (taken / available) * 100;
 }
@@ -146,12 +146,12 @@ export function upcomingLeave(leave: HrLeaveRequest[], today: string, days = 30)
 }
 
 /** Who is off on each working day in the next `days` days (for the absence forecast). */
-export function absenceForecast(leave: HrLeaveRequest[], today: string, days = 14) {
+export function absenceForecast(leave: HrLeaveRequest[], today: string, days = 14, holidays?: ReadonlySet<string>) {
   const out: { date: string; value: number }[] = [];
   for (let i = 0; out.length < days && i < days * 2; i++) {
     const d = new Date(at(today) + i * DAY);
-    if (d.getUTCDay() === 0 || d.getUTCDay() === 6) continue;
     const iso = d.toISOString().slice(0, 10);
+    if (!isWorkingDay(iso, holidays)) continue;
     out.push({ date: iso, value: new Set(leave.filter((l) => l.status === "approved" && l.startDate <= iso && l.endDate >= iso).map((l) => l.employeeId)).size });
   }
   return out;

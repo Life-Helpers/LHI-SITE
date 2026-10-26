@@ -21,6 +21,7 @@ import {
   exceptWebsiteAdminOnly,
   findRole,
   has,
+  holidayDates,
   homePath,
   relieverOptions,
   shortenLeave,
@@ -289,19 +290,21 @@ async function checkLeave(form: FormData, employee: HrEmployee, who: "you" | "th
   const endDate = text(form, "endDate", 10);
   const reason = text(form, "reason", 500);
   const relieverId = text(form, "relieverId", 64);
-  const [types, policies, adjustments, leave, employees, accounts] = await Promise.all([
+  const [types, policies, adjustments, leave, employees, accounts, events] = await Promise.all([
     readStore("hrLeaveTypes"),
     readStore("hrLeavePolicies"),
     readStore("hrLeaveAdjustments"),
     readStore("hrLeave"),
     readStore("hrEmployees"),
     readStore("hrAccounts"),
+    readStore("hrEvents"),
   ]);
   const leaveType = types.find((t) => t.id === type && t.active);
   if (!leaveType) return { error: "Choose a leave type." };
   if (!isDate(startDate) || !isDate(endDate) || endDate < startDate) return { error: "Enter a valid start and end date." };
-  const days = workingDays(startDate, endDate);
-  if (days < 1) return { error: "The dates chosen don't include any working days." };
+  // Only working days count: weekends and public holidays (fixed ones and those on the calendar) are free.
+  const days = workingDays(startDate, endDate, holidayDates(events, Number(startDate.slice(0, 4)), Number(endDate.slice(0, 4))));
+  if (days < 1) return { error: "The dates chosen are all weekends or public holidays, so there are no working days to take." };
   if (days > 130) return { error: "A single request can cover at most 130 working days." };
   if (startDate.slice(0, 4) !== endDate.slice(0, 4)) return { error: "Split leave that crosses into a new year into two requests (one per year)." };
   const booked = leave.filter((l) => l.employeeId === employee.id && (l.status === "pending" || l.status === "approved"));
@@ -478,10 +481,10 @@ export async function requestEarlyReturnAction(_prev: HrResult | null, form: For
 }
 
 /** Apply a return or recall: the leave ends the day before `resumeDate`, and unused days go back. */
-function endEarly(l: HrLeaveRequest, resumeDate: string, kind: "returned" | "recalled", reason: string, byName: string): HrLeaveRequest {
+function endEarly(l: HrLeaveRequest, resumeDate: string, kind: "returned" | "recalled", reason: string, byName: string, holidays: ReadonlySet<string>): HrLeaveRequest {
   const now = new Date().toISOString();
   const endedEarly = { kind, resumeDate, reason, byName, at: now };
-  const shorter = shortenLeave(l, resumeDate);
+  const shorter = shortenLeave(l, resumeDate, holidays);
   if (!shorter) return { ...l, status: "cancelled", cancelledAt: now, cancelledByName: byName, cancelReason: reason, endedEarly, returnRequest: undefined };
   return { ...l, originalEndDate: l.originalEndDate ?? l.endDate, originalDays: l.originalDays ?? l.days, endDate: shorter.endDate, days: shorter.days, endedEarly, returnRequest: undefined };
 }
@@ -494,11 +497,11 @@ export async function confirmEarlyReturnAction(_prev: HrResult | null, form: For
     const answer = text(form, "answer", 10);
     const note = text(form, "note", 300);
     if (answer !== "confirm" && answer !== "decline") return fail("Choose confirm or decline.");
-    const employees = await readStore("hrEmployees");
+    const [employees, events] = await Promise.all([readStore("hrEmployees"), readStore("hrEvents")]);
     const updated = await updateStore<"hrLeave", HrLeaveRequest | null>("hrLeave", (items) => {
       const found = items.find((l) => l.id === id);
       if (!found?.returnRequest || !canManageApprovedLeave(ctx.actor, found, employees, ctx.departments)) return { items, result: null };
-      const next = answer === "confirm" ? endEarly(found, found.returnRequest.resumeDate, "returned", found.returnRequest.reason, ctx.displayName) : { ...found, returnRequest: undefined };
+      const next = answer === "confirm" ? endEarly(found, found.returnRequest.resumeDate, "returned", found.returnRequest.reason, ctx.displayName, holidayDates(events, Number(found.startDate.slice(0, 4)), Number(found.endDate.slice(0, 4)))) : { ...found, returnRequest: undefined };
       return { items: items.map((l) => (l.id === id ? next : l)), result: next };
     });
     if (!updated) return fail("You can't confirm this return (it may already be handled, be your own, or be outside your team).");
@@ -524,12 +527,12 @@ export async function recallLeaveAction(_prev: HrResult | null, form: FormData):
     if (!isDate(resumeDate)) return fail("Enter the date they should be back at work.");
     if (!reason) return fail("Give the reason for the recall (it's kept on their record).");
     if (resumeDate < today) return fail("The return date can't be in the past.");
-    const employees = await readStore("hrEmployees");
+    const [employees, events] = await Promise.all([readStore("hrEmployees"), readStore("hrEvents")]);
     const updated = await updateStore<"hrLeave", HrLeaveRequest | "dates" | null>("hrLeave", (items) => {
       const found = items.find((l) => l.id === id);
       if (!found || !canManageApprovedLeave(ctx.actor, found, employees, ctx.departments) || found.endDate < today) return { items, result: null };
       if (resumeDate > found.endDate) return { items, result: "dates" as const };
-      const next = endEarly(found, resumeDate, "recalled", reason, ctx.displayName);
+      const next = endEarly(found, resumeDate, "recalled", reason, ctx.displayName, holidayDates(events, Number(found.startDate.slice(0, 4)), Number(found.endDate.slice(0, 4))));
       return { items: items.map((l) => (l.id === id ? next : l)), result: next };
     });
     if (updated === "dates") return fail("The return date is after the leave ends, so there's nothing to recall.");
@@ -1422,7 +1425,7 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
       const weak = validatePasswordStrength(password);
       if (weak) return fail(`Sample login password: ${weak}`);
     }
-    const [employees, departments] = await Promise.all([readStore("hrEmployees"), readStore("hrDepartments")]);
+    const [employees, departments, events] = await Promise.all([readStore("hrEmployees"), readStore("hrDepartments"), readStore("hrEvents")]);
     if (employees.some((e) => e.sample)) return fail("Sample data is already loaded. Remove it first to load it again.");
 
     const now = new Date().toISOString();
@@ -1469,7 +1472,7 @@ export async function loadSampleDataAction(_prev: HrResult | null, form: FormDat
       type,
       startDate: start,
       endDate: end,
-      days: workingDays(start, end),
+      days: workingDays(start, end, holidayDates(events, Number(start.slice(0, 4)), Number(end.slice(0, 4)))),
       reason,
       status,
       createdAt: now,

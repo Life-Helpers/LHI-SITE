@@ -6,9 +6,11 @@
  */
 import {
   ALL_HR_PERMISSIONS,
+  FIXED_PUBLIC_HOLIDAYS,
   BUILT_IN_HR_ROLES,
   isHrPermission,
   type HrAccount,
+  type HrCalendarEvent,
   type HrDepartment,
   type HrEmployee,
   type HrLeaveRequest,
@@ -149,11 +151,11 @@ export const dayBefore = (iso: string) => new Date(Date.parse(`${iso}T12:00:00Z`
  * Leave cut short by a return or recall on `resumeDate`: it now ends the day before, with the
  * working days recounted. Returns null when nothing of it is left (the leave becomes cancelled).
  */
-export function shortenLeave(leave: Pick<HrLeaveRequest, "startDate" | "endDate" | "days">, resumeDate: string) {
+export function shortenLeave(leave: Pick<HrLeaveRequest, "startDate" | "endDate" | "days">, resumeDate: string, holidays?: ReadonlySet<string>) {
   if (resumeDate > leave.endDate) return { endDate: leave.endDate, days: leave.days };
   const endDate = dayBefore(resumeDate);
   if (endDate < leave.startDate) return null;
-  const days = workingDays(leave.startDate, endDate);
+  const days = workingDays(leave.startDate, endDate, holidays);
   return days > 0 ? { endDate, days } : null;
 }
 
@@ -211,15 +213,34 @@ export function homePath(perms: readonly HrPermission[]): string {
   return "/hrportal/no-access";
 }
 
-/** Working days (Mon–Fri) from start to end inclusive, for ISO dates. */
-export function workingDays(start: string, end: string): number {
+/**
+ * Public holidays as ISO dates for the given years: Nigeria's fixed-date holidays plus every day
+ * of the holidays HR puts on the calendar (e.g. Easter, the Eids).
+ */
+export function holidayDates(events: Pick<HrCalendarEvent, "kind" | "startDate" | "endDate">[], fromYear: number, toYear = fromYear): Set<string> {
+  const out = new Set<string>();
+  for (let y = fromYear; y <= toYear; y++) for (const h of FIXED_PUBLIC_HOLIDAYS) out.add(`${y}-${h.md}`);
+  for (const e of events) {
+    if (e.kind !== "holiday" || e.endDate.slice(0, 4) < String(fromYear) || e.startDate.slice(0, 4) > String(toYear)) continue;
+    for (let d = e.startDate; d <= e.endDate; d = new Date(Date.parse(`${d}T12:00:00Z`) + 86_400_000).toISOString().slice(0, 10)) out.add(d);
+  }
+  return out;
+}
+
+/** Monday to Friday and not a public holiday. */
+export function isWorkingDay(iso: string, holidays?: ReadonlySet<string>): boolean {
+  const wd = new Date(`${iso}T12:00:00Z`).getUTCDay();
+  return wd !== 0 && wd !== 6 && !holidays?.has(iso);
+}
+
+/** Working days from start to end inclusive (weekends and the given public holidays don't count). */
+export function workingDays(start: string, end: string, holidays?: ReadonlySet<string>): number {
   const a = new Date(`${start}T12:00:00Z`);
   const b = new Date(`${end}T12:00:00Z`);
   if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime()) || b < a) return 0;
   let days = 0;
   for (const d = new Date(a); d <= b; d.setUTCDate(d.getUTCDate() + 1)) {
-    const wd = d.getUTCDay();
-    if (wd !== 0 && wd !== 6) days++;
+    if (isWorkingDay(d.toISOString().slice(0, 10), holidays)) days++;
     if (days > 366) break;
   }
   return days;

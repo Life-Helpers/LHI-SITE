@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { calendarItems, monthWeeks, resumptionDate, weekSegments } from "@/lib/hr/calendar";
+import { holidayDates, workingDays } from "@/lib/hr/access";
+import { calendarItems, monthWeeks, resumptionDate, weekSegments, workingRuns } from "@/lib/hr/calendar";
 import { DEFAULT_LEAVE_TYPES, type HrEmployee, type HrLeaveRequest } from "@/lib/hr/types";
 
 const person = (id: string, dob?: string) => ({ id, firstName: id, lastName: "Bello", dateOfBirth: dob, status: "active" }) as HrEmployee;
@@ -94,3 +95,28 @@ describe("month layout", () => {
     ]);
   });
 });
+
+describe("leave counts working days only", () => {
+  const eid = { kind: "holiday" as const, startDate: "2027-03-10", endDate: "2027-03-11" };
+  const holidays = holidayDates([eid], 2026, 2027);
+
+  it("skips weekends, fixed public holidays and holidays HR adds", () => {
+    // Mon 21 - Fri 25 Dec 2026: Christmas Day is a holiday.
+    expect(workingDays("2026-12-21", "2026-12-25", holidays)).toBe(4);
+    // Thu 24 Dec - Mon 28 Dec: only the 24th and 28th count.
+    expect(workingDays("2026-12-24", "2026-12-28", holidays)).toBe(2);
+    // HR's two-day holiday (Wed 10 - Thu 11 Mar 2027) is free too.
+    expect(workingDays("2027-03-08", "2027-03-12", holidays)).toBe(3);
+    expect(resumptionDate("2027-03-09", holidays)).toBe("2027-03-12");
+  });
+
+  it("draws leave on the calendar only on working days", () => {
+    const runs = workingRuns([{ id: "l", kind: "leave", title: "A", start: "2026-12-24", end: "2026-12-29" }, { id: "h", kind: "holiday", title: "H", start: "2026-12-25", end: "2026-12-25" }], holidays);
+    expect(runs.map((r) => [r.id, r.start, r.end])).toEqual([
+      ["l-0", "2026-12-24", "2026-12-24"],
+      ["l-1", "2026-12-28", "2026-12-29"],
+      ["h", "2026-12-25", "2026-12-25"],
+    ]);
+  });
+});
+

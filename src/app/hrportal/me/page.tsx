@@ -12,7 +12,7 @@ import { PortalShell } from "@/components/hr/portal-shell";
 import { ReliefPanel, relieverLabel } from "@/components/hr/relief-panel";
 import { Avatar, Card, Field, fmtDate, inputClass, Notice, PageTitle, Person, TintStat, todayLagos } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
-import { approversFor, has, relieverOptions } from "@/lib/hr/access";
+import { approversFor, has, holidayDates, relieverOptions } from "@/lib/hr/access";
 import { availableByType, balanceFor } from "@/lib/hr/leave-balance";
 import { requireHrPage } from "@/lib/hr/session";
 import { employeeName } from "@/lib/hr/types";
@@ -48,6 +48,8 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
   // Recalls in the last fortnight, so the person sees they've been called back.
   const recalls = mine.filter((l) => l.endedEarly?.kind === "recalled" && Date.now() - Date.parse(l.endedEarly.at) < 14 * 86_400_000);
 
+  const holidayList = [...holidayDates(await readStore("hrEvents"), new Date().getFullYear(), new Date().getFullYear() + 1)];
+
   return (
     <PortalShell ctx={ctx} current="/hrportal/me" crumbs={[{ label: "My record" }]}>
       {params.denied && <Notice tone="danger">You don&apos;t have access to that page.</Notice>}
@@ -58,7 +60,7 @@ export default async function MyRecordPage({ searchParams }: { searchParams: Pro
           canRequest && (
             <Modal label="Request Leave" title="Request leave" description={annual ? `You have ${left} ${annual.type.name.toLowerCase()} days left this year.` : undefined}>
               <ActionForm action={requestLeaveAction} submitLabel="Send request" resetOnSuccess className="space-y-4">
-                <LeaveFields types={ctx.leaveTypes} relievers={relievers.map((e) => ({ id: e.id, label: relieverLabel(e) }))} relieverRequired available={availableByType(balances)} year={year} />
+                <LeaveFields types={ctx.leaveTypes} holidays={holidayList} relievers={relievers.map((e) => ({ id: e.id, label: relieverLabel(e) }))} relieverRequired available={availableByType(balances)} year={year} />
               </ActionForm>
             </Modal>
           )

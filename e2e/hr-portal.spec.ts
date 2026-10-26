@@ -575,6 +575,15 @@ test("the calendar shows HR events to everyone, and leave only to those who may 
   await expect(away).toHaveAttribute("title", /Back on Thu 17 Dec/);
   await expect(staff.getByRole("button", { name: /Outsider - Sick Leave/ })).toHaveCount(0);
 
+  // Leave counts working days only: Christmas Day in Mon 21 - Fri 25 Dec isn't counted.
+  await staff.goto("/hrportal/me");
+  await staff.getByRole("button", { name: "Request Leave" }).click();
+  const req = staff.getByRole("dialog").locator("form");
+  await req.locator('select[name="type"]').selectOption("Study");
+  await req.getByLabel("From", { exact: true }).fill("2026-12-21");
+  await req.getByLabel("To", { exact: true }).fill("2026-12-25");
+  await expect(req.getByText("Study Leave has no yearly limit. 4 working days.")).toBeVisible();
+
   // A manager sees their team's leave.
   await pages.manager.goto("/hrportal/calendar?view=month&date=2026-12-01");
   await expect(pages.manager.getByRole("button", { name: `Leave: ${people.staff.first} ${people.staff.last} - Annual Leave` }).first()).toBeVisible();
