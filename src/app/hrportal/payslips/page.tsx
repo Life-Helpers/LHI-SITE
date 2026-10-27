@@ -4,6 +4,7 @@ import { Download, Eye, ReceiptText } from "lucide-react";
 import { PortalShell } from "@/components/hr/portal-shell";
 import { outlineButtonClass, PageTitle } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
+import { has } from "@/lib/hr/access";
 import { naira, payMonthLabel } from "@/lib/hr/payroll";
 import { requireHrPage } from "@/lib/hr/session";
 
@@ -14,6 +15,9 @@ export const metadata = { title: "My payslips" };
 export default async function MyPayslipsPage() {
   const ctx = await requireHrPage("self.view");
   const slips = (await readStore("hrPayslips")).filter((p) => p.employeeId === ctx.employee.id && p.status === "published").sort((a, b) => b.month.localeCompare(a.month));
+  // Only to explain an empty page; the amounts aren't shown here.
+  const hasSalary = slips.length === 0 && (await readStore("hrSalaries")).some((s) => s.employeeId === ctx.employee.id);
+  const seesAll = has(ctx.permissions, "payroll.payslips.view");
   return (
     <PortalShell ctx={ctx} current="/hrportal/payslips" crumbs={[{ label: "My payslips" }]}>
       <PageTitle title="My payslips" subtitle="Your monthly payslips from HR and Finance. View, print or download each one as a PDF." />
@@ -48,7 +52,22 @@ export default async function MyPayslipsPage() {
             </li>
           ))}
         </ul>
-        {slips.length === 0 && <p className="px-5 py-12 text-center text-sm text-admin-muted">No payslips yet. They appear here once HR or Finance publishes them.</p>}
+        {slips.length === 0 && (
+          <div className="flex flex-col items-center gap-2 px-5 py-12 text-center text-sm">
+            <ReceiptText className="h-8 w-8 text-admin-muted" aria-hidden="true" />
+            <p className="font-semibold">No payslips yet</p>
+            <p className="max-w-md text-admin-muted">
+              {hasSalary
+                ? "Your salary is set up. Your payslip appears here once HR or Finance publishes the month's payroll."
+                : "There's no salary on record for you yet, so no payslip has been made. HR or Finance sets it (nobody can set their own); your payslips then appear here once each month's payroll is published."}
+            </p>
+            {seesAll && (
+              <Link href="/hrportal/payroll/payslips" className="mt-2 font-semibold text-admin-primary hover:underline">
+                See everyone&apos;s payslips in Payroll Management
+              </Link>
+            )}
+          </div>
+        )}
       </section>
     </PortalShell>
   );
