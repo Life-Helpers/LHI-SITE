@@ -43,8 +43,6 @@ import {
   seedTeam,
 } from "@/lib/cms/seed";
 import type { CollectionRecords } from "@/lib/cms/types";
-import type { HrAccount, HrAuditEntry, HrCalendarEvent, HrDepartment, HrPayrollSettings, HrPayslip, HrSalary, HrEmployee, HrLeaveAdjustment, HrLeavePolicy, HrLeaveRequest, HrLeaveType, HrRole, HrToken } from "@/lib/hr/types";
-import { DEFAULT_LEAVE_POLICIES, DEFAULT_LEAVE_TYPES, DEFAULT_PAYROLL_SETTINGS } from "@/lib/hr/types";
 
 /**
  * JSON content store. Each collection (posts, users, settings…) is one JSON document:
@@ -96,21 +94,6 @@ interface StoreShape extends CollectionRecords {
   resetTokens: ResetToken;
   unsubscribes: Unsubscribe;
   magazines: CmsMagazine;
-  // HR portal (/hrportal). Never part of the website backup or the CMS admin.
-  hrAccounts: HrAccount;
-  hrEmployees: HrEmployee;
-  hrDepartments: HrDepartment;
-  hrRoles: HrRole;
-  hrLeave: HrLeaveRequest;
-  hrLeaveTypes: HrLeaveType;
-  hrLeavePolicies: HrLeavePolicy;
-  hrLeaveAdjustments: HrLeaveAdjustment;
-  hrAudit: HrAuditEntry;
-  hrTokens: HrToken;
-  hrEvents: HrCalendarEvent;
-  hrSalaries: HrSalary;
-  hrPayrollSettings: HrPayrollSettings;
-  hrPayslips: HrPayslip;
 }
 
 export type StoreName = keyof StoreShape;
@@ -149,20 +132,6 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   resetTokens: () => [],
   unsubscribes: () => [],
   magazines: () => [],
-  hrAccounts: () => [],
-  hrEmployees: () => [],
-  hrDepartments: () => [],
-  hrRoles: () => [],
-  hrLeave: () => [],
-  hrLeaveTypes: () => structuredClone(DEFAULT_LEAVE_TYPES),
-  hrLeavePolicies: () => structuredClone(DEFAULT_LEAVE_POLICIES),
-  hrLeaveAdjustments: () => [],
-  hrAudit: () => [],
-  hrTokens: () => [],
-  hrEvents: () => [],
-  hrSalaries: () => [],
-  hrPayrollSettings: () => [structuredClone(DEFAULT_PAYROLL_SETTINGS)],
-  hrPayslips: () => [],
 };
 
 const cache = new Map<string, { mtimeMs: number; data: unknown }>();
