@@ -1,3 +1,5 @@
+import { createHash, generateKeyPairSync, sign as rsaSign } from "node:crypto";
+import { createServer, type Server } from "node:http";
 import { gunzipSync } from "node:zlib";
 
 import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
@@ -857,6 +859,97 @@ test("HR imports employees from CSV and manages their status", async () => {
   await expect(admin.getByRole("row", { name: /Amina Bello/ }).getByText("Probation")).toBeVisible();
 });
 
+/**
+ * "Sign in with Microsoft", end to end, against a stand-in for Microsoft's sign-in service on
+ * port 3999 (the server runs with HR_MS_AUTHORITY=http://localhost:3999 and these test IDs).
+ * It checks PKCE like Microsoft does and signs ID tokens with its own key.
+ */
+const MS_TENANT = "11111111-2222-3333-4444-555555555555";
+const MS_CLIENT = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+function fakeMicrosoft(signInAs: () => string) {
+  const keys = generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const codes = new Map<string, { nonce: string; challenge: string; email: string }>();
+  const b64 = (o: unknown) => Buffer.from(JSON.stringify(o)).toString("base64url");
+  return createServer((req, res) => {
+    const url = new URL(req.url ?? "/", "http://localhost:3999");
+    if (url.pathname === `/${MS_TENANT}/oauth2/v2.0/authorize`) {
+      // The person "signs in" and Microsoft sends them back with a one-time code.
+      const code = `code-${codes.size + 1}`;
+      codes.set(code, { nonce: url.searchParams.get("nonce")!, challenge: url.searchParams.get("code_challenge")!, email: signInAs() });
+      const back = new URL(url.searchParams.get("redirect_uri")!);
+      back.searchParams.set("code", code);
+      back.searchParams.set("state", url.searchParams.get("state")!);
+      res.writeHead(302, { location: back.toString() }).end();
+    } else if (url.pathname === `/${MS_TENANT}/oauth2/v2.0/token` && req.method === "POST") {
+      let body = "";
+      req.on("data", (c) => (body += c));
+      req.on("end", () => {
+        const form = new URLSearchParams(body);
+        const grant = codes.get(form.get("code") ?? "");
+        codes.delete(form.get("code") ?? "");
+        const pkceOk = grant && createHash("sha256").update(form.get("code_verifier") ?? "").digest("base64url") === grant.challenge;
+        if (!grant || !pkceOk || form.get("client_id") !== MS_CLIENT || form.get("client_secret") !== "test-secret") {
+          res.writeHead(400, { "content-type": "application/json" }).end(JSON.stringify({ error: "invalid_grant" }));
+          return;
+        }
+        const now = Math.floor(Date.now() / 1000);
+        const head = b64({ alg: "RS256", kid: "test-key", typ: "JWT" });
+        const claims = b64({ iss: `http://localhost:3999/${MS_TENANT}/v2.0`, tid: MS_TENANT, aud: MS_CLIENT, exp: now + 3600, nbf: now, iat: now, nonce: grant.nonce, preferred_username: grant.email, name: "Test", oid: "oid" });
+        const token = `${head}.${claims}.${rsaSign("RSA-SHA256", Buffer.from(`${head}.${claims}`), keys.privateKey).toString("base64url")}`;
+        res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ id_token: token }));
+      });
+    } else if (url.pathname === `/${MS_TENANT}/discovery/v2.0/keys`) {
+      res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ keys: [{ ...keys.publicKey.export({ format: "jwk" }), kid: "test-key", use: "sig" }] }));
+    } else {
+      res.writeHead(404).end();
+    }
+  });
+}
+
+test("staff sign in with their Microsoft account, with no portal password, only if HR gave them an account", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const probe = await freshPage();
+  await probe.goto("/hrportal");
+  test.skip(!(await probe.getByRole("link", { name: "Sign in with Microsoft" }).isVisible()), "server not started with the test Microsoft settings");
+  let email = "";
+  const idp: Server = fakeMicrosoft(() => email);
+  await new Promise<void>((done) => idp.listen(3999, done));
+  try {
+    // HR gives Amina (imported, no login yet) an account. She never sets a password.
+    const admin = pages.admin;
+    await admin.goto("/hrportal/hr/accounts");
+    await admin.getByRole("button", { name: "Create Account" }).click();
+    const form = admin.getByRole("dialog", { name: "Create a portal account" }).locator("form");
+    await form.locator('select[name="employeeId"]').selectOption({ label: "Amina Bello — Nurse" });
+    await form.getByRole("button", { name: "Create account and get invite link" }).click();
+    await expect(form.getByRole("status")).toContainText("Account created");
+
+    // She signs in with Microsoft (Microsoft may send her email in any case) and lands on her own record.
+    email = mail("amina").toUpperCase();
+    await probe.getByRole("link", { name: "Sign in with Microsoft" }).click();
+    await expect(probe).toHaveURL(/\/hrportal\/me$/);
+    await expect(probe.getByRole("heading", { name: "Welcome, Amina" })).toBeVisible();
+    // HR now sees her login as active.
+    await admin.goto("/hrportal/hr/employees?q=Amina");
+    await expect(admin.getByRole("row", { name: /Amina Bello/ })).toContainText("Active");
+
+    // Someone with a Microsoft account but no portal account gets nothing.
+    const stranger = await freshPage();
+    email = "not.in.the.portal@lhinigeria.org";
+    await stranger.goto("/hrportal");
+    await stranger.getByRole("link", { name: "Sign in with Microsoft" }).click();
+    await expect(stranger).toHaveURL(/\/hrportal\?sso=no-account$/);
+    await expect(stranger.getByText("isn't linked to an HR portal account")).toBeVisible();
+    await stranger.goto("/hrportal/me");
+    await expect(stranger).toHaveURL(/\/hrportal$/);
+
+    // A replayed or forged callback without this browser's sign-in secrets is refused.
+    expect((await stranger.request.get("/hrportal/sso/microsoft/callback?code=code-1&state=anything", { maxRedirects: 0 })).headers().location).toContain("sso=expired");
+  } finally {
+    await new Promise((done) => idp.close(done));
+  }
+});
+
 test("HR changes a password; the person must choose their own at next sign-in", async () => {
   test.skip(!pages.admin, "setup did not run");
   const admin = pages.admin;
@@ -1141,6 +1234,29 @@ test("leave types, policies and balances: HR sets allowances and requests can't 
   admin.once("dialog", (d) => void d.accept());
   await admin.getByRole("row", { name: /Hajj Leave Policy/ }).getByRole("button", { name: "Delete Hajj Leave Policy" }).click();
   await expect(admin.getByRole("row", { name: /Hajj Leave Policy/ })).toHaveCount(0);
+});
+
+test("HR can view leave balances as a printable table and download them", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  await admin.goto("/hrportal/hr/leave/balances");
+  await admin.getByRole("link", { name: "Table" }).click();
+  await expect(admin).toHaveURL(/view=table/);
+  // Annual Leave in detail by default, one row per employee.
+  await expect(admin.getByRole("heading", { name: /Leave balances \d{4}: Annual Leave/ })).toBeVisible();
+  for (const heading of ["Allowance", "Carried forward", "Total", "Used", "Pending", "Left"]) await expect(admin.getByRole("columnheader", { name: heading, exact: true })).toBeVisible();
+  await expect(admin.getByRole("row", { name: new RegExp(`${people.staff.first} ${people.staff.last}`) })).toBeVisible();
+  await expect(admin.getByRole("button", { name: "Print" })).toBeVisible();
+  // Every leave type side by side.
+  await admin.locator('select[name="type"]').selectOption("all");
+  await expect(admin.getByRole("heading", { name: /all leave types/ })).toBeVisible();
+  await expect(admin.getByRole("columnheader", { name: "Sick Leave" })).toBeVisible();
+  const href = (await admin.getByRole("link", { name: "Download CSV" }).getAttribute("href")) ?? "";
+  const csv = await admin.request.get(href);
+  expect(csv.headers()["content-type"]).toContain("text/csv");
+  expect(await csv.text()).toContain("Annual Leave");
+  // Staff can't download everyone's balances.
+  expect((await pages.staff.request.get("/hrportal/hr/leave/balances/export")).status()).toBe(404);
 });
 
 test("HR loads sample records for testing and removes them in one go", async () => {

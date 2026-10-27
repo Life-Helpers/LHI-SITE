@@ -14,7 +14,7 @@ import { Avatar, Badge, Field, fmtDateTime, inputClass, PageTitle } from "@/comp
 import { readStore } from "@/lib/cms/store";
 import { allRoles, canGrant, canManageAccount, findRole, has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
-import { employeeName, isCurrentStaff } from "@/lib/hr/types";
+import { employeeName, isCurrentStaff, hasSignedIn } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Accounts" };
@@ -86,7 +86,7 @@ export default async function AccountsPage() {
           const person = employeeOf(a.employeeId);
           const role = findRole(a.roleId, customRoles);
           const manageable = canManageAccount(ctx.actor, a);
-          const state = !a.active ? "inactive" : a.passwordHash ? "active" : "invited";
+          const state = !a.active ? "inactive" : hasSignedIn(a) ? "active" : "invited";
           return (
             <details key={a.id} id={`account-${a.id}`} className="hr-card">
               <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2 px-5 py-4">

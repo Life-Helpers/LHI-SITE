@@ -9,6 +9,7 @@ import { getCurrentUser, hashPassword, validatePasswordStrength, verifyPassword 
 import { can } from "@/lib/cms/schema";
 import { readStore, updateStore } from "@/lib/cms/store";
 import { clientIp } from "@/lib/client-ip";
+import { microsoftConfig } from "@/lib/hr/microsoft-sso";
 import { rateLimited } from "@/lib/rate-limit";
 import {
   accessProblem,
@@ -828,7 +829,8 @@ export async function createAccountAction(_prev: HrResult | null, form: FormData
     const token = await createHrToken(account.id, "invite");
     await hrAudit(ctx, "created account", `account ${address}`, `Linked to ${employeeName(employee)}. Role: ${role.name}. Extra permissions: ${permList(extra)}`);
     refresh();
-    return done(`Account created for ${employeeName(employee)}. Send them this one-time link (valid 7 days) to set their password.`, `${await baseUrl()}/hrportal/activate?token=${token}`);
+    const viaMicrosoft = microsoftConfig() ? ` Or they can simply use "Sign in with Microsoft" with ${address}: no password needed.` : "";
+    return done(`Account created for ${employeeName(employee)}. Send them this one-time link (valid 7 days) to set their password.${viaMicrosoft}`, `${await baseUrl()}/hrportal/activate?token=${token}`);
   });
 }
 

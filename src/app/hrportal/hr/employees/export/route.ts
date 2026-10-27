@@ -2,7 +2,7 @@ import { readStore } from "@/lib/cms/store";
 import { toCsv } from "@/lib/cms/csv";
 import { has } from "@/lib/hr/access";
 import { loadHrSession } from "@/lib/hr/session";
-import { employeeName, statusLabel } from "@/lib/hr/types";
+import { employeeName, statusLabel, hasSignedIn } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +28,7 @@ export async function GET(req: Request) {
     ["Staff number", "First name", "Last name", "Email", "Phone", "Job title", "Department", "Duty station", "Line manager", "Start date", "Status", "Login"],
     rows.map((e) => {
       const a = accounts.find((x) => x.employeeId === e.id);
-      return [e.staffNumber, e.firstName, e.lastName, e.email, e.phone, e.jobTitle, e.department, e.location, nameOf(e.managerId), e.startDate, statusLabel(e.status), !a ? "None" : !a.active ? "Locked" : a.passwordHash ? "Active" : "Invited"];
+      return [e.staffNumber, e.firstName, e.lastName, e.email, e.phone, e.jobTitle, e.department, e.location, nameOf(e.managerId), e.startDate, statusLabel(e.status), !a ? "None" : !a.active ? "Locked" : hasSignedIn(a) ? "Active" : "Invited"];
     }),
   );
   return new Response(csv, {

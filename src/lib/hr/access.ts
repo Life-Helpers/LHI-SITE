@@ -17,6 +17,7 @@ import {
   type HrRole,
   isCurrentStaff,
   upgradePermissions,
+  hasSignedIn,
 } from "@/lib/hr/types";
 
 export function allRoles(customRoles: HrRole[]): HrRole[] {
@@ -183,7 +184,7 @@ export function relieverOptions(
   accounts: HrAccount[],
   departments: HrDepartment[] = [],
 ): HrEmployee[] {
-  const withLogin = new Set(accounts.filter((a) => a.active && a.passwordHash).map((a) => a.employeeId));
+  const withLogin = new Set(accounts.filter((a) => a.active && hasSignedIn(a)).map((a) => a.employeeId));
   const dept = departments.find((d) => d.active && d.id === person.departmentId);
   const approvers = new Set([person.managerId, dept?.headEmployeeId, ...(dept?.approverIds ?? [])].filter(Boolean));
   const all = employees

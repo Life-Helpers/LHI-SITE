@@ -3,7 +3,7 @@
  * to do, most urgent first. Pure functions, so each page and its tests work them out the same way.
  */
 import { awaitingReliever, isWorkingDay } from "@/lib/hr/access";
-import { employeeName, isCurrentStaff, type HrAccount, type HrEmployee, type HrLeaveRequest, type HrPayslip, type HrSalary } from "@/lib/hr/types";
+import { employeeName, isCurrentStaff, type HrAccount, type HrEmployee, type HrLeaveRequest, type HrPayslip, type HrSalary, hasSignedIn } from "@/lib/hr/types";
 
 export type InsightTone = "critical" | "warning" | "info" | "good";
 export interface Insight {
@@ -132,7 +132,7 @@ export function accountInsights({ employees, accounts, today }: { employees: HrE
   const withLogin = new Set(accounts.filter((a) => a.active).map((a) => a.employeeId));
   const none = staff.filter((e) => !withLogin.has(e.id));
   if (none.length) out.push({ id: "accounts-none", tone: "info", title: `${plural(none.length, "employee")} without a portal login`, detail: "They can't request leave or see payslips themselves.", href: "/hrportal/hr/accounts", action: "Invite" });
-  const unused = accounts.filter((a) => a.active && !a.passwordHash && ageDays(a.createdAt, today) > 7);
+  const unused = accounts.filter((a) => a.active && !hasSignedIn(a) && ageDays(a.createdAt, today) > 7);
   if (unused.length) out.push({ id: "accounts-unused", tone: "warning", title: `${plural(unused.length, "invite")} unused for over a week`, detail: "Send a fresh sign-in link.", href: "/hrportal/hr/accounts", action: "Resend" });
   return out;
 }

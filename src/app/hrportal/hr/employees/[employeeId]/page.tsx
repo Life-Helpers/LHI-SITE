@@ -14,7 +14,7 @@ import { Badge, Card, Field, fmtDate, fmtDateTime, initialsOf, inputClass, Notic
 import { readStore } from "@/lib/cms/store";
 import { approversFor, canDecideLeave, canManageAccount, canManageApprovedLeave, findRole, has, reportsOf } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
-import { EMPLOYEE_STATUSES, employeeName, isCurrentStaff, statusLabel } from "@/lib/hr/types";
+import { EMPLOYEE_STATUSES, employeeName, isCurrentStaff, statusLabel, hasSignedIn } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Employee" };
@@ -57,7 +57,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
   ].filter((t) => t.show);
   const tab = tabs.some((t) => t.id === query.tab) ? query.tab! : "basic";
   const base = `/hrportal/hr/employees/${person.id}`;
-  const loginLabel = !account ? "No login" : !account.active ? "Locked" : account.passwordHash ? "Active" : "Invited";
+  const loginLabel = !account ? "No login" : !account.active ? "Locked" : hasSignedIn(account) ? "Active" : "Invited";
 
   const sidebar: [typeof Hash, string][] = [
     [Hash, `Employee ID: ${person.staffNumber || "—"}`],
@@ -106,7 +106,7 @@ export default async function EmployeePage({ params, searchParams }: { params: P
           <div className="mt-6 border-t border-admin-border pt-4 text-sm">
             <p className="flex items-center justify-between">
               <span className="text-admin-muted">Portal login</span>
-              <Badge status={!account ? "none" : !account.active ? "inactive" : account.passwordHash ? "active" : "invited"} label={loginLabel} />
+              <Badge status={!account ? "none" : !account.active ? "inactive" : hasSignedIn(account) ? "active" : "invited"} label={loginLabel} />
             </p>
             {account && (
               <p className="mt-2 flex items-center justify-between">

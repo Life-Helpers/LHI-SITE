@@ -15,7 +15,7 @@ import { awaitingReliever, canDecideLeave, has, holidayDates } from "@/lib/hr/ac
 import { absenceRate, headcountByMonth, lastMonths, pct, turnoverRate } from "@/lib/hr/analytics";
 import { accountInsights, leaveInsights, payrollInsights, peopleInsights, type Insight } from "@/lib/hr/insights";
 import { requireHrPage } from "@/lib/hr/session";
-import { employeeName, type HrEmployee, isCurrentStaff } from "@/lib/hr/types";
+import { employeeName, type HrEmployee, isCurrentStaff, hasSignedIn } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard" };
@@ -58,8 +58,8 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
   const yearAgo = headcountByMonth(employees, months)[0];
   const change = active.length - yearAgo;
   const probation = active.filter((e) => e.status === "probation").length;
-  const activated = accounts.filter((a) => a.active && a.passwordHash).length;
-  const invitesOpen = accounts.filter((a) => a.active && !a.passwordHash).length;
+  const activated = accounts.filter((a) => a.active && hasSignedIn(a)).length;
+  const invitesOpen = accounts.filter((a) => a.active && !hasSignedIn(a)).length;
   const birthdays = active
     .filter((e): e is HrEmployee & { dateOfBirth: string } => Boolean(e.dateOfBirth))
     .map((e) => ({ e, inDays: daysToBirthday(e.dateOfBirth, today) }))

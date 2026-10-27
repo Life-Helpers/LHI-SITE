@@ -145,6 +145,8 @@ export interface HrAccount {
   active: boolean;
   /** Unset until the person activates the account from their invite link. */
   passwordHash?: string;
+  /** When the person first signed in with their LHI Microsoft account (they may never set a portal password). */
+  ssoAt?: string;
   /** Bumped whenever access changes; sessions carrying an older value stop working. */
   sessionVersion: number;
   /** Set when HR chose the password: the person must pick their own before doing anything else. */
@@ -156,6 +158,9 @@ export interface HrAccount {
   lastLoginAt?: string;
   deactivatedAt?: string;
 }
+
+/** Has this person ever got in: set a portal password, or signed in with their LHI Microsoft account. */
+export const hasSignedIn = (a: Pick<HrAccount, "passwordHash" | "ssoAt">) => Boolean(a.passwordHash || a.ssoAt);
 
 /** The leave types the portal started with; HR can rename, recolour, add and retire types. */
 export const LEAVE_TYPES = ["Annual", "Sick", "Compassionate", "Maternity", "Paternity", "Study", "Unpaid", "Other"] as const;

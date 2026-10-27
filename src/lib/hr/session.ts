@@ -21,9 +21,10 @@ const SESSION_TTL_SECONDS = 60 * 60 * 8;
 
 const signHr = async (payload: string) => sign(`hr.${payload}`, await sessionKey());
 
-export async function createHrSession(account: HrAccount) {
+/** `via`: how the person proved who they are ("microsoft" for single sign-on with their LHI Microsoft account). */
+export async function createHrSession(account: HrAccount, via: "password" | "microsoft" = "password") {
   const payload = Buffer.from(
-    JSON.stringify({ aid: account.id, v: account.sessionVersion, exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS, n: randomUUID() }),
+    JSON.stringify({ aid: account.id, v: account.sessionVersion, exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS, n: randomUUID(), ...(via === "microsoft" ? { m: "ms" } : {}) }),
   ).toString("base64url");
   (await cookies()).set(HR_SESSION_COOKIE, `${payload}.${await signHr(payload)}`, {
     httpOnly: true,
@@ -48,7 +49,7 @@ export async function destroyHrSession() {
   (await cookies()).delete(HR_SESSION_COOKIE);
 }
 
-async function readSessionClaims(): Promise<{ aid: string; v: number } | null> {
+async function readSessionClaims(): Promise<{ aid: string; v: number; sso: boolean } | null> {
   const token = (await cookies()).get(HR_SESSION_COOKIE)?.value;
   if (!token) return null;
   const [payload, signature] = token.split(".");
@@ -57,9 +58,9 @@ async function readSessionClaims(): Promise<{ aid: string; v: number } | null> {
   const given = Buffer.from(signature);
   if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
   try {
-    const { aid, v, exp } = JSON.parse(Buffer.from(payload, "base64url").toString()) as { aid: string; v: number; exp: number };
+    const { aid, v, exp, m } = JSON.parse(Buffer.from(payload, "base64url").toString()) as { aid: string; v: number; exp: number; m?: string };
     if (typeof aid !== "string" || typeof v !== "number" || !(exp >= Date.now() / 1000)) return null;
-    return { aid, v };
+    return { aid, v, sso: m === "ms" };
   } catch {
     return null;
   }
@@ -77,6 +78,8 @@ export interface HrContext {
   leaveTypes: HrLeaveType[];
   /** Shown in the portal header. */
   displayName: string;
+  /** Signed in with their LHI Microsoft account rather than a portal password. */
+  viaMicrosoft: boolean;
 }
 
 export type HrSessionState =
@@ -97,7 +100,8 @@ export async function loadHrSession(): Promise<HrSessionState> {
   const leaveTypes = await readStore("hrLeaveTypes");
   const account = accounts.find((a) => a.id === claims.aid);
   // Unknown account, or access changed since this session was issued: treat as signed out.
-  if (!account || account.sessionVersion !== claims.v || !account.passwordHash) return { status: "signed-out" };
+  // A session needs a password set, or (for a Microsoft sign-in) the account linked by one.
+  if (!account || account.sessionVersion !== claims.v || !(account.passwordHash || (claims.sso && account.ssoAt))) return { status: "signed-out" };
   const employee = employees.find((e) => e.id === account.employeeId);
   const problem = accessProblem(account, customRoles, employee);
   if (problem) return { status: "problem", problem, account };
@@ -115,6 +119,7 @@ export async function loadHrSession(): Promise<HrSessionState> {
       departments,
       leaveTypes,
       displayName: `${employee!.firstName} ${employee!.lastName}`.trim() || account.email,
+      viaMicrosoft: claims.sso,
     },
   };
 }
@@ -131,8 +136,8 @@ export async function requireHrPage(need?: Need): Promise<HrContext> {
   const state = await loadHrSession();
   if (state.status === "signed-out") redirect("/hrportal");
   if (state.status === "problem") redirect("/hrportal/no-access");
-  // A password HR chose must be replaced before anything else.
-  if (state.ctx.account.mustChangePassword) redirect("/hrportal/password?required=1");
+  // A password HR chose must be replaced before anything else (not needed after a Microsoft sign-in).
+  if (state.ctx.account.mustChangePassword && !state.ctx.viaMicrosoft) redirect("/hrportal/password?required=1");
   if (!allowed(state.ctx.permissions, need)) redirect(`${homePath(state.ctx.permissions)}?denied=1`);
   return state.ctx;
 }

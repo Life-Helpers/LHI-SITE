@@ -16,7 +16,7 @@ import { readStore } from "@/lib/cms/store";
 import { canManageAccount, has } from "@/lib/hr/access";
 import { IMPORT_TEMPLATE } from "@/lib/hr/csv-import";
 import { requireHrPage } from "@/lib/hr/session";
-import { employeeName, isCurrentStaff, statusLabel, type HrAccount } from "@/lib/hr/types";
+import { employeeName, isCurrentStaff, statusLabel, type HrAccount, hasSignedIn } from "@/lib/hr/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Employees" };
@@ -30,7 +30,7 @@ const TABS = [
 ] as const;
 const PER_PAGE = [10, 25, 50];
 
-const loginState = (a?: HrAccount) => (!a ? { status: "none", label: "No login" } : !a.active ? { status: "inactive", label: "Locked" } : a.passwordHash ? { status: "active", label: "Active" } : { status: "invited", label: "Invited" });
+const loginState = (a?: HrAccount) => (!a ? { status: "none", label: "No login" } : !a.active ? { status: "inactive", label: "Locked" } : hasSignedIn(a) ? { status: "active", label: "Active" } : { status: "invited", label: "Invited" });
 
 export default async function EmployeesPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requireHrPage(["employees.view", "employees.manage"]);
