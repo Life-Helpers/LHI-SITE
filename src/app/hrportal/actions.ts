@@ -10,6 +10,7 @@ import { can } from "@/lib/cms/schema";
 import { readStore, updateStore } from "@/lib/cms/store";
 import { clientIp } from "@/lib/client-ip";
 import { microsoftConfig } from "@/lib/hr/microsoft-sso";
+import { canonicalBankName } from "@/lib/hr/nigerian-banks";
 import { rateLimited } from "@/lib/rate-limit";
 import {
   accessProblem,
@@ -1273,7 +1274,8 @@ export async function updateBankingAction(_prev: HrResult | null, form: FormData
     const ctx = await requireHrAction(["self.update", "employees.manage"]);
     const self = employeeId === ctx.employee.id;
     if (self ? !has(ctx.permissions, "self.update") : !has(ctx.permissions, "employees.manage")) throw new HrAccessError("You don't have permission to do that.");
-    const bankName = text(form, "bankName", 80);
+    // "gtb" or "Gt Bank" is saved as the bank's usual name; other banks as typed.
+    const bankName = canonicalBankName(text(form, "bankName", 80));
     const bankAccountName = text(form, "bankAccountName", 120);
     // The full number is never sent to the browser, so a blank box keeps the number on file.
     const typed = text(form, "bankAccountNumber", 30).replace(/\s+/g, "");

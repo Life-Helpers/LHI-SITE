@@ -984,7 +984,10 @@ test("bank details are visible to the person and HR only; the view page has tabs
   const staff = pages.staff;
   await staff.goto("/hrportal/me");
   await staff.getByText("Update bank details").click();
-  await staff.locator('input[name="bankName"]').fill("First Bank");
+  // The bank field suggests Nigerian banks as you type, short forms included.
+  await staff.locator('input[name="bankName"]').fill("gtb");
+  await staff.getByRole("option", { name: /Guaranty Trust Bank \(GTBank\)/ }).click();
+  await expect(staff.locator('input[name="bankName"]')).toHaveValue("Guaranty Trust Bank (GTBank)");
   await staff.locator('input[name="bankAccountName"]').fill("Esther Staff");
   await staff.locator('input[name="bankAccountNumber"]').fill("0123457890");
   await staff.getByRole("button", { name: "Save bank details" }).click();
@@ -998,7 +1001,7 @@ test("bank details are visible to the person and HR only; the view page has tabs
   const managerView = await pages.manager.goto(`/hrportal/team/${employeeIds.staff}`);
   expect(managerView?.status()).toBe(200);
   expect(await pages.manager.content()).not.toContain("0123457890");
-  expect(await pages.manager.content()).not.toContain("First Bank");
+  expect(await pages.manager.content()).not.toContain("Guaranty Trust");
 
   const admin = pages.admin;
   await admin.goto(`/hrportal/hr/employees/${employeeIds.staff}`);
@@ -1007,6 +1010,7 @@ test("bank details are visible to the person and HR only; the view page has tabs
   await expect(admin.getByText("Leave approvers")).toBeVisible();
   await admin.getByRole("link", { name: "Banking", exact: true }).click();
   await expect(admin.getByText("••••••7890")).toBeVisible();
+  await expect(admin.getByText("Guaranty Trust Bank (GTBank)")).toBeVisible();
   expect(await admin.content()).not.toContain(">0123457890<");
   // HR is told about bank details people change themselves, to check before payroll.
   await admin.goto("/hrportal/hr");

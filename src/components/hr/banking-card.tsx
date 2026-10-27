@@ -1,5 +1,6 @@
 import { updateBankingAction } from "@/app/hrportal/actions";
 import { ActionForm } from "@/components/hr/action-form";
+import { BankInput } from "@/components/hr/bank-input";
 import { Card, Field, inputClass } from "@/components/hr/ui";
 import type { HrEmployee } from "@/lib/hr/types";
 
@@ -37,7 +38,7 @@ export function BankingCard({ person, editable }: { person: HrEmployee; editable
           <ActionForm action={updateBankingAction} submitLabel="Save bank details" className="mt-4 grid gap-3 sm:grid-cols-3">
             <input type="hidden" name="employeeId" value={person.id} />
             <Field label="Bank">
-              <input name="bankName" defaultValue={person.bankName} className={inputClass} />
+              <BankInput defaultValue={person.bankName} />
             </Field>
             <Field label="Account name">
               <input name="bankAccountName" defaultValue={person.bankAccountName} className={inputClass} />
