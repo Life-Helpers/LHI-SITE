@@ -50,6 +50,11 @@ export function ActionForm({
       setNotice(state);
     }
   }, [state, resetOnSuccess, closeOnSuccess]);
+  // Long forms (e.g. Add Employee) put the result below the fold: bring it into view.
+  const resultRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (state && !(closeOnSuccess && state.ok)) resultRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [state, closeOnSuccess]);
   useEffect(() => {
     if (!notice || notice.link) return;
     const t = setTimeout(() => setNotice(null), 8000);
@@ -78,7 +83,9 @@ export function ActionForm({
           {submitLabel}
         </button>
       </div>
-      {closeOnSuccess && state?.ok ? null : <Result state={state} />}
+      <div ref={resultRef} className="scroll-mb-4">
+        {closeOnSuccess && state?.ok ? null : <Result state={state} />}
+      </div>
       {notice &&
         createPortal(
           <div className="fixed bottom-4 right-4 z-50 w-[min(26rem,calc(100%-2rem))] rounded-xl border border-admin-border bg-admin-card p-1 shadow-xl">

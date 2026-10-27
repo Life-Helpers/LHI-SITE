@@ -16,8 +16,8 @@ export function EmployeeFields({ employee, managers, departments }: { employee?:
       <Field label="Work email">
         <input name="email" type="email" defaultValue={e?.email} className={inputClass} />
       </Field>
-      <Field label="Phone">
-        <input name="phone" defaultValue={e?.phone} className={inputClass} />
+      <Field label="Phone" hint="For two numbers, separate them with /">
+        <input name="phone" defaultValue={e?.phone} placeholder="e.g. 0803 123 4567" className={inputClass} />
       </Field>
       <Field label="Staff number">
         <input name="staffNumber" defaultValue={e?.staffNumber} className={inputClass} />

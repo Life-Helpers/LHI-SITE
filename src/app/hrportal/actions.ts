@@ -274,8 +274,12 @@ export async function setAuditAccessAction(_prev: HrResult | null, form: FormDat
   });
 }
 
-/** Empty, or a phone number: digits with optional +, spaces, dashes and brackets (7 to 15 digits). */
-const phoneOk = (v: string) => !v || (/^[+\d][\d\s()-]*$/.test(v) && /^\d{7,15}$/.test(v.replace(/\D/g, "")));
+/**
+ * Empty, or one or more phone numbers ("0803 123 4567 / 0706 000 1111"): each made of digits with
+ * optional +, spaces, dots, dashes and brackets, 7 to 15 digits long. Rejects text like "abc".
+ */
+const phoneOk = (v: string) =>
+  !v || v.split(/\s*(?:[/,;]|\bor\b)\s*/i).every((n) => /^[+\d(][\d\s().-]*$/.test(n.trim()) && /^\d{7,15}$/.test(n.replace(/\D/g, "")));
 
 /* ------------------------------------------------------------------ Self-service */
 
