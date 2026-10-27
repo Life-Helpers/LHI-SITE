@@ -231,6 +231,17 @@ describe("leave that ends early", () => {
   });
 });
 
+describe("auditor", () => {
+  it("can see across HR and payroll but change nothing, and lands on the HR dashboard", () => {
+    const auditor = BUILT_IN_HR_ROLES.find((r) => r.id === "auditor")!;
+    expect(auditor.permissions).toEqual(expect.arrayContaining(["employees.view", "leave.view_all", "reports.view", "payroll.salaries.view", "payroll.payslips.view"]));
+    const changes = auditor.permissions.filter((p) => /manage|approve|request|update|runs/.test(p));
+    expect(changes).toEqual([]);
+    expect(auditor.permissions).not.toContain("audit.view");
+    expect(homePath(auditor.permissions)).toBe("/hrportal/hr");
+  });
+});
+
 describe("payroll access", () => {
   const role = (id: string) => BUILT_IN_HR_ROLES.find((r) => r.id === id)!;
 

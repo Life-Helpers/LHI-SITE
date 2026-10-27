@@ -43,7 +43,7 @@ const NAV: { group: string; href: string; label: string; icon: NavIcon; any: HrP
       { href: "/hrportal/payroll/payslips", label: "Payslips", any: ["payroll.payslips.view"] },
       { href: "/hrportal/payroll/runs", label: "Payroll Runs", any: ["payroll.runs", "payroll.payslips.view"] },
       { href: "/hrportal/payroll/salaries", label: "Employee Salaries", any: ["payroll.salaries.view"] },
-      { href: "/hrportal/payroll/components", label: "Salary Components", any: ["payroll.components.manage"] },
+      { href: "/hrportal/payroll/components", label: "Salary Components", any: ["payroll.components.manage", "payroll.salaries.view"] },
     ],
   },
   { group: "Administration", href: "/hrportal/hr/accounts", label: "Accounts", icon: "accounts", any: ["accounts.manage"] },

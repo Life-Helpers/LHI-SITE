@@ -117,6 +117,14 @@ export const BUILT_IN_HR_ROLES: HrRole[] = [
     builtIn: true,
   },
   {
+    id: "auditor",
+    name: "Auditor",
+    description: "Read-only: every employee record, all leave, analytics, salaries, tax rates and payslips. Can't change anything, and sees no bank account numbers.",
+    // The audit trail stays with the IT team: a website administrator can add it to an auditor's account if needed.
+    permissions: ["self.view", "employees.view", "leave.view_all", "reports.view", "payroll.salaries.view", "payroll.payslips.view"],
+    builtIn: true,
+  },
+  {
     id: "hr_admin",
     name: "HR Administrator",
     description: "Everything, including portal accounts, roles and permissions. The audit trail is for the IT team only.",

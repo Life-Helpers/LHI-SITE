@@ -776,13 +776,17 @@ test("payroll access can be given piece by piece: seeing salaries doesn't show p
   await officer.goto("/hrportal/payroll");
   await expect(officer).toHaveURL(/\/hrportal\/payroll\/salaries$/);
   await expect(menu.getByRole("link", { name: "Employee Salaries" })).toBeVisible();
-  for (const hidden of ["Payslips", "Payroll Runs", "Salary Components"]) await expect(menu.getByRole("link", { name: hidden, exact: true })).toHaveCount(0);
+  for (const hidden of ["Payslips", "Payroll Runs"]) await expect(menu.getByRole("link", { name: hidden, exact: true })).toHaveCount(0);
   // Read only: amounts but no edit or remove, and no link to anyone's payslips.
   await expect(officer.getByRole("row", { name: new RegExp(staffName) })).toContainText("500,000.00");
   await expect(officer.getByRole("button", { name: `Salary: ${staffName}` })).toHaveCount(0);
   await expect(officer.getByRole("link", { name: `${staffName}'s payslips` })).toHaveCount(0);
   // Everything else is closed, typed URL or not.
-  for (const url of ["/hrportal/payroll/runs", "/hrportal/payroll/runs/2026-10", "/hrportal/payroll/payslips", "/hrportal/payroll/components"]) {
+  // The tax rates behind the salaries can be read, not changed.
+  await officer.goto("/hrportal/payroll/components");
+  await expect(officer.getByRole("columnheader", { name: "Calculation" })).toBeVisible();
+  await expect(officer.getByRole("button", { name: "Add tax or deduction" })).toHaveCount(0);
+  for (const url of ["/hrportal/payroll/runs", "/hrportal/payroll/runs/2026-10", "/hrportal/payroll/payslips"]) {
     await officer.goto(url);
     await expect(officer).toHaveURL(/denied=1$/);
   }
@@ -794,6 +798,45 @@ test("payroll access can be given piece by piece: seeing salaries doesn't show p
   await signIn(officer, people.officer.email);
   await expect(officer).toHaveURL(/\/hrportal\/hr$/);
   await expect(officer.getByRole("navigation", { name: "HR portal" }).getByRole("link", { name: "Payroll Management" })).toHaveCount(0);
+});
+
+test("an auditor sees HR and payroll read-only, and can change nothing", async () => {
+  test.skip(!pages.admin, "setup did not run");
+  const admin = pages.admin;
+  const officer = pages.officer;
+  const setRole = async (label: string) => {
+    await admin.goto("/hrportal/hr/accounts");
+    const row = admin.locator(`#account-${accountIds.officer}`);
+    await row.locator("summary").click();
+    await row.locator('select[name="roleId"]').selectOption({ label });
+    await row.getByRole("button", { name: "Change role" }).click();
+    await expect(row.getByRole("status")).toContainText(`Role changed to ${label}`);
+    await signIn(officer, people.officer.email);
+    await expect(officer).toHaveURL(/\/hrportal\/hr$/);
+  };
+  await setRole("Auditor");
+  const menu = officer.getByRole("navigation", { name: "HR portal" });
+  for (const item of ["Analytics", "Employees", "Leave Management", "Payroll Management"]) await expect(menu.getByText(item, { exact: true }).first()).toBeVisible();
+  await expect(menu.getByRole("link", { name: "Accounts" })).toHaveCount(0);
+  // Read-only everywhere: no add, edit or approve controls.
+  await officer.goto("/hrportal/hr/employees");
+  await expect(officer.getByRole("button", { name: "Add Employee" })).toHaveCount(0);
+  await officer.goto("/hrportal/payroll/components");
+  await expect(officer.getByRole("columnheader", { name: "Calculation" })).toBeVisible();
+  await expect(officer.getByRole("button", { name: "Add tax or deduction" })).toHaveCount(0);
+  await officer.goto("/hrportal/payroll/runs");
+  await expect(officer.getByRole("button", { name: "Add Payroll Run" })).toHaveCount(0);
+  await officer.goto("/hrportal/payroll/runs/2026-10");
+  await expect(officer.getByRole("button", { name: /^Publish/ })).toHaveCount(0);
+  await expect(officer.getByRole("link", { name: /Export schedule/ })).toBeVisible();
+  await officer.goto("/hrportal/payroll/salaries");
+  await expect(officer.getByRole("button", { name: /^Salary: / })).toHaveCount(0);
+  // Pages that change things stay closed.
+  for (const url of ["/hrportal/hr/accounts", "/hrportal/hr/roles", "/hrportal/hr/audit"]) {
+    await officer.goto(url);
+    await expect(officer).toHaveURL(/denied=1$/);
+  }
+  await setRole("HR Officer");
 });
 
 test("HR imports employees from CSV and manages their status", async () => {

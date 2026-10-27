@@ -7,6 +7,7 @@ import { QuickAction } from "@/components/hr/quick-action";
 import { Badge, Notice, PageTitle } from "@/components/hr/ui";
 import { readStore } from "@/lib/cms/store";
 import { describeRule, payrollRules } from "@/lib/hr/payroll";
+import { has } from "@/lib/hr/access";
 import { requireHrPage } from "@/lib/hr/session";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,9 @@ export const metadata = { title: "Salary components" };
 
 /** Taxes and deductions taken from pay: add, edit, switch off or remove. */
 export default async function ComponentsPage({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
-  const ctx = await requireHrPage("payroll.components.manage");
+  // Anyone who sees salaries can read the rates behind them; only "Taxes & deductions" can change them.
+  const ctx = await requireHrPage(["payroll.components.manage", "payroll.salaries.view"]);
+  const canEdit = has(ctx.permissions, "payroll.components.manage");
   const { denied } = await searchParams;
   const settings = (await readStore("hrPayrollSettings"))[0];
   const rules = payrollRules(settings);
@@ -26,11 +29,13 @@ export default async function ComponentsPage({ searchParams }: { searchParams: P
         title="Salary Components"
         subtitle={`Taxes and deductions worked out on every payslip. ${settings?.updatedAt ? `Last changed ${settings.updatedAt.slice(0, 10)} by ${settings.updatedByName}.` : "Starting rates: please confirm them with your tax adviser."}`}
         actions={
+          canEdit && (
           <Modal label="Add tax or deduction" title="Add a tax or deduction" description="It applies to payslips prepared from now on. Published payslips never change." wide>
             <ActionForm action={savePayrollRuleAction} submitLabel="Add" className="space-y-4">
               <RuleFields />
             </ActionForm>
           </Modal>
+          )
         }
       />
       <section className="hr-card overflow-hidden">
@@ -45,7 +50,7 @@ export default async function ComponentsPage({ searchParams }: { searchParams: P
                 <th scope="col" className="px-4 py-3">Type</th>
                 <th scope="col" className="px-4 py-3">Applies to</th>
                 <th scope="col" className="px-4 py-3">Status</th>
-                <th scope="col" className="px-4 py-3 text-center">Actions</th>
+                {canEdit && <th scope="col" className="px-4 py-3 text-center">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-admin-border">
@@ -59,6 +64,7 @@ export default async function ComponentsPage({ searchParams }: { searchParams: P
                   <td className="px-4 py-3">
                     <Badge status={r.active ? "approved" : "rejected"} label={r.active ? "In use" : "Switched off"} />
                   </td>
+                  {canEdit && (
                   <td className="px-4 py-3">
                     <span className="flex items-center justify-center gap-1">
                       <Modal label="Edit" iconOnly icon="edit" title={`Edit ${r.name}`} wide>
@@ -76,6 +82,7 @@ export default async function ComponentsPage({ searchParams }: { searchParams: P
                       <QuickAction action={deletePayrollRuleAction} fields={{ ruleId: r.id }} kind="delete" label={`Remove ${r.name}`} tip="Remove" confirmText={`Remove ${r.name}? Published payslips keep it.`} />
                     </span>
                   </td>
+                  )}
                 </tr>
               ))}
             </tbody>

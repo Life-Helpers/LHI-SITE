@@ -73,19 +73,21 @@ export default async function HrDashboardPage({ searchParams }: { searchParams: 
 
   const holidays = holidayDates(await readStore("hrEvents"), Number(today.slice(0, 4)) - 1, Number(today.slice(0, 4)) + 1);
   const deptName = (e: HrEmployee) => ctx.departments.find((d) => d.id === e.departmentId)?.name ?? e.department;
+  // Someone who can only look (e.g. an auditor) gets "View" links, not "Fix" or "Approve".
+  const viewOnly = (items: Insight[], canAct: boolean) => (canAct ? items : items.map((i) => ({ ...i, action: "View" })));
   const insights: Insight[] = [
-    ...(seesLeave ? leaveInsights({ leave, employees, today, holidays, href: "/hrportal/hr/leave", groupOf: deptName }) : []),
-    ...(seesPeople ? peopleInsights({ employees, today }) : []),
+    ...(seesLeave ? viewOnly(leaveInsights({ leave, employees, today, holidays, href: "/hrportal/hr/leave", groupOf: deptName }), has(p, "leave.manage")) : []),
+    ...(seesPeople ? viewOnly(peopleInsights({ employees, today }), has(p, "employees.manage")) : []),
     ...(has(p, "accounts.manage") ? accountInsights({ employees, accounts, today }) : []),
     ...(has(p, "payroll.salaries.view") || has(p, "payroll.runs")
-      ? payrollInsights({
+      ? viewOnly(payrollInsights({
           employees,
           salaries: await readStore("hrSalaries"),
           payslips: await readStore("hrPayslips"),
           today,
           holidays,
           can: { salaries: has(p, "payroll.salaries.view"), runs: has(p, "payroll.runs") },
-        })
+        }), has(p, "payroll.salaries.manage") || has(p, "payroll.runs"))
       : []),
   ];
   const closingSoon = openJobs.filter((j) => j.deadline <= weekAhead);
