@@ -299,6 +299,7 @@ export async function readSettings(): Promise<CmsSettings> {
     stats: { ...defaults.stats, ...stored.stats },
     donations: { ...defaults.donations, ...stored.donations },
     engagement: { ...defaults.engagement, ...stored.engagement },
+    socialPhone: { ...defaults.socialPhone, ...stored.socialPhone },
     popup: { ...defaults.popup, ...stored.popup },
     email: { ...defaults.email, ...stored.email },
     homeText: stored.homeText ?? {},

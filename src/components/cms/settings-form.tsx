@@ -176,6 +176,35 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
         </p>
       </Card>
 
+      <Card title="Home page: social media phone" bodyClassName="space-y-4 p-6">
+        <label className="flex items-start gap-3 text-sm" data-facebook-phone>
+          <input
+            type="checkbox"
+            checked={s.socialPhone.facebook}
+            onChange={(e) => set("socialPhone", "facebook", e.target.checked)}
+            className="mt-1 accent-admin-primary"
+          />
+          <span>
+            <span className="block font-semibold">Show the live Facebook page</span>
+            <span className="block text-xs text-admin-muted">
+              On: the phone in &ldquo;Follow our work&rdquo; streams the Facebook timeline. Off: it plays LHI&apos;s YouTube videos instead.
+            </span>
+          </span>
+        </label>
+        <Row
+          label="YouTube videos to show when Facebook is off"
+          help="One YouTube link per line, optionally followed by | and a title. The first one plays first. Leave empty to show the channel's newest videos."
+        >
+          <textarea
+            value={s.socialPhone.videos}
+            onChange={(e) => set("socialPhone", "videos", e.target.value)}
+            rows={5}
+            className={`${inputClass} font-mono text-xs`}
+            placeholder={"https://www.youtube.com/watch?v=45HZKC19AxY | NIDAKE reusable pads\nhttps://youtu.be/..."}
+          />
+        </Row>
+      </Card>
+
       <Card title="Comments & alerts" bodyClassName="space-y-4 p-6">
         <label className="flex items-start gap-3 text-sm">
           <input

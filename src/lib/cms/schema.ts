@@ -903,6 +903,13 @@ export interface CmsSettings {
     /** Where new-submission alerts are sent once email is connected. */
     alertEmail: string;
   };
+  /** The phone in the home page's "Follow our work" section. */
+  socialPhone: {
+    /** Stream the Facebook Page timeline; when off, the phone plays YouTube videos instead. */
+    facebook: boolean;
+    /** YouTube links to play there (one per line, optional "| title"); empty uses the channel's newest videos. */
+    videos: string;
+  };
   /** The newsletter sign-up pop-up. Each visitor sees it once per `campaign`. */
   popup: {
     enabled: boolean;

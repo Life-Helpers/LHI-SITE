@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getSiteData } from "@/lib/cms/content";
+import { youtubeId } from "@/lib/youtube";
 
 /** Account links from Admin → Settings → Social media accounts. */
 const accounts = async () => (await getSiteData()).social;
@@ -18,6 +19,7 @@ const accounts = async () => (await getSiteData()).social;
  * - X: X_BEARER_TOKEN (+ optional X_USER_ID; otherwise looked up from the handle). Needs an X API
  *   plan that allows reading posts.
  */
+
 
 export type SocialNetwork = "facebook" | "instagram" | "youtube" | "x";
 
@@ -81,14 +83,14 @@ async function youtubeChannelId(): Promise<string | null> {
   return m ? m[1] : null;
 }
 
-export async function youtubeItems(): Promise<SocialItem[]> {
+export async function youtubeItems(count = YOUTUBE_ITEMS): Promise<SocialItem[]> {
   const channel = await youtubeChannelId();
   if (!channel) return [];
   const xml = await getText(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel}`);
   if (!xml) return [];
   return xml
     .split("<entry>")
-    .slice(1, YOUTUBE_ITEMS + 1)
+    .slice(1, count + 1)
     .map((entry) => {
       const id = tag(entry, "yt:videoId");
       return {
@@ -182,7 +184,7 @@ export async function getSocialFeed(limit = 12): Promise<{ items: SocialItem[]; 
   const sources: [SocialNetwork, () => Promise<SocialItem[]>][] = [
     ["facebook", facebookItems],
     ["instagram", instagramItems],
-    ["youtube", youtubeItems],
+    ["youtube", () => youtubeItems()],
     ["x", xItems],
   ];
   const results = await Promise.all(sources.map(([, load]) => load().catch(() => [] as SocialItem[])));
@@ -193,4 +195,41 @@ export async function getSocialFeed(limit = 12): Promise<{ items: SocialItem[]; 
     .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
     .slice(0, limit);
   return { items, connected };
+}
+
+export interface PhoneVideo {
+  id: string;
+  title: string;
+}
+
+/** A video's title from YouTube's oEmbed (cached for a day), or null. */
+async function youtubeTitle(id: string): Promise<string | null> {
+  const json = await getText(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}`, 86_400);
+  try {
+    return json ? (JSON.parse(json) as { title?: string }).title ?? null : null;
+  } catch {
+    return null;
+  }
+}
+
+/** LHI's NIDAKE film: shown when nothing else is set and the channel feed can't be reached. */
+const FALLBACK_VIDEO: PhoneVideo = { id: "45HZKC19AxY", title: "NIDAKE reusable sanitary pads" };
+
+/**
+ * Videos for the home page phone when the Facebook timeline is switched off: the links chosen in
+ * Admin → Site Settings (one per line, "link | title"), or else the channel's newest videos.
+ */
+export async function phoneVideos(links: string): Promise<PhoneVideo[]> {
+  const chosen = links
+    .split("\n")
+    .map((line) => {
+      const [link, ...title] = line.split("|");
+      return { id: youtubeId(link ?? "") ?? "", title: title.join("|").trim() };
+    })
+    .filter((v) => v.id);
+  if (chosen.length) {
+    return Promise.all(chosen.map(async (v) => ({ id: v.id, title: v.title || (await youtubeTitle(v.id)) || "Life Helpers Initiative video" })));
+  }
+  const latest = (await youtubeItems(6)).map((i) => ({ id: i.id.replace(/^yt-/, ""), title: i.text }));
+  return latest.length ? latest : [FALLBACK_VIDEO];
 }

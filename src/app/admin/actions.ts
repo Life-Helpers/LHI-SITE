@@ -46,6 +46,7 @@ import {
 } from "@/lib/cms/schema";
 import { readSettings, readStore, updateStore, writeSettings } from "@/lib/cms/store";
 import { deleteFile } from "@/lib/cms/files";
+import { youtubeId } from "@/lib/youtube";
 import type { FieldErrors } from "@/lib/cms/validate";
 import { validateRecord } from "@/lib/cms/validate";
 import { sendPasswordResetEmail } from "@/lib/email/notifications";
@@ -546,6 +547,16 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
       engagement: {
         autoApproveComments: Boolean(settings.engagement?.autoApproveComments),
         alertEmail: str(settings.engagement?.alertEmail, 200),
+      },
+      socialPhone: {
+        facebook: settings.socialPhone?.facebook !== false,
+        // YouTube links only, one per line, at most 12.
+        videos: str(settings.socialPhone?.videos, 3000)
+          .split("\n")
+          .map((l) => l.trim())
+          .filter((l) => youtubeId(l.split("|")[0].trim()))
+          .slice(0, 12)
+          .join("\n"),
       },
       // Set on the Email & Pop-up screen.
       popup: current.popup,
