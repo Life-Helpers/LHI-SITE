@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Download, Mail } from "lucide-react";
+import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 import { NewsletterComposer } from "@/components/cms/newsletter-composer";
 import {
@@ -35,6 +36,7 @@ export default async function NewsletterPage() {
   return (
     <>
       <PageHeader
+        site={SITE_LOCATIONS.newsletter}
         title="Newsletter"
         description="Write to everyone who subscribed on the website, in downloads, the anniversary popup or when joining a course."
         breadcrumbs={[

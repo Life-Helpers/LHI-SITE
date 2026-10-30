@@ -6,6 +6,7 @@ import { COURSES } from "@/data/training/courses";
 import { requirePageUser } from "@/lib/cms/auth";
 import { can } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
+import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 export const metadata = { title: "Learners" };
 
@@ -20,6 +21,7 @@ export default async function LearnersPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <PageHeader
+        site={SITE_LOCATIONS.learners}
         title="Learners"
         description="People who signed up for the Humanitarian Training centre, with their course progress."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Learners" }]}

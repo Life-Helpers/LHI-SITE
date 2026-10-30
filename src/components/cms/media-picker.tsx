@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FileText, Loader2, Music, Upload, X } from "lucide-react";
 
 import { buttonClass } from "@/components/cms/ui";
+import { toPlayableAudio, needsConversion } from "@/lib/cms/audio-convert";
 import { AUDIO_ACCEPT } from "@/lib/cms/media-types";
 import { directUploadAccess, mediaFilename, SERVER_UPLOAD_LIMIT, uploadDirect } from "@/lib/cms/direct-upload";
 import type { MediaItem } from "@/lib/cms/schema";
@@ -18,8 +19,14 @@ async function postForm(files: File[]): Promise<MediaItem[]> {
 }
 
 /** Small files go through the server (which optimises images); large ones straight to storage when possible. */
-export async function uploadFiles(files: FileList | File[]): Promise<MediaItem[]> {
-  const list = Array.from(files);
+export async function uploadFiles(files: FileList | File[], onStatus?: (message: string) => void): Promise<MediaItem[]> {
+  // Audio browsers can't play (WMA, AMR, AIFF...) is turned into MP3 first.
+  const list: File[] = [];
+  for (const f of Array.from(files)) {
+    if (needsConversion(f)) onStatus?.(`Converting ${f.name} to MP3…`);
+    list.push(await toPlayableAudio(f, (pct) => onStatus?.(`Converting ${f.name} to MP3… ${pct}%`)));
+  }
+  onStatus?.("Uploading…");
   const large = list.filter((f) => f.size > SERVER_UPLOAD_LIMIT);
   const small = list.filter((f) => f.size <= SERVER_UPLOAD_LIMIT);
   const saved: MediaItem[] = small.length ? await postForm(small) : [];
@@ -63,6 +70,7 @@ export function MediaPicker({
   const [items, setItems] = useState<MediaItem[] | null>(null);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [status, setStatus] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -83,14 +91,14 @@ export function MediaPicker({
     return () => window.removeEventListener("keydown", onKey);
   }, [load, onClose]);
 
-  const visible = (items ?? []).filter((m) => (kind === "image" ? m.mimeType.startsWith("image/") : kind === "audio" ? m.mimeType.startsWith("audio/") : true));
+  const visible = (items ?? []).filter((m) => (kind === "image" ? m.mimeType.startsWith("image/") : kind === "audio" ? m.mimeType.startsWith("audio/") || m.mimeType === "video/mp4" : true));
 
   const handleUpload = async (files: FileList | null) => {
     if (!files?.length) return;
     setUploading(true);
     setError("");
     try {
-      const uploaded = await uploadFiles(files);
+      const uploaded = await uploadFiles(files, setStatus);
       if (uploaded.length === 1) {
         onSelect(uploaded[0]);
         return;
@@ -100,6 +108,7 @@ export function MediaPicker({
       setError((e as Error).message);
     } finally {
       setUploading(false);
+      setStatus("");
     }
   };
 
@@ -132,6 +141,7 @@ export function MediaPicker({
             </button>
           </div>
         </div>
+        {uploading && status && <p className="bg-admin-primary-soft px-5 py-2 text-sm text-admin-primary" role="status">{status}</p>}
         {error && <p className="bg-admin-danger-soft px-5 py-2 text-sm text-admin-danger">{error}</p>}
         <div className="flex-1 overflow-y-auto p-5">
           {items === null ? (

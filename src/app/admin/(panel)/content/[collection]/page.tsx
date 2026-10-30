@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { CollectionTable, type TableColumn, type TableRow } from "@/components/cms/collection-table";
 import { buttonClass, PageHeader } from "@/components/cms/ui";
 import { displayValue, loadCollection } from "@/lib/cms/admin-helpers";
+import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 export default async function CollectionListPage({ params }: { params: Promise<{ collection: string }> }) {
   const { collection } = await params;
@@ -39,7 +40,7 @@ export default async function CollectionListPage({ params }: { params: Promise<{
       editHref: `/admin/content/${def.name}/${encodeURIComponent(id)}`,
       viewHref: scheduled ? null : (def.publicPath?.(item) ?? null),
       thumb: imageField ? String(item[imageField.name] || "") || undefined : undefined,
-      canDelete: !def.fixed,
+      canDelete: !def.fixed && !def.lockedIds?.includes(id),
       status: statusField ? String(item[statusField.name] ?? "") : undefined,
       cells,
     };
@@ -50,6 +51,7 @@ export default async function CollectionListPage({ params }: { params: Promise<{
       <PageHeader
         title={def.label}
         description={def.description}
+        site={SITE_LOCATIONS[def.name]}
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: def.label }]}
         actions={
           !def.fixed && (

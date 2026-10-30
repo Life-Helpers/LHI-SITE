@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ExternalLink, Plus } from "lucide-react";
+import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 import { DeleteMagazineButton } from "@/components/cms/delete-magazine-button";
 import { Badge, buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
@@ -15,6 +16,7 @@ export default async function MagazinesAdminPage() {
   return (
     <>
       <PageHeader
+        site={SITE_LOCATIONS.magazines}
         title="Project Magazines"
         description="Magazines, bulletins and newsletters shown as flipbooks on the Project Magazines page."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Magazines" }]}

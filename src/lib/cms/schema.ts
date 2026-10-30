@@ -5,7 +5,7 @@
  */
 
 import { OPERATIONAL_STATES } from "@/data/operational-states";
-import { THEMATIC_AREA_LIST } from "@/data/thematic-areas";
+import { programHref, THEMATIC_AREA_IDS, THEMATIC_AREA_LIST } from "@/data/thematic-areas";
 import { SAFEGUARDING_CHECKS } from "@/lib/cms/safeguarding";
 import type { HomeTextByLocale } from "@/lib/home-text";
 
@@ -118,6 +118,36 @@ export const PERMISSION_HOME: Record<Permission, string> = {
   activity: "/admin/activity",
 };
 
+/** Where each admin section's content appears on the public site, so editors can open it in one click. */
+export const SITE_LOCATIONS: Record<string, { label: string; href: string }[]> = {
+  posts: [{ label: "News & updates", href: "/blog" }, { label: "Success stories", href: "/success-stories" }],
+  interventions: [{ label: "Projects & interventions", href: "/interventions" }],
+  states: [{ label: "Operational map (home page)", href: "/#operational-map-heading" }],
+  partners: [{ label: "Partners strip (home page)", href: "/#implementing-partners-section" }],
+  documents: [{ label: "Partner & Bidder Portal", href: "/partner-portal" }],
+  jobs: [{ label: "Careers page", href: "/careers" }],
+  tenders: [{ label: "Procurement page", href: "/procurement" }],
+  episodes: [{ label: "Radio & TV page", href: "/radio" }, { label: "Home page radio", href: "/" }],
+  events: [{ label: "Events calendar", href: "/events" }],
+  milestones: [{ label: "Our History", href: "/our-history" }],
+  team: [{ label: "Management team", href: "/management-team" }, { label: "Board of Trustees", href: "/board-of-trustees" }],
+  heroSlides: [{ label: "Home page slides", href: "/" }],
+  testimonials: [{ label: "Testimonials (home page)", href: "/#testimonials-heading" }],
+  beforeAfter: [{ label: "Before & after (home page)", href: "/#before-after-heading" }],
+  impactReports: [{ label: "Impact page", href: "/impact" }],
+  emergencies: [{ label: "Emergencies page", href: "/emergencies" }],
+  thematicAreas: [{ label: "Programmes page", href: "/programs" }],
+  faqs: [{ label: "FAQ page", href: "/faq" }, { label: "About page", href: "/about" }],
+  observances: [{ label: "Events calendar", href: "/events" }],
+  magazines: [{ label: "Project Magazines page", href: "/project-magazines" }],
+  learners: [{ label: "Humanitarian Training centre", href: "/get-involved/training" }],
+  certificates: [{ label: "Certificate check (training page)", href: "/get-involved/training" }],
+  comments: [{ label: "News & updates", href: "/blog" }],
+  homeText: [{ label: "Home page", href: "/" }],
+  newsletter: [{ label: "Sign-up form (site footer)", href: "/#site-footer" }],
+  submissions: [{ label: "Contact form", href: "/contact" }, { label: "Careers", href: "/careers" }, { label: "Procurement", href: "/procurement" }, { label: "Get involved", href: "/get-involved" }],
+};
+
 /** A username: 3–30 lower-case letters, numbers, dots, dashes or underscores. */
 export const USERNAME_PATTERN = /^[a-z0-9][a-z0-9._-]{2,29}$/;
 
@@ -213,6 +243,8 @@ export interface CollectionDef {
   statusField?: string;
   /** Items cannot be created or deleted (e.g. map states tied to map geometry). */
   fixed?: boolean;
+  /** These items can be edited but not deleted, and keep their id (their pages are built in). */
+  lockedIds?: readonly string[];
   /** Public URL of an item, for the "View" link. */
   publicPath?: (item: Record<string, unknown>) => string | null;
   fields: FieldDef[];
@@ -462,7 +494,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     label: "Radio Episodes",
     singular: "Episode",
     description:
-      "Radio programme recordings played by the home-page radio and the Radio & TV page. Upload an MP3/M4A, or paste a Google Drive link to the audio file (shared as \"Anyone with the link\") — best for recordings over 4 MB.",
+      "Radio programme recordings played by the home-page radio and the Radio & TV page. Upload any audio file (MP3, M4A, WAV, OGG, FLAC, AAC; WMA, AMR, AIFF and phone recordings are turned into MP3 automatically), or paste a Google Drive link to the audio file (shared as \"Anyone with the link\") — best for recordings over 4 MB.",
     permission: "episodes",
     titleField: "title",
     columns: ["title", "programme", "language", "status", "date"],
@@ -713,14 +745,15 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
     name: "thematicAreas",
     label: "Thematic Area Pages",
     singular: "Thematic area",
-    description: "The text and photo on the six thematic area pages. The six areas themselves are fixed.",
+    description: "LHI's thematic areas: the six built-in ones (which can be edited but not deleted) and any you add. Each has its own page and appears on the Programmes page.",
     permission: "pages",
     titleField: "name",
     columns: ["name", "region", "metricValue"],
-    fixed: true,
-    publicPath: (item) => `/${item.id}`,
+    lockedIds: THEMATIC_AREA_IDS,
+    publicPath: (item) => programHref(String(item.id)),
     fields: [
       { name: "name", label: "Page title", type: "text", required: true },
+      { name: "id", label: "URL slug", type: "slug", from: "name", required: true, help: "The built-in six keep their address." },
       { name: "region", label: "Region", type: "text", required: true },
       { name: "summary", label: "Summary", type: "textarea", required: true },
       { name: "description", label: "Page text", type: "textarea", required: true, help: "Separate paragraphs with a blank line." },

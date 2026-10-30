@@ -303,10 +303,14 @@ export async function getActiveAlerts(): Promise<EmergencyAlert[]> {
     }));
 }
 
-/** The six thematic area pages, in their fixed order. */
+/** The thematic area pages: the built-in six in their fixed order, then any added in the admin (A–Z). */
 export async function getPrograms(): Promise<Program[]> {
   const stored = await readStore("thematicAreas");
-  return THEMATIC_AREA_IDS.flatMap((id) => {
+  const added = stored
+    .filter((a) => !(THEMATIC_AREA_IDS as readonly string[]).includes(a.id))
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((a) => a.id);
+  return [...THEMATIC_AREA_IDS, ...added].flatMap((id) => {
     const a = stored.find((x) => x.id === id);
     if (!a) return [];
     const stats = parseStats(a.stats);

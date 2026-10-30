@@ -4,6 +4,7 @@ import { dictionaries, localeMeta, locales } from "@/i18n";
 import { requirePageUser } from "@/lib/cms/auth";
 import { readSettings } from "@/lib/cms/store";
 import { HOME_TEXT_FIELDS, homeTextDefault } from "@/lib/home-text";
+import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 export const metadata = { title: "Home Page Text" };
 
@@ -17,6 +18,7 @@ export default async function HomeTextPage() {
   return (
     <>
       <PageHeader
+        site={SITE_LOCATIONS.homeText}
         title="Home Page Text"
         description="Headings and text on the home page, in each of the site's languages. Leave a box empty to keep the built-in text."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Home Page Text" }]}

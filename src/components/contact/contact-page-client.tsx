@@ -138,16 +138,17 @@ export function ContactPageClient() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative isolate overflow-hidden border-b border-border bg-muted pb-16 pt-32 sm:pb-20 sm:pt-40">
+      <section className="relative isolate overflow-hidden border-b border-border bg-zinc-900 pb-16 pt-32 sm:pb-20 sm:pt-40">
         <Image
           src={africanFulfillmentImages.contactHero.src}
           alt={africanFulfillmentImages.contactHero.alt}
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center brightness-[0.38] dark:brightness-[0.25]"
+          className="object-cover object-center brightness-[0.6] dark:brightness-[0.4]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        {/* A dark wash (not a fade to white) keeps the photo, text and cards crisp in light and dark mode. */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/30 px-3.5 py-1 text-xs font-semibold uppercase tracking-widest text-white backdrop-blur-md">
             <Building2 className="h-3.5 w-3.5" aria-hidden="true" /> {offices.length} offices · {offices.length} states

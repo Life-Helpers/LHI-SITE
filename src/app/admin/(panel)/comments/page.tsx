@@ -4,6 +4,7 @@ import { CommentActions } from "@/components/cms/comment-actions";
 import { Badge, Card, formatDate, PageHeader } from "@/components/cms/ui";
 import { requirePageUser } from "@/lib/cms/auth";
 import { readStore } from "@/lib/cms/store";
+import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 export const metadata = { title: "Comments" };
 
@@ -19,6 +20,7 @@ export default async function CommentsPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <PageHeader
+        site={SITE_LOCATIONS.comments}
         title="Comments"
         description="Reader comments on posts are held here until approved. Likes are counted automatically."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Comments" }]}

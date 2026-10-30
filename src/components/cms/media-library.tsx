@@ -26,6 +26,7 @@ export function MediaLibrary({ items, canDelete }: { items: MediaItem[]; canDele
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -36,12 +37,13 @@ export function MediaLibrary({ items, canDelete }: { items: MediaItem[]; canDele
     setUploading(true);
     setError("");
     try {
-      await uploadFiles(files);
+      await uploadFiles(files, setStatus);
       router.refresh();
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setUploading(false);
+      setStatus("");
     }
   };
 
@@ -76,6 +78,7 @@ export function MediaLibrary({ items, canDelete }: { items: MediaItem[]; canDele
           <button type="button" className={`${buttonClass.secondary} mt-2`} onClick={() => inputRef.current?.click()} disabled={uploading}>
             {uploading && <Loader2 className="h-4 w-4 animate-spin" />} Select files
           </button>
+          {uploading && status && <p className="text-sm text-admin-primary" role="status">{status}</p>}
           {error && <p className="text-sm text-admin-danger" role="alert">{error}</p>}
         </div>
 

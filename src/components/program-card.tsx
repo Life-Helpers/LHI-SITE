@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { Program } from "@/types/content";
+import { programHref } from "@/data/thematic-areas";
 
 export function ProgramCard({ program }: { program: Program }) {
   return (
@@ -57,7 +58,7 @@ export function ProgramCard({ program }: { program: Program }) {
       </CardContent>
       <CardFooter>
         <Link
-          href={`/${program.id}`}
+          href={programHref(program.id)}
           className="inline-flex items-center gap-1 rounded text-sm font-medium text-primary hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           Learn more

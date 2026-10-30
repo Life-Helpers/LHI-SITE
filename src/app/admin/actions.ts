@@ -373,6 +373,9 @@ export async function saveItemAction(
     }
 
     const { record, errors } = validateRecord(def, values);
+    if (originalId && def.lockedIds?.includes(originalId) && record.id !== undefined && record.id !== originalId) {
+      errors.id = "This built-in page's address can't be changed.";
+    }
     if (Object.keys(errors).length) return { ok: false, errors, error: "Please fix the highlighted fields." };
 
     const isPost = collection === "posts";
@@ -442,7 +445,7 @@ export async function deleteItemAction(collection: string, id: string): Promise<
     if (!isCollectionName(collection)) return { ok: false, error: "Unknown collection." };
     const def = COLLECTIONS[collection];
     const user = await requireUser(def.permission);
-    if (def.fixed) return { ok: false, error: `${def.label} cannot be deleted.` };
+    if (def.fixed || def.lockedIds?.includes(id)) return { ok: false, error: `This ${def.singular.toLowerCase()} is built in and cannot be deleted.` };
 
     const items = (await readStore(collection)) as unknown as Record<string, unknown>[];
     const item = items.find((i) => i.id === id);

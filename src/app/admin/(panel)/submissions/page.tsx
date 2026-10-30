@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
+import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 import { Badge, buttonClass, Card, formatDate, PageHeader, statusTone } from "@/components/cms/ui";
 import { requirePageUser } from "@/lib/cms/auth";
@@ -35,6 +36,7 @@ export default async function SubmissionsPage({
   return (
     <>
       <PageHeader
+        site={SITE_LOCATIONS.submissions}
         title="Submissions"
         description="Job applications, vendor bids and registrations, contact messages, volunteer sign-ups, consortium expressions of interest and newsletter subscribers."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Submissions" }]}

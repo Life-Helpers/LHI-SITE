@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
+import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 import { buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
 import { COURSES } from "@/data/training/courses";
@@ -22,6 +23,7 @@ export default async function CertificatesPage({ searchParams }: { searchParams:
   return (
     <>
       <PageHeader
+        site={SITE_LOCATIONS.certificates}
         title="Training Certificates"
         description="Certificates issued by the Humanitarian Training centre. Anyone can verify a code on the public training page."
         breadcrumbs={[{ label: "Dashboard", href: "/admin" }, { label: "Certificates" }]}

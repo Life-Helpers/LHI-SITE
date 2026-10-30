@@ -76,3 +76,6 @@ export const THEMATIC_AREA_LIST: ThematicArea[] = THEMATIC_AREA_IDS.map((id) => 
 export function isThematicAreaId(value: string): value is ThematicAreaId {
   return (THEMATIC_AREA_IDS as readonly string[]).includes(value);
 }
+
+/** A thematic area's page: the built-in six sit at the top level, ones added in the admin under /programs. */
+export const programHref = (id: string) => (isThematicAreaId(id) ? `/${id}` : `/programs/${id}`);

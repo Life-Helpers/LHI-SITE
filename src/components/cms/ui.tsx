@@ -5,11 +5,14 @@ export function PageHeader({
   description,
   breadcrumbs,
   actions,
+  site,
 }: {
   title: string;
   description?: string;
   breadcrumbs?: { label: string; href?: string }[];
   actions?: React.ReactNode;
+  /** Where this content shows on the public site: links that open it in a new tab. */
+  site?: { label: string; href: string }[];
 }) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -32,6 +35,20 @@ export function PageHeader({
         )}
         <h1 className="truncate text-2xl font-bold tracking-tight">{title}</h1>
         {description && <p className="mt-1 text-sm text-admin-muted">{description}</p>}
+        {site && site.length > 0 && (
+          <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm" data-site-links>
+            <span className="text-admin-muted">See it on the site:</span>
+            {site.map((s) => (
+              <a key={s.href + s.label} href={s.href} target="_blank" rel="noopener" className="inline-flex items-center gap-1 font-semibold text-admin-primary hover:underline">
+                {s.label}
+                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                </svg>
+                <span className="sr-only">(opens in a new tab)</span>
+              </a>
+            ))}
+          </p>
+        )}
       </div>
       {actions && <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>}
     </div>
