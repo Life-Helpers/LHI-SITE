@@ -23,6 +23,8 @@ export type CmsPartner = Omit<PartnerItem, "logo"> & {
 };
 
 export interface CmsDocument {
+  /** False hides the download button on the site. Missing means allowed (older records). */
+  allowDownload?: boolean;
   id: string;
   title: string;
   category: "Organisational documents" | "Registration & tax" | "Financial accountability" | "Safeguarding & integrity";
@@ -56,6 +58,8 @@ export interface CmsPost {
 }
 
 export interface CmsJob {
+  /** False hides the download button on the site. Missing means allowed (older records). */
+  allowDownload?: boolean;
   id: string;
   title: string;
   summary: string;
@@ -73,6 +77,8 @@ export interface CmsJob {
 }
 
 export interface CmsTender {
+  /** False hides the download button on the site. Missing means allowed (older records). */
+  allowDownload?: boolean;
   id: string;
   title: string;
   summary: string;

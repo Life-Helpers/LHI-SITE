@@ -440,6 +440,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "description", label: "Description", type: "textarea", required: true },
       { name: "category", label: "Category", type: "select", sidebar: true, required: true, options: opts("Organisational documents", "Registration & tax", "Financial accountability", "Safeguarding & integrity") },
       { name: "file", label: "Document file (PDF)", type: "file", sidebar: true, help: "Leave empty to show “Request a certified copy”." },
+      { name: "allowDownload", label: "Visitors can download the file", type: "boolean", sidebar: true, help: "Untick to hide the download button on the site (the file stays in the admin)." },
       { name: "href", label: "Or link to page", type: "text", sidebar: true, help: "Internal path, e.g. /impact" },
     ],
   },
@@ -468,6 +469,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "postedDate", label: "Date posted", type: "date", sidebar: true, required: true },
       { name: "deadline", label: "Application deadline", type: "date", sidebar: true, required: true, help: "Applications close at the end of this day." },
       { name: "attachment", label: "Job description / ToR (PDF)", type: "file", sidebar: true },
+      { name: "allowDownload", label: "Visitors can download the file", type: "boolean", sidebar: true, help: "Untick to hide the download button on the site (the file stays in the admin)." },
     ],
   },
   tenders: {
@@ -494,6 +496,7 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "postedDate", label: "Date published", type: "date", sidebar: true, required: true },
       { name: "deadline", label: "Submission deadline", type: "date", sidebar: true, required: true },
       { name: "document", label: "Solicitation pack (PDF)", type: "file", sidebar: true },
+      { name: "allowDownload", label: "Visitors can download the file", type: "boolean", sidebar: true, help: "Untick to hide the download button on the site (the file stays in the admin)." },
     ],
   },
   episodes: {
@@ -1108,6 +1111,8 @@ export interface CmsMagazine {
   story: string;
   pages: number;
   pdf: string;
+  /** False hides the "Download PDF" buttons; the flipbook still shows the pages. */
+  allowDownload?: boolean;
   status: "published" | "draft";
   createdAt: string;
   createdBy: string;

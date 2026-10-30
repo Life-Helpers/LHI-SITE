@@ -12,7 +12,7 @@ export default async function NewItemPage({ params }: { params: Promise<{ collec
   const initial: Record<string, unknown> = {};
   for (const f of def.fields) {
     if (f.type === "multiselect" || f.type === "list" || f.type === "images") initial[f.name] = [];
-    else if (f.type === "boolean") initial[f.name] = f.name === "visible";
+    else if (f.type === "boolean") initial[f.name] = f.name === "visible" || f.name === "allowDownload";
     else if (f.type === "select" && f.required) initial[f.name] = f.options?.[0]?.value ?? "";
     else if (f.type === "date") initial[f.name] = new Date().toISOString().slice(0, 10);
     else initial[f.name] = "";

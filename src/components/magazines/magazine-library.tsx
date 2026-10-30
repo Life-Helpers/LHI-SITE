@@ -309,9 +309,11 @@ function Caption({ magazine, progress }: { magazine: Magazine; progress?: { page
           <div className="h-1 rounded-full bg-primary" style={{ width: `${(progress.page / progress.total) * 100}%` }} />
         </div>
       )}
-      <a href={magazine.pdf} download data-title={magazine.title} className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary">
-        <Download className="h-3 w-3" aria-hidden="true" /> PDF
-      </a>
+      {magazine.pdf && (
+        <a href={magazine.pdf} download data-title={magazine.title} className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary">
+          <Download className="h-3 w-3" aria-hidden="true" /> PDF
+        </a>
+      )}
     </div>
   );
 }

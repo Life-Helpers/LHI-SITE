@@ -286,9 +286,11 @@ export function Flipbook({ magazine }: { magazine: Magazine }) {
           <button type="button" onClick={toggleFullscreen} aria-label={fullscreen ? "Exit full screen" : "Full screen"} title="Full screen" className={btn}>
             {fullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
           </button>
-          <a href={magazine.pdf} download data-title={magazine.title} aria-label="Download PDF" title="Download PDF" className={btn}>
-            <Download className="h-5 w-5" />
-          </a>
+          {magazine.pdf && (
+            <a href={magazine.pdf} download data-title={magazine.title} aria-label="Download PDF" title="Download PDF" className={btn}>
+              <Download className="h-5 w-5" />
+            </a>
+          )}
         </div>
       </div>
     </div>

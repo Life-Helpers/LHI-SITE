@@ -129,3 +129,24 @@ export async function GET() {
   }
   return NextResponse.json({ items: await readStore("magazines") });
 }
+
+/** Turns the "Download PDF" button for one magazine on or off. Body: { slug, allowDownload }. */
+export async function PATCH(req: NextRequest) {
+  let user;
+  try {
+    user = await auth();
+  } catch (res) {
+    return res as NextResponse;
+  }
+  const body = (await req.json().catch(() => ({}))) as { slug?: unknown; allowDownload?: unknown };
+  const slug = slugify(String(body.slug ?? ""));
+  const allowDownload = body.allowDownload === true;
+  const updated = await updateStore("magazines", (items) => {
+    const found = items.find((m) => m.slug === slug);
+    return { items: items.map((m) => (m.slug === slug ? { ...m, allowDownload } : m)), result: found };
+  });
+  if (!updated) return NextResponse.json({ error: "Not found." }, { status: 404 });
+  await logActivity(user, allowDownload ? "allowed PDF download of" : "turned off PDF download of", updated.title, "/admin/magazines");
+  revalidatePath("/project-magazines", "layout");
+  return NextResponse.json({ ok: true });
+}

@@ -50,8 +50,8 @@ export async function getPartners() {
   return (await readStore("partners")).filter((p) => p.visible).sort((a, b) => a.order - b.order);
 }
 
-export function getDocuments() {
-  return readStore("documents");
+export async function getDocuments() {
+  return (await readStore("documents")).map((d) => (d.allowDownload === false ? { ...d, file: "" } : d));
 }
 
 export async function getPublishedPosts(category?: string) {
@@ -78,29 +78,37 @@ export function todayInLagos() {
 }
 
 /** Public vacancies: open ones first, then recently closed (for reference). */
+/** Clears a job's or tender's attached file when the admin has turned off downloads for it. */
+function withoutHiddenFile<T extends { allowDownload?: boolean; attachment?: string; document?: string }>(item: T): T {
+  if (item.allowDownload !== false) return item;
+  return { ...item, ...("attachment" in item ? { attachment: "" } : {}), ...("document" in item ? { document: "" } : {}) };
+}
+
 export async function getPublicJobs() {
   const today = todayInLagos();
-  const jobs = (await readStore("jobs")).filter((j) => j.status !== "draft").sort(byDeadline);
+  const jobs = (await readStore("jobs")).filter((j) => j.status !== "draft").map(withoutHiddenFile).sort(byDeadline);
   const isOpen = (j: (typeof jobs)[number]) => j.status === "open" && j.deadline >= today;
   return { open: jobs.filter(isOpen), closed: jobs.filter((j) => !isOpen(j)).slice(0, 10), isOpen };
 }
 
 export async function getJob(id: string) {
-  const job = (await readStore("jobs")).find((j) => j.id === id && j.status !== "draft");
-  if (!job) return undefined;
+  const found = (await readStore("jobs")).find((j) => j.id === id && j.status !== "draft");
+  if (!found) return undefined;
+  const job = withoutHiddenFile(found);
   return { job, open: job.status === "open" && job.deadline >= todayInLagos() };
 }
 
 export async function getPublicTenders() {
   const today = todayInLagos();
-  const tenders = (await readStore("tenders")).filter((t) => t.status !== "draft").sort(byDeadline);
+  const tenders = (await readStore("tenders")).filter((t) => t.status !== "draft").map(withoutHiddenFile).sort(byDeadline);
   const isOpen = (t: (typeof tenders)[number]) => t.status === "open" && t.deadline >= today;
   return { open: tenders.filter(isOpen), past: tenders.filter((t) => !isOpen(t)).slice(0, 20) };
 }
 
 export async function getTender(id: string) {
-  const tender = (await readStore("tenders")).find((t) => t.id === id && t.status !== "draft");
-  if (!tender) return undefined;
+  const found = (await readStore("tenders")).find((t) => t.id === id && t.status !== "draft");
+  if (!found) return undefined;
+  const tender = withoutHiddenFile(found);
   return { tender, open: tender.status === "open" && tender.deadline >= todayInLagos() };
 }
 
@@ -163,7 +171,7 @@ export async function getAllMagazines(): Promise<Magazine[]> {
         period: m.period,
         description: m.description,
         pages: m.pages,
-        pdf: m.pdf,
+        pdf: m.allowDownload === false ? "" : m.pdf,
         story: m.story || `/project-magazines/${m.slug}`,
         partners: m.partners,
         pagePrefix: `/media/mag-${m.slug}-`,

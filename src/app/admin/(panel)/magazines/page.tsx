@@ -3,6 +3,7 @@ import { ExternalLink, Plus } from "lucide-react";
 import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 import { DeleteMagazineButton } from "@/components/cms/delete-magazine-button";
+import { MagazineDownloadToggle } from "@/components/cms/download-toggle";
 import { Badge, buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
 import { MAGAZINES } from "@/data/magazines";
 import { requirePageUser } from "@/lib/cms/auth";
@@ -42,6 +43,7 @@ export default async function MagazinesAdminPage() {
                     {m.period ? ` · ${m.period}` : ""} · {m.pages} pages · uploaded {formatDate(m.createdAt)} by {m.createdBy}
                   </p>
                 </div>
+                <MagazineDownloadToggle slug={m.slug} title={m.title} allowed={m.allowDownload !== false} />
                 <Badge tone={m.status === "published" ? "success" : "warning"}>{m.status}</Badge>
                 <Link href={`/project-magazines/${m.slug}`} target="_blank" className={buttonClass.secondary}>
                   <ExternalLink className="h-4 w-4" /> View

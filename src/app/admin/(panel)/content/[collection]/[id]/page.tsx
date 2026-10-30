@@ -28,7 +28,7 @@ export default async function EditItemPage({ params }: { params: Promise<{ colle
           { label: "Edit" },
         ]}
       />
-      <ItemEditor collection={def.name} initial={item} originalId={String(item.id)} viewHref={def.publicPath?.(item) ?? null} meta={meta} relationOptions={relationOptionsOf(def)} />
+      <ItemEditor collection={def.name} initial={def.fields.some((f) => f.name === "allowDownload") && item.allowDownload === undefined ? { ...item, allowDownload: true } : item} originalId={String(item.id)} viewHref={def.publicPath?.(item) ?? null} meta={meta} relationOptions={relationOptionsOf(def)} />
     </>
   );
 }
