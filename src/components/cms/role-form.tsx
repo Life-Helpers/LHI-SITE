@@ -6,7 +6,7 @@ import { Loader2, Lock, Save, Trash2 } from "lucide-react";
 
 import { deleteRoleAction, saveRoleAction } from "@/app/admin/actions";
 import { buttonClass, Card, inputClass } from "@/components/cms/ui";
-import { PERMISSION_GROUPS, type CmsRole, type Permission } from "@/lib/cms/schema";
+import { ADMIN_ONLY_PERMISSIONS, PERMISSION_GROUPS, type CmsRole, type Permission } from "@/lib/cms/schema";
 
 export function RoleForm({ role, userCount = 0 }: { role?: CmsRole; userCount?: number }) {
   const router = useRouter();
@@ -75,7 +75,7 @@ export function RoleForm({ role, userCount = 0 }: { role?: CmsRole; userCount?: 
         </div>
         {errors.permissions && <p className="text-xs text-admin-danger">{errors.permissions}</p>}
         {PERMISSION_GROUPS.map((group) => {
-          const ids = group.items.map((i) => i.id) as Permission[];
+          const ids = (group.items.map((i) => i.id) as Permission[]).filter((p) => locked || !ADMIN_ONLY_PERMISSIONS.includes(p));
           const all = locked || ids.every((p) => permissions.includes(p));
           return (
             <Card
@@ -91,6 +91,17 @@ export function RoleForm({ role, userCount = 0 }: { role?: CmsRole; userCount?: 
               bodyClassName="grid gap-2 p-4 sm:grid-cols-2"
             >
               {group.items.map((item) => {
+                if (!locked && ADMIN_ONLY_PERMISSIONS.includes(item.id)) {
+                  return (
+                    <div key={item.id} className="flex items-start gap-3 rounded-lg border border-dashed border-admin-border p-3 text-sm text-admin-muted" data-admin-only>
+                      <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                      <span>
+                        <span className="block font-semibold">{item.label}</span>
+                        <span className="block text-xs">Administrators only.</span>
+                      </span>
+                    </div>
+                  );
+                }
                 const on = locked || permissions.includes(item.id);
                 return (
                   <label

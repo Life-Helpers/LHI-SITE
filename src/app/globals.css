@@ -65,8 +65,9 @@
   --a-danger: #e02424;
   --a-danger-soft: #fdecec;
 }
-/* Chart palette for HR dashboards (colour-blind-checked order; dark mode has its own steps). */
-.hr-root {
+/* Chart palette for the admin and HR dashboards (colour-blind-checked order; dark mode has its own steps). */
+.hr-root,
+.admin-root {
   --viz-1: #2a78d6;
   --viz-2: #eb6834;
   --viz-3: #1baf7a;
@@ -78,7 +79,8 @@
   --viz-other: #9ca3af;
   --viz-grid: #eef0f3;
 }
-.dark .hr-root {
+.dark .hr-root,
+.dark .admin-root {
   --viz-1: #3987e5;
   --viz-2: #d95926;
   --viz-3: #199e70;
@@ -96,13 +98,15 @@
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
-.hr-root .hr-card {
+.hr-root .hr-card,
+.admin-root .hr-card {
   border-radius: 1rem;
   border: 1px solid var(--a-border);
   background: var(--a-card);
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 14px rgba(16, 24, 40, 0.06);
 }
-.dark .hr-root .hr-card {
+.dark .hr-root .hr-card,
+.dark .admin-root .hr-card {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 /* Slim scrollbar for panels that scroll inside a card. */

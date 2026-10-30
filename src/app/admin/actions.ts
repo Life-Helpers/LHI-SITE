@@ -30,6 +30,7 @@ import {
 } from "@/lib/cms/auth";
 import {
   COLLECTIONS,
+  ADMIN_ONLY_PERMISSIONS,
   ALL_PERMISSIONS,
   can,
   isCollectionName,
@@ -823,7 +824,7 @@ export async function saveRoleAction(
     const actor = await requireUser("users");
     const name = input.name.trim().slice(0, 60);
     const description = input.description.trim().slice(0, 200);
-    const permissions = ALL_PERMISSIONS.filter((p) => input.permissions.includes(p));
+    const permissions = ALL_PERMISSIONS.filter((p) => input.permissions.includes(p) && !ADMIN_ONLY_PERMISSIONS.includes(p));
     const errors: FieldErrors = {};
     if (!name) errors.name = "Give the role a name.";
     if (originalId === "administrator") return { ok: false, error: "The Administrator role always has full access and can't be changed." };

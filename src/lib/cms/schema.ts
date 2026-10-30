@@ -78,6 +78,9 @@ export type Permission = (typeof PERMISSION_GROUPS)[number]["items"][number]["id
 
 export const ALL_PERMISSIONS: Permission[] = PERMISSION_GROUPS.flatMap((g) => g.items.map((i) => i.id));
 
+/** Kept for the Administrator role alone: no other role can be given them. */
+export const ADMIN_ONLY_PERMISSIONS: readonly Permission[] = ["activity"];
+
 /** Every permission with its label and help, in menu order. */
 export const PERMISSION_ITEMS: { id: Permission; label: string; help: string; group: string }[] = PERMISSION_GROUPS.flatMap((g) =>
   g.items.map((i): { id: Permission; label: string; help: string; group: string } => ({ id: i.id, label: i.label, help: i.help, group: g.label })),

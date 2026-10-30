@@ -5,7 +5,7 @@ import { promisify } from "node:util";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { ALL_PERMISSIONS, BUILT_IN_ROLES, can, type CmsRole, type CmsUser, type Permission, type PublicUser } from "@/lib/cms/schema";
+import { ADMIN_ONLY_PERMISSIONS, ALL_PERMISSIONS, BUILT_IN_ROLES, can, type CmsRole, type CmsUser, type Permission, type PublicUser } from "@/lib/cms/schema";
 import { readSecret, readStore } from "@/lib/cms/store";
 
 const scryptAsync = promisify(scrypt) as (password: string, salt: Buffer, keylen: number) => Promise<Buffer>;
@@ -117,7 +117,7 @@ async function readSessionUserId(): Promise<string | null> {
 export function resolveRole(roleId: string, roles: CmsRole[]): { name: string; permissions: Permission[] } {
   if (roleId === "administrator") return { name: "Administrator", permissions: ALL_PERMISSIONS };
   const role = roles.find((r) => r.id === roleId) ?? BUILT_IN_ROLES.find((r) => r.id === roleId);
-  return role ? { name: role.name, permissions: role.permissions } : { name: "No role", permissions: [] };
+  return role ? { name: role.name, permissions: role.permissions.filter((p) => !ADMIN_ONLY_PERMISSIONS.includes(p)) } : { name: "No role", permissions: [] };
 }
 
 export function toPublicUser(user: CmsUser, roles: CmsRole[] = BUILT_IN_ROLES): PublicUser {
