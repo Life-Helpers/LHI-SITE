@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus, ShieldCheck } from "lucide-react";
 
 import { Badge, buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
+import { UserRowActions } from "@/components/cms/user-row-actions";
 import { requirePageUser, toPublicUser } from "@/lib/cms/auth";
 import { readStore } from "@/lib/cms/store";
 
@@ -29,23 +30,25 @@ export default async function UsersPage() {
         }
       />
       <Card bodyClassName="overflow-x-auto p-0">
-        <table className="w-full min-w-[560px] text-sm">
+        <table className="w-full min-w-[860px] text-sm">
           <thead>
             <tr className="border-b border-admin-border text-left text-[11px] font-bold uppercase tracking-wider text-admin-muted">
               <th className="px-5 py-3">Name</th>
               <th className="px-5 py-3">Signs in with</th>
               <th className="px-5 py-3">Role</th>
               <th className="px-5 py-3">Last sign-in</th>
+              <th className="px-5 py-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.map((u) => (
-              <tr key={u.id} className="border-b border-admin-border last:border-0 hover:bg-admin-bg/60">
+              <tr key={u.id} className={`border-b border-admin-border last:border-0 hover:bg-admin-bg/60 ${u.disabled ? "opacity-60" : ""}`}>
                 <td className="px-5 py-3">
                   <Link href={u.id === me.id ? "/admin/profile" : `/admin/users/${u.id}`} className="font-semibold hover:text-admin-primary">
                     {u.name}
                   </Link>
                   {u.id === me.id && <span className="ml-2 text-xs text-admin-muted">(you)</span>}
+                  {u.disabled && <span className="ml-2"><Badge tone="danger">Disabled</Badge></span>}
                 </td>
                 <td className="px-5 py-3 text-admin-muted">
                   {u.username && <span className="block font-medium text-admin-text">{u.username}</span>}
@@ -57,6 +60,9 @@ export default async function UsersPage() {
                   {u.twoFactor && <Badge tone="success">2-step</Badge>}
                 </td>
                 <td className="px-5 py-3 text-admin-muted">{u.lastLoginAt ? formatDate(u.lastLoginAt, true) : "Never"}</td>
+                <td className="px-5 py-3">
+                  <UserRowActions id={u.id} name={u.name} disabled={Boolean(u.disabled)} isMe={u.id === me.id} />
+                </td>
               </tr>
             ))}
           </tbody>

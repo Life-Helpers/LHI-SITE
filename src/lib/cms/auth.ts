@@ -121,9 +121,9 @@ export function resolveRole(roleId: string, roles: CmsRole[]): { name: string; p
 }
 
 export function toPublicUser(user: CmsUser, roles: CmsRole[] = BUILT_IN_ROLES): PublicUser {
-  const { id, name, email, username, role, createdAt, lastLoginAt, mustChangePassword } = user;
+  const { id, name, email, username, role, createdAt, lastLoginAt, mustChangePassword, disabled } = user;
   const resolved = resolveRole(role, roles);
-  return { id, name, email, ...(username ? { username } : {}), role, createdAt, lastLoginAt, mustChangePassword, twoFactor: Boolean(user.totpSecret), roleName: resolved.name, permissions: resolved.permissions };
+  return { id, name, email, ...(username ? { username } : {}), role, createdAt, lastLoginAt, mustChangePassword, ...(disabled ? { disabled } : {}), twoFactor: Boolean(user.totpSecret), roleName: resolved.name, permissions: resolved.permissions };
 }
 
 export async function getCurrentUser(): Promise<PublicUser | null> {
@@ -131,7 +131,8 @@ export async function getCurrentUser(): Promise<PublicUser | null> {
   if (!uid) return null;
   const [users, roles] = await Promise.all([readStore("users"), readStore("roles")]);
   const user = users.find((u) => u.id === uid);
-  return user ? toPublicUser(user, roles) : null;
+  // A disabled account is signed out on its next request.
+  return user && !user.disabled ? toPublicUser(user, roles) : null;
 }
 
 /** For pages: redirect to login, or to the dashboard if the user's role lacks the permission. */

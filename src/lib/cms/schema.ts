@@ -1017,6 +1017,8 @@ export interface CmsUser {
    * login, or when an administrator set the password and asked them to replace it.
    */
   mustChangePassword?: boolean;
+  /** Turned off by an administrator: can't sign in, and any open session ends. */
+  disabled?: boolean;
 }
 
 export type PublicUser = Omit<CmsUser, "passwordHash" | "totpSecret" | "totpPending"> & {

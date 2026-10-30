@@ -137,6 +137,7 @@ async function signIn(form: FormData): Promise<ActionResult> {
     return { ok: false, error: "Incorrect email, username or password.", values };
   }
   clearLoginFailures(email);
+  if (user.disabled) return { ok: false, error: "This account has been disabled. Ask an administrator to turn it back on.", values };
   if (user.totpSecret) {
     await startPendingTwoFactor(user.id);
     redirect("/admin/login/verify");
@@ -723,6 +724,41 @@ export async function deleteUserAction(id: string): Promise<ActionResult> {
     if (!target) return { ok: false, error: "User not found." };
     await updateStore("users", (items) => ({ items: items.filter((u) => u.id !== id) }));
     await logActivity(actor, "deleted user", target.name);
+    revalidatePath("/admin/users");
+    return { ok: true };
+  });
+}
+
+/** Turns a team account off (it can't sign in and is signed out) or back on. */
+export async function setUserDisabledAction(id: string, disabled: boolean): Promise<ActionResult> {
+  return guard(async () => {
+    const actor = await requireUser("users");
+    if (id === actor.id) return { ok: false, error: "You can't disable your own account." };
+    const users = await readStore("users");
+    const target = users.find((u) => u.id === id);
+    if (!target) return { ok: false, error: "User not found." };
+    if (disabled && target.role === "administrator" && !users.some((u) => u.id !== id && u.role === "administrator" && !u.disabled)) {
+      return { ok: false, error: "This is the only active administrator. Make someone else an administrator first." };
+    }
+    await updateStore("users", (items) => ({ items: items.map((u) => (u.id === id ? { ...u, disabled: disabled || undefined } : u)) }));
+    await logActivity(actor, disabled ? "disabled user" : "re-enabled user", target.name, "/admin/users");
+    revalidatePath("/admin/users");
+    return { ok: true };
+  });
+}
+
+/** An administrator sets someone's password (e.g. they forgot it), optionally asking them to choose their own at next sign-in. */
+export async function setUserPasswordAction(id: string, password: string, mustChange: boolean): Promise<ActionResult> {
+  return guard(async () => {
+    const actor = await requireUser("users");
+    if (id === actor.id) return { ok: false, error: "Change your own password in Profile." };
+    const weak = validatePasswordStrength(password);
+    if (weak) return { ok: false, errors: { password: weak }, error: weak };
+    const target = (await readStore("users")).find((u) => u.id === id);
+    if (!target) return { ok: false, error: "User not found." };
+    const passwordHash = await hashPassword(password);
+    await updateStore("users", (items) => ({ items: items.map((u) => (u.id === id ? { ...u, passwordHash, mustChangePassword: mustChange || undefined } : u)) }));
+    await logActivity(actor, "set a new password for", target.name, "/admin/users");
     revalidatePath("/admin/users");
     return { ok: true };
   });
