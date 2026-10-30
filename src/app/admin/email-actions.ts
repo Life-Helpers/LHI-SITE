@@ -63,7 +63,7 @@ export async function sendNewsletterAction(_prev: EmailActionResult | null, form
         { to: user.email, subject: `[Test] ${parsed.subject}`, kind: "newsletter-test", content: { ...parsed.content, footer: footer(await unsubscribeUrl(user.email)) } },
       ]);
       revalidatePath("/admin/outbox");
-      return { ok: true, message: `Test sent to ${user.email}.${emailProvider() ? "" : " It is queued in the Email Outbox until email is connected."}` };
+      return { ok: true, message: `Test sent to ${user.email}.${(await emailProvider()) ? "" : " It is queued in the Email Outbox until email is connected."}` };
     }
 
     const subscribers = await getSubscribers();
@@ -90,7 +90,7 @@ export async function sendNewsletterAction(_prev: EmailActionResult | null, form
     revalidatePath("/admin/outbox");
     return {
       ok: true,
-      message: emailProvider()
+      message: (await emailProvider())
         ? `Sending to ${people(count)}. Progress shows in the Email Outbox.`
         : `Queued for ${people(count)}. It will be delivered as soon as email is connected.`,
     };
@@ -101,7 +101,7 @@ export async function sendNewsletterAction(_prev: EmailActionResult | null, form
 export async function deliverOutboxAction(): Promise<EmailActionResult> {
   return run(async () => {
     const user = await requireUser("email");
-    if (!emailProvider()) return { ok: false, error: "Email isn't connected yet. Set EMAIL_PROVIDER, EMAIL_API_KEY and EMAIL_FROM on the server." };
+    if (!(await emailProvider())) return { ok: false, error: "Email is off or not set up yet. Turn it on in Admin → Email & Pop-up." };
     const { sent, failed } = await deliver();
     await logActivity(user, `delivered queued emails (${sent} sent, ${failed} failed)`, "Email Outbox");
     revalidatePath("/admin/outbox");

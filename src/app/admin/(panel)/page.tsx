@@ -99,7 +99,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   // Email delivery.
   const mailCounts = countBy(outbox, (e) => e.status);
-  const provider = emailProvider();
+  const provider = (await emailProvider());
 
   // Site setup checklist for whoever runs the site.
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";

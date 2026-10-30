@@ -299,12 +299,29 @@ export async function readSettings(): Promise<CmsSettings> {
     stats: { ...defaults.stats, ...stored.stats },
     donations: { ...defaults.donations, ...stored.donations },
     engagement: { ...defaults.engagement, ...stored.engagement },
+    popup: { ...defaults.popup, ...stored.popup },
+    email: { ...defaults.email, ...stored.email },
     homeText: stored.homeText ?? {},
   };
 }
 
 export function writeSettings(settings: CmsSettings) {
   return writeDocument("settings", settings);
+}
+
+/** Stores (or with "" removes) a server secret. */
+export async function writeSecret(key: string, value: string): Promise<void> {
+  const apply = (secrets: Record<string, string>) => {
+    const next = { ...secrets };
+    if (value) next[key] = value;
+    else delete next[key];
+    return next;
+  };
+  if (USE_DATABASE) {
+    await dbUpdate<Record<string, string>, void>("secrets", () => ({}), (secrets) => ({ data: apply(secrets) }));
+    return;
+  }
+  await withLock("secrets", async () => writeJson("secrets", apply(await readJson<Record<string, string>>("secrets", () => ({})))));
 }
 
 /** Small key/value file for server secrets (e.g. the session signing key). */

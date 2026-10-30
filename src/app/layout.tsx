@@ -12,6 +12,7 @@ import { AccessibilityProvider } from "@/components/accessibility/accessibility-
 import { BokehBackground } from "@/components/effects/bokeh-background";
 import { FloatingWhatsApp } from "@/components/floating-whatsapp";
 import { AnniversaryPopup } from "@/components/anniversary/anniversary-popup";
+import { PreviewBanner } from "@/components/preview-banner";
 import { DownloadGate } from "@/components/downloads/download-gate";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { LocaleProvider } from "@/i18n/locale-context";
@@ -168,6 +169,7 @@ export default async function RootLayout({
                 <SiteFooter />
                 <FloatingWhatsApp />
                 <AnniversaryPopup />
+                <PreviewBanner />
                 <DownloadGate />
               </PublicChrome>
             </LocaleProvider>

@@ -25,7 +25,7 @@ export default async function NewsletterPage() {
     readStore("unsubscribes"),
     readStore("outbox"),
   ]);
-  const connected = Boolean(emailProvider());
+  const connected = Boolean((await emailProvider()));
   const sources = Object.entries(
     subscribers.reduce<Record<string, number>>(
       (acc, s) => ({ ...acc, [s.source]: (acc[s.source] ?? 0) + 1 }),

@@ -11,8 +11,8 @@ import { useNewsletterSignup } from "@/components/news/use-newsletter";
 import { ANNIVERSARY } from "@/config/anniversary";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
 
-const STORAGE_KEY = `lhi_anniversary_${ANNIVERSARY.years}`;
-const SNOOZE_MS = 3 * 24 * 3600_000;
+/** Remembers that this browser has seen the pop-up (per campaign set in Admin → Email & Pop-up). */
+const STORAGE_KEY = "lhi_newsletter_popup";
 
 function lagosToday() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(new Date());
@@ -23,7 +23,9 @@ function daysUntil(date: string) {
   return Math.ceil(diff / 86_400_000);
 }
 
-function readState(): { subscribed?: boolean; dismissedAt?: number } {
+type PopupState = { campaign?: string; seenAt?: number; subscribed?: boolean };
+
+function readState(): PopupState {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
   } catch {
@@ -31,16 +33,18 @@ function readState(): { subscribed?: boolean; dismissedAt?: number } {
   }
 }
 
-function writeState(state: { subscribed?: boolean; dismissedAt?: number }) {
+function writeState(state: PopupState) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
-    /* storage unavailable: the popup simply shows again next visit */
+    /* storage unavailable (private window): the pop-up may show again next visit */
   }
 }
 
 export function AnniversaryPopup() {
-  const { stats } = useSiteData();
+  const { stats, popup } = useSiteData();
+  // Inside the anniversary season the pop-up celebrates it; the rest of the year it simply invites sign-ups.
+  const [festive, setFestive] = useState(false);
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -50,23 +54,23 @@ export function AnniversaryPopup() {
   const stopConfetti = useRef<() => void>(() => {});
 
   useEffect(() => {
-    if (!ANNIVERSARY.enabled || pathname?.startsWith("/admin")) return;
+    if (!popup.enabled || pathname?.startsWith("/admin") || pathname?.startsWith("/hrportal")) return;
+    // Each visitor sees it once: it never comes back after it has been shown in this browser.
+    if (readState().campaign === popup.campaign) return;
     const today = lagosToday();
-    if (today < ANNIVERSARY.showFrom || today > ANNIVERSARY.showUntil) return;
-    const state = readState();
-    if (state.subscribed || (state.dismissedAt && Date.now() - state.dismissedAt < SNOOZE_MS)) return;
+    const season = ANNIVERSARY.enabled && today >= ANNIVERSARY.showFrom && today <= ANNIVERSARY.showUntil;
     const t = window.setTimeout(() => {
+      writeState({ campaign: popup.campaign, seenAt: Date.now() });
+      setFestive(season);
       setOpen(true);
-      stopConfetti.current = firePoppers();
+      if (season) stopConfetti.current = firePoppers();
     }, 900);
     return () => window.clearTimeout(t);
-  }, [pathname]);
+  }, [pathname, popup.enabled, popup.campaign]);
 
   const close = useCallback(() => {
     setOpen(false);
     stopConfetti.current();
-    const state = readState();
-    writeState({ ...state, dismissedAt: Date.now() });
   }, []);
 
   useEffect(() => {
@@ -107,8 +111,8 @@ export function AnniversaryPopup() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (await subscribe(email, name)) {
-      writeState({ subscribed: true });
-      stopConfetti.current = firePoppers(2200);
+      writeState({ ...readState(), subscribed: true });
+      if (festive) stopConfetti.current = firePoppers(2200);
     }
   }
 
@@ -133,8 +137,8 @@ export function AnniversaryPopup() {
         <div className="grid grid-cols-1 md:grid-cols-5">
           <div className="relative aspect-[16/9] overflow-hidden bg-[#6b4a1f] md:col-span-2 md:aspect-auto md:min-h-[460px]">
             <Image
-              src={LHI_PHOTOS.anniversaryBadge.src}
-              alt={`${LHI_PHOTOS.anniversaryBadge.alt}, ${ANNIVERSARY.foundedYear}–${ANNIVERSARY.foundedYear + ANNIVERSARY.years}`}
+              src={festive ? LHI_PHOTOS.anniversaryBadge.src : LHI_PHOTOS.communityDialogue.src}
+              alt={festive ? `${LHI_PHOTOS.anniversaryBadge.alt}, ${ANNIVERSARY.foundedYear}–${ANNIVERSARY.foundedYear + ANNIVERSARY.years}` : LHI_PHOTOS.communityDialogue.alt}
               fill
               priority
               sizes="(min-width: 768px) 310px, 100vw"
@@ -143,21 +147,27 @@ export function AnniversaryPopup() {
           </div>
           <div className="p-6 sm:p-8 md:col-span-3">
             <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary">
-              <PartyPopper className="h-3.5 w-3.5" /> {eyebrow}
+              <PartyPopper className="h-3.5 w-3.5" /> {festive ? eyebrow : "Stay in touch"}
             </p>
-            <h2 id="anniversary-title" className="mt-3 font-serif-display text-3xl font-light leading-tight text-foreground sm:text-4xl">
-              Celebrating {ANNIVERSARY.years} years of <em className="italic text-primary">touching lives.</em>
-            </h2>
+            {festive ? (
+              <h2 id="anniversary-title" className="mt-3 font-serif-display text-3xl font-light leading-tight text-foreground sm:text-4xl">
+                Celebrating {ANNIVERSARY.years} years of <em className="italic text-primary">touching lives.</em>
+              </h2>
+            ) : (
+              <h2 id="anniversary-title" className="mt-3 font-serif-display text-3xl font-light leading-tight text-foreground sm:text-4xl">
+                News from the field, <em className="italic text-primary">straight to your inbox.</em>
+              </h2>
+            )}
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Since 1 October {ANNIVERSARY.foundedYear}, Life Helpers Initiative has grown from a small initiative in Sokoto into an organisation working
-              across {stats.statesActive.replace(/\+$/, "")} states, with {stats.projects} projects and {stats.peopleReached} people reached. Thank you
-              to every community, partner, volunteer and staff member who made it possible.
+              {festive ? `Since 1 October ${ANNIVERSARY.foundedYear}, Life Helpers Initiative has grown from a small initiative in Sokoto into an organisation working` : "Life Helpers Initiative works"}{" "}
+              across {stats.statesActive.replace(/\+$/, "")} states, with {stats.projects} projects and {stats.peopleReached} people reached.{" "}
+              {festive ? "Thank you to every community, partner, volunteer and staff member who made it possible." : "Get our stories, reports and opportunities a few times a year."}
             </p>
 
             {status === "done" ? (
               <div role="status" className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-5 text-center">
                 <CheckCircle2 className="mx-auto h-8 w-8 text-primary" />
-                <p className="mt-2 font-semibold text-foreground">You&apos;re on the list. Thank you for celebrating with us!</p>
+                <p className="mt-2 font-semibold text-foreground">{festive ? "You\u2019re on the list. Thank you for celebrating with us!" : "You\u2019re on the list. Thank you!"}</p>
                 <button type="button" onClick={close} className="mt-4 rounded-full bg-primary px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
                   Continue to the website
                 </button>

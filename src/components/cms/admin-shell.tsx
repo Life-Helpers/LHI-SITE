@@ -52,7 +52,7 @@ import {
 } from "lucide-react";
 
 import { logoutAction } from "@/app/admin/actions";
-import { can, type Permission, type PublicUser } from "@/lib/cms/schema";
+import { can, siteHrefFor, type Permission, type PublicUser } from "@/lib/cms/schema";
 
 interface NavItem {
   label: string;
@@ -157,6 +157,7 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
         { label: "Users", href: "/admin/users", icon: Users, permission: "users" },
         { label: "Roles & Permissions", href: "/admin/users/roles", icon: ShieldCheck, permission: "users" },
         { label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings" },
+        { label: "Email & Pop-up", href: "/admin/email-settings", icon: Mail, permission: "settings" },
         { label: "Activity Log", href: "/admin/activity", icon: Activity, permission: "activity" },
       ],
     },
@@ -346,6 +347,7 @@ export function AdminShell({
 }
 
 function TopBar({ user, onMenu }: { user: PublicUser; onMenu: () => void }) {
+  const siteHref = siteHrefFor(usePathname() ?? "/admin");
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -398,9 +400,11 @@ function TopBar({ user, onMenu }: { user: PublicUser; onMenu: () => void }) {
       </form>
 
       <div className="ml-auto flex items-center gap-1.5">
+        {/* Opens the public page this admin screen manages (e.g. Radio Episodes → /radio). */}
         <Link
-          href="/"
+          href={siteHref}
           target="_blank"
+          title={siteHref === "/" ? "Open the website" : `Open ${siteHref} on the website`}
           className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-admin-muted hover:bg-admin-bg hover:text-admin-text sm:inline-flex"
         >
           <ExternalLink className="h-4 w-4" /> View site

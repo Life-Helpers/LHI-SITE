@@ -155,6 +155,16 @@ export const SITE_LOCATIONS: Record<string, { label: string; href: string }[]> =
   submissions: [{ label: "Contact form", href: "/contact" }, { label: "Careers", href: "/careers" }, { label: "Procurement", href: "/procurement" }, { label: "Get involved", href: "/get-involved" }],
 };
 
+/** Admin pages outside /admin/content whose key in SITE_LOCATIONS differs from their path. */
+const ADMIN_PAGE_KEYS: Record<string, string> = { "home-text": "homeText", "email-settings": "homeText" };
+
+/** The public page for the admin screen at `pathname` (the top bar's "View site"), or the home page. */
+export function siteHrefFor(pathname: string): string {
+  const parts = pathname.split("/").filter(Boolean); // ["admin", "content", "episodes", ...]
+  const key = parts[1] === "content" ? parts[2] : parts[1] ? (ADMIN_PAGE_KEYS[parts[1]] ?? parts[1]) : "";
+  return (key && SITE_LOCATIONS[key]?.[0]?.href) || "/";
+}
+
 /** A username: 3–30 lower-case letters, numbers, dots, dashes or underscores. */
 export const USERNAME_PATTERN = /^[a-z0-9][a-z0-9._-]{2,29}$/;
 
@@ -893,7 +903,30 @@ export interface CmsSettings {
     /** Where new-submission alerts are sent once email is connected. */
     alertEmail: string;
   };
+  /** The newsletter sign-up pop-up. Each visitor sees it once per `campaign`. */
+  popup: {
+    enabled: boolean;
+    /** Changing it shows the pop-up once more to everyone. */
+    campaign: string;
+  };
+  /** Email delivery set up in Admin → Email & Pop-up. The API key is kept encrypted in the secrets store, never here. */
+  email: {
+    enabled: boolean;
+    provider: EmailProviderId;
+    /** Mailgun sending domain, e.g. mg.lhinigeria.org. */
+    domain: string;
+    /** Mailgun account region. */
+    region: "us" | "eu";
+    /** Sender, e.g. Life Helpers Initiative <news@mg.lhinigeria.org>. */
+    from: string;
+    replyTo: string;
+    /** Last 4 characters of the saved API key, to show it is set. */
+    keyHint: string;
+  };
 }
+
+export const EMAIL_PROVIDERS = ["mailgun", "resend", "sendgrid", "postmark", "brevo"] as const;
+export type EmailProviderId = (typeof EMAIL_PROVIDERS)[number];
 
 export type SubmissionType =
   | "contact"

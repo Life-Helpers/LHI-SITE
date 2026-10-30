@@ -546,6 +546,9 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
         autoApproveComments: Boolean(settings.engagement?.autoApproveComments),
         alertEmail: str(settings.engagement?.alertEmail, 200),
       },
+      // Set on the Email & Pop-up screen.
+      popup: current.popup,
+      email: current.email,
     });
     await logActivity(user, "updated settings", "Site settings", "/admin/settings");
     refreshSite();

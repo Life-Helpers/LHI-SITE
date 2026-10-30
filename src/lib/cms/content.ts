@@ -1,5 +1,7 @@
 import "server-only";
 
+import { draftMode } from "next/headers";
+
 import {
   compareEvents,
   OBSERVANCE_AREAS,
@@ -14,6 +16,16 @@ import type { Emergency, EmergencyAlert, ImpactReport, Program } from "@/types/c
 import { siteDataFrom, type SiteData } from "@/lib/site-data";
 import { THEMATIC_AREA_IDS } from "@/data/thematic-areas";
 import { paragraphs, parseStats } from "@/lib/cms/text";
+
+
+/** True while a signed-in editor is previewing drafts (Next.js draft mode, started from the admin). */
+async function previewing() {
+  try {
+    return (await draftMode()).isEnabled;
+  } catch {
+    return false; // outside a request (e.g. building the sitemap)
+  }
+}
 
 export { paragraphs, parseStats };
 import { getPillarRef, type InterventionProject } from "@/data/interventions-data";
@@ -55,9 +67,10 @@ export async function getDocuments() {
 }
 
 export async function getPublishedPosts(category?: string) {
+  const drafts = await previewing();
   const today = new Date().toISOString().slice(0, 10);
   return (await readStore("posts"))
-    .filter((p) => p.status === "published" && p.date <= today && (!category || p.category === category))
+    .filter((p) => (((p.status === "published" || drafts) && p.date <= today) || drafts) && (!category || p.category === category))
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
@@ -85,28 +98,32 @@ function withoutHiddenFile<T extends { allowDownload?: boolean; attachment?: str
 }
 
 export async function getPublicJobs() {
+  const drafts = await previewing();
   const today = todayInLagos();
-  const jobs = (await readStore("jobs")).filter((j) => j.status !== "draft").map(withoutHiddenFile).sort(byDeadline);
+  const jobs = (await readStore("jobs")).filter((j) => (j.status !== "draft" || drafts)).map(withoutHiddenFile).sort(byDeadline);
   const isOpen = (j: (typeof jobs)[number]) => j.status === "open" && j.deadline >= today;
   return { open: jobs.filter(isOpen), closed: jobs.filter((j) => !isOpen(j)).slice(0, 10), isOpen };
 }
 
 export async function getJob(id: string) {
-  const found = (await readStore("jobs")).find((j) => j.id === id && j.status !== "draft");
+  const drafts = await previewing();
+  const found = (await readStore("jobs")).find((j) => j.id === id && (j.status !== "draft" || drafts));
   if (!found) return undefined;
   const job = withoutHiddenFile(found);
   return { job, open: job.status === "open" && job.deadline >= todayInLagos() };
 }
 
 export async function getPublicTenders() {
+  const drafts = await previewing();
   const today = todayInLagos();
-  const tenders = (await readStore("tenders")).filter((t) => t.status !== "draft").map(withoutHiddenFile).sort(byDeadline);
+  const tenders = (await readStore("tenders")).filter((t) => (t.status !== "draft" || drafts)).map(withoutHiddenFile).sort(byDeadline);
   const isOpen = (t: (typeof tenders)[number]) => t.status === "open" && t.deadline >= today;
   return { open: tenders.filter(isOpen), past: tenders.filter((t) => !isOpen(t)).slice(0, 20) };
 }
 
 export async function getTender(id: string) {
-  const found = (await readStore("tenders")).find((t) => t.id === id && t.status !== "draft");
+  const drafts = await previewing();
+  const found = (await readStore("tenders")).find((t) => t.id === id && (t.status !== "draft" || drafts));
   if (!found) return undefined;
   const tender = withoutHiddenFile(found);
   return { tender, open: tender.status === "open" && tender.deadline >= todayInLagos() };
@@ -114,17 +131,19 @@ export async function getTender(id: string) {
 
 /** Published radio episodes, featured first, then newest. */
 export async function getEpisodes() {
+  const drafts = await previewing();
   const today = todayInLagos();
   return (await readStore("episodes"))
-    .filter((e) => e.status === "published" && e.audio && e.date <= today)
+    .filter((e) => (e.status === "published" || drafts) && e.audio && e.date <= today)
     .sort((a, b) => Number(b.featured) - Number(a.featured) || b.date.localeCompare(a.date));
 }
 
 /** Upcoming observance days plus published LHI events, soonest first. */
 export async function getCalendarEvents(days = 366): Promise<CalendarEvent[]> {
+  const drafts = await previewing();
   const today = todayInLagos();
   const events: CalendarEvent[] = (await readStore("events"))
-    .filter((e) => e.status === "published" && e.startDate && (e.endDate || e.startDate) >= today)
+    .filter((e) => (e.status === "published" || drafts) && e.startDate && (e.endDate || e.startDate) >= today)
     .map((e) => ({
       id: e.id,
       title: e.title,
@@ -139,7 +158,7 @@ export async function getCalendarEvents(days = 366): Promise<CalendarEvent[]> {
       kind: "event",
     }));
   const observances: Observance[] = (await readStore("observances"))
-    .filter((o) => o.status === "published" && o.month >= 1 && o.month <= 12 && o.day >= 1 && o.day <= 31)
+    .filter((o) => (o.status === "published" || drafts) && o.month >= 1 && o.month <= 12 && o.day >= 1 && o.day <= 31)
     .map((o) => ({
       id: o.id,
       title: o.title,
@@ -160,8 +179,9 @@ export async function getCalendarEvent(id: string): Promise<CalendarEvent | unde
 
 /** Uploaded (published) magazines first, newest first, then the built-in editions. */
 export async function getAllMagazines(): Promise<Magazine[]> {
+  const drafts = await previewing();
   const uploaded = (await readStore("magazines"))
-    .filter((m) => m.status === "published")
+    .filter((m) => (m.status === "published" || drafts))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     .map(
       (m): Magazine => ({
@@ -186,8 +206,9 @@ export async function getAnyMagazine(slug: string) {
 
 /** Published history milestones, in road order, shaped for the road-map timeline. */
 export async function getMilestones(): Promise<HistoryMilestone[]> {
+  const drafts = await previewing();
   return (await readStore("milestones"))
-    .filter((m) => m.status === "published")
+    .filter((m) => (m.status === "published" || drafts))
     .sort((a, b) => a.order - b.order)
     .map(toHistoryMilestone);
 }
@@ -210,7 +231,8 @@ export function toHistoryMilestone(m: CmsMilestone): HistoryMilestone {
 
 /** Published members of one team group, in display order. */
 export async function getTeam(group: TeamGroup) {
-  return (await readStore("team")).filter((t) => t.group === group && t.status === "published").sort((a, b) => a.order - b.order);
+  const drafts = await previewing();
+  return (await readStore("team")).filter((t) => t.group === group && (t.status === "published" || drafts)).sort((a, b) => a.order - b.order);
 }
 
 /* ---------------------------------------------- Phase 2: content moved out of the code */
@@ -223,8 +245,9 @@ export async function getSiteData(): Promise<SiteData> {
 }
 
 export async function getHeroSlides(): Promise<HeroSlideItem[]> {
+  const drafts = await previewing();
   return (await readStore("heroSlides"))
-    .filter((h) => h.status === "published" && h.image)
+    .filter((h) => (h.status === "published" || drafts) && h.image)
     .sort(byOrder)
     .map((h) => ({
       id: h.id,
@@ -244,16 +267,19 @@ export async function getHeroSlides(): Promise<HeroSlideItem[]> {
 }
 
 export async function getTestimonials() {
-  return (await readStore("testimonials")).filter((t) => t.status === "published").sort(byOrder);
+  const drafts = await previewing();
+  return (await readStore("testimonials")).filter((t) => (t.status === "published" || drafts)).sort(byOrder);
 }
 
 export async function getBeforeAfterStories() {
-  return (await readStore("beforeAfter")).filter((b) => b.status === "published" && b.photo).sort(byOrder);
+  const drafts = await previewing();
+  return (await readStore("beforeAfter")).filter((b) => (b.status === "published" || drafts) && b.photo).sort(byOrder);
 }
 
 export async function getImpactReports(): Promise<ImpactReport[]> {
+  const drafts = await previewing();
   return (await readStore("impactReports"))
-    .filter((r) => r.status === "published")
+    .filter((r) => (r.status === "published" || drafts))
     .sort(byOrder)
     .map((r) => ({
       id: r.id,
@@ -290,7 +316,8 @@ function toEmergency(e: CmsEmergency): Emergency {
 
 /** Active and resolved emergencies (drafts are hidden). */
 export async function getEmergencies(): Promise<Emergency[]> {
-  return (await readStore("emergencies")).filter((e) => e.status !== "draft").map(toEmergency);
+  const drafts = await previewing();
+  return (await readStore("emergencies")).filter((e) => (e.status !== "draft" || drafts)).map(toEmergency);
 }
 
 export async function getEmergency(id: string) {
@@ -346,8 +373,9 @@ export async function getProgram(id: string) {
 }
 
 export async function getFaqs(): Promise<FaqItem[]> {
+  const drafts = await previewing();
   return (await readStore("faqs"))
-    .filter((f) => f.status === "published" && f.question && f.answer)
+    .filter((f) => (f.status === "published" || drafts) && f.question && f.answer)
     .sort(byOrder)
     .map((f) => ({ id: f.id, category: f.category, question: f.question, answer: f.answer, tags: f.tags, featured: f.featured }));
 }

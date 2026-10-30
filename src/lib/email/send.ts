@@ -5,23 +5,22 @@ import { after } from "next/server";
 
 import type { OutboxEmail } from "@/lib/cms/schema";
 import { readStore, updateStore } from "@/lib/cms/store";
+import type { EmailProviderId } from "@/lib/cms/schema";
+import { getEmailConfig, type EmailConfig } from "@/lib/email/config";
 import { renderEmail, type EmailContent } from "@/lib/email/template";
 
 /**
- * Outgoing email. Every message is written to the outbox store first. When an email
- * provider is configured (EMAIL_PROVIDER + EMAIL_API_KEY + EMAIL_FROM) it is delivered
+ * Outgoing email. Every message is written to the outbox store first. When email is set up and
+ * switched on (Admin → Email & Pop-up, or the EMAIL_* environment variables) it is delivered
  * straight away; otherwise it stays "queued" and can be sent later from Admin → Email Outbox
  * once the provider is connected.
  */
 
 const MAX_OUTBOX = 10_000;
-const PROVIDERS = ["resend", "sendgrid", "postmark", "brevo"] as const;
-type Provider = (typeof PROVIDERS)[number];
 
-export function emailProvider(): Provider | null {
-  const p = process.env.EMAIL_PROVIDER?.trim().toLowerCase() as Provider | undefined;
-  if (!p || !PROVIDERS.includes(p) || !process.env.EMAIL_API_KEY || !process.env.EMAIL_FROM) return null;
-  return p;
+/** The provider email currently goes out through, or null when it is off or not set up. */
+export async function emailProvider(): Promise<EmailProviderId | null> {
+  return (await getEmailConfig().catch(() => null))?.provider ?? null;
 }
 
 const isEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
@@ -51,7 +50,7 @@ export async function sendEmail(input: {
     ...(input.campaignId ? { campaignId: input.campaignId } : {}),
   };
   await updateStore("outbox", (items) => ({ items: [record, ...items].slice(0, MAX_OUTBOX) }));
-  if (emailProvider()) {
+  if (await emailProvider()) {
     if (input.wait) await deliver([record.id]);
     else schedule(() => deliver([record.id]));
   }
@@ -82,7 +81,7 @@ export async function queueEmails(
     });
   if (!records.length) return 0;
   await updateStore("outbox", (items) => ({ items: [...records, ...items].slice(0, MAX_OUTBOX) }));
-  if (emailProvider()) schedule(() => deliver(records.map((r) => r.id)));
+  if (await emailProvider()) schedule(() => deliver(records.map((r) => r.id)));
   return records.length;
 }
 
@@ -100,8 +99,8 @@ const inFlight = new Set<string>();
 
 /** Deliver the given outbox emails (or every queued/failed one) through the configured provider. */
 export async function deliver(ids?: string[]): Promise<{ sent: number; failed: number }> {
-  const provider = emailProvider();
-  if (!provider) return { sent: 0, failed: 0 };
+  const config = await getEmailConfig();
+  if (!config) return { sent: 0, failed: 0 };
   const wanted = ids ? new Set(ids) : null;
   const pending = (await readStore("outbox"))
     .filter((e) => e.status !== "sent" && !inFlight.has(e.id) && (!wanted || wanted.has(e.id)))
@@ -128,7 +127,7 @@ export async function deliver(ids?: string[]): Promise<{ sent: number; failed: n
   try {
     for (const email of pending) {
       try {
-        await sendViaProvider(provider, email);
+        await sendViaProvider(config, email);
         results.set(email.id, undefined);
         sent++;
       } catch (err) {
@@ -149,10 +148,8 @@ function parseFrom(from: string) {
   return m ? { name: m[1].replace(/^"|"$/g, ""), email: m[2] } : { name: "", email: from.trim() };
 }
 
-async function sendViaProvider(provider: Provider, email: OutboxEmail) {
-  const key = process.env.EMAIL_API_KEY!;
-  const from = process.env.EMAIL_FROM!;
-  const replyTo = process.env.EMAIL_REPLY_TO || undefined;
+async function sendViaProvider(config: EmailConfig, email: OutboxEmail) {
+  const { provider, apiKey: key, from, replyTo } = config;
   const sender = parseFrom(from);
   let res: Response;
   const opts = (url: string, headers: Record<string, string>, body: unknown): [string, RequestInit] => [
@@ -166,6 +163,18 @@ async function sendViaProvider(provider: Provider, email: OutboxEmail) {
   ];
 
   switch (provider) {
+    case "mailgun": {
+      const host = config.region === "eu" ? "https://api.eu.mailgun.net" : "https://api.mailgun.net";
+      const body = new URLSearchParams({ from, to: email.to, subject: email.subject, text: email.text, html: email.html });
+      if (replyTo) body.set("h:Reply-To", replyTo);
+      res = await fetch(`${host}/v3/${encodeURIComponent(config.domain ?? "")}/messages`, {
+        method: "POST",
+        headers: { Authorization: `Basic ${Buffer.from(`api:${key}`).toString("base64")}`, Accept: "application/json" },
+        body,
+        signal: AbortSignal.timeout(15_000),
+      });
+      break;
+    }
     case "resend":
       res = await fetch(
         ...opts(

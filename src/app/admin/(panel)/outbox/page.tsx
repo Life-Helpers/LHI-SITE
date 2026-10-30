@@ -23,7 +23,7 @@ const PAGE = 50;
 export default async function OutboxPage({ searchParams }: { searchParams: Promise<{ status?: string; page?: string }> }) {
   await requirePageUser("email");
   const { status = "", page = "1" } = await searchParams;
-  const provider = emailProvider();
+  const provider = (await emailProvider());
   const all = await readStore("outbox");
   const counts = { queued: 0, sent: 0, failed: 0 } as Record<OutboxStatus, number>;
   for (const e of all) counts[e.status]++;
@@ -55,9 +55,9 @@ export default async function OutboxPage({ searchParams }: { searchParams: Promi
         <div className="mb-6 rounded-xl border border-admin-warning/30 bg-admin-warning-soft px-4 py-3 text-sm text-admin-warning">
           <p className="font-semibold">Email is not connected yet — emails are being kept here safely.</p>
           <p className="mt-1">
-            To connect, set <code>EMAIL_PROVIDER</code> (resend, sendgrid, postmark or brevo), <code>EMAIL_API_KEY</code> and{" "}
-            <code>EMAIL_FROM</code> on the server and restart, then press &ldquo;Send queued now&rdquo;. Until then, you can open a
-            password-reset email below and pass the link on personally.
+            An administrator connects Mailgun (or another provider) and switches email on in{" "}
+            <a href="/admin/email-settings" className="font-semibold underline">Email &amp; Pop-up</a>, then presses &ldquo;Send queued now&rdquo; here.
+            Until then, you can open a password-reset email below and pass the link on personally.
           </p>
         </div>
       )}

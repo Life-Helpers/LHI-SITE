@@ -5,6 +5,15 @@ import { formatDate, PageHeader } from "@/components/cms/ui";
 import { loadCollection, relationOptionsOf } from "@/lib/cms/admin-helpers";
 import { relationValues } from "@/lib/cms/relations";
 
+/** The page the item would appear on once live (so drafts can be previewed there), or null. */
+function previewPath(def: { publicPath?: (item: Record<string, unknown>) => string | null }, item: Record<string, unknown>) {
+  for (const status of ["published", "open", "active"]) {
+    const path = def.publicPath?.({ ...item, status });
+    if (path) return path.split("#")[0] || "/";
+  }
+  return null;
+}
+
 export default async function EditItemPage({ params }: { params: Promise<{ collection: string; id: string }> }) {
   const { collection, id } = await params;
   const { def, items } = await loadCollection(collection);
@@ -28,7 +37,8 @@ export default async function EditItemPage({ params }: { params: Promise<{ colle
           { label: "Edit" },
         ]}
       />
-      <ItemEditor collection={def.name} initial={def.fields.some((f) => f.name === "allowDownload") && item.allowDownload === undefined ? { ...item, allowDownload: true } : item} originalId={String(item.id)} viewHref={def.publicPath?.(item) ?? null} meta={meta} relationOptions={relationOptionsOf(def)} />
+      <ItemEditor collection={def.name} initial={def.fields.some((f) => f.name === "allowDownload") && item.allowDownload === undefined ? { ...item, allowDownload: true } : item} originalId={String(item.id)} viewHref={def.publicPath?.(item) ?? null}
+        previewHref={previewPath(def, item)} meta={meta} relationOptions={relationOptionsOf(def)} />
     </>
   );
 }

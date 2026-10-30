@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import { CheckCircle2, ExternalLink, ImagePlus, Loader2, Paperclip, Save, Trash2, X } from "lucide-react";
+import { Eye, CheckCircle2, ExternalLink, ImagePlus, Loader2, Paperclip, Save, Trash2, X } from "lucide-react";
 
 import { deleteItemAction, saveItemAction } from "@/app/admin/actions";
 import { playableAudioUrl } from "@/lib/radio";
@@ -19,6 +19,7 @@ export function ItemEditor({
   initial,
   originalId,
   viewHref,
+  previewHref,
   meta,
   relationOptions,
 }: {
@@ -28,6 +29,8 @@ export function ItemEditor({
   initial: Values;
   originalId: string | null;
   viewHref?: string | null;
+  /** Where the saved item would appear once published: opened in preview mode, drafts included. */
+  previewHref?: string | null;
   meta?: { label: string; value: string }[];
 }) {
   const def = useMemo(() => {
@@ -172,6 +175,19 @@ export function ItemEditor({
               <ExternalLink className="h-3.5 w-3.5" /> View on website
             </a>
           )}
+          {previewHref && (
+            <a
+              href={`/api/admin/preview?path=${encodeURIComponent(previewHref)}`}
+              target="_blank"
+              rel="noreferrer"
+              className={`${buttonClass.secondary} w-full`}
+              title={dirty ? "Save first: the preview shows the last saved version" : "See it on the real page before it goes live"}
+              data-preview
+            >
+              <Eye className="h-4 w-4" /> Preview on the site
+            </a>
+          )}
+          {previewHref && dirty && <p className="text-xs text-admin-muted">Preview shows the last saved version. Save as a draft first to preview your changes.</p>}
           {dirty && <p className="text-xs text-admin-warning">You have unsaved changes.</p>}
         </Card>
         <p className="text-center text-xs text-admin-muted">

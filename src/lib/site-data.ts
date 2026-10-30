@@ -9,6 +9,7 @@ import type { CmsSettings } from "@/lib/cms/schema";
 export interface SiteData {
   contact: CmsSettings["contact"];
   social: CmsSettings["social"];
+  popup: CmsSettings["popup"];
   stats: CmsSettings["stats"] & {
     /** States with an LHI office, counted from the map. */
     statesActive: string;
@@ -17,10 +18,11 @@ export interface SiteData {
   };
 }
 
-export function siteDataFrom(settings: Pick<CmsSettings, "contact" | "social" | "stats">): SiteData {
+export function siteDataFrom(settings: Pick<CmsSettings, "contact" | "social" | "stats"> & Partial<Pick<CmsSettings, "popup">>): SiteData {
   return {
     contact: settings.contact,
     social: settings.social,
+    popup: settings.popup ?? { enabled: true, campaign: "1" },
     stats: { ...settings.stats, statesActive: siteConfig.stats.statesActive, yearsOfService: siteConfig.stats.yearsOfService },
   };
 }
