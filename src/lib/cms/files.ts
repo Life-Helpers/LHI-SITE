@@ -101,8 +101,20 @@ export async function readFileRange(key: string, start: number, end: number): Pr
     return res?.stream ?? null;
   }
   if (databaseFilesEnabled()) {
-    const bytes = await dbReadFile(k, start, end);
-    return bytes ? (Readable.toWeb(Readable.from([bytes])) as ReadableStream<Uint8Array>) : null;
+    if (!(await dbFileInfo(k))) return null;
+    // Read in 512 KB slices as the visitor downloads, so a long audio file is never held whole in memory.
+    const CHUNK = 512 * 1024;
+    let at = start;
+    return new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        if (at > end) return controller.close();
+        const last = Math.min(end, at + CHUNK - 1);
+        const bytes = await dbReadFile(k, at, last);
+        if (!bytes?.length) return controller.close();
+        controller.enqueue(new Uint8Array(bytes));
+        at = last + 1;
+      },
+    });
   }
   return Readable.toWeb(createReadStream(diskPath(k), { start, end })) as ReadableStream<Uint8Array>;
 }

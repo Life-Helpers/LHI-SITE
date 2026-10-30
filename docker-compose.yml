@@ -1,0 +1,93 @@
+# LHI website + its own PostgreSQL database, deployed together (Coolify: "Docker Compose" build pack).
+#
+# Coolify fills in SERVICE_PASSWORD_POSTGRES (a generated password) and SERVICE_FQDN_APP_3000
+# (the domain you give the app). Set the other variables in Coolify → Environment Variables;
+# see .env.example. The database is only reachable from the app, never from the internet.
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-}
+        NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SERVICE_FQDN_APP_3000: ${SERVICE_FQDN_APP_3000:-}
+      DATABASE_URL: postgres://lhi:${SERVICE_PASSWORD_POSTGRES:?set SERVICE_PASSWORD_POSTGRES}@db:5432/lhi
+      # First deploy only: the Neon connection string to copy the data from. Remove after the copy.
+      MIGRATE_FROM_DATABASE_URL: ${MIGRATE_FROM_DATABASE_URL:-}
+      MIGRATE_FORCE: ${MIGRATE_FORCE:-false}
+      # Copy it from Vercel if you can, so people stay signed in. If empty, a new key is made
+      # and stored in the database (everyone signs in again once).
+      CMS_SESSION_SECRET: ${CMS_SESSION_SECRET:-}
+      CMS_SETUP_TOKEN: ${CMS_SETUP_TOKEN:-}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_DONATION_PRODUCT_ID: ${STRIPE_DONATION_PRODUCT_ID:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-}
+      EMAIL_API_KEY: ${EMAIL_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      EMAIL_REPLY_TO: ${EMAIL_REPLY_TO:-}
+      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN:-}
+      MAILGUN_REGION: ${MAILGUN_REGION:-}
+      YOUTUBE_CHANNEL_ID: ${YOUTUBE_CHANNEL_ID:-}
+      FACEBOOK_PAGE_ID: ${FACEBOOK_PAGE_ID:-}
+      FACEBOOK_PAGE_ACCESS_TOKEN: ${FACEBOOK_PAGE_ACCESS_TOKEN:-}
+      INSTAGRAM_ACCESS_TOKEN: ${INSTAGRAM_ACCESS_TOKEN:-}
+      X_BEARER_TOKEN: ${X_BEARER_TOKEN:-}
+      X_USER_ID: ${X_USER_ID:-}
+      UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL:-}
+      UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
+      # Leave empty behind Coolify: the visitor address is read from what its proxy appends.
+      CLIENT_IP_HEADER: ${CLIENT_IP_HEADER:-}
+    volumes:
+      # Resized images and rendered pages, kept across restarts so they aren't rebuilt.
+      - lhi-next-cache:/app/.next/cache
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    mem_limit: 512m
+
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lhi
+      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES:?set SERVICE_PASSWORD_POSTGRES}
+      POSTGRES_DB: lhi
+    # Tuned for a small site sharing the server: a few MB of data, a handful of connections.
+    command: >
+      postgres
+      -c shared_buffers=32MB
+      -c effective_cache_size=96MB
+      -c work_mem=2MB
+      -c maintenance_work_mem=16MB
+      -c max_connections=20
+      -c wal_buffers=1MB
+      -c max_wal_size=256MB
+      -c min_wal_size=32MB
+    volumes:
+      - lhi-db:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lhi -d lhi"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    mem_limit: 256m
+
+volumes:
+  lhi-db:
+  lhi-next-cache:

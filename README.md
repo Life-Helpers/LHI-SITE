@@ -62,6 +62,32 @@ into Stripe's iframe via the Payment Element and never touch this app's
 server or logs; the webhook route rejects anything without a valid Stripe
 signature.
 
+## Self-hosting on Coolify (site + database together)
+
+`docker-compose.yml` deploys the website and its own PostgreSQL 18 database as one stack. The
+database is private to the stack (no public port) and stored in the `lhi-db` volume.
+
+1. In Coolify: **New resource → Public/Private repository → Build pack: Docker Compose**, pick
+   this repository and branch, compose file `docker-compose.yml`.
+2. Give the **app** service your domain (e.g. `https://lhinigeria.org`). Coolify generates
+   `SERVICE_PASSWORD_POSTGRES` itself.
+3. Environment variables (see `.env.example`): `NEXT_PUBLIC_SITE_URL`, the Stripe, analytics
+   and email keys you use, and, for the first deploy, **`MIGRATE_FROM_DATABASE_URL`** = the Neon
+   connection string (Neon console → Connection details; the direct, non-pooled one). Copy
+   `CMS_SESSION_SECRET` from Vercel if you can; otherwise leave it empty and everyone signs in
+   again once.
+4. Deploy. On first start the app copies every collection and uploaded file from Neon into the
+   local database (`[migrate] Done: …` in the app logs), then starts. Later restarts skip the
+   copy. Once it has worked, remove `MIGRATE_FROM_DATABASE_URL`.
+
+Memory: the app is limited to 512 MB and usually sits around 200–300 MB; the database to 256 MB
+(about 50 MB in use). The image uses the standalone Next.js server, WebP-only image resizing,
+an 8 MB page cache in memory (the rest on disk, kept in the `lhi-next-cache` volume) and
+`MALLOC_ARENA_MAX=2`. Building needs up to ~1.5 GB for a few minutes on the server.
+
+Backups: Coolify can schedule database backups for the `db` service; Admin → Settings → Backup
+also downloads the content as a file.
+
 ## Conventions
 
 - Brand palette: red (`--primary`) as the primary CTA/link color, orange

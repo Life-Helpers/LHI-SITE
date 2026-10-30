@@ -1,0 +1,14 @@
+.git
+node_modules
+.next
+.next-dev
+cms-data
+test-results
+playwright-report
+blob-report
+coverage
+e2e
+*.log
+.env*
+!.env.example
+tsconfig.tsbuildinfo

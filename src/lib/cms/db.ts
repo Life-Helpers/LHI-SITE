@@ -37,11 +37,13 @@ function sql(): Sql {
   if (!client) {
     client = postgres(connectionUrl(), {
       // Serverless functions each hold a small pool; the provider's pooler does the rest.
-      max: 3,
+      // On a server (Docker/Coolify) DATABASE_POOL_MAX can raise it.
+      max: Math.max(1, Math.min(20, Number(process.env.DATABASE_POOL_MAX) || 3)),
       idle_timeout: 20,
       connect_timeout: 15,
-      // Transaction-mode poolers (Neon, Supabase) don't support prepared statements.
-      prepare: false,
+      // Transaction-mode poolers (Neon, Supabase) don't support prepared statements; a direct
+      // Postgres (the bundled container) can use them: DATABASE_PREPARE=true.
+      prepare: process.env.DATABASE_PREPARE === "true",
       onnotice: () => {},
     });
   }

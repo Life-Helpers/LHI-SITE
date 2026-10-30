@@ -6,13 +6,20 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   poweredByHeader: false,
   compress: true,
+  // Rendered pages kept in memory (Next's default is 50 MB). Small servers set NEXT_CACHE_MAX_MEMORY
+  // (bytes) lower; pages then come from the on-disk cache instead.
+  cacheMaxMemorySize: Number(process.env.NEXT_CACHE_MAX_MEMORY ?? 50 * 1024 * 1024),
   experimental: {
     devtoolSegmentExplorer: false,
     optimizePackageImports: ["lucide-react", "@radix-ui/react-navigation-menu"],
+    // Lower peak memory while building (matters when Coolify builds on the same server).
+    webpackMemoryOptimizations: true,
+    ...(process.env.NEXT_BUILD_CPUS ? { cpus: Number(process.env.NEXT_BUILD_CPUS) } : {}),
   },
   images: {
-    // AVIF first (smallest), then WebP; browsers that support neither get the original format.
-    formats: ["image/avif", "image/webp"],
+    // WebP for every browser that takes it (others get the original). AVIF is a little smaller but
+    // takes far more memory and CPU to encode, so it is only used where NEXT_IMAGE_AVIF=true.
+    formats: process.env.NEXT_IMAGE_AVIF === "true" ? ["image/avif", "image/webp"] : ["image/webp"],
     // Optimised images are cached for 30 days on the server.
     minimumCacheTTL: 60 * 60 * 24 * 30,
     deviceSizes: [360, 480, 640, 750, 828, 1080, 1200, 1920],
