@@ -144,7 +144,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <div className="flex shrink-0 flex-wrap gap-2">
             {can(user, "posts.own") && (
               <Link href="/admin/content/posts/new" className={buttonClass.primary}>
-                <Plus className="h-4 w-4" /> New post
+                <Plus className="h-4 w-4" /> New blog post
               </Link>
             )}
             {can(user, "interventions") && (

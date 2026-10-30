@@ -75,7 +75,7 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
     {
       label: "Content",
       items: [
-        { label: "Posts", href: "/admin/content/posts", icon: FileText, permission: "posts.own" },
+        { label: "Blog & News Posts", href: "/admin/content/posts", icon: FileText, permission: "posts.own" },
         { label: "Media Library", href: "/admin/media", icon: ImageIcon, permission: "media" },
         { label: "Comments", href: "/admin/comments", icon: MessageSquare, permission: "comments", badge: pendingComments },
         { label: "Radio Episodes", href: "/admin/content/episodes", icon: Radio, permission: "episodes" },

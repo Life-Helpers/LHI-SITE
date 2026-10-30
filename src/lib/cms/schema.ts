@@ -17,8 +17,8 @@ export const PERMISSION_GROUPS = [
   {
     label: "Content",
     items: [
-      { id: "posts.own", label: "Write posts", help: "Create posts and edit their own." },
-      { id: "posts.all", label: "Edit everyone's posts", help: "Edit, publish and delete any post." },
+      { id: "posts.own", label: "Write blog posts", help: "Create blog posts and edit their own." },
+      { id: "posts.all", label: "Edit everyone's blog posts", help: "Edit, publish and delete any blog post." },
       { id: "posts.review", label: "Approve sensitive stories", help: "Publish stories flagged as sensitive (health status, GBV, child protection, mental health) after the safeguarding checks." },
       { id: "media", label: "Upload media", help: "Upload files and use the media library." },
       { id: "media.delete", label: "Delete media", help: "Remove files from the media library." },
@@ -328,9 +328,9 @@ export const TESTIMONIAL_TONES: FieldOption[] = [
 export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
   posts: {
     name: "posts",
-    label: "Posts",
-    singular: "Post",
-    description: "News, success stories, field blog, magazine features and press releases.",
+    label: "Blog & News Posts",
+    singular: "Blog post",
+    description: "Everything on the blog: news, success stories, field blog, magazine features and press releases. Click a title to edit it, or “Add Blog post” to write a new one; pick the category in the right-hand panel.",
     permission: "posts.own",
     titleField: "title",
     columns: ["title", "category", "author", "status", "date"],
