@@ -30,7 +30,7 @@ export default async function UsersPage() {
         }
       />
       <Card bodyClassName="overflow-x-auto p-0">
-        <table className="w-full min-w-[860px] text-sm">
+        <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="border-b border-admin-border text-left text-[11px] font-bold uppercase tracking-wider text-admin-muted">
               <th className="px-5 py-3">Name</th>

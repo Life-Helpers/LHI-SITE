@@ -2,55 +2,85 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Ban, CheckCircle2, KeyRound, Loader2, Pencil, X } from "lucide-react";
+import { CheckCircle2, KeyRound, Loader2, Lock, LockOpen, SquarePen, Trash2, X } from "lucide-react";
 
-import { setUserDisabledAction, setUserPasswordAction } from "@/app/admin/actions";
+import { deleteUserAction, setUserDisabledAction, setUserPasswordAction } from "@/app/admin/actions";
 import { buttonClass, inputClass } from "@/components/cms/ui";
 
-const iconBtn = "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold hover:bg-admin-bg disabled:opacity-50";
+/** Small grey icon button with a hover/focus label, as in the HR portal tables. */
+function IconAction({ label, tip, onClick, href, tone = "", disabled, children }: { label: string; tip: string; onClick?: () => void; href?: string; tone?: string; disabled?: boolean; children: React.ReactNode }) {
+  const cls = `group relative inline-flex h-8 w-8 items-center justify-center rounded-lg text-admin-muted transition-colors hover:bg-admin-bg disabled:opacity-40 ${tone || "hover:text-admin-text"}`;
+  const bubble = (
+    <span role="tooltip" className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-admin-text px-2 py-1 text-[11px] font-medium text-admin-card opacity-0 shadow transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+      {tip}
+    </span>
+  );
+  return href ? (
+    <a href={href} aria-label={label} className={cls}>
+      {children}
+      {bubble}
+    </a>
+  ) : (
+    <button type="button" aria-label={label} onClick={onClick} disabled={disabled} className={cls}>
+      {children}
+      {bubble}
+    </button>
+  );
+}
 
-/** Edit, set password and disable/enable for one row of the Users list. */
+/** Edit, set password, disable/enable and delete for one row of the Users list. */
 export function UserRowActions({ id, name, disabled, isMe }: { id: string; name: string; disabled: boolean; isMe: boolean }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
+  const run = (fn: () => Promise<{ ok: boolean; error?: string }>) => {
+    setError("");
+    start(async () => {
+      const res = await fn();
+      if (!res.ok) setError(res.error ?? "Failed.");
+      else router.refresh();
+    });
+  };
 
   if (isMe) {
     return (
       <div className="flex justify-end">
-        <a href="/admin/profile" className={`${iconBtn} text-admin-primary`}>
-          <Pencil className="h-3.5 w-3.5" /> Edit my profile
-        </a>
+        <IconAction href="/admin/profile" label="Edit my profile" tip="My profile">
+          <SquarePen className="h-[18px] w-[18px]" />
+        </IconAction>
       </div>
     );
   }
   return (
-    <div className="flex flex-wrap items-center justify-end gap-1" data-user-actions={name}>
-      <a href={`/admin/users/${id}`} className={`${iconBtn} text-admin-text`} aria-label={`Edit ${name}`}>
-        <Pencil className="h-3.5 w-3.5" /> Edit
-      </a>
-      <button type="button" onClick={() => setOpen(true)} className={`${iconBtn} text-admin-text`} aria-label={`Set a new password for ${name}`}>
-        <KeyRound className="h-3.5 w-3.5" /> Password
-      </button>
-      <button
-        type="button"
+    <div className="flex flex-wrap items-center justify-end gap-0.5" data-user-actions={name}>
+      <IconAction href={`/admin/users/${id}`} label={`Edit ${name}`} tip="Edit">
+        <SquarePen className="h-[18px] w-[18px]" />
+      </IconAction>
+      <IconAction label={`Set a new password for ${name}`} tip="Set password" onClick={() => setOpen(true)}>
+        <KeyRound className="h-[18px] w-[18px]" />
+      </IconAction>
+      <IconAction
+        label={`${disabled ? "Enable" : "Disable"} ${name}`}
+        tip={disabled ? "Enable" : "Disable"}
         disabled={pending}
+        tone={disabled ? "text-admin-warning hover:text-admin-success" : "hover:text-admin-warning"}
         onClick={() => {
           if (!disabled && !confirm(`Disable ${name}? They will be signed out and can't sign in until you enable them again.`)) return;
-          setError("");
-          start(async () => {
-            const res = await setUserDisabledAction(id, !disabled);
-            if (!res.ok) setError(res.error ?? "Failed.");
-            else router.refresh();
-          });
+          run(() => setUserDisabledAction(id, !disabled));
         }}
-        className={`${iconBtn} ${disabled ? "text-admin-success" : "text-admin-danger"}`}
-        aria-label={`${disabled ? "Enable" : "Disable"} ${name}`}
       >
-        {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : disabled ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Ban className="h-3.5 w-3.5" />}
-        {disabled ? "Enable" : "Disable"}
-      </button>
+        {pending ? <Loader2 className="h-[18px] w-[18px] animate-spin" /> : disabled ? <LockOpen className="h-[18px] w-[18px]" /> : <Lock className="h-[18px] w-[18px]" />}
+      </IconAction>
+      <IconAction
+        label={`Delete ${name}`}
+        tip="Delete"
+        disabled={pending}
+        tone="hover:text-admin-danger"
+        onClick={() => confirm(`Delete ${name}'s account? This can't be undone. (To stop them signing in for now, use Disable instead.)`) && run(() => deleteUserAction(id))}
+      >
+        <Trash2 className="h-[18px] w-[18px]" />
+      </IconAction>
       {error && <p role="alert" className="w-full text-right text-xs text-admin-danger">{error}</p>}
       {open && <PasswordDialog id={id} name={name} onClose={() => setOpen(false)} />}
     </div>
