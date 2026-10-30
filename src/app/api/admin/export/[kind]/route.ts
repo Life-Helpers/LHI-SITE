@@ -1,4 +1,4 @@
-import { COURSES } from "@/data/training/courses";
+import { getAllCourses } from "@/lib/training/catalog";
 import { logActivity } from "@/lib/cms/activity";
 import { getCurrentUser } from "@/lib/cms/auth";
 import { toCsv } from "@/lib/cms/csv";
@@ -17,6 +17,7 @@ const PERMISSIONS: Record<string, Permission> = {
 
 /** CSV exports for the admin. GET /api/admin/export/{subscribers|submissions|learners|certificates}[?type=job-application] */
 export async function GET(req: Request, { params }: { params: Promise<{ kind: string }> }) {
+  const COURSES = await getAllCourses();
   const { kind } = await params;
   const user = await getCurrentUser();
   const permission = PERMISSIONS[kind];

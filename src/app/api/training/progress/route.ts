@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getCourse } from "@/data/training/courses";
+import { getCourse } from "@/lib/training/catalog";
 import { getCurrentLearner, updateLearnerProgress } from "@/lib/training/learners";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   const learner = await getCurrentLearner();
   if (!learner) return NextResponse.json({ error: "Sign in to continue." }, { status: 401 });
   const parsed = schema.safeParse(await req.json().catch(() => null));
-  const course = parsed.success ? getCourse(parsed.data.courseId) : undefined;
+  const course = parsed.success ? await getCourse(parsed.data.courseId) : undefined;
   if (!parsed.success || !course?.lessons.some((l) => l.id === parsed.data.lessonId)) {
     return NextResponse.json({ error: "Invalid lesson." }, { status: 400 });
   }

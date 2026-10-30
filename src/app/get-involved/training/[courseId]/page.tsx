@@ -6,18 +6,19 @@ import { ArrowLeft, Award, BookOpenCheck, Clock, UserRound, Users } from "lucide
 
 import { CourseOutline } from "@/components/training/course-outline";
 import { LearnerBar } from "@/components/training/learner-bar";
-import { coursePhoto, getCourse } from "@/data/training/courses";
+import { coursePhoto } from "@/data/training/courses";
+import { getCourse } from "@/lib/training/catalog";
 import { getCurrentLearner } from "@/lib/training/learners";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }): Promise<Metadata> {
-  const course = getCourse((await params).courseId);
+  const course = await getCourse((await params).courseId);
   return course ? { title: `${course.title} | Humanitarian Training`, description: course.description, alternates: { canonical: `/get-involved/training/${course.id}` } } : {};
 }
 
 export default async function CoursePage({ params }: { params: Promise<{ courseId: string }> }) {
-  const course = getCourse((await params).courseId);
+  const course = await getCourse((await params).courseId);
   if (!course) notFound();
   const photo = coursePhoto(course);
   const learner = await getCurrentLearner();

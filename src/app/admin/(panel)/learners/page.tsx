@@ -2,7 +2,7 @@ import { Download } from "lucide-react";
 
 import { LearnerActions } from "@/components/cms/learner-actions";
 import { buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
-import { COURSES } from "@/data/training/courses";
+import { getAllCourses } from "@/lib/training/catalog";
 import { requirePageUser } from "@/lib/cms/auth";
 import { can } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
@@ -11,6 +11,7 @@ import { SITE_LOCATIONS } from "@/lib/cms/schema";
 export const metadata = { title: "Learners" };
 
 export default async function LearnersPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const COURSES = await getAllCourses();
   const user = await requirePageUser("training");
   const { q = "" } = await searchParams;
   const all = (await readStore("learners")).sort((a, b) => b.createdAt.localeCompare(a.createdAt));

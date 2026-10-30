@@ -2,8 +2,7 @@ import "server-only";
 
 import { randomInt } from "node:crypto";
 
-import { ANSWER_KEYS } from "@/data/training/answer-keys";
-import { getCourse } from "@/data/training/courses";
+import { getAnswerKey, getCourse } from "@/lib/training/catalog";
 import type { Certificate } from "@/lib/cms/schema";
 import { readStore, updateStore } from "@/lib/cms/store";
 
@@ -16,10 +15,9 @@ function certificateCode(courseId: string) {
   return `LHI-${prefix}-${code}`;
 }
 
-export function gradeExam(courseId: string, answers: Record<string, number>) {
-  const course = getCourse(courseId);
-  const key = ANSWER_KEYS[courseId];
-  if (!course || !key) return null;
+export async function gradeExam(courseId: string, answers: Record<string, number>) {
+  const [course, key] = await Promise.all([getCourse(courseId), getAnswerKey(courseId)]);
+  if (!course || !key || course.exam.length === 0) return null;
   const results = course.exam.map((q) => ({ id: q.id, correct: answers[q.id] === key[q.id] }));
   const correct = results.filter((r) => r.correct).length;
   const score = Math.round((correct / course.exam.length) * 100);

@@ -48,6 +48,7 @@ import {
   UserCircle,
   Users,
   X,
+  BookOpenCheck,
 } from "lucide-react";
 
 import { logoutAction } from "@/app/admin/actions";
@@ -58,6 +59,8 @@ interface NavItem {
   href: string;
   icon: React.ElementType;
   permission?: Permission;
+  /** Shown when the user has any of these (instead of one `permission`). */
+  anyOf?: Permission[];
   badge?: number;
 }
 
@@ -136,6 +139,7 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
     {
       label: "Training",
       items: [
+        { label: "Courses & Exams", href: "/admin/training", icon: BookOpenCheck, anyOf: ["training.content", "training.exams", "training.publish"] },
         { label: "Learners", href: "/admin/learners", icon: Users, permission: "training" },
         { label: "Certificates", href: "/admin/certificates", icon: GraduationCap, permission: "training" },
       ],
@@ -201,7 +205,7 @@ export function AdminShell({
   };
 
   const nav = buildNav(newSubmissions, pendingComments)
-    .map((g) => ({ ...g, items: g.items.filter((i) => can(user, i.permission)) }))
+    .map((g) => ({ ...g, items: g.items.filter((i) => (i.anyOf ? i.anyOf.some((p) => can(user, p)) : can(user, i.permission))) }))
     .filter((g) => g.items.length > 0);
 
   const sidebar = (compact: boolean) => (

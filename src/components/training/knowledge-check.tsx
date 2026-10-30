@@ -33,6 +33,28 @@ export function KnowledgeCheck({
     if (allCorrect) completeLesson(lessonId);
   };
 
+  // A lesson with no practice questions is completed by reading it.
+  if (questions.length === 0) {
+    return (
+      <section aria-label="Finish the lesson" className="flex flex-wrap items-center gap-3 rounded-3xl border border-border bg-card p-6 sm:p-8">
+        {submitted || alreadyDone ? (
+          <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+            <CheckCircle2 className="h-5 w-5" /> Lesson complete
+          </p>
+        ) : (
+          <button type="button" onClick={submit} className="rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
+            Mark lesson complete
+          </button>
+        )}
+        {(submitted || alreadyDone) && (
+          <Link href={nextHref} className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
+            {nextLabel} <ArrowRight className="h-4 w-4" />
+          </Link>
+        )}
+      </section>
+    );
+  }
+
   return (
     <section aria-labelledby="check-heading" className="rounded-3xl border border-border bg-card p-6 sm:p-8">
       <h2 id="check-heading" className="font-serif-display text-2xl font-light text-foreground">

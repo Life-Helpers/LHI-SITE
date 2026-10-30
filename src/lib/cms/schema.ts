@@ -55,6 +55,9 @@ export const PERMISSION_GROUPS = [
     items: [
       { id: "training", label: "Learners & certificates", help: "View learners, progress and certificates." },
       { id: "training.manage", label: "Manage learner accounts", help: "Reset learner passwords and delete accounts." },
+      { id: "training.content", label: "Write courses & lessons", help: "Create courses (new ones start as drafts) and edit their lessons, photos and practice questions." },
+      { id: "training.exams", label: "Set final exams", help: "Write final exam questions, mark the correct answers and set the pass mark." },
+      { id: "training.publish", label: "Publish courses", help: "Make a course live for learners, take it down, or delete a draft." },
     ],
   },
   {
@@ -111,6 +114,9 @@ export const PERMISSION_HOME: Record<Permission, string> = {
   tenders: "/admin/content/tenders",
   training: "/admin/learners",
   "training.manage": "/admin/learners",
+  "training.content": "/admin/training",
+  "training.exams": "/admin/training",
+  "training.publish": "/admin/training",
   newsletter: "/admin/newsletter",
   email: "/admin/outbox",
   users: "/admin/users",
@@ -141,6 +147,7 @@ export const SITE_LOCATIONS: Record<string, { label: string; href: string }[]> =
   observances: [{ label: "Events calendar", href: "/events" }],
   magazines: [{ label: "Project Magazines page", href: "/project-magazines" }],
   learners: [{ label: "Humanitarian Training centre", href: "/get-involved/training" }],
+  training: [{ label: "Humanitarian Training centre", href: "/get-involved/training" }],
   certificates: [{ label: "Certificate check (training page)", href: "/get-involved/training" }],
   comments: [{ label: "News & updates", href: "/blog" }],
   homeText: [{ label: "Home page", href: "/" }],

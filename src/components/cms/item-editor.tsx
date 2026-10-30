@@ -360,7 +360,7 @@ function MarkdownField({
   );
 }
 
-function AssetField({
+export function AssetField({
   kind,
   value,
   onChange,

@@ -6,7 +6,8 @@ import { ArrowLeft, Clock } from "lucide-react";
 
 import { KnowledgeCheck } from "@/components/training/knowledge-check";
 import { LessonContent } from "@/components/training/lesson-content";
-import { coursePhoto, getCourse } from "@/data/training/courses";
+import { coursePhoto } from "@/data/training/courses";
+import { getCourse } from "@/lib/training/catalog";
 import { requireLearnerPage } from "@/lib/training/learners";
 
 type Params = Promise<{ courseId: string; lessonId: string }>;
@@ -15,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 async function load(params: Params) {
   const { courseId, lessonId } = await params;
-  const course = getCourse(courseId);
+  const course = await getCourse(courseId);
   const index = course?.lessons.findIndex((l) => l.id === lessonId) ?? -1;
   if (!course || index < 0) return null;
   return { course, lesson: course.lessons[index], index };

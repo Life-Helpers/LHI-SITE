@@ -8,7 +8,8 @@ import { VerifyCertificateForm } from "@/components/training/verify-form";
 import { getCurrentLearner } from "@/lib/training/learners";
 import { PageHeroBanner } from "@/components/ui/page-hero-banner";
 import { LHI_PHOTOS } from "@/data/lhi-photos";
-import { COURSES, coursePhoto } from "@/data/training/courses";
+import { coursePhoto } from "@/data/training/courses";
+import { getCourses } from "@/lib/training/catalog";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/get-involved/training" },
@@ -28,6 +29,7 @@ const steps = [
 export const dynamic = "force-dynamic";
 
 export default async function TrainingPage() {
+  const COURSES = await getCourses();
   const learner = await getCurrentLearner();
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">

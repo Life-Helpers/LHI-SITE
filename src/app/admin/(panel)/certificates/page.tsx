@@ -3,13 +3,14 @@ import { Download } from "lucide-react";
 import { SITE_LOCATIONS } from "@/lib/cms/schema";
 
 import { buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
-import { COURSES } from "@/data/training/courses";
+import { getAllCourses } from "@/lib/training/catalog";
 import { requirePageUser } from "@/lib/cms/auth";
 import { readStore } from "@/lib/cms/store";
 
 export const metadata = { title: "Training Certificates" };
 
 export default async function CertificatesPage({ searchParams }: { searchParams: Promise<{ course?: string; q?: string }> }) {
+  const COURSES = await getAllCourses();
   await requirePageUser("training");
   const { course = "all", q = "" } = await searchParams;
   const all = await readStore("certificates");

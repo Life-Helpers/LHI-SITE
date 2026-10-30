@@ -28,6 +28,8 @@ export interface Lesson {
   summary: string;
   minutes: number;
   photo: LhiPhotoKey;
+  /** An uploaded photo (from the admin), used instead of `photo`. */
+  image?: string;
   blocks: LessonBlock[];
   check: CheckQuestion[];
 }
@@ -47,6 +49,8 @@ export interface Course {
   audience: string;
   facilitator: string;
   photo: LhiPhotoKey;
+  /** An uploaded photo (from the admin), used instead of `photo`. */
+  image?: string;
   passMark: number;
   lessons: Lesson[];
   exam: ExamQuestion[];
@@ -1060,12 +1064,10 @@ const gbvHumanitarian: Course = {
   ],
 };
 
+/** The courses LHI started with. Live courses are edited in Admin → Training courses (see lib/training/catalog). */
 export const COURSES: Course[] = [safeguarding, childSafeguardingPolicy, gbvHumanitarian];
 
-export function getCourse(id: string) {
-  return COURSES.find((c) => c.id === id);
-}
-
-export function coursePhoto(course: Course | Lesson) {
-  return LHI_PHOTOS[course.photo];
+export function coursePhoto(item: Pick<Course | Lesson, "photo" | "image" | "title">) {
+  if (item.image) return { src: item.image, alt: item.title };
+  return LHI_PHOTOS[item.photo] ?? LHI_PHOTOS.caseManagement;
 }

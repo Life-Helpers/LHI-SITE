@@ -3,12 +3,13 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
 import { programHref } from "@/data/thematic-areas";
 import { getEmergencies, getImpactReports, getInterventions, getPublicJobs, getPrograms, getPublicTenders, getPublishedPosts } from "@/lib/cms/content";
-import { COURSES } from "@/data/training/courses";
+import { getCourses } from "@/lib/training/catalog";
 import { MAGAZINES } from "@/data/magazines";
 
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const COURSES = await getCourses();
   const staticRoutes = [
     "",
     "/programs",

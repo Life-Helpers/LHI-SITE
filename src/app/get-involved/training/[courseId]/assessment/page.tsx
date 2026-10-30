@@ -3,18 +3,18 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Assessment } from "@/components/training/assessment";
-import { getCourse } from "@/data/training/courses";
+import { getCourse } from "@/lib/training/catalog";
 import { requireLearnerPage } from "@/lib/training/learners";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }): Promise<Metadata> {
-  const course = getCourse((await params).courseId);
+  const course = await getCourse((await params).courseId);
   return course ? { title: `Final assessment | ${course.title}` } : {};
 }
 
 export default async function AssessmentPage({ params }: { params: Promise<{ courseId: string }> }) {
-  const course = getCourse((await params).courseId);
+  const course = await getCourse((await params).courseId);
   if (!course) notFound();
   const learner = await requireLearnerPage(`/get-involved/training/${course.id}/assessment`);
 

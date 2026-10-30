@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Award, BookOpenCheck, CheckCircle2, Download, KeyRound, PlayCircle, RotateCcw } from "lucide-react";
 
 import { LearnerBar } from "@/components/training/learner-bar";
-import { COURSES } from "@/data/training/courses";
+import { getCourses } from "@/lib/training/catalog";
 import { requireLearnerPage } from "@/lib/training/learners";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +12,7 @@ export const metadata: Metadata = { title: "My learning", robots: { index: false
 const fmt = (d?: string) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "");
 
 export default async function MyLearningPage() {
+  const COURSES = await getCourses();
   const learner = await requireLearnerPage("/get-involved/training/my-learning");
   const rows = COURSES.map((course) => {
     const p = learner.progress[course.id];

@@ -24,6 +24,9 @@ import { BUILT_IN_ROLES } from "@/lib/cms/schema";
 import { databaseUrl, dbRead, dbUpdate } from "@/lib/cms/db";
 import { DATA_DIR } from "@/lib/cms/paths";
 import { JOB_ADVERT_2026_10 } from "@/data/job-advert-2026-10";
+import { ANSWER_KEYS } from "@/data/training/answer-keys";
+import { COURSES } from "@/data/training/courses";
+import type { StoredCourse } from "@/lib/training/catalog";
 import {
   seedBeforeAfter,
   seedEmergencies,
@@ -94,6 +97,7 @@ interface StoreShape extends CollectionRecords {
   resetTokens: ResetToken;
   unsubscribes: Unsubscribe;
   magazines: CmsMagazine;
+  courses: StoredCourse;
 }
 
 export type StoreName = keyof StoreShape;
@@ -132,6 +136,7 @@ const SEEDS: { [K in StoreName]: () => StoreShape[K][] } = {
   resetTokens: () => [],
   unsubscribes: () => [],
   magazines: () => [],
+  courses: () => COURSES.map((c, i) => ({ ...structuredClone(c), answers: { ...ANSWER_KEYS[c.id] }, status: "published" as const, order: i + 1 })),
 };
 
 const cache = new Map<string, { mtimeMs: number; data: unknown }>();

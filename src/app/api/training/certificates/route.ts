@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: formError(parsed.error, "Invalid submission.") }, { status: 400 });
   }
   const { courseId, name, organization, answers } = parsed.data;
-  const graded = gradeExam(courseId, answers);
+  const graded = await gradeExam(courseId, answers);
   if (!graded) return NextResponse.json({ error: "Unknown course." }, { status: 404 });
   const done = learner.progress[courseId]?.completed ?? [];
   if (!graded.course.lessons.every((l) => done.includes(l.id))) {
