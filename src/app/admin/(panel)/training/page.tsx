@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 
-import { CourseRowActions } from "@/components/cms/course-editor";
+import { CourseFileTools, CourseRowActions } from "@/components/cms/course-editor";
 import { Badge, buttonClass, Card, formatDate, PageHeader } from "@/components/cms/ui";
 import { requirePageUser } from "@/lib/cms/auth";
 import { can, SITE_LOCATIONS } from "@/lib/cms/schema";
@@ -36,6 +36,7 @@ export default async function TrainingCoursesPage() {
           )
         }
       />
+      <CourseFileTools canUpload={can(user, "training.content")} />
       <Card bodyClassName="divide-y divide-admin-border p-0">
         {courses.map((c, i) => {
           const started = learners.filter((l) => l.progress?.[c.id]).length;

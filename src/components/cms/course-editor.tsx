@@ -2,9 +2,9 @@
 
 import { useId, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, CheckCircle2, Loader2, Lock, Save, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, CheckCircle2, Download, FileUp, Loader2, Lock, Save, Trash2 } from "lucide-react";
 
-import { deleteCourseAction, moveCourseAction, saveCourseAction } from "@/app/admin/training-actions";
+import { deleteCourseAction, importCourseAction, moveCourseAction, saveCourseAction } from "@/app/admin/training-actions";
 import { AssetField } from "@/components/cms/item-editor";
 import { buttonClass, Card, inputClass } from "@/components/cms/ui";
 import { LHI_PHOTOS, type LhiPhotoKey } from "@/data/lhi-photos";
@@ -350,6 +350,9 @@ export function CourseRowActions({ id, title, live, first, last, canPublish }: {
           </button>
         </>
       )}
+      <a href={`/api/admin/training/file?id=${encodeURIComponent(id)}`} className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg" aria-label={`Download ${title} as a file`} title="Download as a file to edit">
+        <Download className="h-4 w-4" />
+      </a>
       <a href={`/admin/training/${id}`} className={buttonClass.secondary}>
         Open
       </a>
@@ -357,6 +360,49 @@ export function CourseRowActions({ id, title, live, first, last, canPublish }: {
         <button type="button" disabled={pending} onClick={() => confirm(`Delete the draft course “${title}”? Certificates already issued stay valid.`) && act(() => deleteCourseAction(id))} className={buttonClass.danger} aria-label={`Delete ${title}`}>
           <Trash2 className="h-4 w-4" />
         </button>
+      )}
+    </div>
+  );
+}
+
+/** Download the blank course template, and upload a filled-in file to create or update a course. */
+export function CourseFileTools({ canUpload }: { canUpload: boolean }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
+  const upload = (file: File | undefined) => {
+    if (!file) return;
+    start(async () => {
+      setNotice(null);
+      if (file.size > 400_000) return setNotice({ ok: false, text: "The file is too large." });
+      const res = await importCourseAction(await file.text());
+      if (!res.ok) return setNotice({ ok: false, text: res.error ?? "Upload failed." });
+      setNotice({ ok: true, text: res.created ? "Course created as a draft." : "Course updated." });
+      router.push(`/admin/training/${res.id}`);
+    });
+  };
+  return (
+    <div className="hr-card mb-6 flex flex-wrap items-center gap-3 p-4" data-course-file-tools>
+      <div className="min-w-0 flex-1 text-sm">
+        <p className="font-semibold">Work on a course in a document</p>
+        <p className="text-xs text-admin-muted">
+          Download the template (or any course below), fill it in with Word or Notepad, save it as a .txt file and upload it. A file with a course&apos;s ID updates that course;
+          without one it creates a new draft.
+        </p>
+      </div>
+      <a href="/api/admin/training/file" className={buttonClass.secondary}>
+        <Download className="h-4 w-4" /> Download template
+      </a>
+      {canUpload && (
+        <label className={`${buttonClass.primary} cursor-pointer`}>
+          {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />} Upload course file
+          <input type="file" accept=".txt,.md,text/plain" className="sr-only" disabled={pending} onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+        </label>
+      )}
+      {notice && (
+        <p role={notice.ok ? "status" : "alert"} className={`w-full text-sm ${notice.ok ? "text-admin-success" : "text-admin-danger"}`}>
+          {notice.text}
+        </p>
       )}
     </div>
   );

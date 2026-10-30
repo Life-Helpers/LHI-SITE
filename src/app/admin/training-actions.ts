@@ -9,7 +9,9 @@ import { can, slugify } from "@/lib/cms/schema";
 import { readStore, updateStore } from "@/lib/cms/store";
 import { textToBlocks } from "@/lib/training/blocks";
 import type { StoredCourse } from "@/lib/training/catalog";
+import { textToCourse } from "@/lib/training/course-file";
 import type { CourseActionResult, CourseDraft } from "@/lib/training/editor-types";
+import { toDraft } from "@/lib/training/to-draft";
 
 async function run(fn: () => Promise<CourseActionResult>): Promise<CourseActionResult> {
   try {
@@ -178,5 +180,48 @@ export async function moveCourseAction(id: string, dir: -1 | 1): Promise<CourseA
     revalidatePath("/get-involved/training", "layout");
     revalidatePath("/admin/training", "layout");
     return { ok: true };
+  });
+}
+
+/**
+ * Creates or updates a course from an uploaded course file (see lib/training/course-file). Photos,
+ * status and order are kept; a file without a FINAL EXAM section keeps the current exam.
+ */
+export async function importCourseAction(text: string): Promise<CourseActionResult & { created?: boolean }> {
+  return run(async () => {
+    const user = await requireTrainer();
+    if (!can(user, "training.content")) return { ok: false, error: "Your role can't upload course content." };
+    if (text.length > 400_000) return { ok: false, error: "The file is too large." };
+    let parsed;
+    try {
+      parsed = textToCourse(text);
+    } catch (e) {
+      return { ok: false, error: (e as Error).message };
+    }
+    const existing = parsed.id ? (await readStore("courses")).find((c) => c.id === parsed.id) : undefined;
+    if (parsed.id && !existing) return { ok: false, error: `No course has the ID “${parsed.id}”. Clear the Course ID line to create a new course.` };
+    const current = existing ? toDraft(existing, true) : null;
+    const draft: CourseDraft = {
+      id: existing?.id ?? "",
+      title: parsed.title,
+      subtitle: parsed.subtitle,
+      description: parsed.description,
+      level: parsed.level || current?.level || "Foundation",
+      audience: parsed.audience,
+      facilitator: parsed.facilitator,
+      photo: current?.photo ?? "caseManagement",
+      image: current?.image ?? "",
+      passMark: parsed.passMark ?? current?.passMark ?? 80,
+      status: current?.status ?? "draft",
+      lessons: parsed.lessons.map((l, i) => {
+        // Keep each lesson's photo: matched by its ID, or by position for a renamed lesson.
+        const was = current?.lessons.find((x) => l.id && x.id === l.id) ?? current?.lessons[i];
+        return { ...l, id: l.id && current?.lessons.some((x) => x.id === l.id) ? l.id : "", photo: was?.photo ?? current?.photo ?? "caseManagement", image: was?.image ?? "" };
+      }),
+      // Without an exam section, or for someone who doesn't set exams, the stored exam is kept.
+      exam: parsed.exam && can(user, "training.exams") ? parsed.exam.map((q, n) => ({ ...q, id: current?.exam[n]?.id ?? "" })) : (current?.exam ?? []),
+    };
+    const res = await saveCourseAction(existing ? existing.id : null, draft);
+    return { ...res, created: !existing };
   });
 }
