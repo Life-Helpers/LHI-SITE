@@ -11,7 +11,7 @@ export function PageHeader({
   description?: string;
   breadcrumbs?: { label: string; href?: string }[];
   actions?: React.ReactNode;
-  /** Where this content shows on the public site: links that open it in a new tab. */
+  /** Where this content shows on the public site. */
   site?: { label: string; href: string }[];
 }) {
   return (
@@ -39,12 +39,12 @@ export function PageHeader({
           <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm" data-site-links>
             <span className="text-admin-muted">See it on the site:</span>
             {site.map((s) => (
-              <a key={s.href + s.label} href={s.href} target="_blank" rel="noopener" className="inline-flex items-center gap-1 font-semibold text-admin-primary hover:underline">
+              // Same tab, so pop-up blockers can't stop it; the browser's Back button returns here.
+              <a key={s.href + s.label} href={s.href} className="inline-flex items-center gap-1 font-semibold text-admin-primary hover:underline">
                 {s.label}
                 <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                  <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
-                <span className="sr-only">(opens in a new tab)</span>
               </a>
             ))}
           </p>
