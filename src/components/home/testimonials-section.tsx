@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Quote, Star } from "lucide-react";
+import { ArrowUpRight, Quote } from "lucide-react";
 
 import type { Testimonial } from "@/data/testimonials";
 import { useLocale } from "@/i18n/locale-context";
@@ -15,16 +15,6 @@ const initials = (name: string) =>
     .slice(0, 2)
     .map((w) => w[0])
     .join("");
-
-function Stars() {
-  return (
-    <span className="flex gap-0.5 text-[#f5a524]" aria-hidden="true">
-      {Array.from({ length: 5 }, (_, i) => (
-        <Star key={i} className="h-4 w-4 fill-current" />
-      ))}
-    </span>
-  );
-}
 
 /**
  * Quotes from Admin → Testimonials as soft neumorphic glass cards. The cards sit on a
@@ -125,16 +115,13 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
             {testimonials.map((item) => (
               <li key={item.name} className="w-[82vw] max-w-[380px] shrink-0 snap-start">
                 <figure className="neu-glass group relative flex h-full flex-col rounded-[2rem] p-7">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br ${item.tone} text-white shadow-lg`}
-                      aria-hidden="true"
-                    >
-                      <Quote className="h-5 w-5 fill-current" />
-                    </span>
-                    <Stars />
-                  </div>
-                  <blockquote className="mt-5 flex-1 font-serif-display text-lg italic leading-relaxed text-foreground">“{item.quote}”</blockquote>
+                  <span
+                    className={`flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br ${item.tone} text-white shadow-lg`}
+                    aria-hidden="true"
+                  >
+                    <Quote className="h-5 w-5 fill-current" />
+                  </span>
+                  <blockquote className="mt-4 flex-1 font-serif-display text-lg italic leading-relaxed text-foreground">“{item.quote}”</blockquote>
                   <figcaption className="neu-inset mt-6 flex items-center gap-3 rounded-2xl p-3">
                     <span
                       className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${item.tone} text-sm font-bold text-white`}
