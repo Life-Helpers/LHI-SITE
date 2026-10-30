@@ -33,7 +33,7 @@ export default async function UsersPage() {
           <thead>
             <tr className="border-b border-admin-border text-left text-[11px] font-bold uppercase tracking-wider text-admin-muted">
               <th className="px-5 py-3">Name</th>
-              <th className="px-5 py-3">Email</th>
+              <th className="px-5 py-3">Signs in with</th>
               <th className="px-5 py-3">Role</th>
               <th className="px-5 py-3">Last sign-in</th>
             </tr>
@@ -47,7 +47,11 @@ export default async function UsersPage() {
                   </Link>
                   {u.id === me.id && <span className="ml-2 text-xs text-admin-muted">(you)</span>}
                 </td>
-                <td className="px-5 py-3 text-admin-muted">{u.email}</td>
+                <td className="px-5 py-3 text-admin-muted">
+                  {u.username && <span className="block font-medium text-admin-text">{u.username}</span>}
+                  {u.email || (u.username ? null : "—")}
+                  {u.mustChangePassword && <span className="mt-0.5 block text-xs text-admin-warning">Choosing their password at first sign-in</span>}
+                </td>
                 <td className="px-5 py-3">
                   <Badge tone={u.role === "administrator" ? "primary" : "neutral"}>{u.roleName}</Badge>
                   {u.twoFactor && <Badge tone="success">2-step</Badge>}

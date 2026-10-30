@@ -5,7 +5,7 @@ import { QuickDraft } from "@/components/cms/quick-draft";
 import { Badge, buttonClass, Card, formatDate, PageHeader, statusTone } from "@/components/cms/ui";
 import { WeeklyBarChart, type WeeklyPoint } from "@/components/cms/weekly-bar-chart";
 import { requirePageUser } from "@/lib/cms/auth";
-import { can, SUBMISSION_TYPE_LABELS } from "@/lib/cms/schema";
+import { can, PERMISSION_HOME, PERMISSION_ITEMS, SUBMISSION_TYPE_LABELS } from "@/lib/cms/schema";
 import { readStore } from "@/lib/cms/store";
 
 
@@ -27,9 +27,12 @@ function weeklyCounts(dates: string[], weeks = 12): WeeklyPoint[] {
   return buckets.map((b) => ({ label: b.start.toLocaleDateString("en-GB", { day: "numeric", month: "short" }), value: b.value }));
 }
 
-export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ denied?: string; welcome?: string }> }) {
   const user = await requirePageUser();
-  const { denied } = await searchParams;
+  const { denied, welcome } = await searchParams;
+  // What this person's role lets them do, grouped as in the menu, each linking to where it's done.
+  const myFunctions = PERMISSION_ITEMS.filter((i) => user.permissions.includes(i.id));
+  const functionGroups = [...new Set(myFunctions.map((f) => f.group))].map((group) => ({ group, items: myFunctions.filter((f) => f.group === group) }));
   const isEditor = can(user, "submissions");
 
   const [posts, interventions, partners, media, submissions, activity] = await Promise.all([
@@ -77,9 +80,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         description="Here's what's happening on lhinigeria.org."
         actions={
           <>
-            <Link href="/admin/content/posts/new" className={buttonClass.primary}>
-              <Plus className="h-4 w-4" /> New post
-            </Link>
+            {can(user, "posts.own") && (
+              <Link href="/admin/content/posts/new" className={buttonClass.primary}>
+                <Plus className="h-4 w-4" /> New post
+              </Link>
+            )}
             {isEditor && (
               <Link href="/admin/content/interventions/new" className={buttonClass.secondary}>
                 <Plus className="h-4 w-4" /> New intervention
@@ -94,6 +99,33 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           Your role doesn&apos;t have access to that page.
         </p>
       )}
+
+      <Card
+        title={`Your role: ${user.roleName}`}
+        action={<span className="text-xs text-admin-muted">{welcome ? "Welcome! This is what you're responsible for on the website." : "What you can do on the website"}</span>}
+        bodyClassName="p-5"
+        className="mb-6"
+      >
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-your-role>
+          {functionGroups.map((g) => (
+            <div key={g.group}>
+              <p className="text-xs font-semibold uppercase tracking-wider text-admin-muted">{g.group}</p>
+              <ul className="mt-2 space-y-1.5 text-sm">
+                {g.items.map((f) => (
+                  <li key={f.id}>
+                    <Link href={PERMISSION_HOME[f.id]} className="font-medium text-admin-primary hover:underline" title={f.help}>
+                      {f.label}
+                    </Link>
+                    {/* A long list (e.g. administrators) shows names only; the description is on hover. */}
+                    {myFunctions.length <= 12 && <span className="block text-xs text-admin-muted">{f.help}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          {functionGroups.length === 0 && <p className="text-sm text-admin-muted">Your role has no permissions yet. Ask an administrator to give it some.</p>}
+        </div>
+      </Card>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         {tiles.map((t) => (

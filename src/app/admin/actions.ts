@@ -41,6 +41,7 @@ import {
   type PublicUser,
   type Role,
   type SubmissionStatus,
+  USERNAME_PATTERN,
 } from "@/lib/cms/schema";
 import { readSettings, readStore, updateStore, writeSettings } from "@/lib/cms/store";
 import { deleteFile } from "@/lib/cms/files";
@@ -105,7 +106,7 @@ async function signIn(form: FormData): Promise<ActionResult> {
   const email = normEmail(form.get("email"));
   const password = String(form.get("password") ?? "");
   const values = { email };
-  if (!email || !password) return { ok: false, error: "Enter your email and password.", values };
+  if (!email || !password) return { ok: false, error: "Enter your email or username and your password.", values };
   if (loginLocked(email)) return { ok: false, error: "Too many failed attempts. Try again in 15 minutes.", values };
 
   // Default first sign-in (Admin / Admin), only while no admin account exists yet.
@@ -128,10 +129,11 @@ async function signIn(form: FormData): Promise<ActionResult> {
     }
   }
 
-  const user = (await readStore("users")).find((u) => u.email === email);
+  // Either their email or the username an administrator gave them.
+  const user = (await readStore("users")).find((u) => (u.email && u.email === email) || (u.username && u.username === email));
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
     recordLoginFailure(email);
-    return { ok: false, error: "Incorrect email or password.", values };
+    return { ok: false, error: "Incorrect email, username or password.", values };
   }
   clearLoginFailures(email);
   if (user.totpSecret) {
@@ -174,7 +176,7 @@ export async function startTwoFactorSetupAction(): Promise<ActionResult & { secr
     const user = await requireUser();
     const secret = generateTotpSecret();
     await updateStore("users", (items) => ({ items: items.map((u) => (u.id === user.id ? { ...u, totpPending: secret } : u)) }));
-    const qr = await QRCode.toDataURL(otpauthUrl(secret, user.email), { margin: 1, width: 220 });
+    const qr = await QRCode.toDataURL(otpauthUrl(secret, user.email || user.username || user.name), { margin: 1, width: 220 });
     return { ok: true, secret, qr };
   } catch (err) {
     if (err instanceof AuthError) return { ok: false, error: err.message };
@@ -325,6 +327,24 @@ export async function completeFirstLoginAction(_prev: ActionResult | null, form:
   }));
   await logActivity({ name }, "set their email and password after the first sign-in", name);
   redirect("/admin");
+}
+
+/** First sign-in with a password an administrator set: the person replaces it with their own. */
+export async function chooseOwnPasswordAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
+  const password = String(form.get("password") ?? "");
+  const confirm = String(form.get("confirm") ?? "");
+  const current = await getCurrentUser();
+  if (!current) redirect("/admin/login");
+  if (!current.mustChangePassword) redirect("/admin");
+  const weak = validatePasswordStrength(password);
+  if (weak) return { ok: false, error: weak };
+  if (password !== confirm) return { ok: false, error: "The two passwords don't match." };
+  const user = (await readStore("users")).find((u) => u.id === current.id);
+  if (user && (await verifyPassword(password, user.passwordHash))) return { ok: false, error: "Choose a new password, not the one you were given." };
+  const passwordHash = await hashPassword(password);
+  await updateStore("users", (items) => ({ items: items.map((u) => (u.id === current.id ? { ...u, passwordHash, mustChangePassword: false } : u)) }));
+  await logActivity({ name: current.name }, "chose their own password at first sign-in", current.name);
+  redirect("/admin?welcome=1");
 }
 
 export async function logoutAction() {
@@ -635,15 +655,20 @@ export async function deleteMediaAction(id: string): Promise<ActionResult> {
 
 export async function saveUserAction(
   originalId: string | null,
-  input: { name: string; email: string; role: Role; password?: string },
+  input: { name: string; email: string; username?: string; role: Role; password?: string; mustChangePassword?: boolean },
 ): Promise<ActionResult> {
   return guard(async () => {
     const actor = await requireUser("users");
     const name = input.name.trim();
     const email = input.email.trim().toLowerCase();
+    const username = (input.username ?? "").trim().toLowerCase();
     const errors: FieldErrors = {};
     if (!name) errors.name = "Enter a name.";
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.email = "Enter a valid email address.";
+    // They sign in with their email or a username (at least one); the email also receives password reset links.
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.email = "Enter a valid email address, or leave it blank and give a username.";
+    if (!email && !username) errors.username = "Give them a username or an email to sign in with.";
+    if (username && !USERNAME_PATTERN.test(username)) errors.username = "3 to 30 lower-case letters, numbers, dots, dashes or underscores (e.g. amina.bello).";
+    if (username === DEFAULT_ADMIN.username) errors.username = "That username is reserved. Choose another.";
     const roles = await readStore("roles");
     if (!roles.some((r) => r.id === input.role) && input.role !== "administrator") errors.role = "Choose a role.";
     if (!originalId || input.password) {
@@ -651,7 +676,8 @@ export async function saveUserAction(
       if (weak) errors.password = weak;
     }
     const users = await readStore("users");
-    if (users.some((u) => u.email === email && u.id !== originalId)) errors.email = "A user with this email already exists.";
+    if (email && users.some((u) => u.email === email && u.id !== originalId)) errors.email = "A user with this email already exists.";
+    if (username && users.some((u) => u.id !== originalId && (u.username === username || u.email === username))) errors.username = "That username is taken. Choose another.";
     if (originalId === actor.id && !resolveRole(input.role, roles).permissions.includes("users")) {
       errors.role = "You can't give yourself a role without access to Users & roles.";
     }
@@ -663,12 +689,17 @@ export async function saveUserAction(
       if (originalId) {
         return {
           items: items.map((u) =>
-            u.id === originalId ? { ...u, name, email, role: input.role, ...(passwordHash ? { passwordHash } : {}) } : u,
+            u.id === originalId
+              ? { ...u, name, email, username: username || undefined, role: input.role, ...(passwordHash ? { passwordHash, mustChangePassword: Boolean(input.mustChangePassword) } : {}) }
+              : u,
           ),
         };
       }
       return {
-        items: [...items, { id, name, email, role: input.role, passwordHash: passwordHash!, createdAt: new Date().toISOString() }],
+        items: [
+          ...items,
+          { id, name, email, ...(username ? { username } : {}), role: input.role, passwordHash: passwordHash!, createdAt: new Date().toISOString(), ...(input.mustChangePassword ? { mustChangePassword: true } : {}) },
+        ],
       };
     });
     await logActivity(actor, originalId ? "updated user" : "created user", `${name} (${resolveRole(input.role, roles).name})`, "/admin/users");

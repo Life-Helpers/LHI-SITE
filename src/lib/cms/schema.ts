@@ -78,6 +78,46 @@ export type Permission = (typeof PERMISSION_GROUPS)[number]["items"][number]["id
 
 export const ALL_PERMISSIONS: Permission[] = PERMISSION_GROUPS.flatMap((g) => g.items.map((i) => i.id));
 
+/** Every permission with its label and help, in menu order. */
+export const PERMISSION_ITEMS: { id: Permission; label: string; help: string; group: string }[] = PERMISSION_GROUPS.flatMap((g) =>
+  g.items.map((i): { id: Permission; label: string; help: string; group: string } => ({ id: i.id, label: i.label, help: i.help, group: g.label })),
+);
+
+/** Where each permission's work is done in the admin, so people see their functions as links. */
+export const PERMISSION_HOME: Record<Permission, string> = {
+  "posts.own": "/admin/content/posts",
+  "posts.all": "/admin/content/posts",
+  "posts.review": "/admin/content/posts",
+  media: "/admin/media",
+  "media.delete": "/admin/media",
+  comments: "/admin/comments",
+  episodes: "/admin/content/episodes",
+  events: "/admin/content/events",
+  magazines: "/admin/magazines",
+  about: "/admin/content/team",
+  homepage: "/admin/content/heroSlides",
+  impact: "/admin/content/impactReports",
+  pages: "/admin/content/thematicAreas",
+  interventions: "/admin/content/interventions",
+  states: "/admin/content/states",
+  partners: "/admin/content/partners",
+  documents: "/admin/content/documents",
+  submissions: "/admin/submissions",
+  "submissions.delete": "/admin/submissions",
+  jobs: "/admin/content/jobs",
+  tenders: "/admin/content/tenders",
+  training: "/admin/learners",
+  "training.manage": "/admin/learners",
+  newsletter: "/admin/newsletter",
+  email: "/admin/outbox",
+  users: "/admin/users",
+  settings: "/admin/settings",
+  activity: "/admin/activity",
+};
+
+/** A username: 3–30 lower-case letters, numbers, dots, dashes or underscores. */
+export const USERNAME_PATTERN = /^[a-z0-9][a-z0-9._-]{2,29}$/;
+
 export interface CmsRole {
   id: string;
   name: string;
@@ -881,7 +921,10 @@ export interface MediaItem {
 export interface CmsUser {
   id: string;
   name: string;
+  /** Sign-in email (also where password reset links go); may be empty for a username-only login. */
   email: string;
+  /** Optional short sign-in name set by an administrator, e.g. "amina.blog". */
+  username?: string;
   role: Role;
   passwordHash: string;
   createdAt: string;
@@ -890,7 +933,10 @@ export interface CmsUser {
   totpSecret?: string;
   /** Secret being set up, until the first code is confirmed. */
   totpPending?: string;
-  /** Signed in with the default Admin/Admin login: must set a real email and password before doing anything else. */
+  /**
+   * Must choose their own password before doing anything else: after the default Admin/Admin
+   * login, or when an administrator set the password and asked them to replace it.
+   */
   mustChangePassword?: boolean;
 }
 

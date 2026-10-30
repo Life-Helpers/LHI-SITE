@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Loader2, Lock } from "lucide-react";
 
-import { forgotPasswordAction, loginAction, resetPasswordAction, setupAction, verifyTwoFactorLoginAction, type ActionResult, completeFirstLoginAction } from "@/app/admin/actions";
+import { forgotPasswordAction, loginAction, resetPasswordAction, setupAction, verifyTwoFactorLoginAction, type ActionResult, completeFirstLoginAction, chooseOwnPasswordAction } from "@/app/admin/actions";
 
 const inputClass =
   "mt-1.5 block w-full rounded-lg border border-admin-border bg-admin-card px-3.5 py-2.5 text-sm text-admin-text outline-none placeholder:text-admin-muted focus:border-admin-primary focus:ring-3 focus:ring-admin-primary/20";
@@ -222,6 +222,41 @@ export function FirstLoginForm() {
           <input name="confirm" type="password" autoComplete="new-password" minLength={10} required className={inputClass} />
         </label>
         <SubmitButton pending={pending}>Save and open the dashboard</SubmitButton>
+      </form>
+    </AuthCard>
+  );
+}
+
+/**
+ * First sign-in with a password an administrator set: the person sees their role and what it lets
+ * them do, then chooses their own password.
+ */
+export function ChoosePasswordForm({ name, roleName, functions }: { name: string; roleName: string; functions: { label: string; help: string }[] }) {
+  const [state, action, pending] = useActionState(chooseOwnPasswordAction, null);
+  return (
+    <AuthCard title={`Welcome, ${name.split(" ")[0]}`} subtitle={`You're signed in as ${roleName}. Choose your own password to continue.`}>
+      <div className="mb-5 rounded-lg border border-admin-border bg-admin-bg p-4 text-sm" data-role-functions>
+        <p className="font-semibold">As {roleName}, you can:</p>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-admin-muted">
+          {functions.map((f) => (
+            <li key={f.label}>
+              <span className="font-medium text-admin-text">{f.label}</span>: {f.help}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <form action={action} className="space-y-4">
+        <ErrorBox state={state} />
+        <label className="block text-sm font-medium">
+          New password
+          <input name="password" type="password" autoComplete="new-password" minLength={10} required className={inputClass} />
+          <span className="mt-1 block text-xs font-normal text-admin-muted">At least 10 characters, with letters and numbers.</span>
+        </label>
+        <label className="block text-sm font-medium">
+          Confirm new password
+          <input name="confirm" type="password" autoComplete="new-password" minLength={10} required className={inputClass} />
+        </label>
+        <SubmitButton pending={pending}>Save and open my dashboard</SubmitButton>
       </form>
     </AuthCard>
   );

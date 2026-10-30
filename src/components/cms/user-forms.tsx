@@ -38,6 +38,9 @@ export function UserForm({ user, isSelf, roles }: { user?: PublicUser; isSelf?: 
   const router = useRouter();
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
+  const [username, setUsername] = useState(user?.username ?? "");
+  // A new user (or a password reset) chooses their own password at first sign-in, unless unticked.
+  const [mustChange, setMustChange] = useState(true);
   const [role, setRole] = useState<string>(user?.role ?? roles.find((r) => r.id === "author")?.id ?? roles[0]?.id ?? "");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -46,7 +49,7 @@ export function UserForm({ user, isSelf, roles }: { user?: PublicUser; isSelf?: 
 
   const submit = () =>
     startTransition(async () => {
-      const res = await saveUserAction(user?.id ?? null, { name, email, role, password: password || undefined });
+      const res = await saveUserAction(user?.id ?? null, { name, email, username, role, password: password || undefined, mustChangePassword: Boolean(password) && mustChange });
       setErrors(res.errors ?? {});
       if (!res.ok) {
         setNotice({ ok: false, text: res.error ?? "Save failed." });
@@ -75,9 +78,14 @@ export function UserForm({ user, isSelf, roles }: { user?: PublicUser; isSelf?: 
         <Row label="Name" error={errors.name}>
           <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} autoComplete="off" />
         </Row>
-        <Row label="Email" error={errors.email}>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} autoComplete="off" />
-        </Row>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Row label="Username" error={errors.username} help="What they type to sign in, e.g. amina.bello. Optional if they have an email.">
+            <input value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, "."))} className={inputClass} autoComplete="off" autoCapitalize="none" placeholder="e.g. amina.bello" />
+          </Row>
+          <Row label="Email" error={errors.email} help="They can sign in with it too, and it receives password reset links. Optional with a username.">
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} autoComplete="off" />
+          </Row>
+        </div>
         <fieldset>
           <legend className="text-sm font-semibold">Role</legend>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -117,6 +125,15 @@ export function UserForm({ user, isSelf, roles }: { user?: PublicUser; isSelf?: 
         >
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} autoComplete="new-password" />
         </Row>
+        {(!user || password) && !isSelf && (
+          <label className="flex items-start gap-2 text-sm">
+            <input type="checkbox" checked={mustChange} onChange={(e) => setMustChange(e.target.checked)} className="mt-1" />
+            <span>
+              Ask them to choose their own password when they first sign in
+              <span className="block text-xs text-admin-muted">They&apos;ll see their role and what it lets them do, then set a password only they know.</span>
+            </span>
+          </label>
+        )}
       </Card>
       <div className="flex items-center justify-between">
         {user && !isSelf ? (

@@ -121,9 +121,9 @@ export function resolveRole(roleId: string, roles: CmsRole[]): { name: string; p
 }
 
 export function toPublicUser(user: CmsUser, roles: CmsRole[] = BUILT_IN_ROLES): PublicUser {
-  const { id, name, email, role, createdAt, lastLoginAt, mustChangePassword } = user;
+  const { id, name, email, username, role, createdAt, lastLoginAt, mustChangePassword } = user;
   const resolved = resolveRole(role, roles);
-  return { id, name, email, role, createdAt, lastLoginAt, mustChangePassword, twoFactor: Boolean(user.totpSecret), roleName: resolved.name, permissions: resolved.permissions };
+  return { id, name, email, ...(username ? { username } : {}), role, createdAt, lastLoginAt, mustChangePassword, twoFactor: Boolean(user.totpSecret), roleName: resolved.name, permissions: resolved.permissions };
 }
 
 export async function getCurrentUser(): Promise<PublicUser | null> {
@@ -149,7 +149,7 @@ export class AuthError extends Error {}
 export async function requireUser(permission?: Permission): Promise<PublicUser> {
   const user = await getCurrentUser();
   if (!user) throw new AuthError("Your session has expired. Please log in again.");
-  if (user.mustChangePassword) throw new AuthError("Set your own email and password first.");
+  if (user.mustChangePassword) throw new AuthError("Choose your own password first.");
   if (!can(user, permission)) throw new AuthError("You don't have permission to do that.");
   return user;
 }
