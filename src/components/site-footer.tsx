@@ -65,9 +65,9 @@ export function SiteFooter() {
 
   return (
     <footer className="relative mt-20 border-t border-border bg-card/30 backdrop-blur-md">
-      <div className="mx-auto max-w-6xl px-4 pt-14 pb-12 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pt-12 pb-10 sm:px-6">
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
           {/* Brand & Contact summary */}
           <div className="lg:col-span-4 flex flex-col gap-4">
             <Link href="/" className="inline-block">
@@ -81,11 +81,11 @@ export function SiteFooter() {
                 className="h-9 w-auto sm:h-10"
               />
             </Link>
-            <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground leading-relaxed">
               {t.footer.tagline}
             </p>
 
-            <div className="mt-3 flex flex-col gap-2.5 text-xs text-muted-foreground">
+            <div className="mt-3 flex flex-col gap-2 text-xs leading-snug text-muted-foreground">
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 shrink-0 text-primary mt-0.5" aria-hidden="true" />
                 <span>
@@ -119,7 +119,7 @@ export function SiteFooter() {
               <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
                 {t.footer.whoWeAreHeading}
               </p>
-              <ul className="mt-3.5 flex flex-col gap-2">
+              <ul className="mt-3 flex flex-col gap-2.5 leading-snug">
                 {whoWeAreLinks.map((link) => (
                   <li key={link.href}>
                     <Link
@@ -138,7 +138,7 @@ export function SiteFooter() {
               <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
                 {t.footer.programsHeading}
               </p>
-              <ul className="mt-3.5 flex flex-col gap-2">
+              <ul className="mt-3 flex flex-col gap-2.5 leading-snug">
                 {programLinks.map((link) => (
                   <li key={link.href}>
                     <Link
@@ -157,7 +157,7 @@ export function SiteFooter() {
               <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
                 {t.footer.impactHeading}
               </p>
-              <ul className="mt-3.5 flex flex-col gap-2">
+              <ul className="mt-3 flex flex-col gap-2.5 leading-snug">
                 {impactLinks.map((link) => (
                   <li key={link.href}>
                     <Link
@@ -176,7 +176,7 @@ export function SiteFooter() {
               <p className="text-xs font-semibold uppercase tracking-wider text-foreground">
                 {t.footer.getInvolvedHeading}
               </p>
-              <ul className="mt-3.5 flex flex-col gap-2">
+              <ul className="mt-3 flex flex-col gap-2.5 leading-snug">
                 {getInvolvedLinks.map((link) => (
                   <li key={link.href}>
                     <Link
@@ -194,8 +194,8 @@ export function SiteFooter() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-border/80 px-4 py-6 sm:px-6">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-xs text-muted-foreground sm:flex-row">
+      <div className="border-t border-border/80 py-6">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 text-xs text-muted-foreground sm:flex-row sm:px-6">
           <div className="flex items-center gap-2 text-center sm:text-left">
             <ShieldCheck className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
             <span>
