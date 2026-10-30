@@ -69,75 +69,74 @@ interface NavGroup {
   items: NavItem[];
 }
 
+/**
+ * The admin menu, grouped by job and in the same order as the public site's menu (Home, Who we
+ * are, What we do, News, Impact, Get involved), with daily inbox work near the top.
+ */
 function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
   return [
-    { label: "Home", items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard }] },
+    { label: "Overview", items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard }] },
     {
-      label: "Content",
+      label: "Inbox",
       items: [
-        { label: "Blog & News Posts", href: "/admin/content/posts", icon: FileText, permission: "posts.own" },
-        { label: "Media Library", href: "/admin/media", icon: ImageIcon, permission: "media" },
+        { label: "Form Submissions", href: "/admin/submissions", icon: Inbox, permission: "submissions", badge: newSubmissions },
         { label: "Comments", href: "/admin/comments", icon: MessageSquare, permission: "comments", badge: pendingComments },
-        { label: "Radio Episodes", href: "/admin/content/episodes", icon: Radio, permission: "episodes" },
-        { label: "Events", href: "/admin/content/events", icon: CalendarDays, permission: "events" },
-        { label: "Magazines", href: "/admin/magazines", icon: BookOpen, permission: "magazines" },
       ],
     },
     {
       label: "Home Page",
       items: [
         { label: "Hero Slides", href: "/admin/content/heroSlides", icon: GalleryHorizontal, permission: "homepage" },
+        { label: "Home Page Text", href: "/admin/home-text", icon: Languages, permission: "settings" },
         { label: "Testimonials", href: "/admin/content/testimonials", icon: Quote, permission: "homepage" },
         { label: "Before & After", href: "/admin/content/beforeAfter", icon: Columns2, permission: "homepage" },
-        { label: "Home Page Text", href: "/admin/home-text", icon: Languages, permission: "settings" },
+        { label: "Partners & Logos", href: "/admin/content/partners", icon: Handshake, permission: "partners" },
       ],
     },
     {
-      label: "Pages",
+      label: "Who We Are",
       items: [
-        { label: "Thematic Area Pages", href: "/admin/content/thematicAreas", icon: Layers, permission: "pages" },
+        { label: "Team & Board", href: "/admin/content/team", icon: UsersRound, permission: "about" },
+        { label: "History Timeline", href: "/admin/content/milestones", icon: Route, permission: "about" },
         { label: "FAQs", href: "/admin/content/faqs", icon: CircleHelp, permission: "pages" },
-        { label: "Observance Days", href: "/admin/content/observances", icon: CalendarHeart, permission: "pages" },
       ],
     },
     {
-      label: "Impact & Emergencies",
+      label: "What We Do",
+      items: [
+        { label: "Thematic Areas", href: "/admin/content/thematicAreas", icon: Layers, permission: "pages" },
+        { label: "Projects & Interventions", href: "/admin/content/interventions", icon: FolderKanban, permission: "interventions" },
+        { label: "Office Map (States)", href: "/admin/content/states", icon: Map, permission: "states" },
+      ],
+    },
+    {
+      label: "News & Media",
+      items: [
+        { label: "Blog & News Posts", href: "/admin/content/posts", icon: FileText, permission: "posts.own" },
+        { label: "Events", href: "/admin/content/events", icon: CalendarDays, permission: "events" },
+        { label: "Observance Days", href: "/admin/content/observances", icon: CalendarHeart, permission: "pages" },
+        { label: "Radio Episodes", href: "/admin/content/episodes", icon: Radio, permission: "episodes" },
+        { label: "Magazines", href: "/admin/magazines", icon: BookOpen, permission: "magazines" },
+        { label: "Media Library", href: "/admin/media", icon: ImageIcon, permission: "media" },
+      ],
+    },
+    {
+      label: "Impact",
       items: [
         { label: "Impact Reports", href: "/admin/content/impactReports", icon: BarChart3, permission: "impact" },
         { label: "Emergencies & Alerts", href: "/admin/content/emergencies", icon: AlertTriangle, permission: "impact" },
       ],
     },
     {
-      label: "About LHI",
-      items: [
-        { label: "History Timeline", href: "/admin/content/milestones", icon: Route, permission: "about" },
-        { label: "Team", href: "/admin/content/team", icon: UsersRound, permission: "about" },
-      ],
-    },
-    {
-      label: "Programmes",
-      items: [
-        { label: "Interventions", href: "/admin/content/interventions", icon: FolderKanban, permission: "interventions" },
-        { label: "Map States", href: "/admin/content/states", icon: Map, permission: "states" },
-      ],
-    },
-    {
-      label: "Partnerships",
-      items: [
-        { label: "Partners & Logos", href: "/admin/content/partners", icon: Handshake, permission: "partners" },
-        { label: "Compliance Docs", href: "/admin/content/documents", icon: FileCheck2, permission: "documents" },
-        { label: "Submissions", href: "/admin/submissions", icon: Inbox, permission: "submissions", badge: newSubmissions },
-      ],
-    },
-    {
-      label: "Recruitment & Procurement",
+      label: "Get Involved",
       items: [
         { label: "Jobs & Vacancies", href: "/admin/content/jobs", icon: BriefcaseBusiness, permission: "jobs" },
         { label: "Vendor Requests", href: "/admin/content/tenders", icon: Gavel, permission: "tenders" },
+        { label: "Partner Portal Documents", href: "/admin/content/documents", icon: FileCheck2, permission: "documents" },
       ],
     },
     {
-      label: "Training",
+      label: "Training Centre",
       items: [
         { label: "Courses & Exams", href: "/admin/training", icon: BookOpenCheck, anyOf: ["training.content", "training.exams", "training.publish"] },
         { label: "Learners", href: "/admin/learners", icon: Users, permission: "training" },
@@ -145,7 +144,7 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
       ],
     },
     {
-      label: "Communications",
+      label: "Email & Newsletter",
       items: [
         { label: "Newsletter", href: "/admin/newsletter", icon: Newspaper, permission: "newsletter" },
         { label: "Email Outbox", href: "/admin/outbox", icon: Mail, permission: "email" },
@@ -156,8 +155,8 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
       items: [
         { label: "Users", href: "/admin/users", icon: Users, permission: "users" },
         { label: "Roles & Permissions", href: "/admin/users/roles", icon: ShieldCheck, permission: "users" },
-        { label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings" },
-        { label: "Email & Pop-up", href: "/admin/email-settings", icon: Mail, permission: "settings" },
+        { label: "Site Settings", href: "/admin/settings", icon: Settings, permission: "settings" },
+        { label: "Email & Pop-up Settings", href: "/admin/email-settings", icon: Mail, permission: "settings" },
         { label: "Activity Log", href: "/admin/activity", icon: Activity, permission: "activity" },
       ],
     },
