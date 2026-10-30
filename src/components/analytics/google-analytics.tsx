@@ -8,7 +8,9 @@ export function GoogleAnalytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   // Analytics only loads when a measurement ID is configured (NEXT_PUBLIC_GA_MEASUREMENT_ID).
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "";
+  // Only a real Google measurement ID (e.g. "G-ABC123XYZ") is used: it's written into a script below.
+  const raw = (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "").trim();
+  const gaId = /^G-[A-Z0-9]{4,20}$/.test(raw) ? raw : "";
 
   useEffect(() => {
     if (!gaId || typeof window === "undefined" || !(window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
