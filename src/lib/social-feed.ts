@@ -180,11 +180,11 @@ async function xItems(): Promise<SocialItem[]> {
 }
 
 /** Newest first, across every connected network. */
-export async function getSocialFeed(limit = 12): Promise<{ items: SocialItem[]; connected: SocialNetwork[] }> {
+export async function getSocialFeed(limit = 12, youtubeCount = YOUTUBE_ITEMS): Promise<{ items: SocialItem[]; connected: SocialNetwork[] }> {
   const sources: [SocialNetwork, () => Promise<SocialItem[]>][] = [
     ["facebook", facebookItems],
     ["instagram", instagramItems],
-    ["youtube", () => youtubeItems()],
+    ["youtube", () => youtubeItems(youtubeCount)],
     ["x", xItems],
   ];
   const results = await Promise.all(sources.map(([, load]) => load().catch(() => [] as SocialItem[])));
@@ -197,11 +197,6 @@ export async function getSocialFeed(limit = 12): Promise<{ items: SocialItem[]; 
   return { items, connected };
 }
 
-export interface PhoneVideo {
-  id: string;
-  title: string;
-}
-
 /** A video's title from YouTube's oEmbed (cached for a day), or null. */
 async function youtubeTitle(id: string): Promise<string | null> {
   const json = await getText(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}`, 86_400);
@@ -212,14 +207,11 @@ async function youtubeTitle(id: string): Promise<string | null> {
   }
 }
 
-/** LHI's NIDAKE film: shown when nothing else is set and the channel feed can't be reached. */
-const FALLBACK_VIDEO: PhoneVideo = { id: "45HZKC19AxY", title: "NIDAKE reusable sanitary pads" };
-
 /**
- * Videos for the home page phone when the Facebook timeline is switched off: the links chosen in
- * Admin → Site Settings (one per line, "link | title"), or else the channel's newest videos.
+ * Videos chosen in Admin → Site Settings (one YouTube link per line, optional "| title"), as wall
+ * cards in the order given. They have no date, so the card shows none.
  */
-export async function phoneVideos(links: string): Promise<PhoneVideo[]> {
+export async function chosenVideos(links: string): Promise<SocialItem[]> {
   const chosen = links
     .split("\n")
     .map((line) => {
@@ -227,9 +219,15 @@ export async function phoneVideos(links: string): Promise<PhoneVideo[]> {
       return { id: youtubeId(link ?? "") ?? "", title: title.join("|").trim() };
     })
     .filter((v) => v.id);
-  if (chosen.length) {
-    return Promise.all(chosen.map(async (v) => ({ id: v.id, title: v.title || (await youtubeTitle(v.id)) || "Life Helpers Initiative video" })));
-  }
-  const latest = (await youtubeItems(6)).map((i) => ({ id: i.id.replace(/^yt-/, ""), title: i.text }));
-  return latest.length ? latest : [FALLBACK_VIDEO];
+  return Promise.all(
+    chosen.map(async (v) => ({
+      id: `yt-${v.id}`,
+      network: "youtube" as const,
+      url: `https://www.youtube.com/watch?v=${v.id}`,
+      text: v.title || (await youtubeTitle(v.id)) || "Life Helpers Initiative video",
+      image: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
+      date: "",
+      video: true,
+    })),
+  );
 }

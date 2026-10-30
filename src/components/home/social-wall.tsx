@@ -22,7 +22,7 @@ const when = (iso: string) => {
 };
 
 /** Filterable masonry wall of recent social posts. */
-export function SocialWall({ items }: { items: SocialItem[] }) {
+export function SocialWall({ items, wide = false }: { items: SocialItem[]; /** Full width: three columns on large screens. */ wide?: boolean }) {
   const networks = [...new Set(items.map((i) => i.network))];
   const [filter, setFilter] = useState<SocialNetwork | "all">("all");
   const shown = filter === "all" ? items : items.filter((i) => i.network === filter);
@@ -52,7 +52,8 @@ export function SocialWall({ items }: { items: SocialItem[] }) {
         </div>
       )}
 
-      <ul className="columns-1 gap-4 sm:columns-2 [&>li]:mb-4">
+      {/* Beside the phone: a two-column masonry. Full width: a three-column grid that fills left to right. */}
+      <ul className={wide ? "grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3" : "columns-1 gap-4 sm:columns-2 [&>li]:mb-4"}>
         {shown.map((item) => {
           const a = ACCOUNT[item.network];
           return (
@@ -74,7 +75,13 @@ export function SocialWall({ items }: { items: SocialItem[] }) {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold text-foreground">Life Helpers Initiative</span>
                     <span className="block truncate text-xs text-muted-foreground">
-                      {a.handle} · <time dateTime={item.date}>{when(item.date)}</time>
+                      {a.handle}
+                      {item.date && (
+                        <>
+                          {" · "}
+                          <time dateTime={item.date}>{when(item.date)}</time>
+                        </>
+                      )}
                     </span>
                   </span>
                   <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" aria-hidden="true" />

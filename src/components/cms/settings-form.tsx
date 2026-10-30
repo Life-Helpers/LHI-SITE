@@ -176,7 +176,7 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
         </p>
       </Card>
 
-      <Card title="Home page: social media phone" bodyClassName="space-y-4 p-6">
+      <Card title="Home page: social media section" bodyClassName="space-y-4 p-6">
         <label className="flex items-start gap-3 text-sm" data-facebook-phone>
           <input
             type="checkbox"
@@ -185,15 +185,16 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
             className="mt-1 accent-admin-primary"
           />
           <span>
-            <span className="block font-semibold">Show the live Facebook page</span>
+            <span className="block font-semibold">Show the Facebook phone</span>
             <span className="block text-xs text-admin-muted">
-              On: the phone in &ldquo;Follow our work&rdquo; streams the Facebook timeline. Off: it plays LHI&apos;s YouTube videos instead.
+              On: a phone streaming the Facebook timeline sits beside the posts in &ldquo;Follow our work&rdquo;. Off: the phone is removed and the posts fill the
+              full width, with more YouTube videos.
             </span>
           </span>
         </label>
         <Row
-          label="YouTube videos to show when Facebook is off"
-          help="One YouTube link per line, optionally followed by | and a title. The first one plays first. Leave empty to show the channel's newest videos."
+          label="Extra YouTube videos to show when the phone is off"
+          help="Optional. One YouTube link per line, optionally followed by | and a title; they appear first, in this order. The channel's newest videos are always shown too."
         >
           <textarea
             value={s.socialPhone.videos}

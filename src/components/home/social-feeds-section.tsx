@@ -2,21 +2,26 @@ import { ExternalLink } from "lucide-react";
 
 import { SocialWall } from "@/components/home/social-wall";
 import { SOCIAL_ACCOUNTS, SocialIcon, socialAccounts } from "@/components/social-links";
-import { YoutubePhone } from "@/components/home/youtube-phone";
 import { getSettings, getSiteData } from "@/lib/cms/content";
-import { getSocialFeed, phoneVideos } from "@/lib/social-feed";
+import { chosenVideos, getSocialFeed } from "@/lib/social-feed";
 
 /**
  * "Follow our work": a live social media newsroom. The phone on the left streams the
- * official Facebook Page timeline (Meta's page plugin, always live), or LHI's YouTube videos when
- * Facebook is switched off in Admin → Site Settings. The wall on the right
+ * official Facebook Page timeline (Meta's page plugin, always live). With the phone switched off
+ * in Admin → Site Settings, the wall takes the full width with more YouTube videos (the ones
+ * chosen there first). The wall on the right
  * shows the newest posts from every connected account (see src/lib/social-feed.ts), and falls
  * back to follow cards for each channel until an account is connected.
  */
 export async function SocialFeedsSection() {
-  const [{ items }, { social }, { socialPhone }] = await Promise.all([getSocialFeed(10), getSiteData(), getSettings()]);
-  const videos = socialPhone.facebook ? [] : await phoneVideos(socialPhone.videos);
-  const youtube = social.youtube || (SOCIAL_ACCOUNTS.find((a) => a.name === "YouTube")?.href ?? "");
+  const { socialPhone } = await getSettings();
+  const showPhone = socialPhone.facebook;
+  const [feed, { social }, picked] = await Promise.all([
+    showPhone ? getSocialFeed(10) : getSocialFeed(12, 6),
+    getSiteData(),
+    showPhone ? Promise.resolve([]) : chosenVideos(socialPhone.videos),
+  ]);
+  const items = [...picked, ...feed.items.filter((i) => !picked.some((p) => p.id === i.id))].slice(0, showPhone ? 10 : 15);
   const accounts = socialAccounts(social);
   const fbPlugin = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(
     social.facebook,
@@ -69,51 +74,36 @@ export async function SocialFeedsSection() {
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
-          {/* Phone streaming the live Facebook timeline, or YouTube videos */}
-          <div className="lg:col-span-4">
-            <div className="relative mx-auto w-full max-w-[360px] rounded-[2.75rem] border border-border bg-gradient-to-b from-muted to-muted/40 p-3 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.35)]">
-              <div aria-hidden="true" className="absolute left-1/2 top-4 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-black" />
-              <div className="overflow-hidden rounded-[2.2rem] bg-white">
-                {socialPhone.facebook ? (
-                  <>
-                    <div className="flex items-center justify-between bg-[#0866FF] px-5 pb-3 pt-10 text-white">
-                      <span className="inline-flex items-center gap-2 text-sm font-semibold">
-                        <SocialIcon path={SOCIAL_ACCOUNTS[0].path} className="h-4 w-4" /> Live on Facebook
-                      </span>
-                      <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold hover:underline">
-                        Open <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                        <span className="sr-only">Facebook page (opens in a new tab)</span>
-                      </a>
-                    </div>
-                    <iframe
-                      src={fbPlugin}
-                      title="Life Helpers Initiative Facebook timeline"
-                      loading="lazy"
-                      className="h-[560px] w-full border-0 bg-white"
-                      allow="encrypted-media; picture-in-picture; web-share"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between bg-[#FF0000] px-5 pb-3 pt-10 text-white">
-                      <span className="inline-flex items-center gap-2 text-sm font-semibold">
-                        <SocialIcon path={(SOCIAL_ACCOUNTS.find((a) => a.name === "YouTube") ?? SOCIAL_ACCOUNTS[0]).path} className="h-4 w-4" /> Watch on YouTube
-                      </span>
-                      <a href={youtube} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold hover:underline">
-                        Channel <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                        <span className="sr-only">YouTube channel (opens in a new tab)</span>
-                      </a>
-                    </div>
-                    <YoutubePhone videos={videos} />
-                  </>
-                )}
+          {/* Phone streaming the live Facebook timeline (can be switched off in Site Settings) */}
+          {showPhone && (
+            <div className="lg:col-span-4">
+              <div className="relative mx-auto w-full max-w-[360px] rounded-[2.75rem] border border-border bg-gradient-to-b from-muted to-muted/40 p-3 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.35)]">
+                <div aria-hidden="true" className="absolute left-1/2 top-4 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-black" />
+                <div className="overflow-hidden rounded-[2.2rem] bg-white">
+                  <div className="flex items-center justify-between bg-[#0866FF] px-5 pb-3 pt-10 text-white">
+                    <span className="inline-flex items-center gap-2 text-sm font-semibold">
+                      <SocialIcon path={SOCIAL_ACCOUNTS[0].path} className="h-4 w-4" /> Live on Facebook
+                    </span>
+                    <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold hover:underline">
+                      Open <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                      <span className="sr-only">Facebook page (opens in a new tab)</span>
+                    </a>
+                  </div>
+                  <iframe
+                    src={fbPlugin}
+                    title="Life Helpers Initiative Facebook timeline"
+                    loading="lazy"
+                    className="h-[560px] w-full border-0 bg-white"
+                    allow="encrypted-media; picture-in-picture; web-share"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          <div className="lg:col-span-8">
+          <div className={showPhone ? "lg:col-span-8" : "lg:col-span-12"}>
             {items.length > 0 ? (
-              <SocialWall items={items} />
+              <SocialWall items={items} wide={!showPhone} />
             ) : (
               <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {accounts.filter((a) => a.name !== "Facebook").map((a, i) => (
