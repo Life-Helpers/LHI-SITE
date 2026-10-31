@@ -6,6 +6,9 @@ import postgres from "postgres";
 const scrypt = promisify(scryptCallback);
 const email = String(process.argv[2] ?? "").trim().toLowerCase();
 const name = String(process.argv[3] ?? "").trim();
+const reset = process.argv[4] === '--reset';
+const suppliedPassword = process.argv[5];
+if (reset && (!suppliedPassword || suppliedPassword.length < 16)) throw new Error('Reset requires a strong temporary password.');
 const databaseUrl = process.env.DATABASE_URL?.trim();
 
 if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
@@ -27,11 +30,13 @@ try {
     }
 
     const users = rows[0]?.data ?? [];
-    if (users.some((user) => user?.email?.toLowerCase() === email)) {
+    const matches = users.filter((user) => user?.email?.toLowerCase() === email);
+    if (reset && (matches.length !== 1 || matches[0].role !== 'administrator')) throw new Error('Expected exactly one existing administrator.');
+    if (!reset && matches.length) {
       throw new Error(`An account already exists for ${email}; no changes were made.`);
     }
 
-    const password = `LHI-${randomBytes(9).toString('base64url')}-9`;
+    const password = suppliedPassword ?? `LHI-${randomBytes(9).toString('base64url')}-9`;
     const salt = randomBytes(16);
     const hash = await scrypt(password, salt, 64);
     const user = {
@@ -44,9 +49,10 @@ try {
       mustChangePassword: true,
     };
 
+    const nextUsers = reset ? users.map((existing) => existing.id === matches[0].id ? { ...existing, passwordHash: user.passwordHash, mustChangePassword: true } : existing) : [...users, user];
     await tx`
       insert into cms_store (name, data, updated_at)
-      values ('users', ${tx.json([...users, user])}, now())
+      values ('users', ${tx.json(nextUsers)}, now())
       on conflict (name) do update set data = excluded.data, updated_at = now()
     `;
     return { email, password, role: user.role, mustChangePassword: true };
