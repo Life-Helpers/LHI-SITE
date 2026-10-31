@@ -22,11 +22,11 @@ try {
     // race with an administrator editing the user list.
     await tx`select pg_advisory_xact_lock(hashtext('cms:users'))`;
     const rows = await tx`select data from cms_store where name = 'users' for update`;
-    if (rows.length !== 1 || !Array.isArray(rows[0].data)) {
+    if (rows.length > 0 && !Array.isArray(rows[0].data)) {
       throw new Error('The deployed users collection is missing or invalid; no changes were made.');
     }
 
-    const users = rows[0].data;
+    const users = rows[0]?.data ?? [];
     if (users.some((user) => user?.email?.toLowerCase() === email)) {
       throw new Error(`An account already exists for ${email}; no changes were made.`);
     }
@@ -39,15 +39,15 @@ try {
       name,
       email,
       role: 'administrator',
-      passwordHash: `${salt.toString('base64')}.${hash.toString('base64')}`,
+      passwordHash: `scrypt$${salt.toString('base64')}$${hash.toString('base64')}`,
       createdAt: new Date().toISOString(),
       mustChangePassword: true,
     };
 
     await tx`
-      update cms_store
-      set data = ${tx.json([...users, user])}, updated_at = now()
-      where name = 'users'
+      insert into cms_store (name, data, updated_at)
+      values ('users', ${tx.json([...users, user])}, now())
+      on conflict (name) do update set data = excluded.data, updated_at = now()
     `;
     return { email, password, role: user.role, mustChangePassword: true };
   });
