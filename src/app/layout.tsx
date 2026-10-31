@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter, Sora } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 import { EmergencyAlertBanner } from "@/components/emergency-alert-banner";
@@ -23,26 +23,40 @@ import { DEFAULT_SITE_DATA } from "@/lib/site-data";
 import { siteConfig } from "@/config/site";
 import { jsonLdScript } from "@/lib/validation";
 
-const cormorant = Cormorant_Garamond({
+// Keep production builds independent of Google Fonts. These files come from the
+// version-locked Fontsource packages and are emitted with the app's static assets.
+const cormorant = localFont({
+  src: [
+    {
+      path: "../../node_modules/@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-normal.woff2",
+      weight: "300 700",
+      style: "normal",
+    },
+    {
+      path: "../../node_modules/@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-italic.woff2",
+      weight: "300 700",
+      style: "italic",
+    },
+  ],
   variable: "--font-cormorant",
-  subsets: ["latin"],
-  // Only the weights the site uses (headings are light, a few medium); fewer font files to download.
-  weight: ["300", "400", "500"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
-const sora = Sora({
+const sora = localFont({
+  src: "../../node_modules/@fontsource-variable/sora/files/sora-latin-wght-normal.woff2",
+  weight: "100 800",
+  style: "normal",
   variable: "--font-sora",
-  subsets: ["latin"],
   display: "swap",
   // Used for a few bold UI labels below the fold; no need to compete with above-the-fold fonts.
   preload: false,
 });
 
-const inter = Inter({
+const inter = localFont({
+  src: "../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
+  weight: "100 900",
+  style: "normal",
   variable: "--font-inter",
-  subsets: ["latin"],
   display: "swap",
 });
 
