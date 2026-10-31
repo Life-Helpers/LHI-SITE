@@ -42,7 +42,7 @@ COPY --from=build --chown=app:app /app/.next/static ./.next/static
 COPY --from=build --chown=app:app /app/public ./public
 # The one-time Neon copy script needs the database driver (Next.js bundles its own copy into the server).
 COPY --from=build --chown=app:app /app/node_modules/postgres ./node_modules/postgres
-COPY --chown=app:app scripts/migrate-from-neon.mjs scripts/docker-entrypoint.sh ./scripts/
+COPY --chown=app:app scripts/migrate-from-neon.mjs scripts/provision-admin.mjs scripts/docker-entrypoint.sh ./scripts/
 # The cache folder exists (owned by the app user) so a mounted volume can be written to.
 RUN mkdir -p /app/.next/cache && chown -R app:app /app/.next/cache
 USER app
