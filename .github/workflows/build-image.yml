@@ -6,8 +6,7 @@ name: Build and deploy
 #
 # Set up once (Settings -> Secrets and variables -> Actions):
 #   Secret   COOLIFY_TOKEN   a Coolify API token (Coolify -> Keys & Tokens -> API tokens, "deploy" access)
-#   Variable COOLIFY_URL     https://app.lhinigeria.org
-#   Variable COOLIFY_APP     the website's resource UUID in Coolify
+#   (optional) Variables COOLIFY_URL and COOLIFY_APP override the defaults below
 #   Variables NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_GA_MEASUREMENT_ID, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
 #             NEXT_PUBLIC_TURNSTILE_SITE_KEY  (public values baked into the browser code)
 # Without the Coolify settings the image is still built and pushed, and the deploy step is skipped.
@@ -50,7 +49,7 @@ jobs:
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:${{ github.sha }}
           build-args: |
-            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL }}
+            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL || 'https://lhinigeria.org' }}
             NEXT_PUBLIC_GA_MEASUREMENT_ID=${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
             NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
             NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
@@ -61,8 +60,9 @@ jobs:
       - name: Deploy on Coolify
         env:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
-          COOLIFY_URL: ${{ vars.COOLIFY_URL }}
-          COOLIFY_APP: ${{ vars.COOLIFY_APP }}
+          COOLIFY_URL: ${{ vars.COOLIFY_URL || 'https://app.lhinigeria.org' }}
+          # The LHI Nigeria Website resource in Coolify.
+          COOLIFY_APP: ${{ vars.COOLIFY_APP || 'd91i3mqbusnfylns7mh724l7' }}
         run: |
           if [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_URL" ] || [ -z "$COOLIFY_APP" ]; then
             echo "::notice::Coolify settings not set; image pushed, deploy skipped."
