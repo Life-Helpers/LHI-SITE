@@ -1,0 +1,267 @@
+// LHI TRAINING COURSE FILE
+// Upload in Admin -> Courses & Exams -> Upload course file. It arrives as a draft for review.
+
+Course ID:
+Title: Operations Essentials: Procurement, Logistics and Safety
+Subtitle: Buy fairly, store and move supplies well, and keep people and assets safe
+Level: Foundation
+Audience: Operations, logistics, admin and programme staff, drivers and store keepers
+Facilitator: LHI Operations & Logistics Unit
+Pass mark: 80
+Description: How LHI's operations keep programmes running: a fair and transparent procurement cycle, receiving and storing supplies, managing vehicles and movements, looking after assets, and the safety and security habits that protect staff in the field.
+
+=== LESSON: The procurement cycle ===
+Summary: From identifying a need to paying the supplier, fairly and transparently.
+Minutes: 7
+
+Procurement is how LHI buys goods, services and works. Good procurement gets value for money, treats suppliers fairly and leaves a clear record for donors and auditors.
+
+## The cycle
+1. Identify the need and raise a purchase requisition linked to the budget line.
+2. Choose the procurement method based on the value, following LHI's thresholds: a few written quotations for smaller purchases, an open tender for larger ones.
+3. Invite suppliers and receive quotations or bids by the deadline.
+4. Evaluate bids against criteria set in advance (price, quality, delivery time, experience), using a committee for larger purchases.
+5. Award the contract or issue a purchase order to the winning supplier.
+6. Receive and inspect the goods or services.
+7. Pay against the invoice and proof of delivery.
+
+## Principles
+- Transparency: the process and decision are documented.
+- Fair competition: all suppliers get the same information and deadline.
+- Conflicts of interest are declared, and the person steps back.
+- No splitting a purchase into smaller orders to stay under a threshold.
+
+[!warning] Gifts and favours
+Never accept gifts, money, meals or favours from current or potential suppliers. Politely refuse and tell your supervisor; this protects you as well as LHI.
+
+--- PRACTICE QUESTION ---
+Q: Why are evaluation criteria set before bids are opened?
+* So bids are judged fairly against the same standards, not adjusted to favour one supplier
+- So the evaluation takes longer
+- Because suppliers write the criteria
+Why: Pre-set criteria prevent the decision being shaped after seeing who bid.
+
+--- PRACTICE QUESTION ---
+Q: Splitting one large purchase into several smaller orders to avoid a tender is:
+- Good practice for speed
+* Not allowed
+- Required by donors
+Why: Order splitting bypasses the competition the thresholds require.
+
+=== LESSON: Receiving and storing supplies ===
+Summary: Inspecting deliveries, warehouse records and stock rotation.
+Minutes: 7
+
+Supplies such as food, hygiene kits and medicines are aid. Losing them to damage, expiry or theft takes help away from people.
+
+## Receiving a delivery
+- Check the goods against the purchase order and delivery note: item, quantity, specification, condition and expiry dates.
+- Record shortfalls or damage on the delivery note before signing, and report them.
+- Complete a goods received note (GRN) and update the stock card the same day.
+
+## Store keeping
+- Every item has a stock card or entry in the stock system showing receipts, issues and balance.
+- Goods leave the store only with an approved request and a waybill or issue voucher, signed by the person collecting.
+- Store items off the floor on pallets, away from walls, and keep the store clean, dry and secure.
+- Use FEFO (first expiry, first out) for items with expiry dates, and FIFO (first in, first out) for others.
+- Physical stock counts are done regularly and compared with the records; differences are investigated and reported.
+
+[!info] Two people for the keys
+Where possible, the store is opened by the store keeper in the presence of another staff member, and keys are never lent informally.
+
+--- PRACTICE QUESTION ---
+Q: A delivery has five damaged cartons. What do you do?
+- Sign the delivery note as received in full
+* Note the damage on the delivery note before signing, and report it
+- Return the whole delivery without recording it
+Why: Recording damage before signing protects LHI's right to replacement.
+
+--- PRACTICE QUESTION ---
+Q: Medicines with the earliest expiry date should be issued:
+* First (FEFO)
+- Last
+- Only after a stock count
+Why: First expiry, first out reduces waste from expired items.
+
+=== LESSON: Vehicles and movements ===
+Summary: Trip requests, logbooks, mileage and safe driving.
+Minutes: 6
+
+Vehicles are among LHI's most expensive and risky assets. Every trip must be authorised, recorded and safe.
+
+## Before the trip
+- Submit a vehicle request with the purpose, destination, passengers and timing, approved by your supervisor.
+- The driver completes a pre-trip check: fuel, tyres including the spare, lights, brakes, oil, first-aid kit and communication.
+- Movements to the field follow the security plan, including check-in times.
+
+## During and after
+- The logbook records start and end mileage, route, passengers and purpose for every trip.
+- Fuel is bought against receipts and recorded with the mileage, so fuel use can be checked.
+- Only authorised passengers travel; no unauthorised passengers, goods or personal use.
+
+## Safe driving
+- Seatbelts for everyone, every trip.
+- Respect speed limits and LHI's limits, which may be lower.
+- No phone use while driving, and no driving at night outside towns unless authorised.
+- Drivers take rest breaks on long journeys.
+
+[!warning] Hired vehicles follow the same rules
+Rented cars and buses carrying LHI staff or goods need the same request, logbook and mileage records as LHI's own vehicles. The HR Portal's vehicle module records start and end mileage for each hired car.
+
+--- PRACTICE QUESTION ---
+Q: What must be recorded in the vehicle logbook?
+* Start and end mileage, route, passengers and purpose
+- Only the driver's name
+- Nothing, if the trip is short
+Why: Complete logbooks let fuel and use be checked and justified.
+
+--- PRACTICE QUESTION ---
+Q: A community member asks for a lift in an LHI vehicle. The driver should:
+- Agree, since it is on the way
+* Politely refuse unless the passenger is authorised
+- Charge a small fee
+Why: Unauthorised passengers create security, insurance and reputation risks.
+
+=== LESSON: Asset management ===
+Summary: Registering, tagging, tracking and disposing of LHI's equipment.
+Minutes: 5
+
+Assets are equipment that lasts beyond a year, such as laptops, phones, generators, solar panels, furniture and vehicles. Many are bought with donor funds, and donors may decide what happens to them at the end of a project.
+
+## Looking after assets
+- Every asset is entered in the asset register with a tag number, description, serial number, location, funding source, purchase date, value and custodian.
+- The asset tag is attached to the item.
+- Staff sign for equipment they are given and return it when they leave or change role.
+- Asset checks compare the register with what is physically there, at least once a year.
+- Loss, damage or theft is reported straight away, with a police report for theft.
+
+## Disposal
+Assets are never sold, given away or written off informally. Disposal follows LHI's policy and the donor's rules, with approval and documentation. Donor-funded assets may need to be transferred to partners, the community or another project.
+
+[!info] Your signature matters
+When you sign for a laptop or phone, you become its custodian. Keep it safe, use it for LHI work and report problems promptly.
+
+--- PRACTICE QUESTION ---
+Q: A project ends and its generator is no longer needed. What happens?
+- The project manager takes it home
+* It is disposed of or transferred following LHI policy and donor rules, with approval
+- It is sold to the highest bidder in the market
+Why: Donor-funded assets need approved, documented disposal.
+
+--- PRACTICE QUESTION ---
+Q: Which information belongs in the asset register?
+* Tag number, serial number, location, funding source and custodian
+- Only the purchase price
+- The supplier's bank details
+Why: These details let each asset be found, checked and accounted for.
+
+=== LESSON: Safety and security in the field ===
+Summary: Security plans, movement tracking, communication and what to do in an incident.
+Minutes: 7
+
+LHI works in places affected by conflict, crime and natural hazards. Security is everyone's responsibility, and no programme activity is worth a staff member's life.
+
+## The basics
+- Read and follow the security plan for your state, including no-go areas and curfew times.
+- Movements to the field are authorised and tracked, with agreed check-in calls at departure, arrival and return.
+- Carry a charged phone, emergency contacts and your LHI ID.
+- Keep a low profile: no large amounts of cash, valuables or sensitive documents.
+- Listen to community leaders and local staff about the situation on the day.
+
+## Acceptance
+Our best protection is the trust of the communities we serve. Treat people with respect, keep our promises, stay impartial and explain who we are and what we do.
+
+## If something happens
+1. Your safety and the safety of others come first; comply with armed people and do not resist.
+2. Move to a safe place when you can.
+3. Contact your supervisor or the security focal point as soon as it is safe.
+4. Report the incident in writing, including near misses, so others can learn.
+
+[!warning] Missed check-in
+If a team misses a check-in, the security focal point follows the agreed procedure straight away. Never skip a check-in because "everything is fine".
+
+--- PRACTICE QUESTION ---
+Q: You are stopped at an unofficial checkpoint by armed men demanding the vehicle. You should:
+- Drive through quickly
+* Stay calm, comply and do not resist, then report when safe
+- Argue that LHI is neutral
+Why: Lives come first; vehicles and goods can be replaced.
+
+--- PRACTICE QUESTION ---
+Q: Why report near misses?
+* So risks are known and others can avoid them
+- They don't need reporting
+- To get someone in trouble
+Why: Near misses are warnings; sharing them prevents future incidents.
+
+=== FINAL EXAM ===
+
+--- QUESTION ---
+Q: What is the first step in the procurement cycle?
+- Paying the supplier
+* Identifying the need and raising an approved requisition
+- Choosing a favourite supplier
+- Receiving the goods
+
+--- QUESTION ---
+Q: A supplier offers you a gift during a tender. You should:
+- Accept it if it is small
+- Accept it and declare it later
+* Politely refuse and tell your supervisor
+- Share it with the team
+
+--- QUESTION ---
+Q: Which document records goods received into the store?
+- The vehicle logbook
+* The goods received note (GRN)
+- The asset register
+- The security plan
+
+--- QUESTION ---
+Q: Goods may leave the store when:
+- Anyone asks for them
+* There is an approved request and a signed waybill or issue voucher
+- The store keeper decides
+- The stock card is full
+
+--- QUESTION ---
+Q: Why are stock counts compared with the records?
+- To keep store keepers busy
+- To decide salaries
+- To change the records to match
+* To find and investigate losses, theft or errors
+
+--- QUESTION ---
+Q: Which is part of a driver's pre-trip check?
+* Tyres including the spare, fuel, lights, brakes and first-aid kit
+- Choosing a faster route than planned
+- Picking up extra passengers
+- Turning off the phone for the day
+
+--- QUESTION ---
+Q: Logbook mileage and fuel receipts are checked together to:
+- Make the driver's job harder
+* Confirm fuel use matches the distance driven
+- Calculate staff bonuses
+- Plan holidays
+
+--- QUESTION ---
+Q: An asset bought with donor funds is no longer needed. It can be:
+- Taken home by the last user
+- Sold informally to staff
+* Disposed of or transferred only with approval under LHI policy and donor rules
+- Left wherever it is
+
+--- QUESTION ---
+Q: What is "acceptance" in security?
+- Accepting every risk
+* Earning the community's trust through respect, impartiality and keeping promises
+- Accepting gifts from leaders
+- Avoiding communities altogether
+
+--- QUESTION ---
+Q: A field team misses its check-in call. What happens?
+- Nothing until the next day
+- Someone posts about it on social media
+- The team is disciplined on return
+* The security focal point follows the agreed procedure immediately

@@ -1,0 +1,261 @@
+// LHI TRAINING COURSE FILE
+// Upload in Admin -> Courses & Exams -> Upload course file. It arrives as a draft for review.
+
+Course ID:
+Title: Programme Cycle Management
+Subtitle: Design and deliver projects that are needed, safe, inclusive and well run
+Level: Foundation
+Audience: Programme officers, project leads, field staff and implementing partners
+Facilitator: LHI Programmes Directorate
+Pass mark: 80
+Description: How a project moves from an idea to a closed, well-documented intervention at LHI: assessing needs, designing with Do No Harm and protection in mind, targeting fairly with the community, implementing with partners and coordination bodies, and reporting and closing out responsibly.
+
+=== LESSON: The programme cycle ===
+Summary: The stages every LHI project goes through, and why each one matters.
+Minutes: 6
+
+Every project, whether a three-month emergency response or a three-year development programme, follows the same cycle. Skipping a stage almost always causes problems later.
+
+## The stages
+1. Needs assessment: understand the situation, the people affected and what they need.
+2. Design: decide what we will do, for whom, how, with what budget and how we will measure it.
+3. Resource mobilisation: write the proposal and secure funding.
+4. Implementation: deliver the activities with quality, on time and within budget.
+5. Monitoring: track progress and adapt as we go.
+6. Evaluation and learning: assess what changed and why.
+7. Close-out: finish activities responsibly, report and hand over.
+
+[!info] Communities are part of every stage
+People affected by a crisis are not just recipients. They help identify needs, shape the design, choose who is targeted, give feedback during implementation and judge the results.
+
+Programmes, MEAL, finance, operations, safeguarding and communications all play a part at each stage. A good project lead brings them in early, not at the reporting deadline.
+
+--- PRACTICE QUESTION ---
+Q: Which stage comes before design?
+- Implementation
+* Needs assessment
+- Close-out
+Why: We must understand needs before deciding what to do.
+
+--- PRACTICE QUESTION ---
+Q: When should other units such as finance and MEAL be involved?
+* From the start, at assessment and design
+- Only when the report is due
+- Only if there is a problem
+Why: Early involvement avoids budgeting, measurement and compliance problems later.
+
+=== LESSON: Needs assessment and design ===
+Summary: Finding out what people need, and designing a response that fits.
+Minutes: 8
+
+A needs assessment answers: who is affected, how, what they need most, what is already being provided, and what capacities exist in the community.
+
+## Sources of information
+- Existing data: government figures, cluster assessments, other agencies' reports.
+- Household surveys, focus group discussions with women, men, girls and boys separately, and key informant interviews.
+- Observation of markets, water points, health facilities and shelters.
+
+## Designing the response
+- Prioritise the most urgent needs and the most affected groups.
+- Choose the right modality: in-kind items, cash and vouchers, services, or a mix. Cash can work well where markets function and is safe to deliver.
+- Set clear objectives, results and indicators with MEAL.
+- Build a realistic workplan and budget with finance and operations.
+- Identify risks and how they will be managed.
+
+[!warning] Separate groups, separate voices
+Women and girls often cannot speak freely in mixed groups. Hold separate discussions, led by female staff where possible, so their needs are heard.
+
+--- PRACTICE QUESTION ---
+Q: Why hold separate focus group discussions for women and men?
+* So women and girls can speak freely about their needs
+- To save time
+- Because men's views don't matter
+Why: Mixed groups often silence women's and girls' concerns.
+
+--- PRACTICE QUESTION ---
+Q: Cash assistance is most suitable when:
+- Markets have no goods
+* Markets function and cash can be delivered safely
+- The donor prefers it, regardless of context
+Why: Cash only helps if people can buy what they need safely.
+
+=== LESSON: Do No Harm, protection and inclusion ===
+Summary: Making sure our help doesn't create new risks, and reaches everyone who needs it.
+Minutes: 8
+
+Aid can cause harm if it is poorly designed: a distribution that sparks conflict between communities, a water point that women must walk to at night, or targeting that excludes people with disabilities. Do No Harm means looking for these risks and designing them out.
+
+## Protection mainstreaming: four principles
+- Prioritise safety and dignity, and avoid causing harm.
+- Ensure meaningful access, without discrimination, especially for groups who face barriers.
+- Accountability: listen to communities and respond to their feedback and complaints.
+- Participation and empowerment: support people to claim their rights and take part in decisions.
+
+## Practical examples
+- Hold distributions in safe, accessible places at times that suit women, with separate queues and shade.
+- Make sure people with disabilities and older people can reach sites, or arrange home delivery.
+- Train all staff, volunteers and partners in safeguarding and the code of conduct.
+- Know the referral pathways for GBV, child protection and health services in each location.
+
+[!warning] Never promise what you can't deliver
+Raising expectations you can't meet damages trust and can put staff at risk. Be clear about what LHI will and won't provide.
+
+--- PRACTICE QUESTION ---
+Q: A distribution site can only be reached by crossing an unsafe area. What does Do No Harm require?
+- Continue, since the items are urgent
+* Change the site or timing to remove the risk
+- Ask people to travel in groups and accept the risk
+Why: We must not expose people to new dangers to receive aid.
+
+--- PRACTICE QUESTION ---
+Q: Which is a protection mainstreaming principle?
+* Meaningful access without discrimination
+- Serving only the easiest-to-reach communities
+- Keeping feedback mechanisms secret
+Why: Meaningful access ensures people facing barriers are reached.
+
+=== LESSON: Targeting and community engagement ===
+Summary: Choosing who is assisted fairly and transparently, together with the community.
+Minutes: 7
+
+Resources are always limited, so we must decide who receives assistance. Targeting must be fair, transparent and based on need, or it can cause conflict and exclusion.
+
+## Good targeting
+- Clear, needs-based criteria agreed with the community and explained publicly (for example, households headed by women, households with a person with a disability, or households without income).
+- Community-based targeting committees that include women, youth and people with disabilities, with checks to prevent favouritism.
+- Verification of lists by LHI staff through household visits or spot checks.
+- Publication of the criteria, and a way to appeal or complain about the list.
+
+## Engaging the community
+- Introduce the project to traditional, religious and local government leaders, and to community members directly.
+- Share information in local languages, by radio, community meetings and town criers as well as written notices.
+- Explain how to give feedback and complain, and that assistance is free.
+
+[!warning] Aid is always free
+Nobody may be asked to pay, provide favours or give anything in return for being registered or receiving assistance. Any such demand is a serious violation and must be reported.
+
+--- PRACTICE QUESTION ---
+Q: A ward head insists that his relatives be added to the beneficiary list. You should:
+- Add them to keep good relations
+* Explain the agreed criteria, verify all households against them, and report undue pressure to your supervisor
+- Remove other people to make space
+Why: Targeting must follow the agreed, needs-based criteria for everyone.
+
+--- PRACTICE QUESTION ---
+Q: Why publish the targeting criteria?
+* So the process is transparent and people can raise concerns
+- To make the list longer
+- Because donors forbid it otherwise
+Why: Transparency builds trust and helps catch errors and favouritism.
+
+=== LESSON: Partners, coordination, reporting and close-out ===
+Summary: Working with partners and coordination bodies, reporting well and ending projects responsibly.
+Minutes: 7
+
+## Working with partners
+LHI often works with local organisations, community structures and government ministries. Good partnerships are based on mutual respect, clear agreements, capacity strengthening and shared accountability. Partners are assessed before agreements are signed, and they follow the same safeguarding, financial and data protection standards.
+
+## Coordination
+Take part in the relevant coordination meetings: humanitarian sector or cluster meetings, state working groups and local government forums. Share where LHI works and what it does, using the 4W format (who, what, where, when), to avoid duplication and fill gaps.
+
+## Reporting
+- Know the donor's reporting calendar and templates from the start.
+- Combine figures from MEAL, finance and operations so the narrative and financial reports agree.
+- Explain variances honestly and describe how challenges were managed.
+
+## Close-out
+1. Tell the community and leaders well in advance when and how the project will end.
+2. Complete or hand over remaining activities and referrals responsibly.
+3. Dispose of or transfer assets according to policy and donor rules.
+4. Close accounts, contracts and partner agreements.
+5. Submit final reports and archive project records for the required period.
+6. Hold a lessons-learned session.
+
+[!info] Plan the exit from the start
+Projects that build local ownership from the beginning, such as training community committees or working through government services, leave lasting results when funding ends.
+
+--- PRACTICE QUESTION ---
+Q: What is the purpose of sharing 4W information with the cluster?
+* To avoid duplication and identify gaps in assistance
+- To advertise LHI
+- To compete with other agencies
+Why: Coordination makes the overall response more complete and efficient.
+
+--- PRACTICE QUESTION ---
+Q: When should a community be told the project is ending?
+- On the last day
+- Never, to avoid disappointment
+* Well in advance, with a clear explanation
+Why: Advance notice allows people to plan and protects trust.
+
+=== FINAL EXAM ===
+
+--- QUESTION ---
+Q: Which is the correct order of the first stages of the programme cycle?
+- Implementation, assessment, design
+* Needs assessment, design, resource mobilisation
+- Design, close-out, assessment
+- Evaluation, design, assessment
+
+--- QUESTION ---
+Q: Which source gives a needs assessment the views of affected people directly?
+- Only government figures
+* Household surveys and separate focus group discussions
+- The donor's proposal template
+- Last year's budget
+
+--- QUESTION ---
+Q: Do No Harm means:
+- Doing as little as possible
+* Identifying and designing out risks that our assistance could create
+- Avoiding work in insecure areas entirely
+- Only working with men
+
+--- QUESTION ---
+Q: Which practice supports meaningful access?
+- Holding distributions far from town to avoid crowds
+- One queue for everyone at midday
+* Accessible sites, separate queues, and home delivery for those who cannot travel
+- Requiring printed ID that many people do not have
+
+--- QUESTION ---
+Q: Targeting criteria should be:
+- Kept secret to prevent complaints
+- Chosen by the most powerful leader
+- Changed for each household
+* Needs-based, agreed with the community and published
+
+--- QUESTION ---
+Q: A volunteer asks beneficiaries for ₦500 to be added to the list. This is:
+- Acceptable to cover transport
+* A serious violation that must be reported
+- Normal practice in some places
+- A matter for the volunteer's conscience
+
+--- QUESTION ---
+Q: Partner organisations are expected to:
+- Follow their own rules only
+* Meet the same safeguarding, financial and data protection standards
+- Avoid reporting to LHI
+- Handle all coordination for LHI
+
+--- QUESTION ---
+Q: The "4W" shared with coordination bodies stands for:
+- Water, Wash, Women, Work
+* Who, What, Where, When
+- Weekly Work With Wards
+- Why, Which, Whose, Where
+
+--- QUESTION ---
+Q: Why must narrative and financial reports agree?
+- Donors only read one of them
+* Because inconsistent reports raise compliance concerns and undermine trust
+- To make reports longer
+- They don't need to agree
+
+--- QUESTION ---
+Q: Which is part of a responsible close-out?
+- Leaving without informing the community
+- Taking assets to the next project without approval
+* Informing the community in advance, completing referrals and archiving records
+- Deleting project files to save space

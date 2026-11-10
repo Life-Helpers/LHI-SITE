@@ -1,0 +1,261 @@
+// LHI TRAINING COURSE FILE
+// Upload in Admin -> Courses & Exams -> Upload course file. It arrives as a draft for review.
+
+Course ID:
+Title: Financial Management and Donor Compliance
+Subtitle: Spend donor funds correctly, document everything and prevent fraud
+Level: Foundation
+Audience: Programme, finance, operations and field staff who request, approve or spend project funds
+Facilitator: LHI Finance & Grants Unit
+Pass mark: 80
+Description: The financial essentials every budget holder and field officer at LHI needs: the principles of good stewardship, working within a budget, supporting documents, cash advances and retirement, preventing fraud and corruption, and staying compliant with donor rules so costs are never disallowed.
+
+=== LESSON: Principles of good financial management ===
+Summary: Why we are stewards of donor money, and the principles behind every financial rule.
+Minutes: 6
+
+Every naira LHI spends was given in trust, to help specific people in a specific way. Good financial management protects that trust, the people we serve and every staff member who handles money.
+
+## The core principles
+- Stewardship: use resources carefully, for the purpose they were given.
+- Accountability: be able to explain and justify every transaction.
+- Transparency: keep records open to managers, auditors and donors.
+- Integrity: be honest, avoid conflicts of interest and never use funds for personal gain.
+- Segregation of duties: no single person requests, approves, pays and records the same transaction.
+- Value for money: get the best result for the cost, not just the cheapest price.
+
+[!info] Follow LHI's Finance Manual
+This course explains the principles. The exact approval limits, thresholds and forms are set out in LHI's Finance Manual and procurement policy, which always take precedence. Ask Finance if you are unsure.
+
+--- PRACTICE QUESTION ---
+Q: Why does segregation of duties matter?
+* It stops any one person controlling a transaction from start to finish, which reduces error and fraud
+- It makes payments faster
+- It means only Finance does any work
+Why: Splitting request, approval, payment and recording builds in checks.
+
+--- PRACTICE QUESTION ---
+Q: Value for money means:
+- Always choosing the cheapest option
+* Getting the best result for the cost, including quality and timeliness
+- Spending the whole budget before the deadline
+Why: The cheapest item can be poor value if it fails or arrives late.
+
+=== LESSON: Budgets and budget monitoring ===
+Summary: Budget lines, charging costs correctly and tracking spending against the plan.
+Minutes: 7
+
+A project budget is a contract with the donor. It sets out how much can be spent on each budget line, for which activities, and over which period.
+
+## Charging costs correctly
+- Charge each cost to the correct project and budget line, using the project and activity codes Finance provides.
+- Only charge costs that relate to the project and fall within its start and end dates.
+- Shared costs, such as an office used by several projects, are split using an agreed, documented method, never by guesswork.
+
+## Budget versus actual
+Budget holders review a budget versus actual (BvA) report every month with Finance. It shows, for each line, what was budgeted, what has been spent and what remains.
+
+## What to watch for
+- Underspending: activities are behind schedule; plan how to catch up or request a revision.
+- Overspending: a line will run out; stop and agree a solution before spending more.
+- Burn rate: is spending on track for the time that has passed?
+
+[!warning] Ask before moving money between lines
+Most donors allow only small variations between budget lines without written approval. Larger changes need a formal budget revision approved by the donor before the money is spent.
+
+--- PRACTICE QUESTION ---
+Q: A training costs more than its budget line. What do you do?
+- Charge the extra to any line with money left
+* Raise it with Finance and the grants team before spending, so approval can be sought if needed
+- Ask the vendor to split the invoice across two projects
+Why: Moving costs between lines may need donor approval first.
+
+--- PRACTICE QUESTION ---
+Q: A monthly budget versus actual review helps you:
+* See early whether spending is on track, under or over budget
+- Avoid talking to Finance
+- Decide staff salaries
+Why: Regular review allows problems to be fixed before they become disallowed costs.
+
+=== LESSON: Supporting documents and the audit trail ===
+Summary: What every payment needs on file so it can be traced, checked and defended.
+Minutes: 7
+
+An auditor should be able to pick any transaction and follow it from the original request to the final payment and delivery. That chain of documents is the audit trail. If a document is missing, the donor may treat the cost as ineligible and LHI must repay it from its own funds.
+
+## A complete payment file usually contains
+1. An approved request or purchase requisition, linked to the budget line.
+2. Quotations or bids, as required by the procurement thresholds.
+3. A purchase order or contract.
+4. Proof of delivery: a delivery note, goods received note or signed completion of service.
+5. The supplier's invoice or receipt.
+6. Payment approval and proof of payment.
+
+## For activities with participants
+- Attendance sheets with names, signatures or thumbprints, dates and location.
+- Distribution lists signed by recipients.
+- Transport reimbursement lists signed by those paid.
+
+[!warning] Documents must be genuine and contemporaneous
+Never create, backdate or alter a document, or ask a vendor for a receipt for something that did not happen. This is fraud, even if the money was spent on the project.
+
+--- PRACTICE QUESTION ---
+Q: A cost has no proof of delivery. What may happen at audit?
+- Nothing, if the invoice is present
+* The donor may disallow the cost and LHI must repay it
+- The auditor will create the missing document
+Why: Without evidence that goods or services were received, the cost cannot be verified.
+
+--- PRACTICE QUESTION ---
+Q: A participant list is lost after a training. A colleague suggests rewriting it from memory and signing on behalf of participants. This is:
+- Acceptable if the training really happened
+* Fraud, which must not be done
+- Required by donors
+Why: Creating documents after the fact is falsification; report the loss honestly instead.
+
+=== LESSON: Cash, advances and retirement ===
+Summary: Handling cash safely, and accounting for every advance on time.
+Minutes: 6
+
+Cash is the riskiest way to pay. Use bank transfers wherever possible, including for suppliers, staff and, where feasible, participants.
+
+## When cash is used
+- Keep it in a locked cash box or safe, with access limited to the named custodian.
+- Count it regularly and record every movement in the petty cash book.
+- Get a signed receipt for every payment.
+- Never mix project cash with personal money.
+
+## Advances and retirement
+An advance is money given to a staff member to spend on approved activities, such as field transport or a training venue. Retirement means accounting for it.
+1. Request the advance with a budget for the specific activity, and get approval.
+2. Spend it only on the approved items.
+3. Retire it within the deadline in LHI's Finance Manual, with original receipts and supporting documents.
+4. Return any unspent balance at the same time.
+
+[!warning] Outstanding advances
+A new advance is not normally given while a previous one is unretired, and unretired advances may be recovered from salary under LHI policy.
+
+--- PRACTICE QUESTION ---
+Q: After a field activity, you have money left over from your advance. You should:
+- Keep it for the next activity
+* Return it to Finance when you retire the advance
+- Share it with the field team
+Why: Unspent balances are returned at retirement.
+
+--- PRACTICE QUESTION ---
+Q: Which payment method is preferred wherever possible?
+- Cash
+* Bank transfer
+- Airtime
+Why: Transfers leave a clear record and reduce theft and error.
+
+=== LESSON: Fraud, corruption and donor compliance ===
+Summary: Recognising red flags, conflicts of interest, and the donor rules that make costs eligible.
+Minutes: 8
+
+LHI has zero tolerance for fraud, bribery and corruption. They take aid away from people in need, and a single case can end a donor partnership.
+
+## Red flags to watch for
+- Vendors who always win, or quotes that look alike in format and handwriting.
+- Pressure to skip procurement steps "because it is urgent".
+- Invoices for round amounts with no detail, or from unknown companies.
+- Beneficiary lists with repeated names, phone numbers or signatures.
+- A staff member who never takes leave or refuses to share their work.
+
+## Conflicts of interest
+A conflict of interest arises when your personal interests, or those of family and friends, could influence your work decisions, such as a relative bidding for a contract. Declare it in writing and step back from the decision.
+
+## Donor compliance
+- Eligible costs are necessary for the project, within the budget, within the project dates, properly documented and compliant with donor rules.
+- Many donors prohibit certain costs, such as alcohol, fines, entertainment, or purchases from sanctioned individuals and organisations.
+- Partners and suppliers are screened against sanctions lists before contracts are signed.
+- Keep records for the period the donor requires, often several years after the project ends.
+
+[!warning] Report it
+If you suspect fraud or corruption, report it through LHI's whistleblowing channel or to the Finance Director or Executive Director. Reports are treated confidentially, and LHI does not tolerate retaliation against anyone who reports in good faith.
+
+--- PRACTICE QUESTION ---
+Q: Your brother's company submits a bid for a project you manage. You should:
+- Help him improve the bid
+- Say nothing and score all bids fairly
+* Declare the conflict of interest in writing and step back from the evaluation
+Why: Declaring and stepping back protects you, LHI and the process.
+
+--- PRACTICE QUESTION ---
+Q: Which of these is a fraud red flag?
+* Three "competing" quotes with the same handwriting and layout
+- A supplier who delivers on time
+- A complete payment file
+Why: Look-alike quotes suggest the competition was faked.
+
+=== FINAL EXAM ===
+
+--- QUESTION ---
+Q: What does stewardship mean in financial management?
+- Spending the budget as fast as possible
+* Using resources carefully, for the purpose they were given
+- Keeping all money in cash
+- Letting donors decide every payment
+
+--- QUESTION ---
+Q: Which arrangement shows good segregation of duties?
+- One officer requests, approves and pays the same invoice
+* Different people request, approve, pay and record a transaction
+- The vendor approves their own invoice
+- Finance signs blank cheques in advance
+
+--- QUESTION ---
+Q: A shared office is used by three projects. How is the rent charged?
+- All to the project with the most money
+- Split however the budget holder prefers each month
+* Split using an agreed, documented method
+- It is never charged to projects
+
+--- QUESTION ---
+Q: Before moving a large amount between budget lines you should:
+- Just do it and explain in the final report
+* Get approval, including donor approval where required, before spending
+- Ask the vendor to change the invoice
+- Delete the original budget
+
+--- QUESTION ---
+Q: Which document proves that goods were received?
+- The purchase requisition
+- The quotation
+* The delivery note or goods received note
+- The budget
+
+--- QUESTION ---
+Q: Retiring an advance means:
+* Accounting for it with receipts and returning any unspent balance
+- Spending the whole amount
+- Asking for a new advance
+- Keeping the receipts at home
+
+--- QUESTION ---
+Q: Which of these is a conflict of interest?
+- Choosing the best value supplier after a fair process
+* Evaluating a bid from a company owned by your spouse
+- Working with a long-standing partner organisation
+- Attending a training run by a donor
+
+--- QUESTION ---
+Q: A cost is usually eligible for donor funding when it is:
+- Approved by any staff member
+- Paid in cash
+* Necessary, within the budget and project dates, documented and allowed by donor rules
+- Incurred after the project ended
+
+--- QUESTION ---
+Q: Why are partners and suppliers screened against sanctions lists?
+- To check their prices
+- To speed up payment
+- To choose the cheapest
+* To make sure donor funds never reach prohibited individuals or organisations
+
+--- QUESTION ---
+Q: You suspect a colleague is inflating fuel receipts. You should:
+- Confront them publicly
+- Ignore it unless it happens again
+* Report it confidentially through the whistleblowing channel or to senior management
+- Inflate your own receipts to balance it out
