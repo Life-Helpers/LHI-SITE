@@ -287,7 +287,7 @@ export function seedSettings(): CmsSettings {
       autoApproveComments: false,
       alertEmail: siteConfig.contact.email,
     },
-    socialPhone: { facebook: true, videos: "" },
+    socialPhone: { facebook: true, videos: "", linkedin: "" },
     popup: { enabled: true, campaign: "1" },
     email: { enabled: false, provider: "mailgun", domain: "", region: "us", from: "", replyTo: "", keyHint: "" },
   };

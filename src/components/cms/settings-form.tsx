@@ -185,16 +185,15 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
             className="mt-1 accent-admin-primary"
           />
           <span>
-            <span className="block font-semibold">Show the Facebook phone</span>
+            <span className="block font-semibold">Show the Facebook feed</span>
             <span className="block text-xs text-admin-muted">
-              On: a phone streaming the Facebook timeline sits beside the posts in &ldquo;Follow our work&rdquo;. Off: the phone is removed and the posts fill the
-              full width, with more YouTube videos.
+              On: &ldquo;Follow our work&rdquo; shows three feeds side by side: Facebook, YouTube and LinkedIn. Off: only YouTube and LinkedIn.
             </span>
           </span>
         </label>
         <Row
-          label="Extra YouTube videos to show when the phone is off"
-          help="Optional. One YouTube link per line, optionally followed by | and a title; they appear first, in this order. The channel's newest videos are always shown too."
+          label="YouTube videos to show first"
+          help="Optional. One YouTube link per line, optionally followed by | and a title; the first plays in the YouTube feed and the rest are listed under it. The channel's newest videos fill the rest."
         >
           <textarea
             value={s.socialPhone.videos}
@@ -202,6 +201,18 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
             rows={5}
             className={`${inputClass} font-mono text-xs`}
             placeholder={"https://www.youtube.com/watch?v=45HZKC19AxY | NIDAKE reusable pads\nhttps://youtu.be/..."}
+          />
+        </Row>
+        <Row
+          label="LinkedIn posts to show"
+          help="LinkedIn has no free live feed, so choose the posts here: on LinkedIn, open a post's ••• menu, choose “Copy link to post” and paste it on its own line. Newest first, up to 6. With none, the panel invites visitors to follow the page."
+        >
+          <textarea
+            value={s.socialPhone.linkedin}
+            onChange={(e) => set("socialPhone", "linkedin", e.target.value)}
+            rows={4}
+            className={`${inputClass} font-mono text-xs`}
+            placeholder={"https://www.linkedin.com/posts/life-helpers-initiative_...-activity-7254321987654321098-AbCd"}
           />
         </Row>
       </Card>

@@ -909,6 +909,8 @@ export interface CmsSettings {
     facebook: boolean;
     /** YouTube links to play there (one per line, optional "| title"); empty uses the channel's newest videos. */
     videos: string;
+    /** LinkedIn post links to show in the LinkedIn panel, one per line, newest first. */
+    linkedin: string;
   };
   /** The newsletter sign-up pop-up. Each visitor sees it once per `campaign`. */
   popup: {

@@ -1,31 +1,51 @@
-import { ExternalLink } from "lucide-react";
+import type { ReactNode } from "react";
+import { ExternalLink, Play } from "lucide-react";
 
-import { SocialWall } from "@/components/home/social-wall";
 import { SOCIAL_ACCOUNTS, SocialIcon, socialAccounts } from "@/components/social-links";
 import { getSettings, getSiteData } from "@/lib/cms/content";
-import { chosenVideos, getSocialFeed } from "@/lib/social-feed";
+import { linkedinEmbed } from "@/lib/linkedin";
+import { chosenVideos, youtubeItems } from "@/lib/social-feed";
+import { youtubeId } from "@/lib/youtube";
+
+const brand = (name: string) => SOCIAL_ACCOUNTS.find((a) => a.name === name)!;
+
+/** One network's feed: a header in the network's colour with a link to the account, then the feed itself. */
+function FeedPanel({ name, label, href, children }: { name: string; label: string; href: string; children: ReactNode }) {
+  const a = brand(name);
+  return (
+    <div className="flex min-w-0 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+      <div className="flex items-center justify-between gap-3 px-5 py-3.5 text-white" style={{ backgroundColor: a.color }}>
+        <span className="inline-flex items-center gap-2 text-sm font-semibold">
+          <SocialIcon path={a.path} className="h-4 w-4" /> {label}
+        </span>
+        <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold hover:underline">
+          Open <ExternalLink className="h-3 w-3" aria-hidden="true" />
+          <span className="sr-only">{name} (opens in a new tab)</span>
+        </a>
+      </div>
+      <div className="h-[560px] overflow-y-auto">{children}</div>
+    </div>
+  );
+}
 
 /**
- * "Follow our work": a live social media newsroom. The phone on the left streams the
- * official Facebook Page timeline (Meta's page plugin, always live). With the phone switched off
- * in Admin → Site Settings, the wall takes the full width with more YouTube videos (the ones
- * chosen there first). The wall on the right
- * shows the newest posts from every connected account (see src/lib/social-feed.ts), and falls
- * back to follow cards for each channel until an account is connected.
+ * "Follow our work": three live feeds side by side. Facebook streams the Page timeline (Meta's page
+ * plugin; can be switched off in Admin → Site Settings), YouTube plays the newest video (or the first one
+ * chosen in Site Settings) with more listed under it, and LinkedIn shows the posts chosen in Site Settings,
+ * because LinkedIn has no free live feed of a company page.
  */
 export async function SocialFeedsSection() {
   const { socialPhone } = await getSettings();
-  const showPhone = socialPhone.facebook;
-  const [feed, { social }, picked] = await Promise.all([
-    showPhone ? getSocialFeed(10) : getSocialFeed(12, 6),
-    getSiteData(),
-    showPhone ? Promise.resolve([]) : chosenVideos(socialPhone.videos),
-  ]);
-  const items = [...picked, ...feed.items.filter((i) => !picked.some((p) => p.id === i.id))].slice(0, showPhone ? 10 : 15);
+  const showFacebook = socialPhone.facebook;
+  const [{ social }, picked, latest] = await Promise.all([getSiteData(), chosenVideos(socialPhone.videos), youtubeItems(5)]);
+  const videos = [...picked, ...latest.filter((i) => !picked.some((p) => p.id === i.id))].slice(0, 5);
+  const [first, ...more] = videos;
+  const firstId = first ? youtubeId(first.url) : null;
+  const linkedinPosts = (socialPhone.linkedin ?? "").split("\n").map(linkedinEmbed).filter((u): u is string => Boolean(u));
   const accounts = socialAccounts(social);
   const fbPlugin = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(
     social.facebook,
-  )}&tabs=timeline&width=340&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
+  )}&tabs=timeline&width=500&height=560&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
 
   return (
     <section aria-labelledby="social-heading" className="border-t border-border/60 bg-background py-20 text-foreground sm:py-28">
@@ -73,67 +93,95 @@ export async function SocialFeedsSection() {
           </ul>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
-          {/* Phone streaming the live Facebook timeline (can be switched off in Site Settings) */}
-          {showPhone && (
-            <div className="lg:col-span-4">
-              <div className="relative mx-auto w-full max-w-[360px] rounded-[2.75rem] border border-border bg-gradient-to-b from-muted to-muted/40 p-3 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.35)]">
-                <div aria-hidden="true" className="absolute left-1/2 top-4 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-black" />
-                <div className="overflow-hidden rounded-[2.2rem] bg-white">
-                  <div className="flex items-center justify-between bg-[#0866FF] px-5 pb-3 pt-10 text-white">
-                    <span className="inline-flex items-center gap-2 text-sm font-semibold">
-                      <SocialIcon path={SOCIAL_ACCOUNTS[0].path} className="h-4 w-4" /> Live on Facebook
-                    </span>
-                    <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold hover:underline">
-                      Open <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                      <span className="sr-only">Facebook page (opens in a new tab)</span>
-                    </a>
-                  </div>
-                  <iframe
-                    src={fbPlugin}
-                    title="Life Helpers Initiative Facebook timeline"
-                    loading="lazy"
-                    className="h-[560px] w-full border-0 bg-white"
-                    allow="encrypted-media; picture-in-picture; web-share"
-                  />
-                </div>
-              </div>
-            </div>
+        <div className={`mt-12 grid grid-cols-1 gap-6 ${showFacebook ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>
+          {showFacebook && (
+            <FeedPanel name="Facebook" label="Live on Facebook" href={social.facebook}>
+              <iframe
+                src={fbPlugin}
+                title="Life Helpers Initiative Facebook timeline"
+                loading="lazy"
+                className="h-full w-full border-0 bg-white"
+                allow="encrypted-media; picture-in-picture; web-share"
+              />
+            </FeedPanel>
           )}
 
-          <div className={showPhone ? "lg:col-span-8" : "lg:col-span-12"}>
-            {items.length > 0 ? (
-              <SocialWall items={items} wide={!showPhone} />
+          <FeedPanel name="YouTube" label="Latest on YouTube" href={social.youtube}>
+            {firstId ? (
+              <div className="space-y-4 p-4">
+                <div className="aspect-video overflow-hidden rounded-xl bg-black">
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${firstId}`}
+                    title={first.text}
+                    loading="lazy"
+                    className="h-full w-full border-0"
+                    allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+                <p className="text-sm font-semibold leading-snug">{first.text}</p>
+                {more.length > 0 && (
+                  <ul className="space-y-3 border-t border-border pt-4" aria-label="More videos">
+                    {more.map((v) => (
+                      <li key={v.id}>
+                        <a href={v.url} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3">
+                          <span className="relative w-28 shrink-0 overflow-hidden rounded-lg bg-muted">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={v.image} alt="" loading="lazy" className="aspect-video w-full object-cover" />
+                            <span className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+                              <Play className="h-5 w-5 fill-white text-white drop-shadow" />
+                            </span>
+                          </span>
+                          <span className="line-clamp-3 text-sm leading-snug text-foreground/85 group-hover:text-foreground group-hover:underline">
+                            {v.text}
+                            <span className="sr-only"> (opens YouTube in a new tab)</span>
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             ) : (
-              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {accounts.filter((a) => a.name !== "Facebook").map((a, i) => (
-                  <li key={a.name} className={i === 0 ? "sm:col-span-2" : ""}>
-                    <a
-                      href={a.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group relative flex h-full min-h-40 flex-col justify-between overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-foreground/20 hover:shadow-md"
-                    >
-                      <SocialIcon path={a.path} className="absolute -bottom-6 -right-4 h-32 w-32 text-foreground/[0.05]" />
-                      <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl text-white" style={{ backgroundColor: a.color }}>
-                        <SocialIcon path={a.path} className="h-5 w-5" />
-                      </span>
-                      <span className="relative mt-6">
-                        <span className="block font-serif-display text-2xl font-light">{a.name}</span>
-                        <span className="block text-sm text-muted-foreground">{a.handle}</span>
-                      </span>
-                      <span className="relative mt-4 inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground">
-                        {a.name === "Linktree" ? "All our links" : a.name === "YouTube" ? "Watch" : "Follow"} <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                        <span className="sr-only">(opens in a new tab)</span>
-                      </span>
-                    </a>
+              <FollowCard name="YouTube" href={social.youtube} action="Watch our videos" />
+            )}
+          </FeedPanel>
+
+          <FeedPanel name="LinkedIn" label="On LinkedIn" href={social.linkedin}>
+            {linkedinPosts.length > 0 ? (
+              <ul className="space-y-4 bg-muted/40 p-4">
+                {linkedinPosts.map((src, i) => (
+                  <li key={src} className="overflow-hidden rounded-xl bg-white">
+                    <iframe src={src} title={`Life Helpers Initiative LinkedIn post ${i + 1}`} loading="lazy" className="h-[520px] w-full border-0" />
                   </li>
                 ))}
               </ul>
+            ) : (
+              <FollowCard name="LinkedIn" href={social.linkedin} action="Follow us on LinkedIn" />
             )}
-          </div>
+          </FeedPanel>
         </div>
       </div>
     </section>
+  );
+}
+
+/** Shown in a panel when it has nothing to play yet: the account, and a link to follow it. */
+function FollowCard({ name, href, action }: { name: string; href: string; action: string }) {
+  const a = brand(name);
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="group flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
+      <span className="flex h-16 w-16 items-center justify-center rounded-2xl text-white" style={{ backgroundColor: a.color }}>
+        <SocialIcon path={a.path} className="h-7 w-7" />
+      </span>
+      <span>
+        <span className="block font-serif-display text-2xl font-light">Life Helpers Initiative</span>
+        <span className="block text-sm text-muted-foreground">{a.handle}</span>
+      </span>
+      <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground">
+        {action} <ExternalLink className="h-3 w-3" aria-hidden="true" />
+        <span className="sr-only">(opens in a new tab)</span>
+      </span>
+    </a>
   );
 }

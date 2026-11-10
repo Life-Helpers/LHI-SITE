@@ -46,6 +46,7 @@ import {
 } from "@/lib/cms/schema";
 import { readSettings, readStore, updateStore, writeSettings } from "@/lib/cms/store";
 import { deleteFile } from "@/lib/cms/files";
+import { linkedinEmbed } from "@/lib/linkedin";
 import { youtubeId } from "@/lib/youtube";
 import type { FieldErrors } from "@/lib/cms/validate";
 import { validateRecord } from "@/lib/cms/validate";
@@ -556,6 +557,13 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
           .map((l) => l.trim())
           .filter((l) => youtubeId(l.split("|")[0].trim()))
           .slice(0, 12)
+          .join("\n"),
+        // LinkedIn post links only, one per line, at most 6.
+        linkedin: str(settings.socialPhone?.linkedin, 3000)
+          .split("\n")
+          .map((l) => l.trim())
+          .filter((l) => linkedinEmbed(l))
+          .slice(0, 6)
           .join("\n"),
       },
       // Set on the Email & Pop-up screen.
