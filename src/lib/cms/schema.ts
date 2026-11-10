@@ -905,12 +905,14 @@ export interface CmsSettings {
   };
   /** The phone in the home page's "Follow our work" section. */
   socialPhone: {
-    /** Stream the Facebook Page timeline; when off, the phone plays YouTube videos instead. */
+    /** Show each feed panel in "Follow our work". */
     facebook: boolean;
-    /** YouTube links to play there (one per line, optional "| title"); empty uses the channel's newest videos. */
+    youtube: boolean;
+    linkedin: boolean;
+    /** YouTube links to play first (one per line, optional "| title"); the channel's newest videos fill the rest. */
     videos: string;
     /** LinkedIn post links to show in the LinkedIn panel, one per line, newest first. */
-    linkedin: string;
+    linkedinPosts: string;
   };
   /** The newsletter sign-up pop-up. Each visitor sees it once per `campaign`. */
   popup: {

@@ -177,20 +177,30 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
       </Card>
 
       <Card title="Home page: social media section" bodyClassName="space-y-4 p-6">
-        <label className="flex items-start gap-3 text-sm" data-facebook-phone>
-          <input
-            type="checkbox"
-            checked={s.socialPhone.facebook}
-            onChange={(e) => set("socialPhone", "facebook", e.target.checked)}
-            className="mt-1 accent-admin-primary"
-          />
-          <span>
-            <span className="block font-semibold">Show the Facebook feed</span>
-            <span className="block text-xs text-admin-muted">
-              On: &ldquo;Follow our work&rdquo; shows three feeds side by side: Facebook, YouTube and LinkedIn. Off: only YouTube and LinkedIn.
-            </span>
-          </span>
-        </label>
+        <fieldset className="space-y-3">
+          <legend className="text-sm font-semibold">Feeds to show in &ldquo;Follow our work&rdquo;</legend>
+          <p className="text-xs text-admin-muted">Each feed you switch on appears as its own panel, side by side. Switch them all off to show only the links to our accounts.</p>
+          {(
+            [
+              ["facebook", "Facebook", "The live timeline of our Facebook Page."],
+              ["youtube", "YouTube", "Our newest video, with more listed under it."],
+              ["linkedin", "LinkedIn", "The LinkedIn posts chosen below."],
+            ] as const
+          ).map(([key, name, help]) => (
+            <label key={key} className="flex items-start gap-3 text-sm" {...(key === "facebook" ? { "data-facebook-phone": "" } : {})}>
+              <input
+                type="checkbox"
+                checked={s.socialPhone[key]}
+                onChange={(e) => set("socialPhone", key, e.target.checked)}
+                className="mt-1 accent-admin-primary"
+              />
+              <span>
+                <span className="block font-semibold">Show the {name} feed</span>
+                <span className="block text-xs text-admin-muted">{help}</span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
         <Row
           label="YouTube videos to show first"
           help="Optional. One YouTube link per line, optionally followed by | and a title; the first plays in the YouTube feed and the rest are listed under it. The channel's newest videos fill the rest."
@@ -208,8 +218,8 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
           help="LinkedIn has no free live feed, so choose the posts here: on LinkedIn, open a post's ••• menu, choose “Copy link to post” and paste it on its own line. Newest first, up to 6. With none, the panel invites visitors to follow the page."
         >
           <textarea
-            value={s.socialPhone.linkedin}
-            onChange={(e) => set("socialPhone", "linkedin", e.target.value)}
+            value={s.socialPhone.linkedinPosts}
+            onChange={(e) => set("socialPhone", "linkedinPosts", e.target.value)}
             rows={4}
             className={`${inputClass} font-mono text-xs`}
             placeholder={"https://www.linkedin.com/posts/life-helpers-initiative_...-activity-7254321987654321098-AbCd"}

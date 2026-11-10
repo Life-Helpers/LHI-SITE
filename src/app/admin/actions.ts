@@ -551,6 +551,8 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
       },
       socialPhone: {
         facebook: settings.socialPhone?.facebook !== false,
+        youtube: settings.socialPhone?.youtube !== false,
+        linkedin: settings.socialPhone?.linkedin !== false,
         // YouTube links only, one per line, at most 12.
         videos: str(settings.socialPhone?.videos, 3000)
           .split("\n")
@@ -559,7 +561,7 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
           .slice(0, 12)
           .join("\n"),
         // LinkedIn post links only, one per line, at most 6.
-        linkedin: str(settings.socialPhone?.linkedin, 3000)
+        linkedinPosts: str(settings.socialPhone?.linkedinPosts, 3000)
           .split("\n")
           .map((l) => l.trim())
           .filter((l) => linkedinEmbed(l))

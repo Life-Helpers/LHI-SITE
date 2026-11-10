@@ -36,13 +36,19 @@ function FeedPanel({ name, label, href, children }: { name: string; label: strin
  */
 export async function SocialFeedsSection() {
   const { socialPhone } = await getSettings();
-  const showFacebook = socialPhone.facebook;
-  const [{ social }, picked, latest] = await Promise.all([getSiteData(), chosenVideos(socialPhone.videos), youtubeItems(5)]);
+  const { facebook: showFacebook, youtube: showYoutube, linkedin: showLinkedin } = socialPhone;
+  const [{ social }, picked, latest] = await Promise.all([
+    getSiteData(),
+    showYoutube ? chosenVideos(socialPhone.videos) : [],
+    showYoutube ? youtubeItems(5) : [],
+  ]);
   const videos = [...picked, ...latest.filter((i) => !picked.some((p) => p.id === i.id))].slice(0, 5);
   const [first, ...more] = videos;
   const firstId = first ? youtubeId(first.url) : null;
-  const linkedinPosts = (socialPhone.linkedin ?? "").split("\n").map(linkedinEmbed).filter((u): u is string => Boolean(u));
+  const linkedinPosts = (socialPhone.linkedinPosts ?? "").split("\n").map(linkedinEmbed).filter((u): u is string => Boolean(u));
   const accounts = socialAccounts(social);
+  const panels = [showFacebook, showYoutube, showLinkedin].filter(Boolean).length;
+  const columns = panels === 3 ? "lg:grid-cols-3" : panels === 2 ? "md:grid-cols-2" : "mx-auto max-w-xl";
   const fbPlugin = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(
     social.facebook,
   )}&tabs=timeline&width=500&height=560&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
@@ -93,7 +99,8 @@ export async function SocialFeedsSection() {
           </ul>
         </div>
 
-        <div className={`mt-12 grid grid-cols-1 gap-6 ${showFacebook ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>
+        {panels > 0 && (
+        <div className={`mt-12 grid grid-cols-1 gap-6 ${columns}`}>
           {showFacebook && (
             <FeedPanel name="Facebook" label="Live on Facebook" href={social.facebook}>
               <iframe
@@ -106,6 +113,7 @@ export async function SocialFeedsSection() {
             </FeedPanel>
           )}
 
+          {showYoutube && (
           <FeedPanel name="YouTube" label="Latest on YouTube" href={social.youtube}>
             {firstId ? (
               <div className="space-y-4 p-4">
@@ -146,7 +154,9 @@ export async function SocialFeedsSection() {
               <FollowCard name="YouTube" href={social.youtube} action="Watch our videos" />
             )}
           </FeedPanel>
+          )}
 
+          {showLinkedin && (
           <FeedPanel name="LinkedIn" label="On LinkedIn" href={social.linkedin}>
             {linkedinPosts.length > 0 ? (
               <ul className="space-y-4 bg-muted/40 p-4">
@@ -160,7 +170,9 @@ export async function SocialFeedsSection() {
               <FollowCard name="LinkedIn" href={social.linkedin} action="Follow us on LinkedIn" />
             )}
           </FeedPanel>
+          )}
         </div>
+        )}
       </div>
     </section>
   );
