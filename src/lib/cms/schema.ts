@@ -470,6 +470,12 @@ export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
       { name: "summary", label: "Summary", type: "textarea", required: true, help: "Two or three sentences shown on the vacancy card." },
       { name: "description", label: "Full job description", type: "markdown", required: true, help: "Background, responsibilities, reporting line. Markdown supported." },
       { name: "requirements", label: "Qualifications & requirements", type: "list", help: "One per line." },
+      {
+        name: "keywords",
+        label: "Screening keywords (not shown on the site)",
+        type: "list",
+        help: "One per line, e.g. MEAL, KoboToolbox, Hausa. Each CV is scored by how many it mentions; write alternatives on one line as \"M&E / MEAL\". Re-screen applicants in Recruitment after changing these.",
+      },
       { name: "location", label: "Duty station", type: "text", required: true, help: "e.g. Sokoto (with travel to project LGAs)" },
       { name: "status", label: "Status", type: "select", sidebar: true, required: true, options: [{ value: "open", label: "Open" }, { value: "closed", label: "Closed" }, { value: "draft", label: "Draft" }] },
       { name: "department", label: "Department / unit", type: "select", sidebar: true, required: true, options: opts("Programmes", "Health & Nutrition", "Education", "Livelihood & Agriculture", "Protection & Gender", "MEAL", "Finance & Grants", "Human Resources & Administration", "Logistics & Procurement", "Safeguarding & Accountability", "Communications") },
@@ -978,8 +984,37 @@ export interface SubmissionReview {
   stage: string;
   score?: number;
   notes: { id: string; author: string; text: string; at: string }[];
+  /** A job application's interview, once scheduled. */
+  interview?: Interview;
   updatedAt: string;
   updatedBy: string;
+}
+
+export interface Interview {
+  /** Local date and time in Lagos, "YYYY-MM-DDTHH:MM". */
+  at: string;
+  minutes: number;
+  mode: "In person" | "Video call" | "Phone call";
+  /** Address, meeting link or the number we will call. */
+  where: string;
+  message: string;
+  scheduledBy: string;
+  scheduledAt: string;
+  /** Whether the candidate was emailed the invitation. */
+  emailed: boolean;
+}
+
+/** How well a CV matches the vacancy's screening keywords. */
+export interface Screening {
+  /** 0–100: the share of keywords the CV mentions. */
+  score: number;
+  matched: string[];
+  missing: string[];
+  /** False when the CV's text could not be read, even by OCR; the score is then 0. */
+  readable: boolean;
+  /** A scanned CV still being read by OCR in the background; the score follows in a minute or two. */
+  pending?: boolean;
+  at: string;
 }
 
 export interface Submission {
@@ -994,6 +1029,10 @@ export interface Submission {
   /** Private uploads (CVs, quotations) served only to signed-in editors. */
   attachments?: { filename: string; stored: string; size: number }[];
   review?: SubmissionReview;
+  /** Job applications: the vacancy applied for (absent on applications made before this was kept). */
+  jobId?: string;
+  /** Job applications: keyword screening of the CV. */
+  screening?: Screening;
   createdAt: string;
 }
 

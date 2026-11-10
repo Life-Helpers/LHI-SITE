@@ -28,6 +28,7 @@ import {
   FolderKanban,
   GraduationCap,
   BriefcaseBusiness,
+  UserSearch,
   Gavel,
   Handshake,
   ImageIcon,
@@ -131,6 +132,7 @@ function buildNav(newSubmissions: number, pendingComments: number): NavGroup[] {
       label: "Get Involved",
       items: [
         { label: "Jobs & Vacancies", href: "/admin/content/jobs", icon: BriefcaseBusiness, permission: "jobs" },
+        { label: "Recruitment", href: "/admin/recruitment", icon: UserSearch, permission: "submissions" },
         { label: "Vendor Requests", href: "/admin/content/tenders", icon: Gavel, permission: "tenders" },
         { label: "Partner Portal Documents", href: "/admin/content/documents", icon: FileCheck2, permission: "documents" },
       ],

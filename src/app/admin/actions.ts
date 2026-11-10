@@ -608,7 +608,14 @@ export async function updateSubmissionReviewAction(id: string, input: { stage: s
           ? {
               ...s,
               status: s.status === "new" ? "read" : s.status,
-              review: { stage: input.stage, ...(score !== undefined ? { score } : {}), notes: s.review?.notes ?? [], updatedAt: new Date().toISOString(), updatedBy: user.name },
+              review: {
+                stage: input.stage,
+                ...(score !== undefined ? { score } : {}),
+                notes: s.review?.notes ?? [],
+                ...(s.review?.interview ? { interview: s.review.interview } : {}),
+                updatedAt: new Date().toISOString(),
+                updatedBy: user.name,
+              },
             }
           : s,
       ),

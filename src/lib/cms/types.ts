@@ -65,6 +65,8 @@ export interface CmsJob {
   summary: string;
   description: string;
   requirements: string[];
+  /** Words a good CV mentions; used to score applications. Never shown on the site. */
+  keywords?: string[];
   location: string;
   status: "open" | "closed" | "draft";
   department: string;
