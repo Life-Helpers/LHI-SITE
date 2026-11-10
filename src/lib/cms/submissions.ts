@@ -17,6 +17,8 @@ export async function addSubmission(input: {
   organization?: string;
   fields: Record<string, unknown>;
   attachments?: Submission["attachments"];
+  jobId?: string;
+  screening?: Submission["screening"];
 }): Promise<Submission> {
   const fields = Object.fromEntries(
     Object.entries(input.fields)
@@ -33,6 +35,8 @@ export async function addSubmission(input: {
     organization: input.organization?.slice(0, 200),
     fields,
     ...(input.attachments?.length ? { attachments: input.attachments } : {}),
+    ...(input.jobId ? { jobId: input.jobId } : {}),
+    ...(input.screening ? { screening: input.screening } : {}),
     createdAt: new Date().toISOString(),
   };
   await updateStore("submissions", (items) => ({ items: [submission, ...items].slice(0, MAX_SUBMISSIONS) }));

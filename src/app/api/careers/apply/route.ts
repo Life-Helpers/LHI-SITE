@@ -4,6 +4,8 @@ import { getJob } from "@/lib/cms/content";
 import { file, isEmail, text } from "@/lib/cms/form-data";
 import { savePrivateUpload } from "@/lib/cms/private-uploads";
 import { addSubmission } from "@/lib/cms/submissions";
+import { cvText } from "@/lib/recruitment/cv-text";
+import { screenCv } from "@/lib/recruitment/screening";
 import { checkSpam } from "@/lib/spam";
 
 export async function POST(req: NextRequest) {
@@ -32,6 +34,7 @@ export async function POST(req: NextRequest) {
   if (!cv) return NextResponse.json({ error: "Attach your CV (PDF or Word, max 5 MB)." }, { status: 400 });
   const stored = await savePrivateUpload(cv, "applications");
   if (typeof stored === "string") return NextResponse.json({ error: stored }, { status: 400 });
+  const screening = screenCv(await cvText(new Uint8Array(await cv.arrayBuffer()), cv.name), job.keywords ?? []);
 
   await addSubmission({
     type: "job-application",
@@ -48,6 +51,8 @@ export async function POST(req: NextRequest) {
       coverLetter: text(form, "coverLetter", 5000),
     },
     attachments: [stored],
+    jobId: job.id,
+    screening,
   });
 
   return NextResponse.json({ ok: true });
