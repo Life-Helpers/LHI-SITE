@@ -44,7 +44,7 @@ export default async function UsersPage() {
             {users.map((u) => (
               <tr key={u.id} className={`border-b border-admin-border last:border-0 hover:bg-admin-bg/60 ${u.disabled ? "opacity-60" : ""}`}>
                 <td className="px-5 py-3">
-                  <Link href={u.id === me.id ? "/admin/profile" : `/admin/users/${u.id}`} className="font-semibold hover:text-admin-primary">
+                  <Link href={`/admin/users/${u.id}`} className="font-semibold hover:text-admin-primary">
                     {u.name}
                   </Link>
                   {u.id === me.id && <span className="ml-2 text-xs text-admin-muted">(you)</span>}

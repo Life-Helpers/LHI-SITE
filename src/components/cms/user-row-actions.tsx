@@ -46,7 +46,8 @@ export function UserRowActions({ id, name, disabled, isMe }: { id: string; name:
   if (isMe) {
     return (
       <div className="flex justify-end">
-        <IconAction href="/admin/profile" label="Edit my profile" tip="My profile">
+        {/* The full edit page (name, email, username) handles your own account; Profile can't change the email. */}
+        <IconAction href={`/admin/users/${id}`} label="Edit my account" tip="Edit my account">
           <SquarePen className="h-[18px] w-[18px]" />
         </IconAction>
       </div>
