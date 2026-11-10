@@ -71,7 +71,7 @@ export default async function VacancyApplicantsPage({ params }: { params: Promis
                       <Link href={`/admin/submissions/${s.id}`} className="block rounded-lg border border-admin-border bg-admin-card p-3 text-sm hover:border-admin-primary">
                         <span className="flex items-start justify-between gap-2">
                           <span className={`min-w-0 truncate ${s.status === "new" ? "font-bold" : "font-semibold"}`}>{s.name}</span>
-                          {s.screening && <Badge tone={matchTone(s)}>{s.screening.readable ? `${s.screening.score}%` : "CV unreadable"}</Badge>}
+                          {s.screening && <Badge tone={matchTone(s)}>{s.screening.pending ? "Reading scan…" : s.screening.readable ? `${s.screening.score}%` : "CV unreadable"}</Badge>}
                         </span>
                         {s.screening?.matched.length ? <span className="mt-1 line-clamp-2 block text-xs text-admin-muted">{s.screening.matched.join(" · ")}</span> : null}
                         {s.review?.interview && (

@@ -85,9 +85,11 @@ export default async function SubmissionDetailPage({ params }: { params: Promise
           >
             {!s.screening ? (
               <p className="text-sm text-admin-muted">Not screened yet. Open the vacancy in Recruitment and press Re-screen CVs.</p>
+            ) : s.screening.pending ? (
+              <p className="text-sm text-admin-muted">The CV is a scanned image and is being read by text recognition (OCR). Refresh in a minute or two for its score.</p>
             ) : !s.screening.readable ? (
               <p className="text-sm text-admin-muted">
-                The CV&apos;s text couldn&apos;t be read (a scanned image or an old Word .doc file), so it has no keyword score. Read the CV yourself.
+                The CV&apos;s text couldn&apos;t be read, even by text recognition (OCR): it may be a blurry scan, a photo or a damaged file. Read the CV yourself.
               </p>
             ) : (
               <div className="space-y-3 text-sm">

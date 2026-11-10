@@ -36,6 +36,9 @@ ENV NODE_ENV=production \
     MALLOC_ARENA_MAX=2 \
     DATABASE_POOL_MAX=5 \
     DATABASE_PREPARE=true
+# Text recognition for scanned CVs (src/lib/recruitment/cv-text.ts): pdftoppm turns pages into images, Tesseract reads them.
+RUN apt-get update && apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng \
+    && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system app && useradd --system --gid app --home /app app
 COPY --from=build --chown=app:app /app/.next/standalone ./
 COPY --from=build --chown=app:app /app/.next/static ./.next/static

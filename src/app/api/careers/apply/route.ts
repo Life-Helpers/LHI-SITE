@@ -3,7 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getJob } from "@/lib/cms/content";
 import { file, isEmail, text } from "@/lib/cms/form-data";
 import { savePrivateUpload } from "@/lib/cms/private-uploads";
+import { updateStore } from "@/lib/cms/store";
 import { addSubmission } from "@/lib/cms/submissions";
+import { schedule } from "@/lib/email/send";
 import { cvText } from "@/lib/recruitment/cv-text";
 import { screenCv } from "@/lib/recruitment/screening";
 import { checkSpam } from "@/lib/spam";
@@ -34,9 +36,14 @@ export async function POST(req: NextRequest) {
   if (!cv) return NextResponse.json({ error: "Attach your CV (PDF or Word, max 5 MB)." }, { status: 400 });
   const stored = await savePrivateUpload(cv, "applications");
   if (typeof stored === "string") return NextResponse.json({ error: stored }, { status: 400 });
-  const screening = screenCv(await cvText(new Uint8Array(await cv.arrayBuffer()), cv.name), job.keywords ?? []);
+  const keywords = job.keywords ?? [];
+  const bytes = new Uint8Array(await cv.arrayBuffer());
+  const screening = screenCv(await cvText(bytes, cv.name), keywords);
+  // A scanned PDF has no text: read it by OCR after the applicant has their answer.
+  const scanned = !screening.readable && keywords.length > 0 && stored.filename.toLowerCase().endsWith(".pdf");
+  if (scanned) screening.pending = true;
 
-  await addSubmission({
+  const saved = await addSubmission({
     type: "job-application",
     name,
     email,
@@ -54,6 +61,12 @@ export async function POST(req: NextRequest) {
     jobId: job.id,
     screening,
   });
+  if (scanned) {
+    schedule(async () => {
+      const result = screenCv(await cvText(bytes, cv.name, { ocr: true }), keywords);
+      await updateStore("submissions", (items) => ({ items: items.map((s) => (s.id === saved.id ? { ...s, screening: result } : s)) }));
+    });
+  }
 
   return NextResponse.json({ ok: true });
 }

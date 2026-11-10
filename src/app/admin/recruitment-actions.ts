@@ -41,7 +41,7 @@ export async function rescreenJobAction(jobId: string): Promise<RecruitmentResul
     const unreadable = [...results.values()].filter((r) => r && !r.readable).length;
     return {
       ok: true,
-      message: `Re-screened ${mine.length} application${mine.length === 1 ? "" : "s"}.${unreadable ? ` ${unreadable} CV${unreadable === 1 ? "" : "s"} couldn't be read (scanned or old Word format); check those by hand.` : ""}`,
+      message: `Re-screened ${mine.length} application${mine.length === 1 ? "" : "s"}.${unreadable ? ` ${unreadable} CV${unreadable === 1 ? "" : "s"} couldn't be read even with text recognition; check those by hand.` : ""}`,
     };
   });
 }

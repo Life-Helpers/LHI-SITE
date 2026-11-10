@@ -21,7 +21,7 @@ export async function rescreen(s: Submission, keywords: readonly string[]): Prom
   const cv = s.attachments?.[0];
   if (!cv) return screenCv("", keywords);
   const data = await readPrivateUpload(cv.stored).catch(() => null);
-  return screenCv(data ? await cvText(new Uint8Array(data), cv.filename) : "", keywords);
+  return screenCv(data ? await cvText(new Uint8Array(data), cv.filename, { ocr: true }) : "", keywords);
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");

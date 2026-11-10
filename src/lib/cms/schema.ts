@@ -1006,8 +1006,10 @@ export interface Screening {
   score: number;
   matched: string[];
   missing: string[];
-  /** False when the CV's text could not be read (scanned image or old .doc); the score is then 0. */
+  /** False when the CV's text could not be read, even by OCR; the score is then 0. */
   readable: boolean;
+  /** A scanned CV still being read by OCR in the background; the score follows in a minute or two. */
+  pending?: boolean;
   at: string;
 }
 
