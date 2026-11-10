@@ -62,7 +62,8 @@ async function docText(data: Uint8Array): Promise<string> {
 let ocrQueue: Promise<unknown> = Promise.resolve();
 
 /**
- * Text of a scanned PDF by OCR: the first pages as greyscale images (poppler's pdftoppm), each read
+ * Text of a scanned PDF by OCR: the first pages as 150 dpi greyscale images (poppler's pdftoppm; enough
+ * for CV text and light on memory inside the 512 MB container), each read
  * by Tesseract. One CV at a time, so a burst of applications can't exhaust a small server. Needs
  * both programs installed (the Dockerfile adds them); without them this gives "".
  */
@@ -71,7 +72,7 @@ function ocrPdf(data: Uint8Array): Promise<string> {
     const dir = await mkdtemp(path.join(tmpdir(), "lhi-cv-"));
     try {
       await writeFile(path.join(dir, "cv.pdf"), data);
-      await run("pdftoppm", ["-r", "200", "-gray", "-png", "-l", String(OCR_PAGES), "cv.pdf", "page"], { cwd: dir, timeout: 60_000 });
+      await run("pdftoppm", ["-r", "150", "-gray", "-png", "-l", String(OCR_PAGES), "cv.pdf", "page"], { cwd: dir, timeout: 60_000 });
       const pages = (await readdir(dir)).filter((f) => f.startsWith("page") && f.endsWith(".png")).sort();
       const texts: string[] = [];
       for (const page of pages) {
