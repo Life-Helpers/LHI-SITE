@@ -8,6 +8,7 @@ import { deleteCourseAction, importCourseAction, moveCourseAction, saveCourseAct
 import { AssetField } from "@/components/cms/item-editor";
 import { buttonClass, Card, inputClass } from "@/components/cms/ui";
 import { LHI_PHOTOS, type LhiPhotoKey } from "@/data/lhi-photos";
+import { docxToCourseText, isDocx } from "@/lib/training/course-docx";
 import type { CourseDraft, ExamDraft, LessonDraft } from "@/lib/training/editor-types";
 
 const PHOTO_OPTIONS = (Object.keys(LHI_PHOTOS) as LhiPhotoKey[]).map((k) => ({ value: k, label: LHI_PHOTOS[k].alt }));
@@ -350,7 +351,7 @@ export function CourseRowActions({ id, title, live, first, last, canPublish }: {
           </button>
         </>
       )}
-      <a href={`/api/admin/training/file?id=${encodeURIComponent(id)}`} className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg" aria-label={`Download ${title} as a file`} title="Download as a file to edit">
+      <a href={`/api/admin/training/file?id=${encodeURIComponent(id)}`} className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg" aria-label={`Download ${title} as a file`} title="Download as a Word document to edit">
         <Download className="h-4 w-4" />
       </a>
       <a href={`/admin/training/${id}`} className={buttonClass.secondary}>
@@ -374,8 +375,16 @@ export function CourseFileTools({ canUpload }: { canUpload: boolean }) {
     if (!file) return;
     start(async () => {
       setNotice(null);
-      if (file.size > 400_000) return setNotice({ ok: false, text: "The file is too large." });
-      const res = await importCourseAction(await file.text());
+      if (file.size > 5_000_000) return setNotice({ ok: false, text: "The file is too large." });
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      let text: string;
+      try {
+        text = isDocx(bytes) ? docxToCourseText(bytes) : new TextDecoder().decode(bytes);
+      } catch {
+        return setNotice({ ok: false, text: "That file couldn't be read. Upload the Word document (.docx) or text file (.txt) you downloaded here." });
+      }
+      if (text.length > 400_000) return setNotice({ ok: false, text: "The file is too large." });
+      const res = await importCourseAction(text);
       if (!res.ok) return setNotice({ ok: false, text: res.error ?? "Upload failed." });
       setNotice({ ok: true, text: res.created ? "Course created as a draft." : "Course updated." });
       router.push(`/admin/training/${res.id}`);
@@ -386,17 +395,17 @@ export function CourseFileTools({ canUpload }: { canUpload: boolean }) {
       <div className="min-w-0 flex-1 text-sm">
         <p className="font-semibold">Work on a course in a document</p>
         <p className="text-xs text-admin-muted">
-          Download the template (or any course below), fill it in with Word or Notepad, save it as a .txt file and upload it. A file with a course&apos;s ID updates that course;
-          without one it creates a new draft.
+          Download the Word template (or any course below), fill it in in Word, save it and upload it. A file with a course&apos;s ID updates that course; without
+          one it creates a new draft.
         </p>
       </div>
       <a href="/api/admin/training/file" className={buttonClass.secondary}>
-        <Download className="h-4 w-4" /> Download template
+        <Download className="h-4 w-4" /> Download Word template
       </a>
       {canUpload && (
         <label className={`${buttonClass.primary} cursor-pointer`}>
           {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />} Upload course file
-          <input type="file" accept=".txt,.md,text/plain" className="sr-only" disabled={pending} onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+          <input type="file" accept=".docx,.txt,.md,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="sr-only" disabled={pending} onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
         </label>
       )}
       {notice && (

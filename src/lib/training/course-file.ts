@@ -11,11 +11,11 @@ import type { CourseDraft, ExamDraft, LessonDraft } from "@/lib/training/editor-
  *   --- PRACTICE QUESTION ---
  *   Q: question
  *   - wrong option
- *   * right option
+ *   - right option (correct)          (older files mark it "* right option" instead)
  *   Why: explanation
  *   === FINAL EXAM ===
  *   --- QUESTION ---
- *   Q: question / - option / * right option
+ *   Q: question / - option / - right option (correct)
  *
  * Lines starting with // are notes and are ignored.
  */
@@ -23,24 +23,27 @@ import type { CourseDraft, ExamDraft, LessonDraft } from "@/lib/training/editor-
 const LESSON = /^===\s*LESSON\s*:\s*(.*?)\s*===\s*$/i;
 const EXAM = /^===\s*FINAL EXAM\s*===\s*$/i;
 const QUESTION = /^---\s*(PRACTICE QUESTION|QUESTION)\s*---\s*$/i;
+/** "(correct)" (any case) or a tick at the end of an option marks the right answer. */
+const CORRECT = /\s*(\(\s*correct\s*\)|[✓✔])\s*$/i;
 const FIELD = /^([A-Za-z][A-Za-z ]{1,20}):\s*(.*)$/;
 
 export const COURSE_TEMPLATE_HELP = [
   "// LHI TRAINING COURSE FILE",
-  "// Fill this in, save it as a .txt file and upload it in Admin -> Courses & Exams.",
+  "// Fill this in in Word, save it, and upload it in Admin -> Courses & Exams.",
   "// Lines starting with // are notes and are ignored.",
   "// Keep 'Course ID' as it is to update an existing course; leave it empty for a new course.",
-  "// Lesson text: leave a blank line between paragraphs. Start lines with '- ' for bullets or",
-  "// '1. ' for steps, put '## Title' above a list to name it, and start a block with",
-  "// '[!info] Title', '[!warning] Title' or '[!success] Title' for a highlighted box.",
-  "// Questions: '- ' marks a wrong option and '* ' the right one.",
+  "// Lesson text: one paragraph per line. Use Word's bullets or numbering for lists (or start lines",
+  "// with '- ' or '1. '), put '## Title' just above a list to name it, and start a highlighted box",
+  "// with '[!info] Title', '[!warning] Title' or '[!success] Title' with its text on the next line.",
+  "// Questions: one option per line starting with '- ' (Word may turn these into bullets, which is fine);",
+  "// write (correct) after the right one.",
 ];
 
 function questionText(q: { prompt: string; options: string[]; answer: number; explain?: string }, label: string, withAnswer: boolean) {
   return [
     `--- ${label} ---`,
     `Q: ${q.prompt}`,
-    ...q.options.map((o, i) => `${withAnswer && i === q.answer ? "*" : "-"} ${o}`),
+    ...q.options.map((o, i) => `- ${o}${withAnswer && i === q.answer ? " (correct)" : ""}`),
     ...(q.explain !== undefined && q.explain ? [`Why: ${q.explain}`] : []),
   ].join("\n");
 }
@@ -97,7 +100,7 @@ export const BLANK_COURSE_TEMPLATE = courseToText(
         check: [{ prompt: "A practice question?", options: ["A wrong answer", "The right answer", "Another wrong answer"], answer: 1, explain: "Why the right answer is right." }],
       },
     ],
-    exam: [{ id: "", prompt: "A final exam question?", options: ["Option A", "Option B (right)", "Option C", "Option D"], answer: 1 }],
+    exam: [{ id: "", prompt: "A final exam question?", options: ["Option A", "Option B", "Option C", "Option D"], answer: 1 }],
   },
   true,
 );
@@ -121,20 +124,23 @@ function parseQuestion(lines: string[], where: string) {
   let explain = "";
   const options: string[] = [];
   let answer = -1;
-  for (const line of lines) {
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
     if (/^Q\s*:/i.test(line)) prompt = line.replace(/^Q\s*:\s*/i, "");
     else if (/^Why\s*:/i.test(line)) explain = line.replace(/^Why\s*:\s*/i, "");
     else if (/^[*-]\s+/.test(line)) {
-      if (line.startsWith("*")) {
-        if (answer >= 0) throw new Error(`${where}: only one option can be marked with *.`);
+      const right = line.startsWith("*") || CORRECT.test(line);
+      if (right) {
+        if (answer >= 0) throw new Error(`${where}: only one option can be marked (correct).`);
         answer = options.length;
       }
-      options.push(line.replace(/^[*-]\s+/, ""));
+      options.push(line.replace(/^[*-]\s+/, "").replace(CORRECT, "").trim());
     } else if (prompt && !options.length) prompt += ` ${line}`;
   }
   if (!prompt) throw new Error(`${where}: the question needs a line starting with "Q:".`);
   if (options.length < 2) throw new Error(`${where}: give at least two options, each on a line starting with "- " or "* ".`);
-  if (answer < 0) throw new Error(`${where}: mark the right option with "* " instead of "- ".`);
+  if (answer < 0) throw new Error(`${where}: write (correct) after the right option.`);
   return { prompt, options, answer, explain };
 }
 

@@ -45,6 +45,6 @@ describe("course file", () => {
 
   it("explains what is missing", () => {
     expect(() => textToCourse("Subtitle: x")).toThrow(/Title/);
-    expect(() => textToCourse("Title: T\n=== LESSON: L ===\nSome text\n--- PRACTICE QUESTION ---\nQ: q\n- a\n- b")).toThrow(/mark the right option/);
+    expect(() => textToCourse("Title: T\n=== LESSON: L ===\nSome text\n--- PRACTICE QUESTION ---\nQ: q\n- a\n- b")).toThrow(/write \(correct\) after the right option/);
   });
 });

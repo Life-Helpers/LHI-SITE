@@ -125,8 +125,9 @@ Cash is the riskiest way to pay. Use bank transfers wherever possible, including
 - Get a signed receipt for every payment.
 - Never mix project cash with personal money.
 
-## Advances and retirement
 An advance is money given to a staff member to spend on approved activities, such as field transport or a training venue. Retirement means accounting for it.
+
+## Advances and retirement
 1. Request the advance with a budget for the specific activity, and get approval.
 2. Spend it only on the approved items.
 3. Retire it within the deadline in LHI's Finance Manual, with original receipts and supporting documents.
