@@ -1,0 +1,263 @@
+// LHI TRAINING COURSE FILE
+// Upload in Admin -> Courses & Exams -> Upload course file. It arrives as a draft for review.
+
+Course ID:
+Title: Cyber Security for Everyone at LHI
+Subtitle: Protect your accounts, our money and the people whose data we hold
+Level: Foundation
+Audience: All staff, volunteers, interns and consultants who use a computer, phone or LHI account
+Facilitator: LHI ICT Unit
+Pass mark: 80
+Description: The everyday habits that keep LHI safe online: why humanitarian organisations are targeted, strong passwords and two-step verification, spotting phishing and payment scams, keeping devices and Wi-Fi safe, and what to do the moment something goes wrong.
+
+=== LESSON: Why NGOs are targets ===
+Summary: What attackers want from organisations like LHI, and why people are the first line of defence.
+Minutes: 5
+
+Humanitarian organisations hold things criminals want: money moving to suppliers and partners, donor relationships, and personal data about vulnerable people. Many attacks do not break in through technology; they trick a person into opening the door.
+
+## What attackers are after
+- Money: changing a supplier's bank details, or a fake "urgent payment" request from a director.
+- Accounts: your email password, which opens shared drives, finance systems and contacts.
+- Data: beneficiary lists, staff records and payroll, which can be sold or used to harm people.
+- Disruption: ransomware that locks files until a ransom is paid.
+
+[!info] You are the first line of defence
+Most successful attacks start with a click, a reply or a shared password. A few careful habits stop the great majority of them.
+
+## Everyone's responsibilities
+- Use LHI accounts and devices for LHI work.
+- Follow the ICT policy and the steps in this course.
+- Report anything suspicious to the ICT Unit straight away, even if you think it is probably nothing or you already clicked.
+
+--- PRACTICE QUESTION ---
+Q: How do most successful cyber attacks on organisations begin?
+- Hackers breaking encryption
+* Tricking a person into clicking, replying or sharing a password
+- Power cuts
+Why: Most attacks rely on deceiving people rather than defeating technology.
+
+--- PRACTICE QUESTION ---
+Q: You clicked a link that now looks suspicious. What should you do?
+- Keep quiet and hope nothing happens
+* Report it to the ICT Unit immediately
+- Wait a week to see if anything changes
+Why: Fast reporting lets ICT contain the damage; nobody is punished for reporting.
+
+=== LESSON: Passwords and two-step verification ===
+Summary: Strong passphrases, never reusing them, and turning on two-step verification.
+Minutes: 6
+
+Your password protects everything your account can reach. A weak or reused password is the easiest way in.
+
+## A strong password
+- Long: at least 12 characters. A passphrase of four random words, such as "mango-bicycle-river-lantern", is long, strong and easy to remember.
+- Unique: a different password for every account. If one website is breached, criminals try the same password everywhere else.
+- Private: never shared with anyone, including colleagues, ICT or your supervisor. ICT will never ask for your password.
+- Stored safely: in a password manager approved by ICT, not on paper stuck to your screen or in a phone note.
+
+## Two-step verification (2SV)
+Two-step verification, also called multi-factor authentication, asks for a second proof after your password, such as a code from an authenticator app or a prompt on your phone. Even if someone steals your password, they cannot get in without your phone.
+
+[!warning] Never approve a sign-in you didn't start
+If your phone asks you to approve a sign-in or gives you a code you did not request, someone has your password. Deny it, change your password and tell ICT. Never read a verification code out to anyone who calls you.
+
+--- PRACTICE QUESTION ---
+Q: Which is the strongest password?
+- Lhi2026!
+* mango-bicycle-river-lantern
+- your date of birth
+Why: Long passphrases of random words are much harder to crack than short complex ones.
+
+--- PRACTICE QUESTION ---
+Q: Someone calls from "ICT" and asks for the code just sent to your phone. You:
+- Read it out, since it is ICT
+* Refuse, hang up and report the call
+- Send it by SMS instead
+Why: Verification codes are never shared; this is a common account-takeover trick.
+
+=== LESSON: Spotting phishing and payment scams ===
+Summary: The warning signs of fake emails, messages and calls, and the rule for any change of bank details.
+Minutes: 8
+
+Phishing is a message designed to make you click a link, open an attachment, enter your password or send money. It can come by email, WhatsApp, SMS or a phone call, and it often looks like it comes from someone you trust.
+
+## Warning signs
+- Urgency or pressure: "pay today", "your account will be closed", "keep this confidential".
+- A sender address that is slightly wrong, such as lhinigeria.co or a Gmail address for a director.
+- Unexpected attachments or links, especially to "view a document" or "verify your account".
+- Requests to buy airtime or gift cards, or to change payment details.
+- Poor spelling, or a greeting that doesn't sound like the person.
+
+## Before you click
+1. Hover over a link to see where it really goes.
+2. If in doubt, open the website yourself instead of using the link.
+3. Check with the sender using a phone number or contact you already have, not the details in the message.
+
+[!warning] Bank details never change by email alone
+Business email compromise is one of the costliest scams: a criminal sends a convincing email, apparently from a supplier or partner, saying their bank account has changed. Any request to change bank details must be confirmed by phone with a known contact at the supplier, and approved by Finance, before any payment is made.
+
+The same applies to an "urgent" payment request from a manager or director. Real leaders will not mind you checking.
+
+--- PRACTICE QUESTION ---
+Q: A supplier emails new bank details for this month's payment. What do you do?
+- Update the details and pay, since the email looks genuine
+- Reply to the email to confirm
+* Call the supplier on a number you already have, and get Finance approval
+Why: Replies go to the scammer; only an independent check confirms a real change.
+
+--- PRACTICE QUESTION ---
+Q: Which is a common sign of phishing?
+* Pressure to act urgently and keep it confidential
+- A message from a colleague about a meeting you both arranged
+- A newsletter you subscribed to
+Why: Scammers use urgency and secrecy to stop you from checking.
+
+=== LESSON: Safe devices, Wi-Fi and files ===
+Summary: Updates, screen locks, public Wi-Fi, USB sticks, backups and travelling with devices.
+Minutes: 6
+
+Your laptop and phone carry LHI email, files and often beneficiary data. Losing one, or letting malware onto it, puts all of that at risk.
+
+## Device habits
+- Install updates for your operating system, browser and apps as soon as they are offered.
+- Lock your screen whenever you step away (Windows key + L), and set a PIN or password on your phone.
+- Only install software from official sources approved by ICT.
+- Keep antivirus switched on.
+- Don't let family or friends use your work device.
+
+## Wi-Fi and USB
+- Avoid public Wi-Fi for finance or sensitive work; use your mobile data or a VPN approved by ICT.
+- Don't plug in USB sticks you found or were given at events; they can carry malware.
+
+## Files and backups
+- Save work in LHI's shared drives, which are backed up, not only on your desktop.
+- Share files with named people, not "anyone with the link", when they contain personal or financial data.
+
+[!info] Travelling to the field
+Carry only the data you need, keep devices with you rather than in vehicles, and report a lost or stolen device to ICT immediately so it can be locked or wiped.
+
+--- PRACTICE QUESTION ---
+Q: You find a USB stick in the car park labelled "Salaries 2026". You:
+- Plug it in to find the owner
+* Hand it to ICT without plugging it in
+- Take it home
+Why: Unknown USB sticks are a classic way to spread malware.
+
+--- PRACTICE QUESTION ---
+Q: Why install updates promptly?
+* They fix security weaknesses that attackers already know about
+- They make the device slower
+- They are only for new features
+Why: Updates close known security holes.
+
+=== LESSON: When something goes wrong ===
+Summary: Recognising an incident and the exact steps to take in the first minutes.
+Minutes: 5
+
+Incidents happen even to careful people. What matters most is reporting quickly. The first hour often decides whether an incident is a small problem or a serious loss.
+
+## Signs of an incident
+- You clicked a suspicious link or entered your password on a strange page.
+- Your account sends messages you didn't write, or you are locked out.
+- Files are renamed, encrypted or disappear; a message demands payment.
+- A device is lost or stolen.
+- Personal or financial data was sent to the wrong person.
+
+## What to do
+1. Stop: don't keep clicking or try to fix it alone.
+2. Disconnect: turn off Wi-Fi or unplug the network cable if you suspect malware or ransomware.
+3. Report: call or message the ICT Unit immediately, then tell your supervisor.
+4. Change your password from a different, safe device if your account may be compromised.
+5. Write down what happened and when, while you remember.
+
+[!success] No blame for reporting
+LHI will never punish anyone for reporting a mistake promptly. Hiding an incident is what causes the real damage.
+
+If personal data may have been exposed, the data protection focal point must also be told, because the law requires serious breaches to be reported within a short deadline.
+
+--- PRACTICE QUESTION ---
+Q: Your screen shows files have been encrypted and a payment is demanded. Your first steps are:
+- Pay the ransom quickly
+* Disconnect from the network and report to ICT immediately
+- Restart and keep working
+Why: Disconnecting limits the spread; ICT must lead the response.
+
+--- PRACTICE QUESTION ---
+Q: Your work phone is stolen in the market. When do you tell ICT?
+* Immediately, so the device and accounts can be locked
+- After you have bought a new phone
+- Only if it had beneficiary data
+Why: Quick reporting lets ICT protect every account on the phone.
+
+=== FINAL EXAM ===
+
+--- QUESTION ---
+Q: Why are humanitarian organisations attractive targets?
+- They never use computers
+* They move money and hold valuable personal data
+- They are not allowed to report crimes
+- They have no email
+
+--- QUESTION ---
+Q: Which password practice is safest?
+- Using the same strong password everywhere
+- Sharing your password only with your supervisor
+* A unique long passphrase for each account, kept in an approved password manager
+- Writing it on a note under your keyboard
+
+--- QUESTION ---
+Q: What does two-step verification protect against?
+- Viruses on USB sticks
+* Someone signing in with a stolen password
+- Power cuts
+- Slow internet
+
+--- QUESTION ---
+Q: You get a sign-in approval prompt you did not start. You should:
+- Approve it to make it stop
+- Ignore it
+- Forward it to a colleague
+* Deny it, change your password and tell ICT
+
+--- QUESTION ---
+Q: Which email address should make you suspicious of a message from LHI's Executive Director?
+- An address ending in @lhinigeria.org
+* A Gmail address saying they are using a personal account for an urgent payment
+- An address you have used before
+- An internal calendar invitation
+
+--- QUESTION ---
+Q: How must a supplier's change of bank details be confirmed?
+- By replying to the email
+- By the supplier sending a second email
+* By phone to a known contact at the supplier, with Finance approval
+- It does not need to be confirmed
+
+--- QUESTION ---
+Q: For sensitive work while travelling, which connection is safest?
+- Free hotel Wi-Fi
+- Airport Wi-Fi
+* Your mobile data or an ICT-approved VPN
+- A neighbour's open Wi-Fi
+
+--- QUESTION ---
+Q: Where should work files be saved?
+* In LHI's backed-up shared drives
+- Only on your desktop
+- On a personal USB stick
+- In your personal email
+
+--- QUESTION ---
+Q: What is the first thing to do if you suspect ransomware?
+- Pay the ransom
+- Delete all your files
+- Restart the computer and continue
+* Disconnect from the network and report to ICT
+
+--- QUESTION ---
+Q: Why does LHI never blame staff who report incidents promptly?
+- Because incidents never cause harm
+* Because quick reporting limits damage, and hiding incidents makes them worse
+- Because ICT prefers not to know
+- Because reporting is optional

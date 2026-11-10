@@ -1,0 +1,262 @@
+// LHI TRAINING COURSE FILE
+// Upload in Admin -> Courses & Exams -> Upload course file. It arrives as a draft for review.
+
+Course ID:
+Title: MEAL Essentials for Humanitarian Programmes
+Subtitle: Plan, measure, listen and learn so our programmes deliver what communities need
+Level: Foundation
+Audience: Programme, MEAL and field staff, volunteers and implementing partners
+Facilitator: LHI Monitoring, Evaluation, Accountability & Learning (MEAL) Unit
+Pass mark: 80
+Description: An introduction to Monitoring, Evaluation, Accountability and Learning (MEAL) at LHI: what each part means, how a results framework and indicators work, how to collect good data safely, how communities hold us to account through feedback, and how we turn evidence into better programmes and honest reports.
+
+=== LESSON: What MEAL is and why it matters ===
+Summary: The four parts of MEAL and how they fit into every project.
+Minutes: 6
+
+MEAL stands for Monitoring, Evaluation, Accountability and Learning. Together they answer four questions every project must be able to answer: Are we doing what we said? Is it making a difference? Are we answering to the people we serve? What should we do better?
+
+## The four parts
+- Monitoring: routine, continuous tracking of activities and outputs against the plan (for example, how many hygiene kits were distributed this month).
+- Evaluation: a periodic, deeper assessment of whether the project achieved its outcomes and why (for example, a mid-term or final evaluation).
+- Accountability: taking account of, giving account to and being held to account by communities, donors and partners.
+- Learning: using what we find to adapt programmes, share lessons and improve future work.
+
+[!info] MEAL is everyone's job
+The MEAL team designs the systems, but programme staff, volunteers and partners collect most of the data and hear most of the feedback. Good MEAL depends on everyone recording accurately and honestly.
+
+MEAL starts at design, not at the end. A project that sets clear results and indicators from day one is far easier to monitor, evaluate and report on than one that tries to find evidence after the money has been spent.
+
+--- PRACTICE QUESTION ---
+Q: Counting how many hygiene kits were distributed each month is an example of:
+- Evaluation
+* Monitoring
+- Learning
+Why: Monitoring is the routine tracking of activities and outputs against the plan.
+
+--- PRACTICE QUESTION ---
+Q: When should MEAL planning begin?
+- After the first donor report is due
+- During the final evaluation
+* At project design, before activities start
+Why: Results and indicators set at design make monitoring, evaluation and reporting possible.
+
+=== LESSON: Results frameworks, indicators and baselines ===
+Summary: How a logframe links activities to change, and how indicators measure it.
+Minutes: 8
+
+Most donors ask for a logical framework (logframe) or results framework. It shows the chain of results the project expects, from what we do to the change we want to see.
+
+## The results chain
+1. Inputs: money, staff, supplies and time.
+2. Activities: what we do, such as training community health workers.
+3. Outputs: the direct products, such as 120 health workers trained.
+4. Outcomes: the change in behaviour or conditions, such as more caregivers using oral rehydration salts for diarrhoea.
+5. Impact: the long-term goal, such as fewer child deaths.
+
+An indicator is a specific, measurable sign that a result has happened. Good indicators are SMART: Specific, Measurable, Achievable, Relevant and Time-bound. Each one needs a definition, a data source, a collection method, a frequency and a person responsible. This is recorded in an indicator reference sheet or MEAL plan.
+
+## Always disaggregate
+- By sex (women, men, girls, boys).
+- By age group.
+- By disability, using the Washington Group Short Set of questions.
+- By location (state, LGA, community) where relevant.
+
+[!warning] No baseline, no proof of change
+A baseline measures the starting point before activities begin. Without it we cannot show how much an outcome changed. Set the target only after you know the baseline.
+
+--- PRACTICE QUESTION ---
+Q: "120 community health workers trained" is best described as:
+- An impact
+* An output
+- An input
+Why: It is the direct product of an activity, which makes it an output.
+
+--- PRACTICE QUESTION ---
+Q: Why do we collect a baseline?
+* To know the starting point so we can measure change
+- To replace the final evaluation
+- To decide the project budget
+Why: Change can only be shown against a starting value measured before activities begin.
+
+=== LESSON: Collecting good data safely ===
+Summary: Methods, sampling, data quality and the ethics of collecting information from people.
+Minutes: 8
+
+Data is only useful if it is accurate and was collected without harming anyone. Choose the method that fits the question: surveys for numbers, focus group discussions and key informant interviews for reasons and experiences, and observation or registers for activities.
+
+## Common tools at LHI
+- Digital forms on KoboToolbox or ODK, which reduce errors and speed up analysis.
+- Attendance and distribution registers.
+- Post-distribution monitoring (PDM) surveys.
+- Focus group discussion and interview guides.
+
+## Data quality: the five checks
+- Valid: it measures what it is meant to measure.
+- Reliable: the same method gives the same result each time.
+- Timely: it is available when decisions are made.
+- Precise: it has enough detail to be useful.
+- Integrity: it is protected from errors and manipulation.
+
+[!warning] Consent comes first
+Explain who we are, why we are asking, how the information will be used and that taking part is voluntary and will not affect assistance. Record consent before asking any questions. Children need the consent of a parent or guardian as well as their own agreement.
+
+Collect only the personal data you need. Never write names next to sensitive information such as GBV or health status unless the form is designed and approved for it, and keep paper forms locked away until they are entered and destroyed according to policy.
+
+--- PRACTICE QUESTION ---
+Q: A respondent says they do not want to answer. What do you do?
+- Explain that their assistance depends on answering
+* Thank them and end the interview without consequences for them
+- Ask a neighbour to answer for them
+Why: Participation is voluntary and must never be linked to assistance.
+
+--- PRACTICE QUESTION ---
+Q: Which data quality check asks whether the data is available when decisions are made?
+- Validity
+- Precision
+* Timeliness
+Why: Timely data reaches decision-makers while it can still change what we do.
+
+=== LESSON: Accountability to affected populations ===
+Summary: How communities give feedback and complaints, and how we respond and close the loop.
+Minutes: 7
+
+Accountability to Affected Populations (AAP) means communities have a say in decisions that affect them and can tell us when something is wrong. It is part of the Core Humanitarian Standard (CHS) that LHI works to.
+
+## A good feedback and complaints mechanism
+- Has several channels: a toll-free line, help desks at distributions, suggestion boxes, community committees and staff in person.
+- Is designed with the community, including women, older people and people with disabilities, so everyone can use it.
+- Is explained at every activity, in local languages such as Hausa.
+- Keeps complainants' identities confidential.
+- Records every piece of feedback, refers it to the right person and tracks it until it is resolved.
+
+## Closing the loop
+1. Acknowledge the feedback.
+2. Refer it to the person who can act on it.
+3. Act or decide.
+4. Tell the person, and where appropriate the wider community, what was done.
+
+[!warning] Sensitive complaints go straight to safeguarding
+Any report of sexual exploitation, abuse, harassment or fraud must be passed immediately and confidentially to the Safeguarding or relevant focal point, not handled through the normal feedback process.
+
+--- PRACTICE QUESTION ---
+Q: What does "closing the loop" mean?
+- Deleting feedback after a month
+* Telling people what action was taken on their feedback
+- Asking the community to stop sending complaints
+Why: People need to see that their feedback led to a response, or they stop using the mechanism.
+
+--- PRACTICE QUESTION ---
+Q: A woman at a distribution reports that a volunteer asked her for a favour in exchange for her kit. What do you do?
+- Log it as general feedback for the monthly report
+* Report it immediately and confidentially to the safeguarding focal point
+- Ask the volunteer for his side of the story first
+Why: Possible sexual exploitation is a safeguarding concern and must be reported straight away.
+
+=== LESSON: Learning, reporting and using evidence ===
+Summary: Turning data into decisions, honest reports and lessons we share.
+Minutes: 6
+
+Data that sits in a spreadsheet changes nothing. Learning means looking at the evidence regularly and asking what it tells us to do differently.
+
+## Ways we learn
+- Monthly data review meetings with programme and MEAL staff.
+- After-action reviews once an activity or distribution ends: what was planned, what happened, why, and what we will change.
+- Lessons-learned workshops at mid-term and close-out.
+- Sharing findings back with communities and partners.
+
+## Writing a good report
+- Compare results with targets, and explain the differences honestly.
+- Use disaggregated figures, not just totals.
+- Combine numbers with short stories or quotes, with consent and without identifying people.
+- Name challenges and what was done about them.
+- Make sure every figure can be traced back to its source data.
+
+[!success] Adaptive programming
+When monitoring shows something is not working, such as low attendance by women at a session held at midday, we change the activity, not the report. Record the change and the reason so donors and evaluators can follow the decision.
+
+--- PRACTICE QUESTION ---
+Q: Results are below target. What should the report do?
+- Leave the indicator out
+- Round the figure up to the target
+* Report the real figure and explain why it is below target
+Why: Honest reporting builds trust and helps everyone learn.
+
+--- PRACTICE QUESTION ---
+Q: An after-action review asks:
+* What was planned, what happened, why, and what we will change
+- Which staff member is to blame
+- How much money is left
+Why: It is a short, blame-free review focused on learning.
+
+=== FINAL EXAM ===
+
+--- QUESTION ---
+Q: What does the "A" in MEAL stand for?
+- Assessment
+* Accountability
+- Analysis
+- Audit
+
+--- QUESTION ---
+Q: Which of these is an outcome?
+- 500 dignity kits distributed
+- Two trainings held
+* More caregivers using oral rehydration salts for diarrhoea
+- A vehicle hired for field visits
+
+--- QUESTION ---
+Q: What does SMART stand for when describing indicators?
+- Simple, Measurable, Approved, Reported, Tracked
+* Specific, Measurable, Achievable, Relevant, Time-bound
+- Specific, Monitored, Accurate, Reliable, Timely
+- Standard, Measurable, Agreed, Relevant, Total
+
+--- QUESTION ---
+Q: Which question set is used to identify people with disabilities in data collection?
+- The Kobo Disability Form
+* The Washington Group Short Set
+- The CHS Disability Checklist
+- The census household questions
+
+--- QUESTION ---
+Q: When must consent be recorded?
+- After the interview, if the answers are useful
+* Before any questions are asked
+- Only when interviewing children
+- Only for focus group discussions
+
+--- QUESTION ---
+Q: Why should a project set its targets after the baseline?
+* So targets reflect the real starting point
+- Because donors do not read baselines
+- So the targets are always easy to reach
+- Because baselines replace targets
+
+--- QUESTION ---
+Q: Which is a good feature of a feedback and complaints mechanism?
+- It has only one channel, the office email
+- It records only complaints, not suggestions
+* It is designed with the community and offers several channels in local languages
+- It shares complainants' names with staff involved
+
+--- QUESTION ---
+Q: A complaint alleges fraud by a staff member. How should it be handled?
+- Through the normal monthly feedback review
+- By the staff member's own team
+* Passed immediately and confidentially to the relevant focal point
+- Ignored unless it is repeated
+
+--- QUESTION ---
+Q: What is the main purpose of disaggregating data?
+- To make reports longer
+* To see whether different groups, such as women, girls or people with disabilities, are reached and benefit equally
+- To reduce the amount of data collected
+- To meet a software requirement
+
+--- QUESTION ---
+Q: Monitoring shows women are not attending a midday session. What is adaptive programming?
+- Reporting full attendance anyway
+- Ending the activity without telling the donor
+* Changing the session time with women's input, and recording the change and reason
+- Waiting for the final evaluation to decide

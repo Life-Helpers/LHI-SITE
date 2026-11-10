@@ -1,0 +1,272 @@
+// LHI TRAINING COURSE FILE
+// Upload in Admin -> Courses & Exams -> Upload course file. It arrives as a draft for review.
+
+Course ID:
+Title: Data Skills for Programme Staff
+Subtitle: Collect, clean, analyse and protect data you can trust
+Level: Foundation
+Audience: Programme, MEAL, finance and operations staff who work with spreadsheets and data
+Facilitator: LHI Monitoring, Evaluation, Accountability & Learning (MEAL) Unit
+Pass mark: 80
+Description: Practical data skills for everyday work at LHI: setting up a clean spreadsheet, spotting and fixing errors, simple analysis with disaggregation, presenting results clearly, and protecting the personal data of the people we serve under Nigeria's data protection law.
+
+=== LESSON: Types of data and what good data looks like ===
+Summary: Numbers and words, indicators and records, and the signs of data you can rely on.
+Minutes: 6
+
+Data is any information we record to understand our work. At LHI it includes beneficiary registers, survey answers, distribution lists, stock records, attendance sheets, finance transactions and feedback logs.
+
+## Two kinds of data
+- Quantitative data is numbers you can count or measure: how many people attended, how many kilograms were delivered, what percentage of households have soap.
+- Qualitative data is words and observations: what people said in a focus group, why women stopped attending a session, a complaint in someone's own words.
+
+Both are needed. Numbers show how much; words explain why.
+
+## Signs of good data
+- Complete: no missing rows or blank required fields.
+- Accurate: values are correct and match the source document.
+- Consistent: the same thing is written the same way everywhere (one spelling for each LGA).
+- Timely: it is entered soon after collection, while questions can still be checked.
+- Traceable: every figure can be followed back to a form, register or record.
+
+[!info] Rubbish in, rubbish out
+No amount of analysis can fix data that was recorded wrongly. Most data problems are prevented by careful collection and entry, not by clever formulas later.
+
+--- PRACTICE QUESTION ---
+Q: "Why did women stop attending the midday session?" is best answered by:
+- Quantitative data
+* Qualitative data
+- Finance data
+Why: Reasons and experiences come from words and observations.
+
+--- PRACTICE QUESTION ---
+Q: A register has "Sokoto North", "Sokoto Nth" and "SOKOTO NORTH". Which quality problem is this?
+- Timeliness
+* Consistency
+- Completeness
+Why: The same place is written in different ways, which breaks counting and filtering.
+
+=== LESSON: Setting up a clean spreadsheet ===
+Summary: Simple rules that make data easy to count, filter and share.
+Minutes: 7
+
+Most of our data lives in Excel or Google Sheets. A few rules make the difference between a sheet you can analyse in minutes and one that takes days to fix.
+
+## The rules of a tidy sheet
+1. One table per sheet, starting in the top-left cell.
+2. One header row, with short, clear column names and no merged cells.
+3. One row for each record (one person, one household, one distribution).
+4. One piece of information per column: put first name and surname, or state and LGA, in separate columns.
+5. Use dates in one format, such as 2026-11-18, and store numbers as numbers, not text.
+6. Use drop-down lists (data validation) for fixed choices like sex, LGA or disability status.
+7. Never use colour alone to carry meaning; add a column instead.
+8. Give each record a unique ID so it can be found and never counted twice.
+
+[!warning] Keep the raw data untouched
+Save the original download or entry sheet as it is, and do your cleaning and analysis in a copy or a separate sheet. If something goes wrong you can always go back.
+
+Name files so others can find them, for example 2026-11_Sokoto_PDM_Raw.xlsx, and keep them in the shared drive folder for the project rather than on a personal laptop.
+
+--- PRACTICE QUESTION ---
+Q: Which header is best for a spreadsheet column?
+- A merged cell spanning "Beneficiary Details"
+* A single short name such as "lga"
+- No header, to save space
+Why: One clear header per column makes sorting, filtering and analysis reliable.
+
+--- PRACTICE QUESTION ---
+Q: Where should you clean the data?
+- Directly in the only copy of the raw data
+* In a copy, keeping the raw data unchanged
+- In an email to the team
+Why: Keeping the raw data lets you check or redo the cleaning at any time.
+
+=== LESSON: Cleaning data ===
+Summary: Finding and fixing duplicates, blanks, typos and impossible values, and recording what you changed.
+Minutes: 8
+
+Cleaning means finding and fixing errors before analysis. Do it every time new data arrives, not just at the end of the project.
+
+## What to look for
+- Duplicates: the same person or household entered twice. Check the unique ID, and also name, phone number and community together.
+- Blanks: required fields left empty.
+- Typos and inconsistent spellings: use filters to list every value in a column and spot odd ones.
+- Impossible values: an age of 250, a pregnant man, a distribution date in the future, a household of 0 people.
+- Outliers: values that are possible but unusual, such as one household receiving ten kits. Check these against the source before changing anything.
+
+## Useful spreadsheet tools
+- Filter and sort to see all values in a column.
+- Remove duplicates, after checking which copy is correct.
+- TRIM and PROPER to tidy extra spaces and capital letters.
+- COUNTIF to find values that appear more than once.
+- Conditional formatting to highlight blanks and values outside a range.
+
+[!warning] Never guess
+If you cannot confirm the correct value from the form, register or the person who collected it, mark it as missing. A blank is honest; a guess is a false record.
+
+Keep a short cleaning log: what you found, what you changed, why, who did it and when. It protects you in an audit and lets others trust your figures.
+
+--- PRACTICE QUESTION ---
+Q: A record shows a 4-year-old as head of household. What do you do first?
+- Change the age to 40
+- Delete the record
+* Check the source form or ask the enumerator
+Why: Confirm against the source before changing anything; never guess.
+
+--- PRACTICE QUESTION ---
+Q: Why keep a cleaning log?
+* So anyone can see what was changed, why and by whom
+- Because spreadsheets require it
+- To make the file larger
+Why: A log makes the cleaning transparent and the figures trustworthy.
+
+=== LESSON: Simple analysis and presenting results ===
+Summary: Counts, percentages, disaggregation and charts that tell the truth.
+Minutes: 8
+
+Most programme questions are answered with simple analysis: how many, what percentage, and how it differs between groups.
+
+## Everyday analysis
+- Counts and sums: how many people were reached (COUNTIFS, SUMIFS).
+- Percentages: the share who meet a standard, always with the number it is a percentage of ("62% of 340 households").
+- Averages: use the median when a few extreme values could mislead.
+- Pivot tables: the fastest way to summarise by LGA, sex, age group or month.
+- Change over time: compare with the baseline and the previous period.
+
+## Disaggregate to see who is left out
+Totals can hide gaps. Break results down by sex, age group, disability and location. If 80% of all households received kits but only 45% of households headed by a person with a disability did, the total hides a problem we must act on.
+
+## Charts that tell the truth
+- Bar charts for comparing groups, line charts for change over time.
+- Start the value axis at zero for bar charts.
+- Give every chart a clear title, labelled axes, the period and the source.
+- Avoid 3D and pie charts with many slices; they are hard to read.
+
+[!info] Avoid double counting
+One person who attends three sessions is one person reached but three attendances. Be clear which you are reporting, and use unique IDs to count people.
+
+--- PRACTICE QUESTION ---
+Q: Which is the clearest way to report a percentage?
+- "62%"
+* "62% of 340 households (211)"
+- "Most households"
+Why: Giving the base number lets readers judge the result.
+
+--- PRACTICE QUESTION ---
+Q: A woman attended three trainings. How many people were reached?
+- Three
+* One
+- Zero
+Why: People reached counts individuals once; attendances count each visit.
+
+=== LESSON: Protecting personal data ===
+Summary: What personal data is, the law that protects it, and the daily habits that keep it safe.
+Minutes: 7
+
+Personal data is any information that identifies a living person: a name, phone number, photo, address, ID number or fingerprint. Some is sensitive, such as health status, disability, religion, ethnicity or experience of violence. Leaking it can put people in real danger.
+
+In Nigeria, personal data is protected by the Nigeria Data Protection Act 2023, overseen by the Nigeria Data Protection Commission. Donors and LHI's own policies add further rules.
+
+## Principles to follow
+- Collect only what the project needs (data minimisation).
+- Tell people why you collect it and get their consent.
+- Use it only for the purpose you explained.
+- Keep it accurate and up to date.
+- Keep it only as long as needed, then delete or destroy it securely.
+- Keep it secure and share it only with people who need it.
+
+## Daily habits
+- Store data on LHI's approved systems, not on personal phones, USB sticks or personal email.
+- Password-protect files with personal data and share them through access-controlled links, not attachments to large groups.
+- Remove names and phone numbers before sharing data for analysis or reports (anonymise or use IDs).
+- Lock away paper forms and shred them when no longer needed.
+- Never post photos or stories of beneficiaries on social media without their informed consent and approval through communications.
+
+[!warning] Report a data breach immediately
+If personal data is lost, sent to the wrong person or accessed without permission, report it to your supervisor and the data protection focal point at once. Quick action limits the harm, and serious breaches must be reported to the authorities within a short deadline.
+
+--- PRACTICE QUESTION ---
+Q: Which of these is sensitive personal data?
+- The name of an LGA
+* A beneficiary's HIV status
+- The number of kits distributed
+Why: Health information can cause serious harm if disclosed.
+
+--- PRACTICE QUESTION ---
+Q: You emailed a beneficiary list to the wrong person. What do you do?
+- Nothing, because it was an accident
+- Ask them to delete it and tell no one
+* Report it at once to your supervisor and the data protection focal point
+Why: Breaches must be reported quickly so the harm can be limited.
+
+=== FINAL EXAM ===
+
+--- QUESTION ---
+Q: Which of these is quantitative data?
+- Quotes from a focus group
+* The number of households that received soap
+- A complaint written in someone's own words
+- Notes from an observation
+
+--- QUESTION ---
+Q: In a tidy spreadsheet, each row should contain:
+* One record, such as one person or one household
+- One LGA's totals
+- A merged heading
+- Several people separated by commas
+
+--- QUESTION ---
+Q: Why should each record have a unique ID?
+- To make the sheet look professional
+- Because Excel needs it to open the file
+* So records can be found and never counted twice
+- To replace the person's name in all reports
+
+--- QUESTION ---
+Q: A record lists a household size of 0. This is:
+- An outlier you should keep
+* An impossible value to check against the source
+- A duplicate
+- A consistent value
+
+--- QUESTION ---
+Q: If you cannot confirm the correct value during cleaning, you should:
+- Use the average of the column
+- Copy the value from the row above
+- Delete the whole record
+* Mark it as missing
+
+--- QUESTION ---
+Q: Which tool is fastest for summarising results by LGA and sex?
+- Conditional formatting
+* A pivot table
+- Spell check
+- Merging cells
+
+--- QUESTION ---
+Q: Why disaggregate results?
+* To see whether some groups are being left out
+- To make the total bigger
+- Because totals are always wrong
+- To avoid using charts
+
+--- QUESTION ---
+Q: Which law protects personal data in Nigeria?
+- The Freedom of Information Act 2011
+- The Cybercrimes Act 2015
+* The Nigeria Data Protection Act 2023
+- The Companies and Allied Matters Act 2020
+
+--- QUESTION ---
+Q: What is data minimisation?
+- Making files smaller by deleting columns at random
+* Collecting only the personal data the project needs
+- Using small fonts in reports
+- Sharing data with fewer donors
+
+--- QUESTION ---
+Q: Where should beneficiary data be stored?
+- On your personal phone, for quick access
+- On a USB stick kept in your bag
+* On LHI's approved, access-controlled systems
+- In a group chat with the field team
