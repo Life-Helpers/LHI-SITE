@@ -8,6 +8,7 @@ import { deleteCourseAction, importCourseAction, moveCourseAction, saveCourseAct
 import { AssetField } from "@/components/cms/item-editor";
 import { buttonClass, Card, inputClass } from "@/components/cms/ui";
 import { LHI_PHOTOS, type LhiPhotoKey } from "@/data/lhi-photos";
+import { courseCsvToText, decodeCsv } from "@/lib/training/course-csv";
 import { docxToCourseText, isDocx } from "@/lib/training/course-docx";
 import type { CourseDraft, ExamDraft, LessonDraft } from "@/lib/training/editor-types";
 
@@ -351,7 +352,7 @@ export function CourseRowActions({ id, title, live, first, last, canPublish }: {
           </button>
         </>
       )}
-      <a href={`/api/admin/training/file?id=${encodeURIComponent(id)}`} className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg" aria-label={`Download ${title} as a file`} title="Download as a Word document to edit">
+      <a href={`/api/admin/training/file?id=${encodeURIComponent(id)}`} className="rounded-lg p-1.5 text-admin-muted hover:bg-admin-bg" aria-label={`Download ${title} as a file`} title="Download as a spreadsheet (CSV) to edit">
         <Download className="h-4 w-4" />
       </a>
       <a href={`/admin/training/${id}`} className={buttonClass.secondary}>
@@ -377,11 +378,16 @@ export function CourseFileTools({ canUpload }: { canUpload: boolean }) {
       setNotice(null);
       if (file.size > 5_000_000) return setNotice({ ok: false, text: "The file is too large." });
       const bytes = new Uint8Array(await file.arrayBuffer());
+      const name = file.name.toLowerCase();
+      if (name.endsWith(".xlsx") || name.endsWith(".xls")) {
+        return setNotice({ ok: false, text: "Save the spreadsheet as CSV first (File → Save As → CSV UTF-8), then upload the .csv file." });
+      }
       let text: string;
       try {
-        text = isDocx(bytes) ? docxToCourseText(bytes) : new TextDecoder().decode(bytes);
-      } catch {
-        return setNotice({ ok: false, text: "That file couldn't be read. Upload the Word document (.docx) or text file (.txt) you downloaded here." });
+        text = name.endsWith(".csv") ? courseCsvToText(decodeCsv(bytes)) : isDocx(bytes) ? docxToCourseText(bytes) : new TextDecoder().decode(bytes);
+      } catch (err) {
+        const reason = err instanceof Error && /^Row \d+|header row|Word document/.test(err.message) ? err.message : "";
+        return setNotice({ ok: false, text: reason || "That file couldn't be read. Upload the CSV, Word or text file you downloaded here." });
       }
       if (text.length > 400_000) return setNotice({ ok: false, text: "The file is too large." });
       const res = await importCourseAction(text);
@@ -395,17 +401,17 @@ export function CourseFileTools({ canUpload }: { canUpload: boolean }) {
       <div className="min-w-0 flex-1 text-sm">
         <p className="font-semibold">Work on a course in a document</p>
         <p className="text-xs text-admin-muted">
-          Download the Word template (or any course below), fill it in in Word, save it and upload it. A file with a course&apos;s ID updates that course; without
-          one it creates a new draft.
+          Download the template (or any course below) as a spreadsheet, fill it in in Excel or Google Sheets, save it as CSV and upload it. A file with a
+          course&apos;s ID updates that course; without one it creates a new draft. Word and text course files can be uploaded too.
         </p>
       </div>
       <a href="/api/admin/training/file" className={buttonClass.secondary}>
-        <Download className="h-4 w-4" /> Download Word template
+        <Download className="h-4 w-4" /> Download template (Excel CSV)
       </a>
       {canUpload && (
         <label className={`${buttonClass.primary} cursor-pointer`}>
           {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />} Upload course file
-          <input type="file" accept=".docx,.txt,.md,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="sr-only" disabled={pending} onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
+          <input type="file" accept=".csv,.docx,.txt,.md,.xlsx,text/csv,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="sr-only" disabled={pending} onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ""; }} />
         </label>
       )}
       {notice && (

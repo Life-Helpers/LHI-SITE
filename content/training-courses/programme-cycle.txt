@@ -152,10 +152,10 @@ Why: Transparency builds trust and helps catch errors and favouritism.
 Summary: Working with partners and coordination bodies, reporting well and ending projects responsibly.
 Minutes: 7
 
-## Working with partners
+[!info] Working with partners
 LHI often works with local organisations, community structures and government ministries. Good partnerships are based on mutual respect, clear agreements, capacity strengthening and shared accountability. Partners are assessed before agreements are signed, and they follow the same safeguarding, financial and data protection standards.
 
-## Coordination
+[!info] Coordination
 Take part in the relevant coordination meetings: humanitarian sector or cluster meetings, state working groups and local government forums. Share where LHI works and what it does, using the 4W format (who, what, where, when), to avoid duplication and fill gaps.
 
 ## Reporting

@@ -56,7 +56,7 @@ Your password protects everything your account can reach. A weak or reused passw
 - Private: never shared with anyone, including colleagues, ICT or your supervisor. ICT will never ask for your password.
 - Stored safely: in a password manager approved by ICT, not on paper stuck to your screen or in a phone note.
 
-## Two-step verification (2SV)
+[!info] Two-step verification (2SV)
 Two-step verification, also called multi-factor authentication, asks for a second proof after your password, such as a code from an authenticator app or a prompt on your phone. Even if someone steals your password, they cannot get in without your phone.
 
 [!warning] Never approve a sign-in you didn't start

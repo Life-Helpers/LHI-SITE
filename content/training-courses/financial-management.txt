@@ -52,7 +52,7 @@ A project budget is a contract with the donor. It sets out how much can be spent
 - Only charge costs that relate to the project and fall within its start and end dates.
 - Shared costs, such as an office used by several projects, are split using an agreed, documented method, never by guesswork.
 
-## Budget versus actual
+[!info] Budget versus actual
 Budget holders review a budget versus actual (BvA) report every month with Finance. It shows, for each line, what was budgeted, what has been spent and what remains.
 
 ## What to watch for
@@ -163,7 +163,7 @@ LHI has zero tolerance for fraud, bribery and corruption. They take aid away fro
 - Beneficiary lists with repeated names, phone numbers or signatures.
 - A staff member who never takes leave or refuses to share their work.
 
-## Conflicts of interest
+[!info] Conflicts of interest
 A conflict of interest arises when your personal interests, or those of family and friends, could influence your work decisions, such as a relative bidding for a contract. Declare it in writing and step back from the decision.
 
 ## Donor compliance

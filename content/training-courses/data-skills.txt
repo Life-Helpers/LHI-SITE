@@ -133,7 +133,7 @@ Most programme questions are answered with simple analysis: how many, what perce
 - Pivot tables: the fastest way to summarise by LGA, sex, age group or month.
 - Change over time: compare with the baseline and the previous period.
 
-## Disaggregate to see who is left out
+[!info] Disaggregate to see who is left out
 Totals can hide gaps. Break results down by sex, age group, disability and location. If 80% of all households received kits but only 45% of households headed by a person with a disability did, the total hides a problem we must act on.
 
 ## Charts that tell the truth

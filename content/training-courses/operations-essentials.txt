@@ -135,7 +135,7 @@ Assets are equipment that lasts beyond a year, such as laptops, phones, generato
 - Asset checks compare the register with what is physically there, at least once a year.
 - Loss, damage or theft is reported straight away, with a police report for theft.
 
-## Disposal
+[!info] Disposal
 Assets are never sold, given away or written off informally. Disposal follows LHI's policy and the donor's rules, with approval and documentation. Donor-funded assets may need to be transferred to partners, the community or another project.
 
 [!info] Your signature matters
@@ -168,7 +168,7 @@ LHI works in places affected by conflict, crime and natural hazards. Security is
 - Keep a low profile: no large amounts of cash, valuables or sensitive documents.
 - Listen to community leaders and local staff about the situation on the day.
 
-## Acceptance
+[!info] Acceptance
 Our best protection is the trust of the communities we serve. Treat people with respect, keep our promises, stay impartial and explain who we are and what we do.
 
 ## If something happens
