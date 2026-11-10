@@ -1,0 +1,72 @@
+name: Build and deploy
+
+# Builds the website's Docker image on GitHub's machines instead of on the server, pushes it to
+# GitHub Container Registry, then tells Coolify to deploy it. The server only downloads the finished
+# image, so a deploy no longer uses its CPU, memory or disk for compiling.
+#
+# Set up once (Settings -> Secrets and variables -> Actions):
+#   Secret   COOLIFY_TOKEN   a Coolify API token (Coolify -> Keys & Tokens -> API tokens, "deploy" access)
+#   Variable COOLIFY_URL     https://app.lhinigeria.org
+#   Variable COOLIFY_APP     the website's resource UUID in Coolify
+#   Variables NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_GA_MEASUREMENT_ID, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+#             NEXT_PUBLIC_TURNSTILE_SITE_KEY  (public values baked into the browser code)
+# Without the Coolify settings the image is still built and pushed, and the deploy step is skipped.
+
+on:
+  push:
+    branches: [life/helpers-initiative]
+  workflow_dispatch:
+
+concurrency:
+  group: build-and-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/life-helpers/lhi-site
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL }}
+            NEXT_PUBLIC_GA_MEASUREMENT_ID=${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
+            NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+            NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          # Reuse layers from earlier builds, so a small change rebuilds in a few minutes.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy on Coolify
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_URL: ${{ vars.COOLIFY_URL }}
+          COOLIFY_APP: ${{ vars.COOLIFY_APP }}
+        run: |
+          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_URL" ] || [ -z "$COOLIFY_APP" ]; then
+            echo "::notice::Coolify settings not set; image pushed, deploy skipped."
+            exit 0
+          fi
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            "$COOLIFY_URL/api/v1/deploy?uuid=$COOLIFY_APP&force=false"

@@ -1,10 +1,12 @@
+# syntax=docker/dockerfile:1
 # LHI website: small production image (Next.js standalone server, ~200 MB RAM at rest).
 # Built and run by docker-compose.yml together with its PostgreSQL database.
 
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+# The npm download cache is kept between builds (BuildKit cache mount), so only changed packages are fetched.
+RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund --prefer-offline
 
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
@@ -19,7 +21,9 @@ ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
 ENV NEXT_TELEMETRY_DISABLED=1 \
     NEXT_BUILD_CPUS=1 \
     NODE_OPTIONS=--max-old-space-size=1536
-RUN npm run build
+# Next.js's compile cache is kept between builds in a BuildKit cache mount: rebuilds only recompile what
+# changed (much less CPU), and the ~650 MB cache never lands in an image layer (less disk).
+RUN --mount=type=cache,target=/app/.next/cache npm run build
 
 FROM node:22-bookworm-slim AS run
 WORKDIR /app
