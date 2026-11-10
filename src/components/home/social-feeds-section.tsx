@@ -23,7 +23,7 @@ function FeedPanel({ name, label, href, children }: { name: string; label: strin
           <span className="sr-only">{name} (opens in a new tab)</span>
         </a>
       </div>
-      <div className="h-[560px] overflow-y-auto">{children}</div>
+      <div className="h-[380px] overflow-y-auto sm:h-[460px] lg:h-[560px]">{children}</div>
     </div>
   );
 }
