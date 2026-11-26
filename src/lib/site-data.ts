@@ -9,6 +9,8 @@ import type { CmsSettings } from "@/lib/cms/schema";
 export interface SiteData {
   contact: CmsSettings["contact"];
   social: CmsSettings["social"];
+  /** The offices with the address text from Settings over the built-in ones. */
+  offices: (typeof siteConfig.offices)[number][];
   popup: CmsSettings["popup"];
   stats: CmsSettings["stats"] & {
     /** States with an LHI office, counted from the map. */
@@ -18,10 +20,12 @@ export interface SiteData {
   };
 }
 
-export function siteDataFrom(settings: Pick<CmsSettings, "contact" | "social" | "stats"> & Partial<Pick<CmsSettings, "popup">>): SiteData {
+export function siteDataFrom(settings: Pick<CmsSettings, "contact" | "social" | "stats"> & Partial<Pick<CmsSettings, "popup" | "offices">>): SiteData {
   return {
     contact: settings.contact,
     social: settings.social,
+    // Only the offices in code are shown (each needs a map position); Settings changes their text.
+    offices: siteConfig.offices.map((o) => ({ ...o, ...settings.offices?.find((e) => e.id === o.id), id: o.id })),
     popup: settings.popup ?? { enabled: true, campaign: "1" },
     stats: { ...settings.stats, statesActive: siteConfig.stats.statesActive, yearsOfService: siteConfig.stats.yearsOfService },
   };

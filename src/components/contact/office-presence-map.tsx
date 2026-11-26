@@ -1,6 +1,6 @@
 "use client";
 
-import { siteConfig } from "@/config/site";
+import type { siteConfig } from "@/config/site";
 import { NIGERIA_VB_H as VB_H, NIGERIA_VB_W as VB_W, NIGERIA_VIEWBOX as VIEWBOX, useNigeriaLocations } from "@/lib/nigeria-map";
 
 export type Office = (typeof siteConfig.offices)[number];
@@ -19,17 +19,16 @@ export function projectToMap({ lat, lng }: { lat: number; lng: number }) {
   };
 }
 
-const OFFICE_STATES = new Set<string>(siteConfig.offices.map((o) => o.mapStateId));
-
-export function OfficePresenceMap({ selectedId, onSelect }: { selectedId: string; onSelect: (id: string) => void }) {
+export function OfficePresenceMap({ offices, selectedId, onSelect }: { offices: Office[]; selectedId: string; onSelect: (id: string) => void }) {
   const locations = useNigeriaLocations();
-  const selected = siteConfig.offices.find((o) => o.id === selectedId);
+  const officeStates = new Set<string>(offices.map((o) => o.mapStateId));
+  const selected = offices.find((o) => o.id === selectedId);
 
   return (
     <div className="relative mx-auto w-full max-w-2xl">
       <svg viewBox={VIEWBOX} className="h-auto w-full" role="img" aria-label="Map of Nigeria showing Life Helpers Initiative's 11 state offices">
         {locations.map((loc) => {
-          const hasOffice = OFFICE_STATES.has(loc.id);
+          const hasOffice = officeStates.has(loc.id);
           const active = selected?.mapStateId === loc.id;
           return (
             <path
@@ -45,7 +44,7 @@ export function OfficePresenceMap({ selectedId, onSelect }: { selectedId: string
         })}
       </svg>
 
-      {siteConfig.offices.map((office) => {
+      {offices.map((office) => {
         const { x, y } = projectToMap(office.geo);
         const active = office.id === selectedId;
         return (

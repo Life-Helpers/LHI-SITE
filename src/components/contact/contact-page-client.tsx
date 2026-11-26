@@ -6,7 +6,6 @@ import { telHref } from "@/lib/site-data";
 import Image from "next/image";
 import { Check, Clock, Copy, Mail, MapPin, Navigation, Phone, ShieldAlert, Building2 } from "lucide-react";
 
-import { siteConfig } from "@/config/site";
 import { ContactForm } from "@/components/contact/contact-form";
 import { africanFulfillmentImages } from "@/data/african-fulfillment-images";
 import { OfficePresenceMap, type Office } from "@/components/contact/office-presence-map";
@@ -124,9 +123,8 @@ function OfficeCard({ office, highlighted, onFocus }: { office: Office; highligh
 }
 
 export function ContactPageClient() {
-  const { contact } = useSiteData();
+  const { contact, offices } = useSiteData();
   const [selectedId, setSelectedId] = useState<string>("sokoto-hq");
-  const offices = siteConfig.offices;
   const selected = offices.find((o) => o.id === selectedId) ?? offices[0];
   const hq = offices.find((o) => o.isPrimary) ?? offices[0];
 
@@ -190,7 +188,7 @@ export function ContactPageClient() {
 
           <div className="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
             <div className="rounded-3xl border border-border bg-card p-4 sm:p-6 lg:col-span-7">
-              <OfficePresenceMap selectedId={selectedId} onSelect={setSelectedId} />
+              <OfficePresenceMap offices={offices} selectedId={selectedId} onSelect={setSelectedId} />
               <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border pt-4 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
                   <span className="flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-accent text-[6px] font-bold text-white shadow">HQ</span>

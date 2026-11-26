@@ -36,7 +36,7 @@ const VALUE_ICONS = { Love: Heart, Honesty: Lock, Inclusion: Users } as const;
 export const revalidate = 300;
 
 export default async function AboutPage() {
-  const [faqs, { stats }] = await Promise.all([getFaqs(), getSiteData()]);
+  const [faqs, { stats, offices }] = await Promise.all([getFaqs(), getSiteData()]);
   const STATS = [
     { value: stats.projects, label: "Projects implemented" },
     { value: stats.peopleReached, label: "People directly reached" },
@@ -191,7 +191,7 @@ export default async function AboutPage() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">Our offices</p>
           <h2 className="mt-2 font-serif-display text-3xl font-light text-foreground">Headquarters in Sokoto, offices in 10 more states</h2>
           <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {siteConfig.offices.map((o) => (
+            {offices.map((o) => (
               <li key={o.id} className="rounded-2xl border border-border bg-card p-5">
                 <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-accent">
                   <MapPin size={12} /> {o.state}

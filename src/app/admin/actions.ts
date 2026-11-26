@@ -34,9 +34,11 @@ import {
   ALL_PERMISSIONS,
   can,
   isCollectionName,
+  OFFICE_TEXT_KEYS,
   REVIEW_STAGES,
   SCORED_TYPES,
   slugify,
+  type CmsOfficeText,
   type CmsSettings,
   type CmsUser,
   type PublicUser,
@@ -536,6 +538,13 @@ export async function saveSettingsAction(settings: CmsSettings): Promise<ActionR
         recruitmentEmail: str(settings.contact.recruitmentEmail, 200),
       },
       social,
+      offices: current.offices.map((was) => {
+        const sent = settings.offices?.find((o) => o.id === was.id);
+        if (!sent) return was;
+        const office = { id: was.id } as CmsOfficeText;
+        for (const key of OFFICE_TEXT_KEYS) office[key] = str(sent[key], key === "address" ? 300 : 120);
+        return office;
+      }),
       stats: {
         peopleReached: str(settings.stats?.peopleReached, 40),
         households: str(settings.stats?.households, 40),

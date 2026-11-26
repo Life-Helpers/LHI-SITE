@@ -272,6 +272,7 @@ export function seedSettings(): CmsSettings {
     },
     contact: { ...DEFAULT_SITE_DATA.contact },
     social: { ...DEFAULT_SITE_DATA.social },
+    offices: DEFAULT_SITE_DATA.offices.map(({ id, type, name, address, city, state, postalCode, phone, email, mapQuery }) => ({ id, type, name, address, city, state, postalCode, phone, email, mapQuery })),
     stats: {
       peopleReached: DEFAULT_SITE_DATA.stats.peopleReached,
       households: DEFAULT_SITE_DATA.stats.households,

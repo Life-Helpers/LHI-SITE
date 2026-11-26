@@ -8,6 +8,11 @@ import { OPERATIONAL_STATES } from "@/data/operational-states";
 import { programHref, THEMATIC_AREA_IDS, THEMATIC_AREA_LIST } from "@/data/thematic-areas";
 import { SAFEGUARDING_CHECKS } from "@/lib/cms/safeguarding";
 import type { HomeTextByLocale } from "@/lib/home-text";
+import type { siteConfig } from "@/config/site";
+
+/** The editable text of one office. */
+export const OFFICE_TEXT_KEYS = ["type", "name", "address", "city", "state", "postalCode", "phone", "email", "mapQuery"] as const;
+export type CmsOfficeText = { id: string } & Pick<(typeof siteConfig.offices)[number], (typeof OFFICE_TEXT_KEYS)[number]>;
 
 /** A role id: one of the built-in roles or a custom role created in Users → Roles. */
 export type Role = string;
@@ -881,6 +886,8 @@ export interface CmsSettings {
     pseaEmail: string;
     recruitmentEmail: string;
   };
+  /** Office addresses on the Contact page, its map and the About page. Pins stay where the map places each office (set in code). */
+  offices: CmsOfficeText[];
   /** Official social media accounts (full https:// links). */
   social: {
     facebook: string;

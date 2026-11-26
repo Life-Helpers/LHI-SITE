@@ -296,6 +296,7 @@ export async function readSettings(): Promise<CmsSettings> {
     nidake: { ...defaults.nidake, ...stored.nidake },
     contact: { ...defaults.contact, ...stored.contact },
     social: { ...defaults.social, ...stored.social },
+    offices: stored.offices ?? defaults.offices,
     stats: { ...defaults.stats, ...stored.stats },
     donations: { ...defaults.donations, ...stored.donations },
     engagement: { ...defaults.engagement, ...stored.engagement },

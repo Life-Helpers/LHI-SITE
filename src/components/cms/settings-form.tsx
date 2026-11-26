@@ -7,7 +7,7 @@ import { Download, ImagePlus, Loader2, Save, X } from "lucide-react";
 import { saveSettingsAction } from "@/app/admin/actions";
 import { MediaPicker } from "@/components/cms/media-picker";
 import { buttonClass, Card, inputClass } from "@/components/cms/ui";
-import type { CmsSettings } from "@/lib/cms/schema";
+import { OFFICE_TEXT_KEYS, type CmsSettings } from "@/lib/cms/schema";
 
 function Row({ label, help, children }: { label: string; help?: string; children: React.ReactNode }) {
   return (
@@ -124,7 +124,38 @@ export function SettingsForm({ initial }: { initial: CmsSettings }) {
         </Row>
       </Card>
 
-      <Card title="Impact figures" bodyClassName="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
+      <Card title="Office addresses" bodyClassName="space-y-3 p-6" className="xl:col-span-2">
+        <p className="text-xs text-admin-muted">Shown on the Contact page, its map and the About page. Open an office to edit it.</p>
+        {s.offices.map((office, i) => {
+          const edit = (key: (typeof OFFICE_TEXT_KEYS)[number], value: string) =>
+            setS((prev) => ({ ...prev, offices: prev.offices.map((o, j) => (j === i ? { ...o, [key]: value } : o)) }));
+          const field = (key: (typeof OFFICE_TEXT_KEYS)[number], label: string, help?: string) => (
+            <Row label={label} help={help}>
+              <input value={office[key]} onChange={(e) => edit(key, e.target.value)} className={inputClass} />
+            </Row>
+          );
+          return (
+            <details key={office.id} className="rounded-lg border border-admin-border">
+              <summary className="cursor-pointer px-4 py-3 text-sm font-semibold">
+                {office.name} <span className="font-normal text-admin-muted">· {office.city}</span>
+              </summary>
+              <div className="grid grid-cols-1 gap-4 border-t border-admin-border p-4 sm:grid-cols-2">
+                {field("name", "Office name")}
+                {field("type", "Label", "e.g. Headquarters (Sokoto - HQ) or State office")}
+                <div className="sm:col-span-2">{field("address", "Street address")}</div>
+                {field("city", "City")}
+                {field("state", "State")}
+                {field("postalCode", "Postal code")}
+                {field("phone", "Phone")}
+                {field("email", "Email")}
+                {field("mapQuery", "Google Maps search", "What the map and Directions button look up. Update it when the address changes.")}
+              </div>
+            </details>
+          );
+        })}
+      </Card>
+
+      <Card title="Impact figures"bodyClassName="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
         <p className="text-xs text-admin-muted sm:col-span-2">
           Shown on the home page, About, Careers, the map and the anniversary pop-up. Use verified organisation-wide totals only. States and years of service
           are counted automatically.
